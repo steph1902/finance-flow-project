@@ -9,7 +9,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](./docs) · [🐛 Report Bug](https://github.com/stephanus/finance-flow/issues) · [✨ Request Feature](https://github.com/stephanus/finance-flow/issues)
+[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues) · [✨ Request Feature](https://github.com/steph1902/finance-flow-project/issues)
 
 ![FinanceFlow Dashboard](./public/screenshots/dashboard.png)
 
@@ -150,3 +150,175 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 - **CI/CD**: GitHub Actions
 
 ### **Architecture**
+- **Monolithic (Next.js App Router)**: Frontend and API routes co-located for simplified deployment and development experience.
+- **Serverless Functions**: Next.js API routes deploy as serverless functions on Vercel, scaling automatically.
+- **Edge Computing**: Leveraging Vercel's Edge Network for fast content delivery.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+- PostgreSQL database (or Supabase account)
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/steph1902/finance-flow-project.git
+cd finance-flow-project
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Setup environment variables:**
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and add your values:
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: From Google Cloud Console
+
+4. **Run database migrations:**
+```bash
+npx prisma migrate dev
+```
+
+5. **Seed database (optional):**
+```bash
+npx prisma db seed
+```
+
+6. **Start development server:**
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) 🎉
+
+---
+
+## 💡 Usage
+
+1. **Sign Up / Log In**: Create an account or use Google OAuth.
+2. **Add Transactions**: Record your income and expenses with categories and descriptions.
+3. **View Dashboard**: Get an overview of your financial health with interactive charts.
+4. **Manage Budgets**: Set and track spending limits for different categories.
+5. **Export Data**: Download your transaction history as a CSV file.
+
+---
+
+## 📚 API Documentation
+
+Detailed API specifications can be found in the [Functional Specification Document (FSD)](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline).
+
+---
+
+## 📁 Project Structure
+
+```
+finance-tracker/
+├── app/
+│   ├── (auth)/ (Authentication routes: login, signup)
+│   ├── (dashboard)/ (Protected routes: dashboard, transactions, budgets, settings)
+│   ├── api/ (Next.js API routes)
+│   ├── layout.tsx (Root layout)
+│   └── page.tsx (Landing page)
+├── components/ (Reusable UI components)
+│   ├── ui/ (Shadcn/ui components)
+│   ├── auth/ (Auth-specific components)
+│   ├── dashboard/ (Dashboard widgets)
+│   ├── transactions/ (Transaction forms, lists)
+│   ├── budgets/ (Budget forms, progress)
+│   └── layout/ (Header, Sidebar)
+├── lib/ (Utility functions, Prisma client, auth helpers)
+├── hooks/ (Custom React hooks for data fetching)
+├── types/ (TypeScript type definitions)
+├── prisma/ (Prisma schema, migrations, seed)
+├── public/ (Static assets: images, screenshots)
+├── .env.local (Environment variables)
+├── .env.example (Example environment variables)
+├── .eslintrc.json (ESLint configuration)
+├── .gitignore (Git ignore rules)
+├── next.config.js (Next.js configuration)
+├── package.json (Project dependencies and scripts)
+├── tailwind.config.ts (TailwindCSS configuration)
+├── tsconfig.json (TypeScript configuration)
+└── README.md (Project overview)
+```
+
+---
+
+## ⚡ Performance
+
+- **Lighthouse Score**: Aiming for 90+ on Performance, Accessibility, Best Practices, and SEO.
+- **Load Time**: <2 seconds on a 3G connection.
+- **Bundle Size**: Optimized for minimal JavaScript and CSS delivery.
+- **Optimistic UI**: Instant feedback for user actions.
+
+---
+
+## 🗺️ Roadmap
+
+### **Phase 1: MVP (Current)**
+- User Authentication (Email/Password, Google OAuth)
+- Transaction CRUD (Create, Read, Update, Delete)
+- Dashboard with Analytics (Charts, Stats)
+- Basic Budget Management
+- Responsive Design & Dark Mode
+
+### **Phase 2: Enhancements**
+- Recurring Transactions
+- Budget Alerts & Notifications
+- Data Export (PDF, Excel)
+- Multi-currency Support
+
+### **Phase 3: Advanced Features**
+- Bank Account Integration (Plaid API)
+- Financial Goal Setting
+- Investment Tracking
+- Mobile Apps (React Native)
+- AI-powered Insights
+
+---
+
+## 🤝 Contributing
+
+This is primarily a portfolio project, but contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/steph1902/finance-flow-project/issues).
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 📧 Contact
+
+Stephanus Sujatmoko
+- Email: stephanus1902@gmail.com
+- Portfolio: [kairos-projects.com](https://kairos-projects.com)
+- LinkedIn: [stephanussujatmoko](https://linkedin.com/in/stephanussujatmoko)
+
+Project Link: [https://github.com/steph1902/finance-flow-project](https://github.com/steph1902/finance-flow-project)
+
+---
+
+## 🙏 Acknowledgments
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Shadcn/ui](https://ui.shadcn.com/)
+- [NextAuth.js Documentation](https://next-auth.js.org/)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Recharts Documentation](https://recharts.org/en-US/api)
