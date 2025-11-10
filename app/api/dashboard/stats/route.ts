@@ -73,6 +73,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
         by: ["category"],
         where: { ...where, type: "EXPENSE" },
         _sum: { amount: true },
+        orderBy: { category: "asc" },
       }),
       prisma.transaction.findMany({
         where,
@@ -108,7 +109,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
   const spendingByCategory = categoryGroup
     .map((item) => ({
       category: item.category,
-      amount: Number(item._sum.amount ?? 0),
+      amount: Number(item._sum?.amount ?? 0),
     }))
     .sort((a, b) => b.amount - a.amount);
 

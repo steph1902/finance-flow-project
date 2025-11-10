@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Transaction, TransactionType } from "@/types";
 
 const formSchema = z.object({
-  amount: z.coerce.number({ invalid_type_error: "Amount must be a number" }).positive("Amount must be greater than 0"),
+  amount: z.number().positive("Amount must be greater than 0"),
   type: z.enum(["INCOME", "EXPENSE"]),
   category: z.string().min(1, "Category is required"),
   description: z.string().max(191).optional().or(z.literal("")),
@@ -68,7 +68,7 @@ export function TransactionForm({
 
   const categories = useMemo(() => {
     const base = getCategoriesForType(selectedType as TransactionType);
-    if (transaction?.category && !base.includes(transaction.category)) {
+    if (transaction?.category && !base.includes(transaction.category as any)) {
       return [transaction.category, ...base];
     }
     return base;

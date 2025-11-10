@@ -28,14 +28,11 @@ export default function LoginForm() {
     setIsLoading(false);
 
     if (result?.error) {
-      toast({
-        title: "Login Failed",
+      toast.error("Login Failed", {
         description: result.error,
-        variant: "destructive",
       });
     } else {
-      toast({
-        title: "Login Successful",
+      toast.success("Login Successful", {
         description: "Redirecting to dashboard...",
       });
       router.push("/dashboard");

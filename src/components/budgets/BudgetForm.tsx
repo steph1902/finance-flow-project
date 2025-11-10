@@ -20,9 +20,9 @@ import type { Budget } from "@/types";
 
 const schema = z.object({
   category: z.string().min(1, "Category is required"),
-  amount: z.coerce.number({ invalid_type_error: "Amount must be a number" }).positive("Amount must be greater than 0"),
-  month: z.coerce.number().min(1).max(12),
-  year: z.coerce.number().min(2000).max(2100),
+  amount: z.number().positive("Amount must be greater than 0"),
+  month: z.number().int().min(1).max(12),
+  year: z.number().int().min(2000).max(2100),
 });
 
 export type BudgetFormValues = z.infer<typeof schema>;

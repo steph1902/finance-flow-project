@@ -35,8 +35,7 @@ export default function SignupForm() {
         throw new Error(data.error || "Signup failed");
       }
 
-      toast({
-        title: "Signup Successful",
+      toast.success("Signup Successful", {
         description: "Redirecting to login...",
       });
 
@@ -49,10 +48,8 @@ export default function SignupForm() {
 
       router.push("/dashboard");
     } catch (error: any) {
-      toast({
-        title: "Signup Failed",
+      toast.error("Signup Failed", {
         description: error.message,
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

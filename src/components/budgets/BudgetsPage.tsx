@@ -47,17 +47,15 @@ export function BudgetsPage() {
     try {
       if (editingBudget) {
         await updateBudget(editingBudget.id, values);
-        toast({ title: "Budget updated" });
+        toast.success("Budget updated");
       } else {
         await createBudget(values);
-        toast({ title: "Budget created" });
+        toast.success("Budget created");
       }
       handleClose();
     } catch (submitError: any) {
-      toast({
-        title: "Unable to save budget",
+      toast.error("Unable to save budget", {
         description: submitError.message,
-        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -70,12 +68,10 @@ export function BudgetsPage() {
 
     try {
       await deleteBudget(budget.id);
-      toast({ title: "Budget deleted" });
+      toast.success("Budget deleted");
     } catch (deleteError: any) {
-      toast({
-        title: "Unable to delete budget",
+      toast.error("Unable to delete budget", {
         description: deleteError.message,
-        variant: "destructive",
       });
     }
   };

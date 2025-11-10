@@ -60,20 +60,18 @@ export function TransactionsPage() {
           ...values,
           date: values.date,
         });
-        toast({ title: "Transaction updated" });
+        toast.success("Transaction updated");
       } else {
         await createTransaction({
           ...values,
           date: values.date,
         });
-        toast({ title: "Transaction created" });
+        toast.success("Transaction created");
       }
       handleCloseDialog();
     } catch (submitError: any) {
-      toast({
-        title: "Unable to save transaction",
+      toast.error("Unable to save transaction", {
         description: submitError.message,
-        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -86,12 +84,10 @@ export function TransactionsPage() {
 
     try {
       await deleteTransaction(transaction.id);
-      toast({ title: "Transaction deleted" });
+      toast.success("Transaction deleted");
     } catch (deleteError: any) {
-      toast({
-        title: "Unable to delete transaction",
+      toast.error("Unable to delete transaction", {
         description: deleteError.message,
-        variant: "destructive",
       });
     }
   };

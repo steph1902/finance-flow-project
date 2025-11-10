@@ -1,4 +1,4 @@
-type RequestOptions = RequestInit & {
+type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: any;
 };
 
