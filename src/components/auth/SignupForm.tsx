@@ -47,9 +47,9 @@ export default function SignupForm() {
       });
 
       router.push("/dashboard");
-    } catch (error: any) {
+    } catch (error) {
       toast.error("Signup Failed", {
-        description: error.message,
+        description: error instanceof Error ? error.message : "An error occurred",
       });
     } finally {
       setIsLoading(false);

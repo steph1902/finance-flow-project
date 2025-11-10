@@ -68,7 +68,7 @@ export function TransactionForm({
 
   const categories = useMemo(() => {
     const base = getCategoriesForType(selectedType as TransactionType);
-    if (transaction?.category && !base.includes(transaction.category as any)) {
+    if (transaction?.category && !(base as readonly string[]).includes(transaction.category)) {
       return [transaction.category, ...base];
     }
     return base;

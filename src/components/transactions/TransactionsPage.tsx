@@ -69,9 +69,9 @@ export function TransactionsPage() {
         toast.success("Transaction created");
       }
       handleCloseDialog();
-    } catch (submitError: any) {
+    } catch (submitError) {
       toast.error("Unable to save transaction", {
-        description: submitError.message,
+        description: submitError instanceof Error ? submitError.message : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -85,9 +85,9 @@ export function TransactionsPage() {
     try {
       await deleteTransaction(transaction.id);
       toast.success("Transaction deleted");
-    } catch (deleteError: any) {
+    } catch (deleteError) {
       toast.error("Unable to delete transaction", {
-        description: deleteError.message,
+        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
       });
     }
   };
@@ -100,9 +100,9 @@ export function TransactionsPage() {
           <p className="text-sm text-muted-foreground">Manage your income and expenses across all categories.</p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : setIsDialogOpen(true))}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
           <DialogTrigger asChild>
-            <Button onClick={handleOpenCreate}>Add transaction</Button>
+            <Button>Add transaction</Button>
           </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>

@@ -53,9 +53,9 @@ export function BudgetsPage() {
         toast.success("Budget created");
       }
       handleClose();
-    } catch (submitError: any) {
+    } catch (submitError) {
       toast.error("Unable to save budget", {
-        description: submitError.message,
+        description: submitError instanceof Error ? submitError.message : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -69,9 +69,9 @@ export function BudgetsPage() {
     try {
       await deleteBudget(budget.id);
       toast.success("Budget deleted");
-    } catch (deleteError: any) {
+    } catch (deleteError) {
       toast.error("Unable to delete budget", {
-        description: deleteError.message,
+        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
       });
     }
   };
@@ -84,9 +84,9 @@ export function BudgetsPage() {
           <p className="text-sm text-muted-foreground">Plan your spending and stay on track with monthly budgets.</p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : setIsDialogOpen(true))}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
           <DialogTrigger asChild>
-            <Button onClick={handleOpen}>Add budget</Button>
+            <Button>Add budget</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
