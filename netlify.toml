@@ -1,0 +1,62 @@
+# Netlify Configuration for FinanceFlow
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Build command - includes Prisma setup and Next.js build
+  command = "npx prisma generate && npx prisma migrate deploy && npm run build"
+  
+  # Directory to publish
+  publish = ".next"
+  
+  # Base directory (leave empty for root)
+  # base = ""
+
+[build.environment]
+  # Node.js version
+  NODE_VERSION = "20"
+  
+  # NPM version (optional)
+  # NPM_VERSION = "10"
+
+# Next.js Plugin Configuration
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirects and rewrites
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Development context (for branch deploys)
+[context.deploy-preview]
+  command = "npx prisma generate && npm run build"
+
+[context.branch-deploy]
+  command = "npx prisma generate && npm run build"
+
+# Production context
+[context.production]
+  command = "npx prisma generate && npx prisma migrate deploy && npm run build"
