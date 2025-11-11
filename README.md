@@ -324,10 +324,10 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📧 Contact
 
-Stephanus Sujatmoko
-- Email: stephanus1902@gmail.com
-- Portfolio: [kairos-projects.com](https://kairos-projects.com)
-- LinkedIn: [stephanussujatmoko](https://linkedin.com/in/stephanussujatmoko)
+Project Maintainer
+- Email: [your-email@example.com]
+- Portfolio: [your-portfolio.com]
+- LinkedIn: [your-linkedin-profile]
 
 Project Link: [https://github.com/steph1902/finance-flow-project](https://github.com/steph1902/finance-flow-project)
 
