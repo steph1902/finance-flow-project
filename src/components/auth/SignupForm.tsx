@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { signIn } from "next-auth/react";
 
 export default function SignupForm() {
   const [name, setName] = useState("");
@@ -39,14 +38,18 @@ export default function SignupForm() {
         description: "Redirecting to login...",
       });
 
-      // Optionally sign in the user after successful signup
-      await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
+      // Auto-login after signup
+      const loginResponse = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      router.push("/dashboard");
+      if (loginResponse.ok) {
+        router.push("/dashboard");
+      } else {
+        router.push("/login");
+      }
     } catch (error) {
       toast.error("Signup Failed", {
         description: error instanceof Error ? error.message : "An error occurred",

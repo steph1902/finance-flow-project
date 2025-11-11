@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -19,30 +18,39 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
+    try {
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    setIsLoading(false);
+      const data = await response.json();
 
-    if (result?.error) {
+      if (!response.ok) {
+        toast.error("Login Failed", {
+          description: data.error || "Invalid credentials",
+        });
+      } else {
+        toast.success("Login Successful", {
+          description: "Redirecting to dashboard...",
+        });
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (error) {
       toast.error("Login Failed", {
-        description: result.error,
+        description: "An error occurred. Please try again.",
       });
-    } else {
-      toast.success("Login Successful", {
-        description: "Redirecting to dashboard...",
-      });
-      router.push("/dashboard");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
-    setIsLoading(false);
+    toast.error("Google Sign-in", {
+      description: "OAuth providers are temporarily disabled",
+    });
   };
 
   return (
