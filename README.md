@@ -4,7 +4,8 @@
 
 ### Modern Personal Finance Management System
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -41,6 +42,14 @@
 **FinanceFlow** is a modern, full-stack personal finance management application that helps users track their income, expenses, and financial goals with beautiful data visualizations and intuitive user experience.
 
 Built as a **portfolio project** to demonstrate production-ready full-stack development skills for **remote opportunities** in the USD/EUR market.
+
+### Project Statistics
+
+- **Total Lines of Code**: ~4,900 lines
+- **Components**: 40+ React components
+- **API Endpoints**: 8 RESTful endpoints
+- **Database Models**: 5 Prisma models
+- **Tech Stack**: 20+ modern technologies
 
 ### Why This Project?
 
@@ -124,30 +133,33 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 ## 🛠️ Tech Stack
 
 ### **Frontend**
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **UI Library**: [React 19](https://react.dev/)
+- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
+- **Styling**: [TailwindCSS 4](https://tailwindcss.com/)
 - **Components**: [Shadcn/ui](https://ui.shadcn.com/)
 - **Charts**: [Recharts](https://recharts.org/)
 - **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 - **State**: [SWR](https://swr.vercel.app/) (Server state)
 - **Icons**: [Lucide React](https://lucide.dev/)
+- **Toasts**: [Sonner](https://sonner.emilkowal.ski/)
 
 ### **Backend**
 - **Runtime**: [Node.js 20](https://nodejs.org/)
 - **API**: Next.js API Routes (REST)
-- **ORM**: [Prisma](https://www.prisma.io/)
+- **ORM**: [Prisma 6](https://www.prisma.io/)
 - **Database**: [PostgreSQL 15](https://www.postgresql.org/)
-- **Auth**: [NextAuth.js](https://next-auth.js.org/)
-- **Validation**: [Zod](https://zod.dev/)
+- **Auth**: [NextAuth.js 4](https://next-auth.js.org/)
+- **Validation**: [Zod 4](https://zod.dev/)
+- **Password Hashing**: [bcrypt](https://www.npmjs.com/package/bcrypt)
 
 ### **DevOps & Tools**
 - **Deployment**: [Vercel](https://vercel.com/)
-- **Database Hosting**: [Supabase](https://supabase.com/)
+- **Database Hosting**: [Supabase](https://supabase.com/) or PostgreSQL
 - **Version Control**: Git & GitHub
-- **Code Quality**: ESLint, Prettier
+- **Code Quality**: ESLint
 - **Testing**: Jest, React Testing Library
-- **CI/CD**: GitHub Actions
+- **Package Manager**: npm
 
 ### **Architecture**
 - **Monolithic (Next.js App Router)**: Frontend and API routes co-located for simplified deployment and development experience.
@@ -160,8 +172,8 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- npm or yarn package manager
+- Node.js 18+ or 20+ installed
+- npm, yarn, or pnpm package manager
 - PostgreSQL database (or Supabase account)
 
 ### Installation
@@ -225,34 +237,42 @@ Detailed API specifications can be found in the [Functional Specification Docume
 ## 📁 Project Structure
 
 ```
-finance-tracker/
+finance-flow-project/
 ├── app/
-│   ├── (auth)/ (Authentication routes: login, signup)
-│   ├── (dashboard)/ (Protected routes: dashboard, transactions, budgets, settings)
-│   ├── api/ (Next.js API routes)
-│   ├── layout.tsx (Root layout)
-│   └── page.tsx (Landing page)
-├── components/ (Reusable UI components)
-│   ├── ui/ (Shadcn/ui components)
-│   ├── auth/ (Auth-specific components)
-│   ├── dashboard/ (Dashboard widgets)
-│   ├── transactions/ (Transaction forms, lists)
-│   ├── budgets/ (Budget forms, progress)
-│   └── layout/ (Header, Sidebar)
-├── lib/ (Utility functions, Prisma client, auth helpers)
-├── hooks/ (Custom React hooks for data fetching)
-├── types/ (TypeScript type definitions)
-├── prisma/ (Prisma schema, migrations, seed)
-├── public/ (Static assets: images, screenshots)
-├── .env.local (Environment variables)
-├── .env.example (Example environment variables)
-├── .eslintrc.json (ESLint configuration)
-├── .gitignore (Git ignore rules)
-├── next.config.js (Next.js configuration)
-├── package.json (Project dependencies and scripts)
-├── tailwind.config.ts (TailwindCSS configuration)
-├── tsconfig.json (TypeScript configuration)
-└── README.md (Project overview)
+│   ├── (auth)/                    # Authentication routes (login, signup)
+│   ├── (dashboard)/               # Protected dashboard routes
+│   ├── api/                       # Next.js API routes
+│   │   ├── auth/                  # Authentication endpoints
+│   │   ├── budgets/               # Budget CRUD endpoints
+│   │   ├── dashboard/             # Dashboard stats endpoint
+│   │   └── transactions/          # Transaction CRUD endpoints
+│   ├── layout.tsx                 # Root layout
+│   └── page.tsx                   # Landing page
+├── src/
+│   ├── components/                # Reusable UI components
+│   │   ├── auth/                  # Auth-specific components
+│   │   ├── budgets/               # Budget components
+│   │   ├── dashboard/             # Dashboard widgets
+│   │   ├── layout/                # Header, Sidebar, Theme
+│   │   ├── transactions/          # Transaction forms, lists
+│   │   └── ui/                    # Shadcn/ui components
+│   ├── constants/                 # App constants (categories, etc.)
+│   ├── hooks/                     # Custom React hooks for data fetching
+│   ├── lib/                       # Utility functions, Prisma client, auth helpers
+│   └── types/                     # TypeScript type definitions
+├── prisma/
+│   ├── migrations/                # Database migrations
+│   └── schema.prisma              # Prisma schema
+├── public/                        # Static assets
+├── project-guideline/             # Project documentation
+├── .env.local                     # Environment variables (not in git)
+├── .env.example                   # Example environment variables
+├── .gitignore                     # Git ignore rules
+├── next.config.ts                 # Next.js configuration
+├── package.json                   # Project dependencies and scripts
+├── tailwind.config.ts             # TailwindCSS configuration
+├── tsconfig.json                  # TypeScript configuration
+└── README.md                      # Project overview
 ```
 
 ---
