@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { TransactionFilters, FilterState } from "@/components/transactions/TransactionFilters";
-import { TransactionForm, TransactionFormValues } from "@/components/transactions/TransactionForm";
+import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -51,7 +51,14 @@ export function TransactionsPage() {
     setEditingTransaction(null);
   };
 
-  const handleSubmit = async (values: TransactionFormValues) => {
+  const handleSubmit = async (values: {
+    amount: number;
+    type: "INCOME" | "EXPENSE";
+    category: string;
+    description?: string;
+    notes?: string;
+    date: string;
+  }) => {
     setIsSubmitting(true);
 
     try {

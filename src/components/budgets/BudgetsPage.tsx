@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { BudgetForm, BudgetFormValues } from "@/components/budgets/BudgetForm";
+import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { BudgetList } from "@/components/budgets/BudgetList";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,7 +42,12 @@ export function BudgetsPage() {
     setEditingBudget(null);
   };
 
-  const handleSubmit = async (values: BudgetFormValues) => {
+  const handleSubmit = async (values: {
+    category: string;
+    amount: number;
+    month: number;
+    year: number;
+  }) => {
     setIsSubmitting(true);
     try {
       if (editingBudget) {

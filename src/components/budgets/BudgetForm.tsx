@@ -20,16 +20,24 @@ import type { Budget } from "@/types";
 
 const schema = z.object({
   category: z.string().min(1, "Category is required"),
-  amount: z.number().positive("Amount must be greater than 0"),
-  month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2000).max(2100),
+  amount: z.string().min(1, "Amount is required").refine(
+    (val) => !isNaN(Number(val)) && Number(val) > 0,
+    "Amount must be greater than 0"
+  ),
+  month: z.string().min(1, "Month is required"),
+  year: z.string().min(1, "Year is required"),
 });
 
 export type BudgetFormValues = z.infer<typeof schema>;
 
 type BudgetFormProps = {
   budget?: Budget;
-  onSubmit: (values: BudgetFormValues) => Promise<void> | void;
+  onSubmit: (values: {
+    category: string;
+    amount: number;
+    month: number;
+    year: number;
+  }) => Promise<void> | void;
   onCancel?: () => void;
   onDelete?: () => Promise<void> | void;
   isSubmitting?: boolean;
@@ -52,9 +60,9 @@ export function BudgetForm({
     resolver: zodResolver(schema),
     defaultValues: {
       category: budget?.category ?? EXPENSE_CATEGORIES[0],
-      amount: budget?.amount ?? 0,
-      month: budget?.month ?? currentDate.getMonth() + 1,
-      year: budget?.year ?? currentYear,
+      amount: budget?.amount?.toString() ?? "",
+      month: budget?.month?.toString() ?? (currentDate.getMonth() + 1).toString(),
+      year: budget?.year?.toString() ?? currentYear.toString(),
     },
   });
 
@@ -63,7 +71,12 @@ export function BudgetForm({
       <form
         className="space-y-4"
         onSubmit={form.handleSubmit(async (values) => {
-          await onSubmit(values);
+          await onSubmit({
+            category: values.category,
+            amount: Number(values.amount),
+            month: Number(values.month),
+            year: Number(values.year),
+          });
         })}
       >
         <FormField
@@ -112,7 +125,7 @@ export function BudgetForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Month</FormLabel>
-                <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value)}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select month" />
@@ -120,7 +133,7 @@ export function BudgetForm({
                   </FormControl>
                   <SelectContent>
                     {Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
-                      <SelectItem key={month} value={String(month)}>
+                      <SelectItem key={month} value={month.toString()}>
                         {new Date(0, month - 1).toLocaleString(undefined, { month: "long" })}
                       </SelectItem>
                     ))}
@@ -137,7 +150,7 @@ export function BudgetForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Year</FormLabel>
-                <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value)}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select year" />
@@ -145,7 +158,7 @@ export function BudgetForm({
                   </FormControl>
                   <SelectContent>
                     {yearOptions.map((year) => (
-                      <SelectItem key={year} value={String(year)}>
+                      <SelectItem key={year} value={year.toString()}>
                         {year}
                       </SelectItem>
                     ))}
