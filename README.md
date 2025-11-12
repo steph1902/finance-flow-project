@@ -10,7 +10,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues) · [✨ Request Feature](https://github.com/steph1902/finance-flow-project/issues)
+[🚀 Live Demo](https://finance-flow-pied-rho.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues) · [✨ Request Feature](https://github.com/steph1902/finance-flow-project/issues)
 
 ![FinanceFlow Dashboard](./public/screenshots/dashboard.png)
 
@@ -398,7 +398,14 @@ Built to demonstrate enterprise-level development skills and modern web developm
 
 ### Live Deployment & Production Metrics
 
-**🌐 Live Application:** [https://finance-flow.vercel.app](https://finance-flow.vercel.app)
+**🌐 Live Application:** [https://finance-flow-pied-rho.vercel.app](https://finance-flow-pied-rho.vercel.app)
+
+**🔑 Demo Account Credentials:**
+```
+Email: demo@financeflow.com
+Password: Demo1234
+```
+*Pre-populated with 38 sample transactions and 8 budget categories for immediate testing*
 
 **Production Statistics:**
 - **Uptime**: 99.9% (Vercel SLA guarantee)
@@ -613,11 +620,23 @@ Built to demonstrate enterprise-level development skills and modern web developm
 
 ## 🎥 Demo & Screenshots
 
-**🌐 Live Demo:** [https://finance-flow.vercel.app](https://finance-flow.vercel.app)
+**🌐 Live Demo:** [https://finance-flow-pied-rho.vercel.app](https://finance-flow-pied-rho.vercel.app)
 
-**🔑 Test Credentials:**
-- **Email**: `demo@financeflow.com`
-- **Password**: `Demo123456`
+**🔑 Demo Account - Try It Now:**
+
+```
+📧 Email: demo@financeflow.com
+🔒 Password: Demo1234
+```
+
+**What's Included in Demo:**
+- ✅ **38 realistic transactions** spanning 3 months (income & expenses)
+- ✅ **8 budget categories** with real spending data
+- ✅ **Interactive charts** showing spending patterns
+- ✅ **Real-time analytics** dashboard with summary cards
+- ✅ **Full CRUD operations** - create, edit, delete transactions and budgets
+
+*No signup required - just login with the demo account and explore all features!*
 
 ### 📸 Visual Showcase
 
@@ -1243,7 +1262,8 @@ Full-Stack Developer | React & Next.js Specialist
 - 🐙 **GitHub**: [@steph1902](https://github.com/steph1902)
 
 **Project Links:**
-- 🚀 **Live Demo**: [https://finance-flow.vercel.app](https://finance-flow.vercel.app)
+- 🚀 **Live Demo**: [https://finance-flow-pied-rho.vercel.app](https://finance-flow-pied-rho.vercel.app)
+- 🔑 **Demo Account**: `demo@financeflow.com` / `Demo1234`
 - 📦 **Repository**: [https://github.com/steph1902/finance-flow-project](https://github.com/steph1902/finance-flow-project)
 - 🐛 **Issues**: [https://github.com/steph1902/finance-flow-project/issues](https://github.com/steph1902/finance-flow-project/issues)
 
