@@ -9,7 +9,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues) · [✨ Request Feature](https://github.com/steph1902/finance-flow-project/issues)
+[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [✨ Quick Start Guide](./QUICK_START.md) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues)
 
 ![FinanceFlow Dashboard](./public/screenshots/dashboard.png)
 
@@ -34,6 +34,11 @@
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgments](#acknowledgments)
+
+---
+
+> 💡 **New!** Looking for what's next or how to market this project?  
+> 📋 [Quick Start Guide](./QUICK_START.md) | 🗺️ [Full Roadmap](./ROADMAP.md) | 📣 [Marketing Strategy](./MARKETING_STRATEGY.md)
 
 ---
 
