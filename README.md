@@ -29,6 +29,7 @@
 - [Project Structure](#project-structure)
 - [Performance](#performance)
 - [Roadmap](#roadmap)
+- [Marketing Strategy](#marketing-strategy)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -268,25 +269,42 @@ finance-tracker/
 
 ## 🗺️ Roadmap
 
-### **Phase 1: MVP (Current)**
+### **Phase 1: MVP (Current)** ✅
 - User Authentication (Email/Password, Google OAuth)
 - Transaction CRUD (Create, Read, Update, Delete)
 - Dashboard with Analytics (Charts, Stats)
 - Basic Budget Management
 - Responsive Design & Dark Mode
 
-### **Phase 2: Enhancements**
+### **Phase 2: Enhancements** 🔄
 - Recurring Transactions
 - Budget Alerts & Notifications
 - Data Export (PDF, Excel)
 - Multi-currency Support
 
-### **Phase 3: Advanced Features**
+### **Phase 3: Advanced Features** 🚀
 - Bank Account Integration (Plaid API)
 - Financial Goal Setting
 - Investment Tracking
 - Mobile Apps (React Native)
 - AI-powered Insights
+
+📋 **[View Detailed Roadmap](./ROADMAP.md)** - Complete feature list with priorities and timelines
+
+---
+
+## 📣 Marketing Strategy
+
+Looking to promote your project or grow your user base? We've created a comprehensive marketing guide covering:
+
+- **LinkedIn Strategy** (Personal vs. Business Pages)
+- **Product Hunt Launch**
+- **Social Media** (Twitter, Reddit)
+- **Content Marketing** (Dev.to, Technical Blogging)
+- **SEO & Growth Tactics**
+- **90-Day Marketing Plan**
+
+📢 **[View Marketing Strategy](./MARKETING_STRATEGY.md)** - Complete guide to marketing your project
 
 ---
 
