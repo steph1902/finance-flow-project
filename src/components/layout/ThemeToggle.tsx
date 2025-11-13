@@ -6,12 +6,23 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * ThemeToggle component with SSR hydration support.
+ * Note: The setState in useEffect pattern here is intentional and required
+ * for proper SSR/hydration with next-themes. This is a well-known pattern
+ * and the warning can be safely ignored for this specific use case.
+ */
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // This is the recommended pattern from next-themes documentation
+    // for avoiding hydration mismatch
+    setMounted(true);
+  }, []);
 
+  // Show a neutral state during SSR/hydration
   if (!mounted) {
     return (
       <Button variant="secondary" size="icon" className="rounded-full" aria-label="Toggle theme">
@@ -20,7 +31,8 @@ export default function ThemeToggle() {
     );
   }
 
-  const isDark = theme === "dark";
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDark = currentTheme === "dark";
 
   return (
     <Button
