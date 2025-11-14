@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { EXPENSE_CATEGORIES, getCategoriesForType, TRANSACTION_TYPE_OPTIONS } from "@/constants/categories";
+import { AILoading } from "@/components/ai/AILoading";
 import { CategorySuggestionCard } from "@/components/ai/CategorySuggestionCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,12 +72,14 @@ export function TransactionForm({
 
   const [aiSuggestion, setAiSuggestion] = useState<CategorySuggestion | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Trigger AI categorization when description changes (for new transactions)
   useEffect(() => {
     if (!transaction && currentDescription && currentDescription.length > 3 && currentAmount > 0) {
       const timer = setTimeout(async () => {
         setIsLoadingAI(true);
+        setAiError(null);
         try {
           const response = await fetch("/api/ai/categorize", {
             method: "POST",
@@ -91,15 +94,26 @@ export function TransactionForm({
           if (response.ok) {
             const data = await response.json();
             setAiSuggestion(data);
+          } else {
+            // Only show error for non-auth errors (auth errors are expected when not logged in)
+            if (response.status !== 401) {
+              const errorData = await response.json().catch(() => ({ error: "Failed to get AI suggestion" }));
+              setAiError(errorData.error || "AI categorization unavailable");
+            }
           }
         } catch (error) {
           console.error("AI categorization error:", error);
+          setAiError("Network error. AI suggestions temporarily unavailable.");
         } finally {
           setIsLoadingAI(false);
         }
       }, 800); // Debounce API calls
 
       return () => clearTimeout(timer);
+    } else {
+      // Clear suggestions when conditions aren't met
+      setAiSuggestion(null);
+      setAiError(null);
     }
   }, [currentDescription, currentAmount, selectedType, transaction]);
 
@@ -233,14 +247,27 @@ export function TransactionForm({
           )}
         />
 
-        {/* AI Category Suggestion */}
-        {aiSuggestion && (
+        {/* AI Category Suggestion - Loading State */}
+        {isLoadingAI && !aiSuggestion && (
+          <AILoading message="AI is analyzing your transaction..." />
+        )}
+
+        {/* AI Category Suggestion - Success State */}
+        {aiSuggestion && !isLoadingAI && (
           <CategorySuggestionCard
             suggestion={aiSuggestion}
             onAccept={handleAcceptSuggestion}
             onReject={() => setAiSuggestion(null)}
-            isLoading={isLoadingAI}
+            isLoading={false}
           />
+        )}
+
+        {/* AI Category Suggestion - Error State */}
+        {aiError && !isLoadingAI && !aiSuggestion && (
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+            <p className="font-medium">AI Suggestion Unavailable</p>
+            <p className="mt-1 text-xs">{aiError}</p>
+          </div>
         )}
 
         <FormField
