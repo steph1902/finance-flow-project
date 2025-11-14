@@ -5,6 +5,71 @@ export interface ChatContext {
   monthlyBudget?: number;
 }
 
+export interface FinancialContext {
+  totalTransactions: number;
+  totalSpending: number;
+  totalIncome: number;
+  spendingByCategory: Record<string, number>;
+  budgets: Array<{
+    category: string;
+    amount: number;
+    period: string;
+  }>;
+  recentTransactions: Array<{
+    amount: number;
+    category: string;
+    description: string;
+    date: string;
+    type: string;
+  }>;
+}
+
+export function getChatPrompt(context: FinancialContext): string {
+  const topCategories = Object.entries(context.spendingByCategory)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([cat, amt]) => `${cat}: $${amt.toFixed(2)}`)
+    .join(", ");
+
+  return `You are a helpful AI financial assistant for Finance Flow app. You help users understand their spending, income, budgets, and provide personalized financial advice.
+
+USER'S FINANCIAL DATA:
+- Total Transactions: ${context.totalTransactions}
+- Total Spending: $${context.totalSpending.toFixed(2)}
+- Total Income: $${context.totalIncome.toFixed(2)}
+- Net: $${(context.totalIncome - context.totalSpending).toFixed(2)}
+- Top Spending Categories: ${topCategories || "No data yet"}
+- Active Budgets: ${context.budgets.length}
+
+RECENT TRANSACTIONS (last 10):
+${context.recentTransactions
+  .map(
+    (t) =>
+      `- ${t.date}: ${t.type} - ${t.category} - $${t.amount} (${t.description})`
+  )
+  .join("\n")}
+
+GUIDELINES:
+- Be conversational, friendly, and helpful
+- Use specific numbers from the user's actual data
+- Provide actionable insights and recommendations
+- Format monetary values with $ symbol
+- Use bullet points for lists
+- Give context (e.g., "Last month you spent $500 on dining")
+- Suggest budget adjustments based on spending patterns
+- Highlight trends (increasing/decreasing spending)
+- Offer savings tips when relevant
+- Ask clarifying questions if the user's question is ambiguous
+
+EXAMPLES:
+- "How much did I spend on dining?" → Check spendingByCategory, provide exact amount with context
+- "What are my top expenses?" → List top categories with amounts
+- "Give me savings tips" → Analyze spending patterns, suggest specific reductions
+- "Am I over budget?" → Compare spending to budgets, provide detailed breakdown
+
+Respond naturally and conversationally. Focus on being helpful and specific.`;
+}
+
 export function createAssistantPrompt(
   userMessage: string,
   context: ChatContext

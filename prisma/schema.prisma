@@ -27,6 +27,8 @@ model User {
   sessions      Session[]
   transactions  Transaction[]
   budgets       Budget[]
+  aiSuggestions AISuggestion[]
+  aiChatHistory AIChatHistory[]
 
   @@map("users")
 }
@@ -125,4 +127,42 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+// ============================================
+// AI MODELS
+// ============================================
+model AISuggestion {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  transactionId   String?   @map("transaction_id") @db.Uuid
+  suggestionType  String    @map("suggestion_type") @db.VarChar(50)
+  suggestedValue  String    @map("suggested_value") @db.Text
+  confidenceScore Decimal?  @map("confidence_score") @db.Decimal(3, 2)
+  accepted        Boolean?
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], map: "ai_suggestions_user_id_fkey")
+
+  @@index([userId], map: "idx_ai_suggestions_user_id")
+  @@index([transactionId], map: "idx_ai_suggestions_transaction_id")
+  @@index([suggestionType], map: "idx_ai_suggestions_type")
+  @@map("ai_suggestions")
+}
+
+model AIChatHistory {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  conversationId String   @map("session_id") @db.Uuid
+  role           String   @map("message_type") @db.VarChar(10)
+  message        String   @map("content") @db.Text
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], map: "ai_chat_history_user_id_fkey")
+
+  @@index([userId], map: "idx_ai_chat_history_user_id")
+  @@index([conversationId], map: "idx_ai_chat_history_session_id")
+  @@map("ai_chat_history")
 }
