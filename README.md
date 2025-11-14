@@ -52,6 +52,13 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 
 ## ✨ Features
 
+### 🤖 **AI-Powered Features** (NEW!)
+- 🎯 Automatic transaction categorization with Gemini AI
+- 💬 Conversational AI financial assistant
+- 📊 Personalized spending insights and recommendations
+- 🧠 Smart suggestions with confidence scoring
+- 💡 Natural language financial queries
+
 ### 🔐 **Authentication & Security**
 - Email + password authentication with bcrypt hashing
 - Google OAuth integration
@@ -124,13 +131,12 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 ## 🛠️ Tech Stack
 
 ### **Frontend**
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router with Turbopack)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [TailwindCSS](https://tailwindcss.com/)
 - **Components**: [Shadcn/ui](https://ui.shadcn.com/)
 - **Charts**: [Recharts](https://recharts.org/)
 - **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
-- **State**: [SWR](https://swr.vercel.app/) (Server state)
 - **Icons**: [Lucide React](https://lucide.dev/)
 
 ### **Backend**
@@ -140,6 +146,7 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 - **Database**: [PostgreSQL 15](https://www.postgresql.org/)
 - **Auth**: [NextAuth.js](https://next-auth.js.org/)
 - **Validation**: [Zod](https://zod.dev/)
+- **AI**: [Google Gemini API](https://ai.google.dev/) (gemini-2.5-flash)
 
 ### **DevOps & Tools**
 - **Deployment**: [Vercel](https://vercel.com/)
@@ -185,7 +192,9 @@ cp .env.example .env.local
 Edit `.env.local` and add your values:
 - `DATABASE_URL`: PostgreSQL connection string
 - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
+- `NEXTAUTH_URL`: http://localhost:3000 (for development)
 - `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: From Google Cloud Console
+- `GOOGLE_GEMINI_API_KEY`: From Google AI Studio (for AI features)
 
 4. **Run database migrations:**
 ```bash
@@ -268,25 +277,49 @@ finance-tracker/
 
 ## 🗺️ Roadmap
 
-### **Phase 1: MVP (Current)**
+### **Phase 1: Backend Foundation** ✅
 - User Authentication (Email/Password, Google OAuth)
 - Transaction CRUD (Create, Read, Update, Delete)
-- Dashboard with Analytics (Charts, Stats)
-- Basic Budget Management
+- Budget Management (Monthly budgets per category)
+- Database Schema & Migrations
+- API Routes with Authentication
+
+### **Phase 2A: Dashboard & UI** ✅
+- Analytics Dashboard (Charts, Stats)
 - Responsive Design & Dark Mode
+- Transaction Filters & Search
+- Budget Progress Tracking
+- Optimistic UI Updates
 
-### **Phase 2: Enhancements**
+### **Phase 2B: AI Integration** ✅ (COMPLETED)
+- **AI Auto-Categorization**: Gemini-powered transaction categorization
+- **Category Suggestions**: Accept/reject AI suggestions with confidence scores
+- **AI Chat Assistant**: Conversational interface for financial questions
+- **Financial Context**: AI responses based on actual transaction/budget data
+- **Conversation Persistence**: Chat history stored in database
+- **Natural Language Queries**: "How much did I spend on dining?" support
+
+**Documentation:**
+- [Phase 1 Complete](./PHASE1_COMPLETE.md)
+- [Phase 2A Complete](./PHASE2A_COMPLETE.md)
+- [Phase 2B Complete](./PHASE2B_COMPLETE.md)
+- [AI Testing Report](./AI_TESTING_REPORT.md)
+
+### **Phase 3: Insights & Analytics** (In Progress)
+- AI-powered spending insights
+- Budget alerts & recommendations
+- Spending trend predictions
+- Category deep-dive analysis
+- Savings goal tracking
+- Month-over-month comparisons
+
+### **Phase 4: Advanced Features** (Planned)
 - Recurring Transactions
-- Budget Alerts & Notifications
-- Data Export (PDF, Excel)
 - Multi-currency Support
-
-### **Phase 3: Advanced Features**
+- Data Export (CSV, PDF, Excel)
 - Bank Account Integration (Plaid API)
-- Financial Goal Setting
 - Investment Tracking
 - Mobile Apps (React Native)
-- AI-powered Insights
 
 ---
 
