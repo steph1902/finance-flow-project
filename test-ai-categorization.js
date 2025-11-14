@@ -50,6 +50,10 @@ async function testAPI() {
   console.log('🧪 Testing AI Categorization API\n');
   console.log('=' .repeat(60));
 
+  // Wait a bit to ensure server is ready
+  console.log('⏳ Waiting for server to be ready...\n');
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   for (const testCase of testCases) {
     console.log(`\n📝 Test: ${testCase.name}`);
     console.log(`   Input: ${testCase.data.description} ($${testCase.data.amount})`);

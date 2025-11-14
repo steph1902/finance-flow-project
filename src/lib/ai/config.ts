@@ -5,6 +5,7 @@ export const AI_CONFIG = {
   maxTokens: parseInt(process.env.AI_MAX_TOKENS || '1000'),
   topP: 0.8,
   topK: 40,
+  autoAcceptThreshold: parseFloat(process.env.AI_AUTO_ACCEPT_THRESHOLD || '0'), // 0 = manual approval required
 } as const;
 
 export const CATEGORIES = {
