@@ -4,8 +4,8 @@
 
 ### Modern Personal Finance Management SaaS Application
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0.1-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -52,7 +52,7 @@ Built to demonstrate enterprise-level development skills and modern web developm
 
 ### Key Highlights
 
-- 🏗️ **Production-Ready Architecture**: Enterprise-grade full-stack application with Next.js 16 App Router
+- 🏗️ **Production-Ready Architecture**: Enterprise-grade full-stack application with Next.js 16.0.1 App Router
 - 📊 **Data-Driven Insights**: Real-time financial analytics with interactive visualizations
 - 🔐 **Secure & Scalable**: Industry-standard authentication, data validation, and optimized database design
 - 🎨 **Premium UX**: Responsive design with dark mode, accessibility features (WCAG AA), and sub-2s load times
@@ -165,27 +165,29 @@ Built to demonstrate enterprise-level development skills and modern web developm
 **Frontend Technologies:**
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| [Next.js](https://nextjs.org/) | 16 | React framework with App Router, SSR, and API routes |
-| [React](https://react.dev/) | 19 | UI library with React Compiler for auto-optimization |
+| [Next.js](https://nextjs.org/) | 16.0.1 | React framework with App Router, SSR, and API routes |
+| [React](https://react.dev/) | 19.2.0 | UI library with React Compiler for auto-optimization |
 | [TypeScript](https://www.typescriptlang.org/) | 5 | Type safety, developer experience, strict mode |
 | [TailwindCSS](https://tailwindcss.com/) | 4 | Utility-first CSS with JIT compilation |
 | [Shadcn/ui](https://ui.shadcn.com/) | Latest | Accessible component library built on Radix UI |
-| [Recharts](https://recharts.org/) | 3 | Responsive SVG-based data visualizations |
-| [React Hook Form](https://react-hook-form.com/) | 7 | Performance-optimized form management |
-| [Zod](https://zod.dev/) | 4 | TypeScript-first schema validation |
-| [SWR](https://swr.vercel.app/) | 2 | Stale-while-revalidate for server state |
-| [Lucide React](https://lucide.dev/) | Latest | Beautiful, consistent icon library |
-| [Sonner](https://sonner.emilkowal.ski/) | 2 | Elegant toast notifications |
+| [Recharts](https://recharts.org/) | 3.3.0 | Responsive SVG-based data visualizations |
+| [React Hook Form](https://react-hook-form.com/) | 7.66.0 | Performance-optimized form management |
+| [Zod](https://zod.dev/) | 4.1.12 | TypeScript-first schema validation |
+| [SWR](https://swr.vercel.app/) | 2.3.6 | Stale-while-revalidate for server state |
+| [Lucide React](https://lucide.dev/) | 0.552.0 | Beautiful, consistent icon library |
+| [Sonner](https://sonner.emilkowal.ski/) | 2.0.7 | Elegant toast notifications |
+| [Framer Motion](https://www.framer.com/motion/) | 12.23.24 | Production-ready animation library |
+| [date-fns](https://date-fns.org/) | 4.1.0 | Modern JavaScript date utility library |
 
 **Backend Technologies:**
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | [Node.js](https://nodejs.org/) | 20 | JavaScript runtime environment |
-| Next.js API Routes | 16 | RESTful API with serverless functions |
-| [Prisma](https://www.prisma.io/) | 6 | Type-safe ORM with migrations and queries |
+| Next.js API Routes | 16.0.1 | RESTful API with serverless functions |
+| [Prisma](https://www.prisma.io/) | 6.18.0 | Type-safe ORM with migrations and queries |
 | [PostgreSQL](https://www.postgresql.org/) | 15 | ACID-compliant relational database |
-| [NextAuth.js](https://next-auth.js.org/) | 4 | Authentication with multiple providers |
-| [bcrypt](https://www.npmjs.com/package/bcrypt) | 6 | Secure password hashing (10 salt rounds) |
+| [Jose](https://github.com/panva/jose) | 6.1.1 | JWT authentication and token signing |
+| [bcrypt](https://www.npmjs.com/package/bcrypt) | 6.0.0 | Secure password hashing (10 salt rounds) |
 
 **DevOps & Infrastructure:**
 | Tool | Purpose |
@@ -228,7 +230,7 @@ Built to demonstrate enterprise-level development skills and modern web developm
        ┌─────────────┴─────────────┐
        ↓                           ↓
 ┌──────────────┐         ┌─────────────────┐
-│ NextAuth.js  │         │   Prisma ORM    │
+│  Jose (JWT)  │         │   Prisma ORM    │
 │ (Auth Layer) │         │ (Data Access)   │
 └──────┬───────┘         └────────┬────────┘
        │                          │
@@ -306,7 +308,7 @@ Built to demonstrate enterprise-level development skills and modern web developm
 
 **4. Secure Authentication System**
 - Email/password authentication with bcrypt hashing (10 salt rounds, industry standard)
-- Google OAuth integration for seamless passwordless login
+- JWT-based authentication using Jose library for token signing and verification
 - JWT-based session management with 7-day expiry
 - Protected API routes with middleware authorization checks
 - CSRF protection on all state-changing operations (POST, PATCH, DELETE)
@@ -499,7 +501,7 @@ Password: Demo1234
 
 - **Multi-Provider Authentication**:
   - Email/password with bcrypt hashing (10 salt rounds, industry standard)
-  - Google OAuth for seamless passwordless login
+  - JWT-based authentication using Jose library
   - JWT-based session management with configurable expiry (7 days default)
   
 - **Security Features**:
@@ -715,33 +717,13 @@ DATABASE_URL="postgresql://user:password@localhost:5432/financeflow"
 # Or use Supabase:
 # DATABASE_URL="postgresql://postgres:[password]@db.[project].supabase.co:5432/postgres"
 
-# NextAuth Configuration
+# JWT Authentication Configuration
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret-key-here"  # Generate: openssl rand -base64 32
-
-# Google OAuth (Optional but Recommended)
-GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
 # Environment
 NODE_ENV="development"
 ```
-
-<details>
-<summary>📝 How to get Google OAuth credentials (click to expand)</summary>
-
-1. Visit [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Navigate to **APIs & Services** → **Credentials**
-4. Click **Create Credentials** → **OAuth 2.0 Client ID**
-5. Configure OAuth consent screen (user type: External)
-6. Set application type to **Web application**
-7. Add authorized redirect URIs:
-   - `http://localhost:3000/api/auth/callback/google` (development)
-   - `https://your-domain.com/api/auth/callback/google` (production)
-8. Copy **Client ID** and **Client Secret** to your `.env.local`
-
-</details>
 
 #### 4️⃣ Database Setup
 
@@ -817,8 +799,8 @@ npx prettier --write .   # Format code with Prettier
 
 **Environment Variables for Production:**
 - Set `NEXTAUTH_URL` to your production domain
-- Update Google OAuth redirect URIs to include production URL
 - Use production `DATABASE_URL` from Supabase or your PostgreSQL host
+- Ensure `NEXTAUTH_SECRET` is a strong, randomly generated value
 
 ---
 
@@ -849,7 +831,7 @@ Comprehensive project documentation is available in the `/project-guideline` dir
 
 **Base URL**: `http://localhost:3000/api` (development) or `https://your-domain.com/api` (production)
 
-**Authentication**: All protected endpoints require valid session cookie (handled by NextAuth.js)
+**Authentication**: All protected endpoints require valid JWT token in HTTP-only cookie
 
 <details>
 <summary>📖 API Endpoints (click to expand)</summary>
@@ -859,7 +841,20 @@ Comprehensive project documentation is available in the `/project-guideline` dir
 **POST /api/auth/signup**
 - Register new user
 - Body: `{ name, email, password }`
-- Returns: `{ success, user }`
+- Returns: `{ success, user, token }`
+
+**POST /api/auth/signin**
+- Login user
+- Body: `{ email, password }`
+- Returns: `{ success, user, token }`
+
+**POST /api/auth/signout**
+- Logout user
+- Returns: `{ success, message }`
+
+**GET /api/auth/session**
+- Get current user session
+- Returns: `{ user }` or `{ error }`
 
 #### Transactions
 
@@ -922,8 +917,14 @@ finance-flow-project/
 │   │   ├── budgets/page.tsx
 │   │   └── layout.tsx
 │   ├── api/                      # API routes
-│   │   ├── auth/[...nextauth]/route.ts
+│   │   ├── auth/signin/route.ts
+│   │   ├── auth/signup/route.ts
+│   │   ├── auth/signout/route.ts
+│   │   ├── auth/session/route.ts
 │   │   ├── transactions/route.ts
+│   │   ├── transactions/[id]/route.ts
+│   │   ├── budgets/route.ts
+│   │   ├── budgets/[id]/route.ts
 │   │   └── dashboard/stats/route.ts
 │   ├── layout.tsx                # Root layout
 │   ├── page.tsx                  # Landing page
@@ -976,15 +977,16 @@ finance-flow-project/
 
 **1. Authentication Complexity**
 
-**Challenge**: Implementing secure authentication with both credentials and OAuth providers while maintaining type safety.
+**Challenge**: Implementing secure authentication with JWT tokens while maintaining type safety and security best practices.
 
 **Solution**: 
-- Used NextAuth.js v4 with custom Prisma adapter for unified auth flow
+- Used Jose library for JWT token signing and verification with HS256 algorithm
 - Implemented proper TypeScript types for session and user objects
 - Added comprehensive error handling for auth edge cases (email already exists, invalid credentials)
 - Configured proper CSRF protection and secure cookie settings
+- Set HTTP-only cookies with 7-day token expiration
 
-**Learning**: NextAuth.js significantly reduces authentication boilerplate, but requires careful configuration for production security (NEXTAUTH_SECRET, proper callback URLs).
+**Learning**: Jose library provides excellent JWT handling for Next.js applications, with proper TypeScript support and security features. Careful configuration is crucial for production security (NEXTAUTH_SECRET, proper cookie settings).
 
 ---
 
@@ -1235,7 +1237,7 @@ finance-flow-project/
 
 **Frontend**: `Next.js` `React` `TypeScript` `TailwindCSS` `Shadcn/ui` `Recharts` `React Hook Form` `Zod` `SWR`
 
-**Backend**: `Node.js` `Next.js API Routes` `Prisma` `PostgreSQL` `NextAuth.js` `bcrypt`
+**Backend**: `Node.js` `Next.js API Routes` `Prisma` `PostgreSQL` `Jose` `JWT` `bcrypt`
 
 **DevOps**: `Vercel` `Supabase` `Git` `GitHub` `ESLint` `Prettier` `Jest`
 
@@ -1287,12 +1289,14 @@ Resources and tools that made this project possible:
 - **[Supabase](https://supabase.com/)** - Open Source Firebase Alternative
 - **[Shadcn/ui](https://ui.shadcn.com/)** - Beautifully Designed Components
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-First CSS Framework
-- **[NextAuth.js](https://next-auth.js.org/)** - Authentication for Next.js
+- **[Jose](https://github.com/panva/jose)** - Universal "JSON Web Almost Everything" library
 - **[Recharts](https://recharts.org/)** - Redefined Chart Library
 - **[Lucide Icons](https://lucide.dev/)** - Beautiful & Consistent Icons
 - **[React Hook Form](https://react-hook-form.com/)** - Performant Forms
 - **[Zod](https://zod.dev/)** - TypeScript-First Schema Validation
 - **[SWR](https://swr.vercel.app/)** - React Hooks for Data Fetching
+- **[Framer Motion](https://www.framer.com/motion/)** - Production-Ready Animation Library
+- **[date-fns](https://date-fns.org/)** - Modern JavaScript Date Utility Library
 
 ---
 
