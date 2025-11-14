@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Package2, Home, DollarSign, Wallet, Settings, MessageSquare } from "lucide-react";
+import { Package2, Home, DollarSign, Wallet, Settings, MessageSquare, Repeat } from "lucide-react";
 
 export default function Sidebar() {
   return (
@@ -32,6 +32,13 @@ export default function Sidebar() {
           >
             <Wallet className="h-4 w-4" />
             Budgets
+          </Link>
+          <Link
+            href="/recurring"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+          >
+            <Repeat className="h-4 w-4" />
+            Recurring
           </Link>
           <Link
             href="/ai-assistant"
