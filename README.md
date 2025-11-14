@@ -299,19 +299,20 @@ finance-tracker/
 - **Conversation Persistence**: Chat history stored in database
 - **Natural Language Queries**: "How much did I spend on dining?" support
 
-**Documentation:**
-- [Phase 1 Complete](./PHASE1_COMPLETE.md)
-- [Phase 2A Complete](./PHASE2A_COMPLETE.md)
-- [Phase 2B Complete](./PHASE2B_COMPLETE.md)
-- [AI Testing Report](./AI_TESTING_REPORT.md)
+### **Phase 3: Insights & Analytics** ✅ (COMPLETED)
+- **AI-Powered Insights Dashboard**: Smart spending analysis on main dashboard
+- **Budget Alerts**: Automatic warnings at 90%+ usage (critical at 100%+)
+- **Spending Trend Analysis**: Week/Month/Quarter comparisons with percentage changes
+- **Category Deep-Dive**: Identify top spending categories with recommendations
+- **Personalized Recommendations**: AI-generated savings tips and advice
+- **Achievement Tracking**: Celebrate spending reductions and milestones
 
-### **Phase 3: Insights & Analytics** (In Progress)
-- AI-powered spending insights
-- Budget alerts & recommendations
-- Spending trend predictions
-- Category deep-dive analysis
-- Savings goal tracking
-- Month-over-month comparisons
+**Documentation:**
+- [Phase 1 Complete](./PHASE1_COMPLETE.md) - Backend foundation
+- [Phase 2A Complete](./PHASE2A_COMPLETE.md) - UI integration (252 lines)
+- [Phase 2B Complete](./PHASE2B_COMPLETE.md) - Chat assistant (481 lines)
+- [Phase 3 Complete](./PHASE3_COMPLETE.md) - Insights dashboard (420 lines)
+- [AI Testing Report](./AI_TESTING_REPORT.md) - Validation results
 
 ### **Phase 4: Advanced Features** (Planned)
 - Recurring Transactions
