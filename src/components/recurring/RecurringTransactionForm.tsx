@@ -167,12 +167,12 @@ export function RecurringTransactionForm({
           value={watchType}
           onValueChange={(value) => setValue("type", value as "INCOME" | "EXPENSE")}
         >
-          <SelectTrigger id="type">
+          <SelectTrigger id="type" aria-label="Select transaction type">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="EXPENSE">Expense</SelectItem>
-            <SelectItem value="INCOME">Income</SelectItem>
+            <SelectItem value="EXPENSE">💸 Expense</SelectItem>
+            <SelectItem value="INCOME">💰 Income</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -187,13 +187,15 @@ export function RecurringTransactionForm({
               id="amount"
               type="number"
               step="0.01"
+              min="0"
               placeholder="0.00"
               className="pl-9"
+              aria-describedby="amount-description"
               {...register("amount")}
             />
           </div>
           {errors.amount && (
-            <p className="text-sm text-destructive">{errors.amount.message}</p>
+            <p className="text-sm text-destructive" role="alert">{errors.amount.message}</p>
           )}
         </div>
 
@@ -203,7 +205,7 @@ export function RecurringTransactionForm({
             value={watch("category")}
             onValueChange={(value) => setValue("category", value)}
           >
-            <SelectTrigger id="category">
+            <SelectTrigger id="category" aria-label="Select category">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
@@ -215,7 +217,7 @@ export function RecurringTransactionForm({
             </SelectContent>
           </Select>
           {errors.category && (
-            <p className="text-sm text-destructive">{errors.category.message}</p>
+            <p className="text-sm text-destructive" role="alert">{errors.category.message}</p>
           )}
         </div>
       </div>
@@ -226,8 +228,13 @@ export function RecurringTransactionForm({
         <Input
           id="description"
           placeholder="e.g., Netflix Subscription, Rent Payment"
+          maxLength={100}
+          aria-describedby="description-hint"
           {...register("description")}
         />
+        <p id="description-hint" className="text-xs text-muted-foreground">
+          Optional: Add a memorable name for this recurring transaction
+        </p>
       </div>
 
       {/* Frequency Selection */}
@@ -250,7 +257,7 @@ export function RecurringTransactionForm({
               }
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Select recurrence frequency">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

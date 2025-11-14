@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRecurringTransactions } from "@/hooks/useRecurringTransactions";
 import { RecurringTransactionForm } from "./RecurringTransactionForm";
 import { RecurringTransactionCard } from "./RecurringTransactionCard";
+import { RecurringTransactionSkeleton } from "./RecurringTransactionSkeleton";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -122,8 +123,35 @@ export function RecurringTransactionsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-9 w-64 bg-muted animate-pulse rounded mb-2" />
+            <div className="h-5 w-48 bg-muted animate-pulse rounded" />
+          </div>
+          <div className="h-10 w-56 bg-muted animate-pulse rounded" />
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-4 border rounded-lg">
+              <div className="h-4 w-32 bg-muted animate-pulse rounded mb-2" />
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="h-10 w-full bg-muted animate-pulse rounded" />
+
+        {/* Transaction Cards Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <RecurringTransactionSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

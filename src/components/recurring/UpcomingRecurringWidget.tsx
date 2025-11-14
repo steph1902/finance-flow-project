@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Repeat, Calendar, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
+interface RecurringTransactionResponse {
+  id: string;
+  amount: string;
+  type: "INCOME" | "EXPENSE";
+  category: string;
+  description?: string | null;
+  frequency: string;
+  nextDate: string;
+  isActive: boolean;
+}
+
 interface UpcomingRecurring {
   id: string;
   amount: number;
@@ -42,17 +53,21 @@ export function UpcomingRecurringWidget() {
       const now = new Date();
       const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-      const upcoming = data.recurringTransactions
-        .filter((t: any) => {
+      const upcoming: UpcomingRecurring[] = data.recurringTransactions
+        .filter((t: RecurringTransactionResponse) => {
           const nextDate = new Date(t.nextDate);
           return t.isActive && nextDate <= sevenDaysFromNow;
         })
-        .map((t: any) => ({
-          ...t,
+        .map((t: RecurringTransactionResponse) => ({
+          id: t.id,
           amount: parseFloat(t.amount),
+          type: t.type,
+          category: t.category,
+          description: t.description ?? undefined,
+          frequency: t.frequency,
           nextDate: new Date(t.nextDate),
         }))
-        .sort((a: any, b: any) => a.nextDate.getTime() - b.nextDate.getTime())
+        .sort((a: UpcomingRecurring, b: UpcomingRecurring) => a.nextDate.getTime() - b.nextDate.getTime())
         .slice(0, 5); // Show only the next 5
 
       setUpcomingTransactions(upcoming);

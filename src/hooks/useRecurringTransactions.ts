@@ -1,5 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 
+// API response type
+interface RecurringTransactionResponse {
+  id: string;
+  amount: string;
+  type: "INCOME" | "EXPENSE";
+  category: string;
+  description?: string | null;
+  notes?: string | null;
+  frequency: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
+  startDate: string;
+  endDate?: string | null;
+  nextDate: string;
+  isActive: boolean;
+  lastGenerated?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface RecurringTransaction {
   id: string;
   amount: number;
@@ -35,10 +53,12 @@ export function useRecurringTransactions() {
 
       const data = await response.json();
       
-      // Parse dates
-      const parsed = data.recurringTransactions.map((t: any) => ({
+      // Parse dates with proper typing
+      const parsed: RecurringTransaction[] = data.recurringTransactions.map((t: RecurringTransactionResponse) => ({
         ...t,
         amount: parseFloat(t.amount),
+        description: t.description ?? undefined,
+        notes: t.notes ?? undefined,
         startDate: new Date(t.startDate),
         endDate: t.endDate ? new Date(t.endDate) : null,
         nextDate: new Date(t.nextDate),

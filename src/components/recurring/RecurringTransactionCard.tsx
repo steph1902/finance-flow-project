@@ -38,8 +38,8 @@ interface RecurringTransactionCardProps {
   isActive: boolean;
   lastGenerated?: Date | null;
   endDate?: Date | null;
-  onToggleActive: (id: string, isActive: boolean) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
+  onToggleActive: (id: string, isActive: boolean) => Promise<void | boolean>;
+  onDelete: (id: string) => Promise<void | boolean>;
   onEdit?: (id: string) => void;
 }
 
