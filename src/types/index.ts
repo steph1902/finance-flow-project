@@ -93,3 +93,47 @@ export type BudgetFilters = {
   year?: number;
 };
 
+// AI-related types
+export type AISuggestion = {
+  id: string;
+  user_id: string;
+  transaction_id?: string;
+  suggestion_type: 'category' | 'insight' | 'recommendation';
+  suggested_value: string;
+  confidence_score: number;
+  accepted?: boolean;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  user_id: string;
+  session_id: string;
+  message_type: 'user' | 'assistant';
+  content: string;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+};
+
+export type CategorySuggestion = {
+  category: string;
+  subcategory?: string;
+  confidence: number;
+  reasoning: string;
+};
+
+export type InsightType = 'spending_alert' | 'trend' | 'recommendation' | 'achievement';
+export type InsightSeverity = 'info' | 'warning' | 'critical';
+
+export type Insight = {
+  type: InsightType;
+  severity: InsightSeverity;
+  title: string;
+  message: string;
+  category?: string;
+  amount?: number;
+  recommendation?: string;
+};
+
