@@ -2,11 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { EXPENSE_CATEGORIES, getCategoriesForType, TRANSACTION_TYPE_OPTIONS } from "@/constants/categories";
+import { CategorySuggestionCard } from "@/components/ai/CategorySuggestionCard";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Transaction, TransactionType } from "@/types";
+import type { CategorySuggestion, Transaction, TransactionType } from "@/types";
 
 const formSchema = z.object({
   amount: z.coerce.number({ invalid_type_error: "Amount must be a number" }).positive("Amount must be greater than 0"),
@@ -65,6 +66,50 @@ export function TransactionForm({
   });
 
   const selectedType = form.watch("type");
+  const currentDescription = form.watch("description");
+  const currentAmount = form.watch("amount");
+
+  const [aiSuggestion, setAiSuggestion] = useState<CategorySuggestion | null>(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+
+  // Trigger AI categorization when description changes (for new transactions)
+  useEffect(() => {
+    if (!transaction && currentDescription && currentDescription.length > 3 && currentAmount > 0) {
+      const timer = setTimeout(async () => {
+        setIsLoadingAI(true);
+        try {
+          const response = await fetch("/api/ai/categorize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              description: currentDescription,
+              amount: currentAmount,
+              type: selectedType,
+            }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setAiSuggestion(data);
+          }
+        } catch (error) {
+          console.error("AI categorization error:", error);
+        } finally {
+          setIsLoadingAI(false);
+        }
+      }, 800); // Debounce API calls
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentDescription, currentAmount, selectedType, transaction]);
+
+  // Handle accepting AI suggestion
+  const handleAcceptSuggestion = () => {
+    if (aiSuggestion) {
+      form.setValue("category", aiSuggestion.category);
+      setAiSuggestion(null);
+    }
+  };
 
   const categories = useMemo(() => {
     const base = getCategoriesForType(selectedType as TransactionType);
@@ -188,10 +233,20 @@ export function TransactionForm({
           )}
         />
 
+        {/* AI Category Suggestion */}
+        {aiSuggestion && (
+          <CategorySuggestionCard
+            suggestion={aiSuggestion}
+            onAccept={handleAcceptSuggestion}
+            onReject={() => setAiSuggestion(null)}
+            isLoading={isLoadingAI}
+          />
+        )}
+
         <FormField
           control={form.control}
           name="notes"
-          render={({ field }) => (
+          render={({ field}) => (
             <FormItem>
               <FormLabel>Notes</FormLabel>
               <FormControl>
