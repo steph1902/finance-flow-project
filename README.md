@@ -72,7 +72,15 @@ Built as a **portfolio project** to demonstrate production-ready full-stack deve
 - 📅 Date-based filtering and search
 - 📊 Pagination for large datasets
 
-### 📊 **Analytics Dashboard**
+### � **Recurring Transactions** (NEW!)
+- 📅 Automate bills, subscriptions, and regular income
+- 6 frequency types: Daily, Weekly, Bi-weekly, Monthly, Quarterly, Yearly
+- ⏸️ Pause/resume without deletion
+- 📊 Monthly income/expense projections
+- 🎯 Dashboard widget for upcoming obligations
+- ✅ Status tracking (Active/Paused/Due/Ended)
+
+### �📊 **Analytics Dashboard**
 - 📈 Real-time financial overview (balance, income, expenses)
 - 🥧 Interactive pie chart (spending by category)
 - 📉 Line chart (spending trends over time)

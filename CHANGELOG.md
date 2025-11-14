@@ -4,7 +4,41 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [Unreleased]
 
-### Added - AI Integration Complete (2025-11-14)
+### Added - Phase 4A: Recurring Transactions (2025-11-14)
+
+**Backend:**
+- RecurringTransaction model with 6 frequency types (DAILY/WEEKLY/BIWEEKLY/MONTHLY/QUARTERLY/YEARLY)
+- Full CRUD API: `/api/recurring-transactions` (list, create) and `/api/recurring-transactions/:id` (get, update, delete)
+- Automatic next-date calculation based on frequency
+- Support for pausing/resuming and optional end dates
+- User ownership validation on all operations
+
+**Frontend:**
+- `RecurringTransactionForm` - Comprehensive form with frequency selector and live next-occurrence preview
+- `RecurringTransactionCard` - Rich display with status badges, relative dates, and quick actions (pause/resume/delete)
+- `RecurringTransactionsPage` - Full management interface at `/recurring` with tabbed navigation
+- `UpcomingRecurringWidget` - Dashboard widget showing next 5 upcoming transactions
+- `useRecurringTransactions` hook - State management for recurring transactions
+
+**Features:**
+- Live preview: "Next occurrence: Friday, December 1, 2025"
+- Status indicators: Active (green), Paused (gray), Due (orange), Ended (gray)
+- Relative dates: "Today", "Tomorrow", "In 3 days", "Overdue"
+- Monthly projections: Auto-calculate income/expenses from all active recurring
+- Tabbed views: All, Active, Upcoming (next 7 days), Due (overdue), Paused
+- Confirmation dialogs for destructive actions
+- Empty states with helpful guidance
+
+**UX Best Practices:**
+- Progressive disclosure (modal forms)
+- Contextual actions (pause/resume on card)
+- Visual hierarchy (icons, colors, badges)
+- Responsive design (2-col grid → 1-col on mobile)
+- Accessibility (ARIA labels, keyboard navigation)
+
+**Files:** 13 files, ~1,850 lines added
+
+### Added - Phase 3: AI Insights Dashboard (2025-11-14)
 
 #### Phase 1: Backend Foundation
 **Infrastructure:**
