@@ -8,6 +8,7 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { SpendingLineChart } from "@/components/dashboard/SpendingLineChart";
 import { SpendingPieChart } from "@/components/dashboard/SpendingPieChart";
 import { AIInsights } from "@/components/ai/AIInsights";
+import { UpcomingRecurringWidget } from "@/components/recurring/UpcomingRecurringWidget";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/hooks/useDashboard";
 
@@ -49,6 +50,8 @@ export function DashboardContent() {
       <DashboardSummary summary={data?.summary} isLoading={isLoading} />
 
       <AIInsights />
+
+      <UpcomingRecurringWidget />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SpendingPieChart data={data?.spendingByCategory ?? []} isLoading={isLoading} />
