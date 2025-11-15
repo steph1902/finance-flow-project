@@ -3,16 +3,25 @@ import { z } from "zod";
 
 import { withApiAuth } from "@/lib/auth-helpers";
 import { generateInsights } from "@/lib/ai/insights-service";
+import { checkAIRateLimit, getRateLimitHeaders } from "@/lib/rate-limiter";
+import { logError } from "@/lib/logger";
 
 const insightsRequestSchema = z.object({
   period: z.enum(["week", "month", "quarter"]).default("month"),
 });
 
-async function handler(req: NextRequest) {
+export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check rate limit
+    if (!checkAIRateLimit(userId)) {
+      const headers = getRateLimitHeaders(userId, 'AI_ENDPOINTS');
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { 
+          status: 429,
+          headers,
+        }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -38,12 +47,10 @@ async function handler(req: NextRequest) {
       );
     }
 
-    console.error("Insights API error:", error);
+    logError("Insights API error", error, { userId });
     return NextResponse.json(
       { error: "Failed to generate insights" },
       { status: 500 }
     );
   }
-}
-
-export const GET = withApiAuth(handler);
+});

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { withApiAuth } from "@/lib/auth-helpers";
 
 const updateRecurringSchema = z.object({
   amount: z.number().positive().optional(),
@@ -15,19 +16,13 @@ const updateRecurringSchema = z.object({
 });
 
 // GET /api/recurring-transactions/[id]
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const id = req.nextUrl.pathname.split("/").pop()!;
 
     const recurringTransaction = await prisma.recurringTransaction.findFirst({
       where: {
-        id: params.id,
+        id,
         userId,
       },
     });
@@ -47,25 +42,18 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});
 
 // PATCH /api/recurring-transactions/[id]
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const id = req.nextUrl.pathname.split("/").pop()!;
     const body = await req.json();
     const validatedData = updateRecurringSchema.parse(body);
 
     // Check ownership
     const existing = await prisma.recurringTransaction.findFirst({
-      where: { id: params.id, userId },
+      where: { id, userId },
     });
 
     if (!existing) {
@@ -76,7 +64,7 @@ export async function PATCH(
     }
 
     const recurringTransaction = await prisma.recurringTransaction.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
@@ -99,22 +87,16 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+});
 
 // DELETE /api/recurring-transactions/[id]
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const DELETE = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const id = req.nextUrl.pathname.split("/").pop()!;
 
     // Check ownership
     const existing = await prisma.recurringTransaction.findFirst({
-      where: { id: params.id, userId },
+      where: { id, userId },
     });
 
     if (!existing) {
@@ -125,7 +107,7 @@ export async function DELETE(
     }
 
     await prisma.recurringTransaction.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
@@ -136,4 +118,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});

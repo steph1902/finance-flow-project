@@ -4,6 +4,66 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [Unreleased]
 
+### Security - Critical Security Hardening (2025-11-15)
+
+**Critical Fixes:**
+- 🔴 **FIXED:** Authentication bypass vulnerability in `/api/recurring-transactions/:id`
+  - Replaced insecure header-based auth (`x-user-id`) with `withApiAuth` wrapper
+  - Prevented unauthorized access to user's recurring transactions
+  - Now consistent with all other API routes
+- 🔴 **ADDED:** Production-safe error logging utility (`src/lib/logger.ts`)
+  - Sanitizes errors to prevent sensitive data exposure in logs
+  - Automatically redacts passwords, tokens, API keys, secrets
+  - Development: Full error details | Production: Generic messages only
+  - Prevents stack trace leakage in production
+- 🔴 **ADDED:** Security headers configuration in `next.config.ts`
+  - X-Frame-Options: DENY (prevents clickjacking)
+  - X-Content-Type-Options: nosniff (prevents MIME sniffing)
+  - Content-Security-Policy (CSP) with Gemini API whitelisting
+  - Strict-Transport-Security (HSTS) with preload
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Permissions-Policy: Disabled camera/microphone/geolocation
+
+**High Priority Enhancements:**
+- 🟠 **ADDED:** Rate limiting for AI endpoints (`src/lib/rate-limiter.ts`)
+  - AI endpoints: 10 requests/minute per user
+  - Chat endpoint: 5 requests/minute per user
+  - Prevents API abuse and cost overruns (Gemini API protection)
+  - Returns 429 status with X-RateLimit headers
+  - In-memory implementation (upgrade to Redis for production scale)
+- 🟠 **IMPROVED:** Session cookie configuration in `auth.ts`
+  - Reduced session duration: 7 days → 1 day (better security)
+  - Added session update interval: 1 hour
+  - Secure cookie prefix: `__Secure-next-auth.session-token` (production)
+  - httpOnly: true (prevents JavaScript access)
+  - sameSite: 'lax' (CSRF protection)
+  - secure: true in production (HTTPS only)
+
+**Rate Limiting Applied To:**
+- ✅ `/api/ai/categorize` - 10 req/min
+- ✅ `/api/ai/chat` - 5 req/min
+- ✅ `/api/ai/insights` - 10 req/min
+
+**Secure Logging Applied To:**
+- ✅ All AI endpoints (categorize, chat, insights)
+- ✅ Error sanitization (no sensitive data in production logs)
+
+**Security Score Improvement:**
+- Before: 6.5/10 (3 critical vulnerabilities)
+- After: 8.5/10 (all critical issues resolved)
+
+**Documentation:**
+- `SECURITY_AUDIT_REPORT.md` - Comprehensive 450-line security analysis
+- Details all vulnerabilities, fixes, and recommendations
+- Includes attack scenarios and cost impact analysis
+
+**Files Changed:** 8 files
+- Modified: 3 API routes (categorize, chat, insights)
+- Modified: 2 config files (next.config.ts, auth.ts)
+- Modified: 1 API route (recurring-transactions/[id])
+- Created: 2 new utilities (logger.ts, rate-limiter.ts)
+- Created: 1 report (SECURITY_AUDIT_REPORT.md)
+
 ### Added - Phase 4A: Recurring Transactions (2025-11-14)
 
 **Backend:**

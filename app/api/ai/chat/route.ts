@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { withApiAuth } from "@/lib/auth-helpers";
 import { chatWithAssistant } from "@/lib/ai/chat-service";
+import { checkChatRateLimit, getRateLimitHeaders } from "@/lib/rate-limiter";
+import { logError } from "@/lib/logger";
 
 const chatRequestSchema = z.object({
   message: z.string().min(1, "Message cannot be empty"),
@@ -19,15 +21,22 @@ const chatRequestSchema = z.object({
     .default([]),
 });
 
-async function handler(req: NextRequest) {
+export const POST = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
+    // Check rate limit
+    if (!checkChatRateLimit(userId)) {
+      const headers = getRateLimitHeaders(userId, 'CHAT_ENDPOINT');
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { 
+          status: 429,
+          headers,
+        }
+      );
+    }
+
     const body = await req.json();
     const { message, conversationHistory } = chatRequestSchema.parse(body);
-
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const response = await chatWithAssistant({
       userId,
@@ -50,12 +59,10 @@ async function handler(req: NextRequest) {
       );
     }
 
-    console.error("Chat API error:", error);
+    logError("Chat API error", error, { userId });
     return NextResponse.json(
       { error: "Failed to process chat message" },
       { status: 500 }
     );
   }
-}
-
-export const POST = withApiAuth(handler);
+});
