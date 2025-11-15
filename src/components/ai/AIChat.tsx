@@ -21,7 +21,8 @@ interface AIChatProps {
   onClose?: () => void;
 }
 
-export function AIChat({ userId: _userId, onClose: _onClose }: AIChatProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function AIChat(_props: AIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",

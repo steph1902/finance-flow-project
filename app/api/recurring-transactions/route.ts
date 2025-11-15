@@ -15,10 +15,6 @@ const createRecurringSchema = z.object({
   endDate: z.string().datetime().optional(),
 });
 
-const updateRecurringSchema = createRecurringSchema.partial().extend({
-  isActive: z.boolean().optional(),
-});
-
 // Calculate next date based on frequency
 function calculateNextDate(currentDate: Date, frequency: string): Date {
   const next = new Date(currentDate);

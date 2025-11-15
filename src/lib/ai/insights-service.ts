@@ -27,9 +27,9 @@ interface PeriodData {
 function getPeriodDates(period: "week" | "month" | "quarter"): PeriodData {
   const now = new Date();
   const endDate = new Date(now);
-  let startDate = new Date(now);
-  let previousEndDate = new Date(now);
-  let previousStartDate = new Date(now);
+  const startDate = new Date(now);
+  const previousEndDate = new Date(now);
+  const previousStartDate = new Date(now);
 
   switch (period) {
     case "week":
@@ -205,10 +205,12 @@ export async function generateInsights({
   }
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function generateFallbackInsights(
   data: any,
   budgets: any[]
 ): Insight[] {
+/* eslint-enable @typescript-eslint/no-explicit-any */
   const insights: Insight[] = [];
 
   // Spending trend insight

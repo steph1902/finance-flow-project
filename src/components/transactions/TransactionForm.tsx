@@ -86,7 +86,7 @@ export function TransactionForm({
 
   // Trigger AI categorization when description changes (for new transactions)
   useEffect(() => {
-    if (!transaction && currentDescription && currentDescription.length > 3 && currentAmount > 0) {
+    if (!transaction && currentDescription && currentDescription.length > 3 && Number(currentAmount) > 0) {
       const timer = setTimeout(async () => {
         setIsLoadingAI(true);
         setAiError(null);
