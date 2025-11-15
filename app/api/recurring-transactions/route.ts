@@ -44,13 +44,8 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
 }
 
 // GET /api/recurring-transactions - List all recurring transactions
-async function handleGet(req: NextRequest) {
+export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const recurringTransactions = await prisma.recurringTransaction.findMany({
       where: { userId },
       orderBy: { nextDate: "asc" },
@@ -64,16 +59,11 @@ async function handleGet(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // POST /api/recurring-transactions - Create new recurring transaction
-async function handlePost(req: NextRequest) {
+export const POST = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
     const validatedData = createRecurringSchema.parse(body);
 
@@ -110,7 +100,4 @@ async function handlePost(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-export const GET = withApiAuth(handleGet);
-export const POST = withApiAuth(handlePost);
+});
