@@ -165,9 +165,18 @@ export function TransactionForm({
             name="amount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Amount</FormLabel>
+                <FormLabel>
+                  Amount <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    placeholder="Enter amount (e.g., 42.50)" 
+                    aria-label="Transaction amount"
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,9 +188,15 @@ export function TransactionForm({
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date</FormLabel>
+                <FormLabel>
+                  Date <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input 
+                    type="date" 
+                    aria-label="Transaction date"
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -195,10 +210,12 @@ export function TransactionForm({
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Type</FormLabel>
+                <FormLabel>
+                  Type <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Transaction type">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                   </FormControl>
@@ -220,10 +237,12 @@ export function TransactionForm({
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>
+                  Category <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Transaction category">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                   </FormControl>
@@ -253,7 +272,11 @@ export function TransactionForm({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Grocery shopping" {...field} />
+                <Input 
+                  placeholder="e.g., Grocery shopping at Whole Foods" 
+                  aria-label="Transaction description"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -288,9 +311,13 @@ export function TransactionForm({
           name="notes"
           render={({ field}) => (
             <FormItem>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel>Notes (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Optional notes" {...field} />
+                <Textarea 
+                  placeholder="Add any additional details or context..."
+                  aria-label="Transaction notes"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
