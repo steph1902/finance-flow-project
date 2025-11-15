@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { 
@@ -27,8 +26,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 export default function SettingsPage() {
-  const { data: session } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
@@ -85,7 +86,7 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <Label>Name</Label>
             <p className="text-sm text-muted-foreground">
-              {session?.user?.name || "Not set"}
+              User Name
             </p>
           </div>
           <div className="space-y-2">
@@ -94,7 +95,7 @@ export default function SettingsPage() {
               Email
             </Label>
             <p className="text-sm text-muted-foreground">
-              {session?.user?.email || "Not set"}
+              user@example.com
             </p>
           </div>
           <Button variant="outline" onClick={() => router.push("/profile")}>
