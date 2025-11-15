@@ -85,17 +85,17 @@ export function BudgetsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Budgets</h1>
-          <p className="text-sm text-muted-foreground">Plan your spending and stay on track with monthly budgets.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Budgets</h1>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Plan your spending and stay on track with monthly budgets.</p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
           <DialogTrigger asChild>
-            <Button>Add budget</Button>
+            <Button size="lg">Add Budget</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{editingBudget ? "Edit budget" : "Create budget"}</DialogTitle>
+              <DialogTitle>{editingBudget ? "Edit Budget" : "Create New Budget"}</DialogTitle>
             </DialogHeader>
             <BudgetForm
               budget={editingBudget ?? undefined}
@@ -103,7 +103,7 @@ export function BudgetsPage() {
               onCancel={handleClose}
               onDelete={editingBudget ? () => handleDelete(editingBudget) : undefined}
               isSubmitting={isSubmitting}
-              submitLabel={editingBudget ? "Update" : "Create"}
+              submitLabel={editingBudget ? "Update Budget" : "Create Budget"}
             />
           </DialogContent>
         </Dialog>
@@ -112,12 +112,12 @@ export function BudgetsPage() {
       <div className="rounded-lg border bg-card p-4 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-1">
-            <Label>Month</Label>
+            <Label htmlFor="budget-month">Filter by Month</Label>
             <Select
               value={String(filters.month ?? "")}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, month: Number(value) }))}
             >
-              <SelectTrigger>
+              <SelectTrigger id="budget-month" aria-label="Select budget month">
                 <SelectValue placeholder="Select month" />
               </SelectTrigger>
               <SelectContent>
@@ -131,12 +131,12 @@ export function BudgetsPage() {
           </div>
 
           <div className="space-y-1">
-            <Label>Year</Label>
+            <Label htmlFor="budget-year">Filter by Year</Label>
             <Select
               value={String(filters.year ?? "")}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, year: Number(value) }))}
             >
-              <SelectTrigger>
+              <SelectTrigger id="budget-year" aria-label="Select budget year">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent>
@@ -150,17 +150,18 @@ export function BudgetsPage() {
           </div>
 
           <div className="space-y-1">
-            <Label>Total budgets</Label>
-            <div className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
-              Track budgets for each expense category to keep spending on target.
+            <Label>Period</Label>
+            <div className="rounded-md border bg-muted/40 p-3 text-sm text-neutral-600 dark:text-neutral-400">
+              {period ? `${period.month}/${period.year}` : "Select a period"}
             </div>
           </div>
         </div>
       </div>
 
       {isError ? (
-        <div className="rounded-lg border border-destructive bg-destructive/5 p-3 text-sm text-destructive">
-          Failed to load budgets: {error?.message}
+        <div className="rounded-lg border border-danger-200 dark:border-danger-900 bg-danger-50 dark:bg-danger-950/30 p-4 text-sm text-danger-700 dark:text-danger-400" role="alert">
+          <p className="font-medium">Failed to load budgets</p>
+          <p className="mt-1">{error?.message}</p>
         </div>
       ) : null}
 

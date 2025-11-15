@@ -4,16 +4,16 @@ import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>Enter your email below to login to your account</CardDescription>
+    <Card className="w-full shadow-xl border-neutral-200 dark:border-neutral-800">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+        <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
       <CardContent>
         <LoginForm />
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="underline">
+          <Link href="/signup" className="font-medium text-primary-600 dark:text-primary-400 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded">
             Sign up
           </Link>
         </div>

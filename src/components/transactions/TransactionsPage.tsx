@@ -103,17 +103,17 @@ export function TransactionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-          <p className="text-sm text-muted-foreground">Manage your income and expenses across all categories.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Transactions</h1>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Manage your income and expenses across all categories.</p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
           <DialogTrigger asChild>
-            <Button>Add transaction</Button>
+            <Button size="lg">Add Transaction</Button>
           </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle>{editingTransaction ? "Edit transaction" : "Add transaction"}</DialogTitle>
+              <DialogTitle>{editingTransaction ? "Edit Transaction" : "Add New Transaction"}</DialogTitle>
             </DialogHeader>
             <TransactionForm
               transaction={editingTransaction ?? undefined}
@@ -121,7 +121,7 @@ export function TransactionsPage() {
               onCancel={handleCloseDialog}
               onDelete={editingTransaction ? () => handleDelete(editingTransaction) : undefined}
               isSubmitting={isSubmitting}
-              submitLabel={editingTransaction ? "Update" : "Create"}
+              submitLabel={editingTransaction ? "Update Transaction" : "Create Transaction"}
             />
           </DialogContent>
         </Dialog>
