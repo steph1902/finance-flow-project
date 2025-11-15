@@ -20,21 +20,21 @@ export default function SignupForm() {
     const newErrors: { name?: string; email?: string; password?: string } = {};
     
     if (!name || name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
+      newErrors.name = "Name must be at least 2 characters long";
     }
     
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = "Please enter a valid email address";
     }
     
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = "Password must be at least 8 characters long";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      newErrors.password = "Password must contain uppercase, lowercase, and number";
+      newErrors.password = "Password must contain uppercase, lowercase, and a number";
     }
     
     setErrors(newErrors);
@@ -62,11 +62,11 @@ export default function SignupForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Signup failed");
+        throw new Error(data.error || "Signup failed. Please try again.");
       }
 
       toast.success("Signup Successful", {
-        description: "Redirecting to login...",
+        description: "Redirecting to your dashboard...",
       });
 
       // Auto-login after signup
@@ -83,7 +83,7 @@ export default function SignupForm() {
       }
     } catch (error) {
       toast.error("Signup Failed", {
-        description: error instanceof Error ? error.message : "An error occurred",
+        description: error instanceof Error ? error.message : "An error occurred. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -91,11 +91,14 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4" noValidate>
       <div className="grid gap-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">
+          Full Name <span className="text-danger-500" aria-hidden="true">*</span>
+        </Label>
         <Input
           id="name"
+          name="name"
           type="text"
           placeholder="John Doe"
           value={name}
@@ -103,44 +106,74 @@ export default function SignupForm() {
             setName(e.target.value);
             if (errors.name) setErrors({ ...errors, name: undefined });
           }}
-          className={errors.name ? "border-red-500" : ""}
+          className={errors.name ? "border-danger-500" : ""}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
+          required
+          autoComplete="name"
         />
-        {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+        {errors.name && (
+          <p id="name-error" className="text-sm text-danger-600 dark:text-danger-400" role="alert">
+            {errors.name}
+          </p>
+        )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">
+          Email <span className="text-danger-500" aria-hidden="true">*</span>
+        </Label>
         <Input
           id="email"
+          name="email"
           type="email"
-          placeholder="m@example.com"
+          placeholder="your@email.com"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
             if (errors.email) setErrors({ ...errors, email: undefined });
           }}
-          className={errors.email ? "border-red-500" : ""}
+          className={errors.email ? "border-danger-500" : ""}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
+          required
+          autoComplete="email"
         />
-        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+        {errors.email && (
+          <p id="email-error" className="text-sm text-danger-600 dark:text-danger-400" role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">
+          Password <span className="text-danger-500" aria-hidden="true">*</span>
+        </Label>
         <Input
           id="password"
+          name="password"
           type="password"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
             if (errors.password) setErrors({ ...errors, password: undefined });
           }}
-          className={errors.password ? "border-red-500" : ""}
+          className={errors.password ? "border-danger-500" : ""}
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "password-error password-hint" : "password-hint"}
+          required
+          autoComplete="new-password"
         />
-        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
-        <p className="text-xs text-muted-foreground">
-          Must be at least 8 characters with uppercase, lowercase, and number
+        {errors.password && (
+          <p id="password-error" className="text-sm text-danger-600 dark:text-danger-400" role="alert">
+            {errors.password}
+          </p>
+        )}
+        <p id="password-hint" className="text-xs text-neutral-600 dark:text-neutral-400">
+          Must be at least 8 characters with uppercase, lowercase, and a number
         </p>
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Signing up..." : "Sign Up"}
+        {isLoading ? "Creating account..." : "Create Account"}
       </Button>
     </form>
   );

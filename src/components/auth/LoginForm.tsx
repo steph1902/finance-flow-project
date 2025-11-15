@@ -21,13 +21,13 @@ export default function LoginForm() {
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = "Please enter a valid email address";
     }
     
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = "Password must be at least 6 characters long";
     }
     
     setErrors(newErrors);
@@ -54,7 +54,7 @@ export default function LoginForm() {
 
       if (!response.ok) {
         toast.error("Login Failed", {
-          description: data.error || "Invalid credentials",
+          description: data.error || "Invalid credentials. Please try again.",
         });
       } else {
         toast.success("Login Successful", {
@@ -65,7 +65,7 @@ export default function LoginForm() {
       }
     } catch {
       toast.error("Login Failed", {
-        description: "An error occurred. Please try again.",
+        description: "An error occurred. Please try again later.",
       });
     } finally {
       setIsLoading(false);
@@ -73,35 +73,57 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4" noValidate>
       <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">
+          Email <span className="text-danger-500" aria-hidden="true">*</span>
+        </Label>
         <Input
           id="email"
+          name="email"
           type="email"
-          placeholder="m@example.com"
+          placeholder="your@email.com"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
             if (errors.email) setErrors({ ...errors, email: undefined });
           }}
-          className={errors.email ? "border-red-500" : ""}
+          className={errors.email ? "border-danger-500" : ""}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
+          required
+          autoComplete="email"
         />
-        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+        {errors.email && (
+          <p id="email-error" className="text-sm text-danger-600 dark:text-danger-400" role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">
+          Password <span className="text-danger-500" aria-hidden="true">*</span>
+        </Label>
         <Input
           id="password"
+          name="password"
           type="password"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
             if (errors.password) setErrors({ ...errors, password: undefined });
           }}
-          className={errors.password ? "border-red-500" : ""}
+          className={errors.password ? "border-danger-500" : ""}
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "password-error" : undefined}
+          required
+          autoComplete="current-password"
         />
-        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+        {errors.password && (
+          <p id="password-error" className="text-sm text-danger-600 dark:text-danger-400" role="alert">
+            {errors.password}
+          </p>
+        )}
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Login"}

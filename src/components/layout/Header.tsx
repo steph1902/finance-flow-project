@@ -35,7 +35,7 @@ export default function Header() {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col w-64 bg-linear-to-br from-neutral-50 via-white to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-primary-950/20">
+        <SheetContent side="left" className="flex flex-col w-64 bg-gradient-to-br from-neutral-50 via-white to-primary-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-primary-950/20">
           <nav className="grid gap-2 text-base font-medium mt-8">
             <Link
               href="/dashboard"
@@ -43,9 +43,9 @@ export default function Header() {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-primary-500 rounded-lg blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                <TrendingUp className="h-7 w-7 text-primary-600 dark:text-primary-400 relative z-10" />
+                <TrendingUp className="h-7 w-7 text-primary-600 dark:text-primary-400 relative z-10" aria-hidden="true" />
               </div>
-              <span className="bg-linear-to-r from-primary-600 to-primary-500 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary-600 to-primary-500 dark:from-primary-400 dark:to-primary-300 bg-clip-text text-transparent">
                 FinanceFlow
               </span>
             </Link>
@@ -58,9 +58,10 @@ export default function Header() {
                   className={cn(
                     "flex items-center gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all",
                     isActive
-                      ? "bg-linear-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                      ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                       : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30"
                   )}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
@@ -72,14 +73,17 @@ export default function Header() {
 
       {/* Search Bar - Hidden on small screens */}
       <div className="hidden md:flex flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+        <form className="relative w-full" role="search" onSubmit={(e) => e.preventDefault()}>
+          <label htmlFor="header-search" className="sr-only">Search transactions</label>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 pointer-events-none" aria-hidden="true" />
           <input
+            id="header-search"
             type="search"
             placeholder="Search transactions..."
+            aria-label="Search transactions"
             className="w-full pl-10 pr-4 py-2 text-sm border border-neutral-200 dark:border-neutral-700 rounded-lg bg-neutral-50 dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
           />
-        </div>
+        </form>
       </div>
 
       {/* Right Section */}
@@ -89,14 +93,15 @@ export default function Header() {
           variant="ghost" 
           size="icon" 
           className="relative hover:bg-primary-50 dark:hover:bg-primary-950/30"
+          aria-label="View notifications"
         >
-          <Bell className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+          <Bell className="h-5 w-5 text-neutral-600 dark:text-neutral-400" aria-hidden="true" />
           <motion.span
             className="absolute top-1.5 right-1.5 h-2 w-2 bg-danger-500 rounded-full"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
+            aria-label="You have unread notifications"
           />
-          <span className="sr-only">Notifications</span>
         </Button>
 
         {/* User Menu */}
@@ -106,11 +111,11 @@ export default function Header() {
               variant="ghost" 
               size="icon" 
               className="rounded-full hover:bg-primary-50 dark:hover:bg-primary-950/30"
+              aria-label="Open user menu"
             >
-              <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-medium text-sm shadow-lg">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-medium text-sm shadow-lg" aria-hidden="true">
                 D
               </div>
-              <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
