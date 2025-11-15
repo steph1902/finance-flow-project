@@ -84,10 +84,12 @@ export function BudgetForm({
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>
+                Category <span className="text-danger-500" aria-hidden="true">*</span>
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Budget category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                 </FormControl>
@@ -109,9 +111,18 @@ export function BudgetForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Monthly budget amount</FormLabel>
+              <FormLabel>
+                Monthly Budget Amount <span className="text-danger-500" aria-hidden="true">*</span>
+              </FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" min="0" {...field} />
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  placeholder="Enter budget amount (e.g., 500.00)"
+                  aria-label="Monthly budget amount"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,10 +135,12 @@ export function BudgetForm({
             name="month"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Month</FormLabel>
+                <FormLabel>
+                  Month <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Budget month">
                       <SelectValue placeholder="Select month" />
                     </SelectTrigger>
                   </FormControl>
@@ -149,10 +162,12 @@ export function BudgetForm({
             name="year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year</FormLabel>
+                <FormLabel>
+                  Year <span className="text-danger-500" aria-hidden="true">*</span>
+                </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Budget year">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                   </FormControl>

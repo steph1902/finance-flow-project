@@ -26,16 +26,16 @@ export function StatsCard({ title, value, description, icon, trend, index = 0 }:
     >
       <Card className="relative overflow-hidden border-neutral-200 dark:border-neutral-800 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 group">
         {/* Background Gradient */}
-        <div className="absolute inset-0 bg-linear-to-br from-primary-50/50 to-transparent dark:from-primary-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-transparent dark:from-primary-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true" />
         
         {/* Decorative Corner */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-br from-primary-100 to-transparent dark:from-primary-900/20 rounded-bl-[100%] opacity-50" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-100 to-transparent dark:from-primary-900/20 rounded-bl-[100%] opacity-50" aria-hidden="true" />
 
         <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
             {title}
           </CardTitle>
-          <div className="p-2 rounded-lg bg-primary-50 dark:bg-primary-950/30 group-hover:scale-110 transition-transform duration-200">
+          <div className="p-2 rounded-lg bg-primary-50 dark:bg-primary-950/30 group-hover:scale-110 transition-transform duration-200" aria-hidden="true">
             {icon}
           </div>
         </CardHeader>
@@ -45,17 +45,20 @@ export function StatsCard({ title, value, description, icon, trend, index = 0 }:
               {value}
             </div>
             {trend && (
-              <div className={`flex items-center gap-1 text-sm font-medium ${
-                trend.isPositive 
-                  ? "text-success-600 dark:text-success-400" 
-                  : "text-danger-600 dark:text-danger-400"
-              }`}>
+              <div 
+                className={`flex items-center gap-1 text-sm font-medium ${
+                  trend.isPositive 
+                    ? "text-success-600 dark:text-success-400" 
+                    : "text-danger-600 dark:text-danger-400"
+                }`}
+                aria-label={`Trend: ${trend.isPositive ? 'up' : 'down'} ${Math.abs(trend.value)} percent`}
+              >
                 {trend.isPositive ? (
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <TrendingDown className="h-4 w-4" />
+                  <TrendingDown className="h-4 w-4" aria-hidden="true" />
                 )}
-                <span>{Math.abs(trend.value)}%</span>
+                <span aria-hidden="true">{Math.abs(trend.value)}%</span>
               </div>
             )}
           </div>

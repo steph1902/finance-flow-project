@@ -8,6 +8,7 @@ import { Menu, LogOut, Settings, HelpCircle, Bell, Search, TrendingUp } from "lu
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -88,6 +89,9 @@ export default function Header() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
         {/* Notifications */}
         <Button 
           variant="ghost" 
