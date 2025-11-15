@@ -2,10 +2,14 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
 
 class GeminiClient {
-  private genAI: GoogleGenerativeAI;
-  private model: GenerativeModel;
+  private genAI: GoogleGenerativeAI | null = null;
+  private model: GenerativeModel | null = null;
 
-  constructor() {
+  private initialize() {
+    if (this.genAI && this.model) {
+      return; // Already initialized
+    }
+
     if (!AI_CONFIG.apiKey) {
       throw new Error('GEMINI_API_KEY is not set in environment variables');
     }
@@ -17,6 +21,12 @@ class GeminiClient {
   }
 
   async generateContent(prompt: string): Promise<string> {
+    this.initialize();
+    
+    if (!this.model) {
+      throw new Error('Gemini client not properly initialized');
+    }
+
     try {
       const result = await this.model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
