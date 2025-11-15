@@ -1,6 +1,7 @@
 import { geminiClient } from "./gemini-client";
 import { getChatPrompt } from "./prompts/assistant";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -111,8 +112,8 @@ export async function chatWithAssistant({
 
     const responseText = aiResponse || "I'm sorry, I couldn't process that request.";
 
-    // Store conversation in database
-    const conversationId = `conv-${userId}-${Date.now()}`;
+    // Store conversation in database - generate UUIDs for database
+    const conversationId = randomUUID();
     
     await Promise.all([
       prisma.aIChatHistory.create({
