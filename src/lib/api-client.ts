@@ -1,5 +1,5 @@
-type RequestOptions = RequestInit & {
-  body?: any;
+type RequestOptions = Omit<RequestInit, 'body'> & {
+  body?: Record<string, unknown> | unknown;
 };
 
 async function parseResponse<T>(response: Response): Promise<T> {

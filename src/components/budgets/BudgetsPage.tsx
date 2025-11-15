@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { BudgetForm, BudgetFormValues } from "@/components/budgets/BudgetForm";
+import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { BudgetList } from "@/components/budgets/BudgetList";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,22 +42,25 @@ export function BudgetsPage() {
     setEditingBudget(null);
   };
 
-  const handleSubmit = async (values: BudgetFormValues) => {
+  const handleSubmit = async (values: {
+    category: string;
+    amount: number;
+    month: number;
+    year: number;
+  }) => {
     setIsSubmitting(true);
     try {
       if (editingBudget) {
         await updateBudget(editingBudget.id, values);
-        toast({ title: "Budget updated" });
+        toast.success("Budget updated");
       } else {
         await createBudget(values);
-        toast({ title: "Budget created" });
+        toast.success("Budget created");
       }
       handleClose();
-    } catch (submitError: any) {
-      toast({
-        title: "Unable to save budget",
-        description: submitError.message,
-        variant: "destructive",
+    } catch (submitError) {
+      toast.error("Unable to save budget", {
+        description: submitError instanceof Error ? submitError.message : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -70,12 +73,10 @@ export function BudgetsPage() {
 
     try {
       await deleteBudget(budget.id);
-      toast({ title: "Budget deleted" });
-    } catch (deleteError: any) {
-      toast({
-        title: "Unable to delete budget",
-        description: deleteError.message,
-        variant: "destructive",
+      toast.success("Budget deleted");
+    } catch (deleteError) {
+      toast.error("Unable to delete budget", {
+        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
       });
     }
   };
@@ -88,9 +89,9 @@ export function BudgetsPage() {
           <p className="text-sm text-muted-foreground">Plan your spending and stay on track with monthly budgets.</p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : setIsDialogOpen(true))}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
           <DialogTrigger asChild>
-            <Button onClick={handleOpen}>Add budget</Button>
+            <Button>Add budget</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>

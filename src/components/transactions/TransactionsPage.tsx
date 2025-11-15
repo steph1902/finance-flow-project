@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { TransactionFilters, FilterState } from "@/components/transactions/TransactionFilters";
-import { TransactionForm, TransactionFormValues } from "@/components/transactions/TransactionForm";
+import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -51,7 +51,14 @@ export function TransactionsPage() {
     setEditingTransaction(null);
   };
 
-  const handleSubmit = async (values: TransactionFormValues) => {
+  const handleSubmit = async (values: {
+    amount: number;
+    type: "INCOME" | "EXPENSE";
+    category: string;
+    description?: string;
+    notes?: string;
+    date: string;
+  }) => {
     setIsSubmitting(true);
 
     try {
@@ -60,20 +67,18 @@ export function TransactionsPage() {
           ...values,
           date: values.date,
         });
-        toast({ title: "Transaction updated" });
+        toast.success("Transaction updated");
       } else {
         await createTransaction({
           ...values,
           date: values.date,
         });
-        toast({ title: "Transaction created" });
+        toast.success("Transaction created");
       }
       handleCloseDialog();
-    } catch (submitError: any) {
-      toast({
-        title: "Unable to save transaction",
-        description: submitError.message,
-        variant: "destructive",
+    } catch (submitError) {
+      toast.error("Unable to save transaction", {
+        description: submitError instanceof Error ? submitError.message : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -86,12 +91,10 @@ export function TransactionsPage() {
 
     try {
       await deleteTransaction(transaction.id);
-      toast({ title: "Transaction deleted" });
-    } catch (deleteError: any) {
-      toast({
-        title: "Unable to delete transaction",
-        description: deleteError.message,
-        variant: "destructive",
+      toast.success("Transaction deleted");
+    } catch (deleteError) {
+      toast.error("Unable to delete transaction", {
+        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
       });
     }
   };
@@ -104,9 +107,9 @@ export function TransactionsPage() {
           <p className="text-sm text-muted-foreground">Manage your income and expenses across all categories.</p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : setIsDialogOpen(true))}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
           <DialogTrigger asChild>
-            <Button onClick={handleOpenCreate}>Add transaction</Button>
+            <Button>Add transaction</Button>
           </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>

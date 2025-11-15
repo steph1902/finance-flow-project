@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const transactionSchema = z.object({
   amount: z.coerce
-    .number({ invalid_type_error: "Amount must be a number" })
+    .number()
     .positive("Amount must be greater than 0"),
   type: z.nativeEnum(TransactionType),
   category: z.string().min(1, "Category is required"),
@@ -17,7 +17,7 @@ export const transactionSchema = z.object({
     .max(2000, "Notes must be 2000 characters or less")
     .optional()
     .nullable(),
-  date: z.coerce.date({ invalid_type_error: "Date is invalid" }),
+  date: z.coerce.date(),
 });
 
 export const transactionUpdateSchema = transactionSchema.partial();
@@ -37,7 +37,7 @@ export const transactionQuerySchema = z.object({
 export const budgetSchema = z.object({
   category: z.string().min(1, "Category is required"),
   amount: z.coerce
-    .number({ invalid_type_error: "Amount must be a number" })
+    .number()
     .positive("Amount must be greater than 0"),
   month: z.coerce.number().int().min(1).max(12),
   year: z.coerce.number().int().min(2000).max(2100),

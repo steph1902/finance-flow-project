@@ -25,11 +25,14 @@ import { Textarea } from "@/components/ui/textarea";
 import type { CategorySuggestion, Transaction, TransactionType } from "@/types";
 
 const formSchema = z.object({
-  amount: z.coerce.number({ invalid_type_error: "Amount must be a number" }).positive("Amount must be greater than 0"),
+  amount: z.string().min(1, "Amount is required").refine(
+    (val) => !isNaN(Number(val)) && Number(val) > 0,
+    "Amount must be greater than 0"
+  ),
   type: z.enum(["INCOME", "EXPENSE"]),
   category: z.string().min(1, "Category is required"),
-  description: z.string().max(191).optional().or(z.literal("")),
-  notes: z.string().max(2000).optional().or(z.literal("")),
+  description: z.string().max(191, "Description must be 191 characters or less").optional().or(z.literal("")),
+  notes: z.string().max(2000, "Notes must be 2000 characters or less").optional().or(z.literal("")),
   date: z.string().min(1, "Date is required"),
 });
 
@@ -37,7 +40,14 @@ export type TransactionFormValues = z.infer<typeof formSchema>;
 
 type TransactionFormProps = {
   transaction?: Transaction;
-  onSubmit: (values: TransactionFormValues) => Promise<void> | void;
+  onSubmit: (values: {
+    amount: number;
+    type: "INCOME" | "EXPENSE";
+    category: string;
+    description?: string;
+    notes?: string;
+    date: string;
+  }) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   onCancel?: () => void;
   isSubmitting?: boolean;
@@ -53,7 +63,7 @@ export function TransactionForm({
   submitLabel = "Save",
 }: TransactionFormProps) {
   const defaultValues: TransactionFormValues = {
-    amount: transaction?.amount ?? 0,
+    amount: transaction?.amount?.toString() ?? "",
     type: transaction?.type ?? "EXPENSE",
     category: transaction?.category ?? EXPENSE_CATEGORIES[0],
     description: transaction?.description ?? "",
@@ -127,7 +137,7 @@ export function TransactionForm({
 
   const categories = useMemo(() => {
     const base = getCategoriesForType(selectedType as TransactionType);
-    if (transaction?.category && !base.includes(transaction.category)) {
+    if (transaction?.category && !(base as readonly string[]).includes(transaction.category)) {
       return [transaction.category, ...base];
     }
     return base;
@@ -138,9 +148,12 @@ export function TransactionForm({
       <form
         onSubmit={form.handleSubmit(async (values) => {
           await onSubmit({
-            ...values,
-            description: values.description?.trim() ? values.description : undefined,
-            notes: values.notes?.trim() ? values.notes : undefined,
+            amount: Number(values.amount),
+            type: values.type,
+            category: values.category,
+            description: values.description?.trim() || undefined,
+            notes: values.notes?.trim() || undefined,
+            date: values.date,
           });
           form.reset();
         })}

@@ -1,10 +1,31 @@
-import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-import { authOptions } from "@/lib/auth";
+const SECRET = new TextEncoder().encode(
+  process.env.NEXTAUTH_SECRET || "your-secret-key-change-this"
+);
 
 export async function getSession() {
-  return getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, SECRET);
+    return {
+      user: {
+        id: payload.id as string,
+        email: payload.email as string,
+        name: payload.name as string,
+      },
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function getCurrentUserId() {
