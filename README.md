@@ -31,7 +31,6 @@
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
 - [Acknowledgments](#acknowledgments)
 
 ---
@@ -40,13 +39,11 @@
 
 **FinanceFlow** is a modern, full-stack personal finance management application that helps users track their income, expenses, and financial goals with beautiful data visualizations and intuitive user experience.
 
-Built as a **portfolio project** to demonstrate production-ready full-stack development skills for **remote opportunities** in the USD/EUR market.
+### Key Highlights
 
-### Why This Project?
-
-- 💡 **Problem**: Manual expense tracking is time-consuming and lacks insights
-- ✅ **Solution**: Automated tracking with visual analytics and budget management
-- 🎓 **Learning**: Demonstrates modern web development practices and architecture
+- 💡 **Problem**: Manual expense tracking is time-consuming and lacks actionable insights
+- ✅ **Solution**: Automated tracking with AI-powered categorization and visual analytics
+- � **Goal**: Demonstrate modern full-stack development practices and scalable architecture
 
 ---
 
@@ -334,7 +331,15 @@ finance-tracker/
 
 ## 🤝 Contributing
 
-This is primarily a portfolio project, but contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/steph1902/finance-flow-project/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/steph1902/finance-flow-project/issues).
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
@@ -344,18 +349,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 📧 Contact
-
-Stephanus Sujatmoko
-- Email: stephanus1902@gmail.com
-- Portfolio: [kairos-projects.com](https://kairos-projects.com)
-- LinkedIn: [stephanussujatmoko](https://linkedin.com/in/stephanussujatmoko)
-
-Project Link: [https://github.com/steph1902/finance-flow-project](https://github.com/steph1902/finance-flow-project)
-
----
-
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
