@@ -72,12 +72,6 @@ export default function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    toast.error("Google Sign-in", {
-      description: "OAuth providers are temporarily disabled",
-    });
-  };
-
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <div className="grid gap-2">
@@ -111,9 +105,6 @@ export default function LoginForm() {
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Login"}
-      </Button>
-      <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading} type="button">
-        Login with Google
       </Button>
     </form>
   );
