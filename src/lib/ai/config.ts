@@ -1,8 +1,8 @@
 export const AI_CONFIG = {
   apiKey: process.env.GEMINI_API_KEY!,
-  model: process.env.AI_MODEL_VERSION || 'gemini-pro',
+  model: process.env.AI_MODEL_VERSION || 'gemini-1.5-flash',
   temperature: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
-  maxTokens: parseInt(process.env.AI_MAX_TOKENS || '1000'),
+  maxTokens: parseInt(process.env.AI_MAX_TOKENS || '2048'),
   topP: 0.8,
   topK: 40,
   autoAcceptThreshold: parseFloat(process.env.AI_AUTO_ACCEPT_THRESHOLD || '0'), // 0 = manual approval required

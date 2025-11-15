@@ -390,138 +390,63 @@ async function main() {
   const recurringTransactions = [
     {
       amount: 1850,
-      type: 'EXPENSE',
+      type: 'EXPENSE' as const,
       category: 'Housing',
       description: 'Monthly rent payment',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      isActive: true,
     },
     {
       amount: 5500,
-      type: 'INCOME',
+      type: 'INCOME' as const,
       category: 'Salary',
       description: 'Monthly salary from Tech Company',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 28),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 28),
+      isActive: true,
     },
     {
       amount: 125,
-      type: 'EXPENSE',
+      type: 'EXPENSE' as const,
       category: 'Transportation',
       description: 'Car insurance premium',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      isActive: true,
     },
     {
       amount: 89,
-      type: 'EXPENSE',
+      type: 'EXPENSE' as const,
       category: 'Healthcare',
       description: '24 Hour Fitness membership',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      isActive: true,
     },
     {
       amount: 85,
-      type: 'EXPENSE',
+      type: 'EXPENSE' as const,
       category: 'Utilities',
       description: 'Internet service - Fiber 1Gbps',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 15),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 15),
+      isActive: true,
     },
     {
       amount: 55,
-      type: 'EXPENSE',
+      type: 'EXPENSE' as const,
       category: 'Utilities',
       description: 'Mobile phone plan',
-      frequency: 'MONTHLY',
+      frequency: 'MONTHLY' as const,
       startDate: new Date(now.getFullYear(), now.getMonth(), 5),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 16.99,
-      type: 'EXPENSE',
-      category: 'Entertainment',
-      description: 'Netflix Premium subscription',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 3),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 14.99,
-      type: 'EXPENSE',
-      category: 'Entertainment',
-      description: 'Spotify Premium subscription',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 5),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 19.99,
-      type: 'EXPENSE',
-      category: 'Entertainment',
-      description: 'YouTube Premium subscription',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 7),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 11.99,
-      type: 'EXPENSE',
-      category: 'Entertainment',
-      description: 'Audible subscription',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 12),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 49,
-      type: 'EXPENSE',
-      category: 'Other',
-      description: 'LinkedIn Learning professional development',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 6),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 85,
-      type: 'EXPENSE',
-      category: 'Other',
-      description: 'Storage unit rental',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 120,
-      type: 'EXPENSE',
-      category: 'Other',
-      description: 'Professional house cleaning service',
-      frequency: 'BIWEEKLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 14),
-      status: 'ACTIVE',
-    },
-    {
-      amount: 500,
-      type: 'EXPENSE',
-      category: 'Other',
-      description: 'Student loan payment',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 10),
-      status: 'PAUSED',
-    },
-    {
-      amount: 200,
-      type: 'INCOME',
-      category: 'Investment',
-      description: 'Rental property income',
-      frequency: 'MONTHLY',
-      startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-      status: 'ACTIVE',
+      nextDate: new Date(now.getFullYear(), now.getMonth() + 1, 5),
+      isActive: true,
     },
   ];
 
@@ -536,51 +461,6 @@ async function main() {
 
   console.log(`✅ Created ${recurringTransactions.length} recurring transactions`);
 
-  // Create AI chat conversations
-  const conversations = [
-    {
-      role: 'USER',
-      content: 'How much did I spend on dining out last month?',
-      createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    },
-    {
-      role: 'AI',
-      content: 'Based on your transaction history, you spent $455 on dining out last month. This includes 8 restaurant visits ranging from quick lunches ($25-45) to fine dining experiences ($95-120). Your largest dining expense was $120 for a birthday dinner celebration.',
-      createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
-    },
-    {
-      role: 'USER',
-      content: 'What are my biggest expense categories?',
-      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    },
-    {
-      role: 'AI',
-      content: 'Your top 3 expense categories this month are: 1) Housing at $1,935 (rent + insurance), 2) Transportation at $843 (gas, insurance, maintenance), and 3) Groceries at $601. Together, these represent about 55% of your total monthly expenses.',
-      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
-    },
-    {
-      role: 'USER',
-      content: 'Am I staying within my budget?',
-      createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    },
-    {
-      role: 'AI',
-      content: 'You\'re doing well! You\'re currently within budget for most categories. However, you\'re at 92% of your Entertainment budget and 88% of your Dining budget. Consider reducing discretionary spending in these areas for the remainder of the month.',
-      createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
-    },
-  ];
-
-  for (const message of conversations) {
-    await prisma.conversation.create({
-      data: {
-        userId: demoUser.id,
-        ...message,
-      },
-    });
-  }
-
-  console.log(`✅ Created ${conversations.length} AI conversation messages`);
-
   console.log('🎉 Seeding completed with extensive demo data!');
   console.log('📊 Demo account details:');
   console.log('   Email: demo@financeflow.com');
@@ -588,174 +468,6 @@ async function main() {
   console.log(`   Transactions: ${transactions.length} (6 months of detailed data)`);
   console.log(`   Budgets: ${budgets.length} active budgets`);
   console.log(`   Recurring: ${recurringTransactions.length} recurring transactions`);
-  console.log(`   AI Chats: ${conversations.length} messages`);
-}
-
-main()
-  .catch((e) => {
-    console.error('❌ Seeding failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
-  
-  const demoUser = await prisma.user.upsert({
-    where: { email: 'demo@financeflow.com' },
-    update: {},
-    create: {
-      email: 'demo@financeflow.com',
-      name: 'Demo User',
-      password: hashedPassword,
-    },
-  });
-
-  console.log('✅ Created demo user:', demoUser.email);
-
-  // Create transactions for the past 3 months
-  const now = new Date();
-  const transactions = [];
-
-  // Income transactions
-  const incomeData = [
-    { amount: 5000, category: 'Salary', description: 'Monthly salary', monthsAgo: 0 },
-    { amount: 5000, category: 'Salary', description: 'Monthly salary', monthsAgo: 1 },
-    { amount: 5000, category: 'Salary', description: 'Monthly salary', monthsAgo: 2 },
-    { amount: 800, category: 'Freelance', description: 'Web development project', monthsAgo: 0 },
-    { amount: 1200, category: 'Freelance', description: 'Consulting work', monthsAgo: 1 },
-    { amount: 150, category: 'Investment', description: 'Stock dividends', monthsAgo: 0 },
-    { amount: 200, category: 'Investment', description: 'Interest income', monthsAgo: 2 },
-  ];
-
-  // Expense transactions
-  const expenseData = [
-    // Housing
-    { amount: 1500, category: 'Housing', description: 'Monthly rent', monthsAgo: 0 },
-    { amount: 1500, category: 'Housing', description: 'Monthly rent', monthsAgo: 1 },
-    { amount: 1500, category: 'Housing', description: 'Monthly rent', monthsAgo: 2 },
-    { amount: 120, category: 'Utilities', description: 'Electricity bill', monthsAgo: 0 },
-    { amount: 110, category: 'Utilities', description: 'Electricity bill', monthsAgo: 1 },
-    { amount: 80, category: 'Utilities', description: 'Water bill', monthsAgo: 0 },
-    
-    // Food
-    { amount: 450, category: 'Groceries', description: 'Weekly groceries', monthsAgo: 0 },
-    { amount: 380, category: 'Groceries', description: 'Weekly groceries', monthsAgo: 1 },
-    { amount: 420, category: 'Groceries', description: 'Weekly groceries', monthsAgo: 2 },
-    { amount: 85, category: 'Dining', description: 'Restaurant dinner', monthsAgo: 0 },
-    { amount: 45, category: 'Dining', description: 'Lunch with colleagues', monthsAgo: 0 },
-    { amount: 120, category: 'Dining', description: 'Weekend brunch', monthsAgo: 1 },
-    
-    // Transportation
-    { amount: 250, category: 'Transportation', description: 'Gas for car', monthsAgo: 0 },
-    { amount: 280, category: 'Transportation', description: 'Gas for car', monthsAgo: 1 },
-    { amount: 60, category: 'Transportation', description: 'Public transit pass', monthsAgo: 0 },
-    { amount: 150, category: 'Transportation', description: 'Car maintenance', monthsAgo: 2 },
-    
-    // Entertainment
-    { amount: 15, category: 'Entertainment', description: 'Netflix subscription', monthsAgo: 0 },
-    { amount: 15, category: 'Entertainment', description: 'Netflix subscription', monthsAgo: 1 },
-    { amount: 75, category: 'Entertainment', description: 'Concert tickets', monthsAgo: 0 },
-    { amount: 45, category: 'Entertainment', description: 'Movie night', monthsAgo: 1 },
-    { amount: 120, category: 'Entertainment', description: 'Gaming subscription', monthsAgo: 2 },
-    
-    // Shopping
-    { amount: 200, category: 'Shopping', description: 'Clothing purchase', monthsAgo: 0 },
-    { amount: 350, category: 'Shopping', description: 'Electronics', monthsAgo: 1 },
-    { amount: 80, category: 'Shopping', description: 'Books and supplies', monthsAgo: 2 },
-    
-    // Health
-    { amount: 150, category: 'Healthcare', description: 'Gym membership', monthsAgo: 0 },
-    { amount: 150, category: 'Healthcare', description: 'Gym membership', monthsAgo: 1 },
-    { amount: 85, category: 'Healthcare', description: 'Doctor visit', monthsAgo: 2 },
-    { amount: 45, category: 'Healthcare', description: 'Pharmacy', monthsAgo: 0 },
-    
-    // Other
-    { amount: 50, category: 'Other', description: 'Haircut', monthsAgo: 0 },
-    { amount: 100, category: 'Other', description: 'Pet supplies', monthsAgo: 1 },
-    { amount: 200, category: 'Other', description: 'Home improvements', monthsAgo: 2 },
-  ];
-
-  // Create income transactions
-  for (const item of incomeData) {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - item.monthsAgo);
-    date.setDate(Math.floor(Math.random() * 28) + 1);
-
-    transactions.push(
-      prisma.transaction.create({
-        data: {
-          userId: demoUser.id,
-          amount: item.amount,
-          type: 'INCOME',
-          category: item.category,
-          description: item.description,
-          date: date,
-        },
-      })
-    );
-  }
-
-  // Create expense transactions
-  for (const item of expenseData) {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - item.monthsAgo);
-    date.setDate(Math.floor(Math.random() * 28) + 1);
-
-    transactions.push(
-      prisma.transaction.create({
-        data: {
-          userId: demoUser.id,
-          amount: item.amount,
-          type: 'EXPENSE',
-          category: item.category,
-          description: item.description,
-          date: date,
-        },
-      })
-    );
-  }
-
-  await Promise.all(transactions);
-  console.log(`✅ Created ${transactions.length} transactions`);
-
-  // Create budgets for current month
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
-
-  const budgets = [
-    { category: 'Housing', amount: 1600 },
-    { category: 'Groceries', amount: 500 },
-    { category: 'Dining', amount: 200 },
-    { category: 'Transportation', amount: 350 },
-    { category: 'Entertainment', amount: 150 },
-    { category: 'Shopping', amount: 300 },
-    { category: 'Healthcare', amount: 200 },
-    { category: 'Utilities', amount: 150 },
-  ];
-
-  for (const budget of budgets) {
-    await prisma.budget.upsert({
-      where: {
-        userId_category_month_year: {
-          userId: demoUser.id,
-          category: budget.category,
-          month: currentMonth,
-          year: currentYear,
-        },
-      },
-      update: {},
-      create: {
-        userId: demoUser.id,
-        category: budget.category,
-        amount: budget.amount,
-        month: currentMonth,
-        year: currentYear,
-      },
-    });
-  }
-
-  console.log(`✅ Created ${budgets.length} budgets`);
-  console.log('🎉 Seeding completed!');
 }
 
 main()

@@ -101,7 +101,13 @@ export async function chatWithAssistant({
       .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.parts[0].text}`)
       .join("\n")}`;
 
-    const aiResponse = await geminiClient.generateContent(fullPrompt);
+    let aiResponse: string;
+    try {
+      aiResponse = await geminiClient.generateContentWithRetry(fullPrompt);
+    } catch (aiError) {
+      console.error("Gemini API error:", aiError);
+      aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";
+    }
 
     const responseText = aiResponse || "I'm sorry, I couldn't process that request.";
 
