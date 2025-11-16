@@ -4,6 +4,7 @@ import { Edit, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/formatters";
 import type { Budget } from "@/types";
 
 type BudgetListProps = {
@@ -11,11 +12,6 @@ type BudgetListProps = {
   onEdit: (budget: Budget) => void;
   onDelete: (budget: Budget) => void;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 function ProgressBar({ value }: { value: number }) {
   return (
@@ -59,18 +55,18 @@ export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
                 </span>
               </div>
               <CardDescription>Monthly budget limit</CardDescription>
-              <div className="text-2xl font-semibold">{currencyFormatter.format(budget.amount)}</div>
+              <div className="text-2xl font-semibold">{formatCurrency(budget.amount)}</div>
             </CardHeader>
 
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Spent</span>
-                <span className={`font-medium ${statusColor}`}>{currencyFormatter.format(spent)}</span>
+                <span className={`font-medium ${statusColor}`}>{formatCurrency(spent)}</span>
               </div>
               <ProgressBar value={progress} />
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>Remaining</span>
-                <span className="font-medium text-foreground">{currencyFormatter.format(remaining)}</span>
+                <span className="font-medium text-foreground">{formatCurrency(remaining)}</span>
               </div>
             </CardContent>
 

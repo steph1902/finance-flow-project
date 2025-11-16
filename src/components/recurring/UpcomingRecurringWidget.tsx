@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/formatters";
 import { Repeat, Calendar, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { logError } from "@/lib/logger";
 
@@ -78,13 +79,6 @@ export function UpcomingRecurringWidget() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
   };
 
   const formatRelativeDate = (date: Date) => {

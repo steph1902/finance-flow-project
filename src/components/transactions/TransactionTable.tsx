@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/formatters";
 import type { Transaction } from "@/types";
 import { motion } from "framer-motion";
 
@@ -19,11 +20,6 @@ type TransactionTableProps = {
   onEdit: (transaction: Transaction) => void;
   onDelete: (transaction: Transaction) => void;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
   return (
@@ -55,7 +51,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
             </TableRow>
           ) : (
             transactions.map((transaction, index) => {
-              const amount = currencyFormatter.format(transaction.amount);
+              const amount = formatCurrency(transaction.amount);
               const formattedDate = format(new Date(transaction.date), "PPP");
 
               return (

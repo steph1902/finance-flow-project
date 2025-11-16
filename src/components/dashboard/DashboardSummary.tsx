@@ -2,12 +2,8 @@
 
 import { CreditCard, DollarSign, TrendingDown, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
+import { formatCurrency } from "@/lib/formatters";
 import type { DashboardSummary as DashboardSummaryType } from "@/types";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 type DashboardSummaryProps = {
   summary?: DashboardSummaryType;
@@ -42,7 +38,7 @@ export function DashboardSummary({ summary, isLoading = false }: DashboardSummar
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         title="Total Balance"
-        value={currencyFormatter.format(summary.totalBalance)}
+        value={formatCurrency(summary.totalBalance)}
         description="Income minus expenses"
         icon={<DollarSign className="h-5 w-5 text-primary-600 dark:text-primary-400" />}
         trend={balanceTrend}
@@ -50,7 +46,7 @@ export function DashboardSummary({ summary, isLoading = false }: DashboardSummar
       />
       <StatsCard
         title="Total Income"
-        value={currencyFormatter.format(summary.totalIncome)}
+        value={formatCurrency(summary.totalIncome)}
         description="Total income for period"
         icon={<TrendingUp className="h-5 w-5 text-success-600 dark:text-success-400" />}
         trend={incomeTrend}
@@ -58,7 +54,7 @@ export function DashboardSummary({ summary, isLoading = false }: DashboardSummar
       />
       <StatsCard
         title="Total Expenses"
-        value={currencyFormatter.format(summary.totalExpenses)}
+        value={formatCurrency(summary.totalExpenses)}
         description="Total spending for period"
         icon={<TrendingDown className="h-5 w-5 text-danger-600 dark:text-danger-400" />}
         trend={expensesTrend}

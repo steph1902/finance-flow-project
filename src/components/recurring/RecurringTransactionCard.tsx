@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency, formatDate } from "@/lib/formatters";
 import { 
   Repeat, 
   Calendar, 
@@ -94,21 +95,6 @@ export function RecurringTransactionCard({
 
   const isOverdue = nextDate <= new Date() && isActive;
   const hasEnded = endDate ? endDate < new Date() : false;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
-  };
 
   const formatRelativeDate = (date: Date) => {
     const now = new Date();

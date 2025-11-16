@@ -5,6 +5,7 @@ import { useRecurringTransactions } from "@/hooks/useRecurringTransactions";
 import { RecurringTransactionForm } from "./RecurringTransactionForm";
 import { RecurringTransactionCard } from "./RecurringTransactionCard";
 import { RecurringTransactionSkeleton } from "./RecurringTransactionSkeleton";
+import { formatCurrency } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -113,13 +114,6 @@ export function RecurringTransactionsPage() {
       }
       return sum + monthlyAmount;
     }, 0);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
 
   if (isLoading) {
     return (

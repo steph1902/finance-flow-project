@@ -3,17 +3,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, TrendingUp, Wallet } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 import type { Budget } from "@/types";
 
 type BudgetProgressProps = {
   budgets: Array<Budget & { spent?: number; remaining?: number; progress?: number }>;
   isLoading?: boolean;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressProps) {
   // Only show top 5 budgets by progress percentage
@@ -105,16 +101,16 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-600 dark:text-neutral-400">
-                      Spent: <span className="font-medium text-neutral-900 dark:text-white">{currencyFormatter.format(budget.spent)}</span>
+                      Spent: <span className="font-medium text-neutral-900 dark:text-white">{formatCurrency(budget.spent)}</span>
                     </span>
                     <span className="text-neutral-600 dark:text-neutral-400">
-                      of <span className="font-medium">{currencyFormatter.format(budget.amount)}</span>
+                      of <span className="font-medium">{formatCurrency(budget.amount)}</span>
                     </span>
                   </div>
                   {remaining === 0 && progress >= 100 && (
                     <div className="text-xs text-danger-600 dark:text-danger-400 font-medium flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
-                      Budget exceeded by {currencyFormatter.format(budget.spent - budget.amount)}
+                      Budget exceeded by {formatCurrency(budget.spent - budget.amount)}
                     </div>
                   )}
                 </motion.div>
