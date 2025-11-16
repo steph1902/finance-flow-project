@@ -1,0 +1,360 @@
+<div align="center">
+
+# 💰 FinanceFlow
+
+### Modern Personal Finance Management System
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+[🚀 Live Demo](https://finance-flow.vercel.app) · [📖 Documentation](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline) · [🐛 Report Bug](https://github.com/steph1902/finance-flow-project/issues) · [✨ Request Feature](https://github.com/steph1902/finance-flow-project/issues)
+
+![FinanceFlow Dashboard](./public/screenshots/dashboard.png)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [About](#about)
+- [Features](#features)
+- [Demo](#demo)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Performance](#performance)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+---
+
+## 🎯 About
+
+**FinanceFlow** is a modern, full-stack personal finance management application that helps users track their income, expenses, and financial goals with beautiful data visualizations and intuitive user experience.
+
+### Key Highlights
+
+- 💡 **Problem**: Manual expense tracking is time-consuming and lacks actionable insights
+- ✅ **Solution**: Automated tracking with AI-powered categorization and visual analytics
+- � **Goal**: Demonstrate modern full-stack development practices and scalable architecture
+
+---
+
+## ✨ Features
+
+### 🤖 **AI-Powered Features** (NEW!)
+- 🎯 Automatic transaction categorization with Gemini AI
+- 💬 Conversational AI financial assistant
+- 📊 Personalized spending insights and recommendations
+- 🧠 Smart suggestions with confidence scoring
+- 💡 Natural language financial queries
+
+### 🔐 **Authentication & Security**
+- Email + password authentication with bcrypt hashing
+- Google OAuth integration
+- Secure session management with NextAuth.js
+- Protected API routes with middleware
+
+### 💰 **Transaction Management**
+- ➕ Add, edit, and delete transactions
+- 🏷️ Categorize by type (Income/Expense) and custom categories
+- 📝 Add descriptions and notes
+- 📅 Date-based filtering and search
+- 📊 Pagination for large datasets
+
+### � **Recurring Transactions** (NEW!)
+- 📅 Automate bills, subscriptions, and regular income
+- 6 frequency types: Daily, Weekly, Bi-weekly, Monthly, Quarterly, Yearly
+- ⏸️ Pause/resume without deletion
+- 📊 Monthly income/expense projections
+- 🎯 Dashboard widget for upcoming obligations
+- ✅ Status tracking (Active/Paused/Due/Ended)
+
+### �📊 **Analytics Dashboard**
+- 📈 Real-time financial overview (balance, income, expenses)
+- 🥧 Interactive pie chart (spending by category)
+- 📉 Line chart (spending trends over time)
+- 📋 Recent transactions widget
+- 🎯 Month-over-month comparisons
+
+### 💵 **Budget Management**
+- Set monthly budgets per category
+- Visual progress tracking
+- Color-coded alerts (Green/Yellow/Red)
+- Budget vs. actual spending comparison
+
+### 🎨 **User Experience**
+- 🌓 Dark/Light mode toggle
+- 📱 Fully responsive (mobile, tablet, desktop)
+- ⚡ Fast page loads (<2s on 3G)
+- ♿ Accessible (WCAG AA compliant)
+- 🎭 Smooth animations and transitions
+
+### 📤 **Data Management**
+- Export transactions to CSV
+- Soft delete (data recovery)
+- Optimistic UI updates
+
+---
+
+## 🎥 Demo
+
+### 🖼️ Screenshots
+
+<details>
+<summary>Click to expand screenshots</summary>
+
+#### Dashboard
+![Dashboard](./public/screenshots/dashboard.png)
+
+#### Transactions
+![Transactions](./public/screenshots/transactions.png)
+
+#### Budget Tracking
+![Budgets](./public/screenshots/budgets.png)
+
+#### Mobile View
+![Mobile](./public/screenshots/mobile.png)
+
+</details>
+
+### 🎬 Video Demo
+
+[![FinanceFlow Demo](./public/screenshots/video-thumbnail.png)](https://www.youtube.com/watch?v=your-video-id)
+
+*Click to watch 2-minute demo video*
+
+---
+
+## 🛠️ Tech Stack
+
+### **Frontend**
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router with Turbopack)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **Components**: [Shadcn/ui](https://ui.shadcn.com/)
+- **Charts**: [Recharts](https://recharts.org/)
+- **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+### **Backend**
+- **Runtime**: [Node.js 20](https://nodejs.org/)
+- **API**: Next.js API Routes (REST)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Database**: [PostgreSQL 15](https://www.postgresql.org/)
+- **Auth**: [NextAuth.js](https://next-auth.js.org/)
+- **Validation**: [Zod](https://zod.dev/)
+- **AI**: [Google Gemini API](https://ai.google.dev/) (gemini-2.5-flash)
+
+### **DevOps & Tools**
+- **Deployment**: [Vercel](https://vercel.com/)
+- **Database Hosting**: [Supabase](https://supabase.com/)
+- **Version Control**: Git & GitHub
+- **Code Quality**: ESLint, Prettier
+- **Testing**: Jest, React Testing Library
+- **CI/CD**: GitHub Actions
+
+### **Architecture**
+- **Monolithic (Next.js App Router)**: Frontend and API routes co-located for simplified deployment and development experience.
+- **Serverless Functions**: Next.js API routes deploy as serverless functions on Vercel, scaling automatically.
+- **Edge Computing**: Leveraging Vercel's Edge Network for fast content delivery.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+- PostgreSQL database (or Supabase account)
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/steph1902/finance-flow-project.git
+cd finance-flow-project
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Setup environment variables:**
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and add your values:
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
+- `NEXTAUTH_URL`: http://localhost:3000 (for development)
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: From Google Cloud Console
+- `GOOGLE_GEMINI_API_KEY`: From Google AI Studio (for AI features)
+
+4. **Run database migrations:**
+```bash
+npx prisma migrate dev
+```
+
+5. **Seed database (optional):**
+```bash
+npx prisma db seed
+```
+
+6. **Start development server:**
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) 🎉
+
+---
+
+## 💡 Usage
+
+1. **Sign Up / Log In**: Create an account or use Google OAuth.
+2. **Add Transactions**: Record your income and expenses with categories and descriptions.
+3. **View Dashboard**: Get an overview of your financial health with interactive charts.
+4. **Manage Budgets**: Set and track spending limits for different categories.
+5. **Export Data**: Download your transaction history as a CSV file.
+
+---
+
+## 📚 API Documentation
+
+Detailed API specifications can be found in the [Functional Specification Document (FSD)](https://github.com/steph1902/finance-flow-project/tree/main/project-guideline).
+
+---
+
+## 📁 Project Structure
+
+```
+finance-tracker/
+├── app/
+│   ├── (auth)/ (Authentication routes: login, signup)
+│   ├── (dashboard)/ (Protected routes: dashboard, transactions, budgets, settings)
+│   ├── api/ (Next.js API routes)
+│   ├── layout.tsx (Root layout)
+│   └── page.tsx (Landing page)
+├── components/ (Reusable UI components)
+│   ├── ui/ (Shadcn/ui components)
+│   ├── auth/ (Auth-specific components)
+│   ├── dashboard/ (Dashboard widgets)
+│   ├── transactions/ (Transaction forms, lists)
+│   ├── budgets/ (Budget forms, progress)
+│   └── layout/ (Header, Sidebar)
+├── lib/ (Utility functions, Prisma client, auth helpers)
+├── hooks/ (Custom React hooks for data fetching)
+├── types/ (TypeScript type definitions)
+├── prisma/ (Prisma schema, migrations, seed)
+├── public/ (Static assets: images, screenshots)
+├── .env.local (Environment variables)
+├── .env.example (Example environment variables)
+├── .eslintrc.json (ESLint configuration)
+├── .gitignore (Git ignore rules)
+├── next.config.js (Next.js configuration)
+├── package.json (Project dependencies and scripts)
+├── tailwind.config.ts (TailwindCSS configuration)
+├── tsconfig.json (TypeScript configuration)
+└── README.md (Project overview)
+```
+
+---
+
+## ⚡ Performance
+
+- **Lighthouse Score**: Aiming for 90+ on Performance, Accessibility, Best Practices, and SEO.
+- **Load Time**: <2 seconds on a 3G connection.
+- **Bundle Size**: Optimized for minimal JavaScript and CSS delivery.
+- **Optimistic UI**: Instant feedback for user actions.
+
+---
+
+## 🗺️ Roadmap
+
+### **Phase 1: Backend Foundation** ✅
+- User Authentication (Email/Password, Google OAuth)
+- Transaction CRUD (Create, Read, Update, Delete)
+- Budget Management (Monthly budgets per category)
+- Database Schema & Migrations
+- API Routes with Authentication
+
+### **Phase 2A: Dashboard & UI** ✅
+- Analytics Dashboard (Charts, Stats)
+- Responsive Design & Dark Mode
+- Transaction Filters & Search
+- Budget Progress Tracking
+- Optimistic UI Updates
+
+### **Phase 2B: AI Integration** ✅ (COMPLETED)
+- **AI Auto-Categorization**: Gemini-powered transaction categorization
+- **Category Suggestions**: Accept/reject AI suggestions with confidence scores
+- **AI Chat Assistant**: Conversational interface for financial questions
+- **Financial Context**: AI responses based on actual transaction/budget data
+- **Conversation Persistence**: Chat history stored in database
+- **Natural Language Queries**: "How much did I spend on dining?" support
+
+### **Phase 3: Insights & Analytics** ✅ (COMPLETED)
+- **AI-Powered Insights Dashboard**: Smart spending analysis on main dashboard
+- **Budget Alerts**: Automatic warnings at 90%+ usage (critical at 100%+)
+- **Spending Trend Analysis**: Week/Month/Quarter comparisons with percentage changes
+- **Category Deep-Dive**: Identify top spending categories with recommendations
+- **Personalized Recommendations**: AI-generated savings tips and advice
+- **Achievement Tracking**: Celebrate spending reductions and milestones
+
+**Documentation:**
+- [Phase 1 Complete](./PHASE1_COMPLETE.md) - Backend foundation
+- [Phase 2A Complete](./PHASE2A_COMPLETE.md) - UI integration (252 lines)
+- [Phase 2B Complete](./PHASE2B_COMPLETE.md) - Chat assistant (481 lines)
+- [Phase 3 Complete](./PHASE3_COMPLETE.md) - Insights dashboard (420 lines)
+- [AI Testing Report](./AI_TESTING_REPORT.md) - Validation results
+
+### **Phase 4: Advanced Features** (Planned)
+- Recurring Transactions
+- Multi-currency Support
+- Data Export (CSV, PDF, Excel)
+- Bank Account Integration (Plaid API)
+- Investment Tracking
+- Mobile Apps (React Native)
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/steph1902/finance-flow-project/issues).
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+##  Acknowledgments
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Shadcn/ui](https://ui.shadcn.com/)
+- [NextAuth.js Documentation](https://next-auth.js.org/)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Recharts Documentation](https://recharts.org/en-US/api)
