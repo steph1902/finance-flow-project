@@ -52,25 +52,26 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
     const body = await req.json();
     const validatedData = updateRecurringSchema.parse(body);
 
-    // Check ownership
-    const existing = await prisma.recurringTransaction.findFirst({
-      where: { id, userId },
-    });
+    // Use transaction to ensure ownership check and update are atomic
+    const recurringTransaction = await prisma.$transaction(async (tx) => {
+      // Check ownership
+      const existing = await tx.recurringTransaction.findFirst({
+        where: { id, userId },
+      });
 
-    if (!existing) {
-      return NextResponse.json(
-        { error: "Recurring transaction not found" },
-        { status: 404 }
-      );
-    }
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
 
-    const recurringTransaction = await prisma.recurringTransaction.update({
-      where: { id },
-      data: {
-        ...validatedData,
-        startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
-        endDate: validatedData.endDate ? new Date(validatedData.endDate) : undefined,
-      },
+      // Update the recurring transaction
+      return await tx.recurringTransaction.update({
+        where: { id },
+        data: {
+          ...validatedData,
+          startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
+          endDate: validatedData.endDate ? new Date(validatedData.endDate) : undefined,
+        },
+      });
     });
 
     return NextResponse.json({ recurringTransaction });
@@ -79,6 +80,13 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
       return NextResponse.json(
         { error: "Invalid request", details: error.issues },
         { status: 400 }
+      );
+    }
+
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json(
+        { error: "Recurring transaction not found" },
+        { status: 404 }
       );
     }
 
@@ -95,24 +103,32 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
     const id = req.nextUrl.pathname.split("/").pop()!;
 
-    // Check ownership
-    const existing = await prisma.recurringTransaction.findFirst({
-      where: { id, userId },
+    // Use transaction to ensure ownership check and delete are atomic
+    await prisma.$transaction(async (tx) => {
+      // Check ownership
+      const existing = await tx.recurringTransaction.findFirst({
+        where: { id, userId },
+      });
+
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
+
+      // Delete the recurring transaction
+      await tx.recurringTransaction.delete({
+        where: { id },
+      });
     });
 
-    if (!existing) {
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
       return NextResponse.json(
         { error: "Recurring transaction not found" },
         { status: 404 }
       );
     }
 
-    await prisma.recurringTransaction.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
     logError("Delete recurring transaction error", error, { userId });
     return NextResponse.json(
       { error: "Failed to delete recurring transaction" },

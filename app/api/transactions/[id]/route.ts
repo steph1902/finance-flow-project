@@ -60,11 +60,6 @@ export const GET = withApiAuth(async (_req: NextRequest, userId) => {
 export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
   const id = req.nextUrl.pathname.split("/").pop()!;
 
-  const existing = await getTransactionOr404(id, userId);
-  if (!existing) {
-    return NextResponse.json({ error: "Not Found" }, { status: 404 });
-  }
-
   const json = await req.json();
   const parsed = transactionUpdateSchema.safeParse(json);
 
@@ -84,35 +79,78 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
 
   const { amount, date, ...rest } = parsed.data;
 
-  const transaction = await prisma.transaction.update({
-    where: { id: existing.id },
-    data: {
-      ...rest,
-      ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
-      ...(date !== undefined ? { date } : {}),
-    },
-    select: transactionSelect,
-  });
+  try {
+    // Use transaction to ensure ownership check and update are atomic
+    const transaction = await prisma.$transaction(async (tx) => {
+      const existing = await tx.transaction.findFirst({
+        where: {
+          id,
+          userId,
+          deletedAt: null,
+        },
+        select: transactionSelect,
+      });
 
-  return NextResponse.json({
-    message: "Transaction updated",
-    data: serialize(transaction),
-  });
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
+
+      return await tx.transaction.update({
+        where: { id: existing.id },
+        data: {
+          ...rest,
+          ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
+          ...(date !== undefined ? { date } : {}),
+        },
+        select: transactionSelect,
+      });
+    });
+
+    return NextResponse.json({
+      message: "Transaction updated",
+      data: serialize(transaction),
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+
+    throw error;
+  }
 });
 
 export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
   const id = req.nextUrl.pathname.split("/").pop()!;
 
-  const existing = await getTransactionOr404(id, userId);
-  if (!existing) {
-    return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  try {
+    // Use transaction to ensure ownership check and soft delete are atomic
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.transaction.findFirst({
+        where: {
+          id,
+          userId,
+          deletedAt: null,
+        },
+        select: transactionSelect,
+      });
+
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
+
+      await tx.transaction.update({
+        where: { id: existing.id },
+        data: { deletedAt: new Date() },
+      });
+    });
+
+    return NextResponse.json({ message: "Transaction deleted" }, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+
+    throw error;
   }
-
-  await prisma.transaction.update({
-    where: { id: existing.id },
-    data: { deletedAt: new Date() },
-  });
-
-  return NextResponse.json({ message: "Transaction deleted" }, { status: 200 });
 });
 
