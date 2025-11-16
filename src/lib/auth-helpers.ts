@@ -1,10 +1,9 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import { ENV } from "@/lib/env";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "your-secret-key-change-this"
-);
+const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
 
 export async function getSession() {
   const cookieStore = await cookies();

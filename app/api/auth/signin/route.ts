@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
+import { ENV } from "@/lib/env";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "your-secret-key-change-this"
-);
+const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
 
 export async function POST(req: NextRequest) {
   try {
