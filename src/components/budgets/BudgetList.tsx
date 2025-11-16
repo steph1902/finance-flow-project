@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Edit, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
+const BudgetListComponent = ({ budgets, onEdit, onDelete }: BudgetListProps) => {
   if (budgets.length === 0) {
     return (
       <Card>
@@ -85,5 +86,17 @@ export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
       })}
     </div>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const BudgetList = memo(BudgetListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.budgets.length === nextProps.budgets.length &&
+    JSON.stringify(prevProps.budgets) === JSON.stringify(nextProps.budgets) &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+BudgetList.displayName = 'BudgetList';
 

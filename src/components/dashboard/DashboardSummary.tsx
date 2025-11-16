@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { CreditCard, DollarSign, TrendingDown, TrendingUp } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { formatCurrency } from "@/lib/formatters";
@@ -10,7 +11,7 @@ type DashboardSummaryProps = {
   isLoading?: boolean;
 };
 
-export function DashboardSummary({ summary, isLoading = false }: DashboardSummaryProps) {
+const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSummaryProps) => {
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -70,5 +71,18 @@ export function DashboardSummary({ summary, isLoading = false }: DashboardSummar
       />
     </div>
   );
-}
+};
+
+// Memoize to prevent re-renders when parent state changes
+export const DashboardSummary = memo(DashboardSummaryComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.summary?.totalBalance === nextProps.summary?.totalBalance &&
+    prevProps.summary?.totalIncome === nextProps.summary?.totalIncome &&
+    prevProps.summary?.totalExpenses === nextProps.summary?.totalExpenses &&
+    prevProps.summary?.transactionCount === nextProps.summary?.transactionCount
+  );
+});
+
+DashboardSummary.displayName = 'DashboardSummary';
 

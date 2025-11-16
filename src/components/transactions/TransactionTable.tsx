@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { format } from "date-fns";
 import { Edit, Trash2, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ type TransactionTableProps = {
   onDelete: (transaction: Transaction) => void;
 };
 
-export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
+const TransactionTableComponent = ({ transactions, onEdit, onDelete }: TransactionTableProps) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
       <Table>
@@ -128,5 +129,18 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
       </Table>
     </div>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const TransactionTable = memo(TransactionTableComponent, (prevProps, nextProps) => {
+  // Re-render only if transactions array changes or callbacks change
+  return (
+    prevProps.transactions.length === nextProps.transactions.length &&
+    JSON.stringify(prevProps.transactions) === JSON.stringify(nextProps.transactions) &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+TransactionTable.displayName = 'TransactionTable';
 

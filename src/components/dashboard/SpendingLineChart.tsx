@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -23,7 +23,7 @@ type SpendingLineChartProps = {
   isLoading?: boolean;
 };
 
-export function SpendingLineChart({ data, isLoading = false }: SpendingLineChartProps) {
+const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineChartProps) => {
   const [activeChart, setActiveChart] = useState<'line' | 'area'>('area');
 
   return (
@@ -232,5 +232,16 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
       </CardContent>
     </Card>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const SpendingLineChart = memo(SpendingLineChartComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data.length === nextProps.data.length &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});
+
+SpendingLineChart.displayName = 'SpendingLineChart';
 

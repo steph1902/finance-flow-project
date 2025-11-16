@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Pie, PieChart, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +23,7 @@ type SpendingPieChartProps = {
   isLoading?: boolean;
 };
 
-export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartProps) {
+const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChartProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const total = data.reduce((sum, item) => sum + item.amount, 0);
 
@@ -149,5 +149,17 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
       </CardContent>
     </Card>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders when parent state changes
+export const SpendingPieChart = memo(SpendingPieChartComponent, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if data or loading state actually changed
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data.length === nextProps.data.length &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});
+
+SpendingPieChart.displayName = 'SpendingPieChart';
 
