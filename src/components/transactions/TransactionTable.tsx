@@ -15,6 +15,7 @@ import {
 import { formatCurrency } from "@/lib/formatters";
 import type { Transaction } from "@/types";
 import { motion } from "framer-motion";
+import { STAGGER_DELAY } from "@/config/animations";
 
 type TransactionTableProps = {
   transactions: Transaction[];
@@ -58,9 +59,9 @@ const TransactionTableComponent = ({ transactions, onEdit, onDelete }: Transacti
               return (
                 <motion.tr
                   key={transaction.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.02 }}
+                  transition={{ delay: index * STAGGER_DELAY.fast }}
                   className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border-b border-neutral-200 dark:border-neutral-800 last:border-0"
                 >
                   <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">

@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { SpendingByCategory } from "@/types";
 import { motion } from "framer-motion";
 import { getChartColor } from "@/config/charts";
+import { STAGGER_DELAY } from "@/config/animations";
 
 type SpendingPieChartProps = {
   data: SpendingByCategory[];
@@ -109,7 +110,7 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                     key={item.category}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * STAGGER_DELAY.medium }}
                     className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
                       isActive ? 'bg-primary-50 dark:bg-primary-950/20' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                     }`}

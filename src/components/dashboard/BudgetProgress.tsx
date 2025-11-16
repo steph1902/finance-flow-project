@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, TrendingUp, Wallet } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import type { Budget } from "@/types";
+import { DURATION, STAGGER_DELAY } from "@/config/animations";
 
 type BudgetProgressProps = {
   budgets: Array<Budget & { spent?: number; remaining?: number; progress?: number }>;
@@ -83,7 +84,7 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
                   key={budget.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * STAGGER_DELAY.medium }}
                   className="space-y-2 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
@@ -110,7 +111,7 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 }}
+                        transition={{ duration: DURATION.slowest, delay: index * STAGGER_DELAY.slow }}
                         className={`h-full rounded-full ${getProgressColor(progress)} transition-colors`}
                       />
                     </div>
