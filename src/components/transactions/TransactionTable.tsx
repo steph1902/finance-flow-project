@@ -15,7 +15,23 @@ import {
 import { formatCurrency } from "@/lib/formatters";
 import type { Transaction } from "@/types";
 import { motion } from "framer-motion";
-import { STAGGER_DELAY } from "@/config/animations";
+import { getStaggerDelay } from "@/config/animations";
+
+/**
+ * TransactionTable Component
+ * 
+ * Displays transactions in a table format with edit/delete actions.
+ * 
+ * **Performance Note**: This component is optimized for paginated data.
+ * It's recommended to pass no more than 50 transactions at a time for optimal
+ * animation performance. Use server-side pagination or virtual scrolling for
+ * larger datasets.
+ * 
+ * Current implementation includes:
+ * - Stagger animations with max delay cap (0.3s)
+ * - Memoization to prevent unnecessary re-renders
+ * - Responsive design with mobile support
+ */
 
 type TransactionTableProps = {
   transactions: Transaction[];
@@ -24,6 +40,14 @@ type TransactionTableProps = {
 };
 
 const TransactionTableComponent = ({ transactions, onEdit, onDelete }: TransactionTableProps) => {
+  // Performance warning for developers
+  if (process.env.NODE_ENV === 'development' && transactions.length > 100) {
+    console.warn(
+      `TransactionTable: Rendering ${transactions.length} transactions may impact performance. ` +
+      `Consider implementing pagination or virtual scrolling for better UX.`
+    );
+  }
+
   return (
     <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
       <Table>
@@ -61,7 +85,7 @@ const TransactionTableComponent = ({ transactions, onEdit, onDelete }: Transacti
                   key={transaction.id}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * STAGGER_DELAY.fast }}
+                  transition={{ delay: getStaggerDelay(index) }}
                   className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border-b border-neutral-200 dark:border-neutral-800 last:border-0"
                 >
                   <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">
