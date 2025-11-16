@@ -107,6 +107,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                         size="icon" 
                         onClick={() => onEdit(transaction)}
                         className="h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-950/30 hover:text-primary-600 dark:hover:text-primary-400"
+                        aria-label={`Edit transaction: ${transaction.description}`}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit transaction</span>
@@ -116,6 +117,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                         size="icon" 
                         onClick={() => onDelete(transaction)}
                         className="h-8 w-8 hover:bg-danger-50 dark:hover:bg-danger-950/30 hover:text-danger-600 dark:hover:text-danger-400"
+                        aria-label={`Delete transaction: ${transaction.description}`}
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Delete transaction</span>

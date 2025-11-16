@@ -75,11 +75,11 @@ export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
             </CardContent>
 
             <CardFooter className="mt-auto flex justify-end gap-2">
-              <Button variant="ghost" size="icon" onClick={() => onEdit(budget)}>
+              <Button variant="ghost" size="icon" onClick={() => onEdit(budget)} aria-label={`Edit budget: ${budget.category}`}>
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit budget</span>
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => onDelete(budget)}>
+              <Button variant="ghost" size="icon" onClick={() => onDelete(budget)} aria-label={`Delete budget: ${budget.category}`}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete budget</span>
               </Button>

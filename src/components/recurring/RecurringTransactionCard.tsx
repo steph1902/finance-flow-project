@@ -261,6 +261,7 @@ export function RecurringTransactionCard({
                 size="sm"
                 disabled={isDeleting}
                 className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                aria-label={`Delete recurring transaction: ${description}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
