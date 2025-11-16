@@ -196,13 +196,16 @@ A full-stack financial management application with AI-powered transaction catego
 
 - **Start/End Dates**: Configurable recurring period with optional end dates
 
-- **Dashboard Widget**: Upcoming recurring obligations displayed prominently### 📤 **Data Management**
+- **Dashboard Widget**: Upcoming recurring obligations displayed prominently
+- **Pause/Resume**: Toggle active state without deletion
 
-- **Pause/Resume**: Toggle active state without deletion- Export transactions to CSV
-
+### 📤 **Data Management**
+- Export transactions to **JSON** ✅ (Implemented)
+- Export to CSV (Planned - Phase 7)
 - Soft delete (data recovery)
+- Optimistic UI updates
 
-### 📊 Analytics & Insights- Optimistic UI updates
+### 📊 Analytics & Insights
 
 
 
@@ -274,7 +277,7 @@ A full-stack financial management application with AI-powered transaction catego
 
 | [Next.js](https://nextjs.org/) | 16.0.1 | React framework with App Router and Turbopack |### **Frontend**
 
-| [React](https://react.dev/) | 19.2.0 | UI library with React Compiler enabled |- **Framework**: [Next.js 16](https://nextjs.org/) (App Router with Turbopack)
+| [React](https://react.dev/) | 19.2.0 | UI library |- **Framework**: [Next.js 16](https://nextjs.org/) (App Router with Turbopack)
 
 | [TypeScript](https://www.typescriptlang.org/) | 5.x | Type-safe development |- **Language**: [TypeScript](https://www.typescriptlang.org/)
 
@@ -316,11 +319,11 @@ A full-stack financial management application with AI-powered transaction catego
 
 | [Zod](https://zod.dev/) | 4.1.12 | Schema validation |- **Version Control**: Git & GitHub
 
-| [bcrypt](https://www.npmjs.com/package/bcrypt) | 6.0.0 | Password hashing |- **Code Quality**: ESLint, Prettier
+| [bcrypt](https://www.npmjs.com/package/bcrypt) | 6.0.0 | Password hashing |- **Code Quality**: ESLint
 
-| [Google Gemini AI](https://ai.google.dev/) | 0.24.1 | AI categorization and insights |- **Testing**: Jest, React Testing Library
+| [Google Gemini AI](https://ai.google.dev/) | 0.24.1 | AI categorization and insights |- **Testing**: Jest (configured, tests in progress)
 
-| [date-fns](https://date-fns.org/) | 4.1.0 | Date manipulation utilities |- **CI/CD**: GitHub Actions
+| [date-fns](https://date-fns.org/) | 4.1.0 | Date manipulation utilities |
 
 
 
@@ -338,11 +341,42 @@ A full-stack financial management application with AI-powered transaction catego
 
 | Prisma Studio | Database GUI for development |
 
-| ts-node | TypeScript execution for seed scripts |## 🚀 Getting Started
+| ts-node | TypeScript execution for seed scripts |
 
+---
 
+## 🚀 Getting Started
 
----### Prerequisites
+## ⚡ Quick Start (5 Minutes)
+
+**Prerequisites**: Node.js 18+, PostgreSQL 15+
+
+```bash
+# 1. Clone and install
+git clone https://github.com/steph1902/finance-flow-project.git
+cd finance-flow-project/finance-flow
+npm install
+
+# 2. Setup environment
+cp .env.example .env.local
+# Edit .env.local with your database URL and secrets
+
+# 3. Setup database
+npx prisma migrate dev
+npx prisma db seed  # Optional: demo data
+
+# 4. Start development
+npm run dev
+# Visit http://localhost:3000
+```
+
+**Demo Account**: `demo@financeflow.com` / `demo123`
+
+**Next Steps**: See [Full Installation Guide](#installation) below for production setup.
+
+---
+
+### Prerequisites
 
 
 
@@ -621,24 +655,16 @@ brew services start postgresql- **Budget Alerts**: Automatic warnings at 90%+ us
 # Linux (systemd)- **Category Deep-Dive**: Identify top spending categories with recommendations
 
 sudo systemctl start postgresql- **Personalized Recommendations**: AI-generated savings tips and advice
-
 - **Achievement Tracking**: Celebrate spending reductions and milestones
 
-# Windows
+**Phase 4: Recurring Transactions** ✅
+- ✅ 6 frequency types (Daily to Yearly)
+- ✅ Automatic transaction generation
+- ✅ Status management (Active/Paused/Ended)
+- ✅ Dashboard widget for upcoming bills
+- ✅ Start/end date configuration
 
-# Start via Services or PostgreSQL installer**Documentation:**
-
-```- [Phase 1 Complete](./PHASE1_COMPLETE.md) - Backend foundation
-
-- [Phase 2A Complete](./PHASE2A_COMPLETE.md) - UI integration (252 lines)
-
-Or use a cloud provider:- [Phase 2B Complete](./PHASE2B_COMPLETE.md) - Chat assistant (481 lines)
-
-- [Supabase](https://supabase.com/) (Recommended - free tier includes PostgreSQL)- [Phase 3 Complete](./PHASE3_COMPLETE.md) - Insights dashboard (420 lines)
-
-- [Railway](https://railway.app/)- [AI Testing Report](./AI_TESTING_REPORT.md) - Validation results
-
-- [Neon](https://neon.tech/)
+### 🚧 In Progress
 
 - [Vercel Postgres](https://vercel.com/storage/postgres)### **Phase 4: Advanced Features** (Planned)
 
@@ -1178,7 +1204,6 @@ If you discover a security vulnerability, please email security@financeflow.app 
 
 ### Optimizations
 
-- **React Compiler**: Enabled for automatic memoization
 - **Turbopack**: Faster development builds
 - **SWR Caching**: Client-side data caching with stale-while-revalidate
 - **Optimistic Updates**: Instant UI feedback before server confirmation
