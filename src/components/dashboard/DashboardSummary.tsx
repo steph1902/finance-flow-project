@@ -42,7 +42,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         value={formatCurrency(summary.totalBalance)}
         description="Income minus expenses"
         icon={<DollarSign className="h-5 w-5 text-primary-600 dark:text-primary-400" />}
-        trend={balanceTrend}
+        {...(balanceTrend && { trend: balanceTrend })}
         index={0}
       />
       <StatsCard

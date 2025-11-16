@@ -260,12 +260,12 @@ export function RecurringTransactionsPage() {
                   amount={transaction.amount}
                   type={transaction.type}
                   category={transaction.category}
-                  description={transaction.description}
+                  {...(transaction.description && { description: transaction.description })}
                   frequency={transaction.frequency}
                   nextDate={transaction.nextDate}
                   isActive={transaction.isActive}
-                  lastGenerated={transaction.lastGenerated}
-                  endDate={transaction.endDate}
+                  {...(transaction.lastGenerated && { lastGenerated: transaction.lastGenerated })}
+                  {...(transaction.endDate && { endDate: transaction.endDate })}
                   onToggleActive={toggleActive}
                   onDelete={deleteRecurringTransaction}
                 />
