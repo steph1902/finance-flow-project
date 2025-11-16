@@ -16,15 +16,13 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
       );
     }
 
-    // Verify suggestion belongs to user
-    const suggestion = await prisma.$queryRaw<Array<{ user_id: string }>>`
-      SELECT user_id
-      FROM ai_suggestions
-      WHERE id = ${suggestionId}::uuid
-      LIMIT 1
-    `;
+    // Verify suggestion belongs to user - Use Prisma's type-safe query builder
+    const suggestion = await prisma.aISuggestion.findUnique({
+      where: { id: suggestionId },
+      select: { userId: true },
+    });
 
-    if (!suggestion.length || suggestion[0]?.user_id !== userId) {
+    if (!suggestion || suggestion.userId !== userId) {
       return NextResponse.json(
         { error: 'Suggestion not found' },
         { status: 404 }
