@@ -17,13 +17,7 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-interface AIChatProps {
-  userId?: string;
-  onClose?: () => void;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function AIChat(_props: AIChatProps) {
+export function AIChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
