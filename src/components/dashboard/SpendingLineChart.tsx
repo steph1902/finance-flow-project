@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DailyTrendPoint } from "@/types";
 import { motion } from "framer-motion";
+import { CHART_COLORS } from "@/config/charts";
 
 type SpendingLineChartProps = {
   data: DailyTrendPoint[];
@@ -115,12 +116,12 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                 <AreaChart data={data} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
                   <defs>
                     <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                      <stop offset="5%" stopColor={CHART_COLORS[1]} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLORS[1]} stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                      <stop offset="5%" stopColor={CHART_COLORS[3]} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLORS[3]} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="#94A3B8" />
@@ -156,21 +157,21 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                   <Area 
                     type="monotone" 
                     dataKey="income" 
-                    stroke="#10B981" 
+                    stroke={CHART_COLORS[1]} 
                     strokeWidth={2.5} 
                     fill="url(#incomeGradient)" 
                     name="Income"
-                    dot={{ fill: '#10B981', r: 3 }}
+                    dot={{ fill: CHART_COLORS[1], r: 3 }}
                     activeDot={{ r: 5 }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="expenses" 
-                    stroke="#EF4444" 
+                    stroke={CHART_COLORS[3]} 
                     strokeWidth={2.5} 
                     fill="url(#expensesGradient)" 
                     name="Expenses"
-                    dot={{ fill: '#EF4444', r: 3 }}
+                    dot={{ fill: CHART_COLORS[3], r: 3 }}
                     activeDot={{ r: 5 }}
                   />
                 </AreaChart>

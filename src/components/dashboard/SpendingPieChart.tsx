@@ -6,17 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SpendingByCategory } from "@/types";
 import { motion } from "framer-motion";
-
-const COLORS = [
-  "#3B82F6", // primary-500
-  "#10B981", // success-500
-  "#F59E0B", // warning-500
-  "#EF4444", // danger-500
-  "#8B5CF6", // purple-500
-  "#14B8A6", // teal-500
-  "#F97316", // orange-500
-  "#EC4899", // pink-500
-];
+import { getChartColor } from "@/config/charts";
 
 type SpendingPieChartProps = {
   data: SpendingByCategory[];
@@ -83,7 +73,7 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                   {data.map((entry, index) => (
                     <Cell 
                       key={entry.category} 
-                      fill={COLORS[index % COLORS.length]}
+                      fill={getChartColor(index)}
                       opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
                       style={{ 
                         cursor: 'pointer',
@@ -128,7 +118,7 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                   >
                     <span
                       className="h-3 w-3 rounded-full shrink-0"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      style={{ backgroundColor: getChartColor(index) }}
                       aria-hidden
                     />
                     <span className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-medium">
