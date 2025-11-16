@@ -34,11 +34,54 @@ export function useBudgets(filters: BudgetFilters = {}) {
   const createBudget = useCallback(
     async (payload: BudgetPayload) => {
       try {
-        await apiFetch<{ message: string; data: Budget }>("/api/budgets", {
-          method: "POST",
-          body: payload,
-        });
-        await mutate();
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string; data: Budget }>("/api/budgets", {
+              method: "POST",
+              body: payload,
+            });
+
+            // Return current data, will revalidate to get fresh data with spent/remaining
+            return currentData;
+          },
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                return {
+                  data: [],
+                  period: {
+                    month: payload.month,
+                    year: payload.year,
+                    start: "",
+                    end: "",
+                  },
+                };
+              }
+
+              // Create optimistic budget
+              const optimisticBudget: Budget & { spent?: number; remaining?: number; progress?: number } = {
+                id: `temp-${Date.now()}`,
+                userId: "",
+                category: payload.category,
+                amount: payload.amount,
+                month: payload.month,
+                year: payload.year,
+                spent: 0,
+                remaining: payload.amount,
+                progress: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+
+              return {
+                ...currentData,
+                data: [...currentData.data, optimisticBudget],
+              };
+            },
+            rollbackOnError: true,
+            revalidate: true, // Revalidate to get accurate spent/remaining from server
+          }
+        );
         toast.success("Budget created successfully");
       } catch (err) {
         logError("Create budget error", err);
@@ -52,11 +95,74 @@ export function useBudgets(filters: BudgetFilters = {}) {
   const updateBudget = useCallback(
     async (id: string, payload: Partial<BudgetPayload>) => {
       try {
-        await apiFetch<{ message: string; data: Budget }>(`/api/budgets/${id}`, {
-          method: "PATCH",
-          body: payload,
-        });
-        await mutate();
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string; data: Budget }>(`/api/budgets/${id}`, {
+              method: "PATCH",
+              body: payload,
+            });
+
+            // Return updated data
+            if (!currentData) {
+              return {
+                data: [],
+                period: { month: 1, year: 2024, start: "", end: "" },
+              };
+            }
+
+            return {
+              ...currentData,
+              data: currentData.data.map((budget) =>
+                budget.id === id
+                  ? {
+                      ...budget,
+                      ...payload,
+                      // Recalculate remaining if amount changed
+                      ...(payload.amount && budget.spent !== undefined
+                        ? {
+                            remaining: payload.amount - budget.spent,
+                            progress: (budget.spent / payload.amount) * 100,
+                          }
+                        : {}),
+                      updatedAt: new Date().toISOString(),
+                    }
+                  : budget
+              ),
+            };
+          },
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                return {
+                  data: [],
+                  period: { month: 1, year: 2024, start: "", end: "" },
+                };
+              }
+
+              return {
+                ...currentData,
+                data: currentData.data.map((budget) =>
+                  budget.id === id
+                    ? {
+                        ...budget,
+                        ...payload,
+                        // Recalculate remaining if amount changed
+                        ...(payload.amount && budget.spent !== undefined
+                          ? {
+                              remaining: payload.amount - budget.spent,
+                              progress: (budget.spent / payload.amount) * 100,
+                            }
+                          : {}),
+                        updatedAt: new Date().toISOString(),
+                      }
+                    : budget
+                ),
+              };
+            },
+            rollbackOnError: true,
+            revalidate: false,
+          }
+        );
         toast.success("Budget updated successfully");
       } catch (err) {
         logError("Update budget error", err, { id });
@@ -70,10 +176,43 @@ export function useBudgets(filters: BudgetFilters = {}) {
   const deleteBudget = useCallback(
     async (id: string) => {
       try {
-        await apiFetch<{ message: string }>(`/api/budgets/${id}`, {
-          method: "DELETE",
-        });
-        await mutate();
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string }>(`/api/budgets/${id}`, {
+              method: "DELETE",
+            });
+
+            // Return filtered data
+            if (!currentData) {
+              return {
+                data: [],
+                period: { month: 1, year: 2024, start: "", end: "" },
+              };
+            }
+
+            return {
+              ...currentData,
+              data: currentData.data.filter((budget) => budget.id !== id),
+            };
+          },
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                return {
+                  data: [],
+                  period: { month: 1, year: 2024, start: "", end: "" },
+                };
+              }
+
+              return {
+                ...currentData,
+                data: currentData.data.filter((budget) => budget.id !== id),
+              };
+            },
+            rollbackOnError: true,
+            revalidate: false,
+          }
+        );
         toast.success("Budget deleted successfully");
       } catch (err) {
         logError("Delete budget error", err, { id });

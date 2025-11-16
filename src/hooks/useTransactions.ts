@@ -48,14 +48,60 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
   const createTransaction = useCallback(
     async (payload: TransactionPayload) => {
       try {
-        await apiFetch<{ message: string; data: Transaction }>("/api/transactions", {
-          method: "POST",
-          body: {
-            ...payload,
-            date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string; data: Transaction }>(
+              "/api/transactions",
+              {
+                method: "POST",
+                body: {
+                  ...payload,
+                  date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+                },
+              }
+            );
+
+            // Return updated data after API success
+            // Server will return fresh data on revalidation
+            return currentData;
           },
-        });
-        await mutate();
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                // Return empty response structure instead of undefined
+                return {
+                  data: [],
+                  meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
+                };
+              }
+              
+              // Create optimistic transaction with temporary ID
+              const optimisticTransaction: Transaction = {
+                id: `temp-${Date.now()}`,
+                amount: payload.amount,
+                type: payload.type,
+                category: payload.category,
+                description: payload.description ?? null,
+                notes: payload.notes ?? null,
+                date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+                userId: "", // Will be set by server
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+
+              return {
+                ...currentData,
+                data: [optimisticTransaction, ...currentData.data],
+                meta: {
+                  ...currentData.meta,
+                  total: currentData.meta.total + 1,
+                },
+              };
+            },
+            rollbackOnError: true,
+            revalidate: true, // Revalidate to get real data from server
+          }
+        );
         toast.success("Transaction created successfully");
       } catch (err) {
         logError("Create transaction error", err);
@@ -69,17 +115,79 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
   const updateTransaction = useCallback(
     async (id: string, payload: Partial<TransactionPayload>) => {
       try {
-        await apiFetch<{ message: string; data: Transaction }>(`/api/transactions/${id}`, {
-          method: "PATCH",
-          body: {
-            ...payload,
-            date:
-              payload.date instanceof Date
-                ? payload.date.toISOString()
-                : payload.date,
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string; data: Transaction }>(
+              `/api/transactions/${id}`,
+              {
+                method: "PATCH",
+                body: {
+                  ...payload,
+                  date:
+                    payload.date instanceof Date
+                      ? payload.date.toISOString()
+                      : payload.date,
+                },
+              }
+            );
+
+            // Return updated data after API success
+            if (!currentData) {
+              return {
+                data: [],
+                meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
+              };
+            }
+
+            return {
+              ...currentData,
+              data: currentData.data.map((txn) =>
+                txn.id === id
+                  ? {
+                      ...txn,
+                      ...payload,
+                      date: payload.date
+                        ? payload.date instanceof Date
+                          ? payload.date.toISOString()
+                          : payload.date
+                        : txn.date,
+                      updatedAt: new Date().toISOString(),
+                    }
+                  : txn
+              ),
+            };
           },
-        });
-        await mutate();
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                return {
+                  data: [],
+                  meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
+                };
+              }
+
+              return {
+                ...currentData,
+                data: currentData.data.map((txn) =>
+                  txn.id === id
+                    ? {
+                        ...txn,
+                        ...payload,
+                        date: payload.date
+                          ? payload.date instanceof Date
+                            ? payload.date.toISOString()
+                            : payload.date
+                          : txn.date,
+                        updatedAt: new Date().toISOString(),
+                      }
+                    : txn
+                ),
+              };
+            },
+            rollbackOnError: true,
+            revalidate: false,
+          }
+        );
         toast.success("Transaction updated successfully");
       } catch (err) {
         logError("Update transaction error", err, { id });
@@ -93,10 +201,46 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
   const deleteTransaction = useCallback(
     async (id: string) => {
       try {
-        await apiFetch<{ message: string }>(`/api/transactions/${id}`, {
-          method: "DELETE",
-        });
-        await mutate();
+        await mutate(
+          async (currentData) => {
+            await apiFetch<{ message: string }>(`/api/transactions/${id}`, {
+              method: "DELETE",
+            });
+
+            // Return updated data after API success
+            if (!currentData) return currentData;
+
+            return {
+              ...currentData,
+              data: currentData.data.filter((txn) => txn.id !== id),
+              meta: {
+                ...currentData.meta,
+                total: currentData.meta.total - 1,
+              },
+            };
+          },
+          {
+            optimisticData: (currentData) => {
+              if (!currentData) {
+                return {
+                  data: [],
+                  meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
+                };
+              }
+
+              return {
+                ...currentData,
+                data: currentData.data.filter((txn) => txn.id !== id),
+                meta: {
+                  ...currentData.meta,
+                  total: currentData.meta.total - 1,
+                },
+              };
+            },
+            rollbackOnError: true,
+            revalidate: false,
+          }
+        );
         toast.success("Transaction deleted successfully");
       } catch (err) {
         logError("Delete transaction error", err, { id });
