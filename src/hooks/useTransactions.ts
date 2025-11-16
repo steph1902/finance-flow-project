@@ -2,8 +2,10 @@
 
 import useSWR from "swr";
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 import { apiFetch, buildQueryString } from "@/lib/api-client";
+import { logError } from "@/lib/logger";
 import type {
   PaginatedResponse,
   Transaction,
@@ -45,41 +47,62 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
 
   const createTransaction = useCallback(
     async (payload: TransactionPayload) => {
-      await apiFetch<{ message: string; data: Transaction }>("/api/transactions", {
-        method: "POST",
-        body: {
-          ...payload,
-          date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
-        },
-      });
-      await mutate();
+      try {
+        await apiFetch<{ message: string; data: Transaction }>("/api/transactions", {
+          method: "POST",
+          body: {
+            ...payload,
+            date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+          },
+        });
+        await mutate();
+        toast.success("Transaction created successfully");
+      } catch (err) {
+        logError("Create transaction error", err);
+        toast.error(err instanceof Error ? err.message : "Failed to create transaction");
+        throw err;
+      }
     },
     [mutate],
   );
 
   const updateTransaction = useCallback(
     async (id: string, payload: Partial<TransactionPayload>) => {
-      await apiFetch<{ message: string; data: Transaction }>(`/api/transactions/${id}`, {
-        method: "PATCH",
-        body: {
-          ...payload,
-          date:
-            payload.date instanceof Date
-              ? payload.date.toISOString()
-              : payload.date,
-        },
-      });
-      await mutate();
+      try {
+        await apiFetch<{ message: string; data: Transaction }>(`/api/transactions/${id}`, {
+          method: "PATCH",
+          body: {
+            ...payload,
+            date:
+              payload.date instanceof Date
+                ? payload.date.toISOString()
+                : payload.date,
+          },
+        });
+        await mutate();
+        toast.success("Transaction updated successfully");
+      } catch (err) {
+        logError("Update transaction error", err, { id });
+        toast.error(err instanceof Error ? err.message : "Failed to update transaction");
+        throw err;
+      }
     },
     [mutate],
   );
 
   const deleteTransaction = useCallback(
     async (id: string) => {
-      await apiFetch<{ message: string }>(`/api/transactions/${id}`, {
-        method: "DELETE",
-      });
-      await mutate();
+      try {
+        await apiFetch<{ message: string }>(`/api/transactions/${id}`, {
+          method: "DELETE",
+        });
+        await mutate();
+        toast.success("Transaction deleted successfully");
+      } catch (err) {
+        logError("Delete transaction error", err, { id });
+        toast.error(err instanceof Error ? err.message : "Failed to delete transaction");
+        throw err;
+      }
     },
     [mutate],
   );
