@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { withApiAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/logger";
 
 // Validation schemas
 const createRecurringSchema = z.object({
@@ -53,7 +54,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
 
     return NextResponse.json({ recurringTransactions });
   } catch (error) {
-    console.error("Get recurring transactions error:", error);
+    logError("Get recurring transactions error", error, { userId });
     return NextResponse.json(
       { error: "Failed to fetch recurring transactions" },
       { status: 500 }
@@ -94,7 +95,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId: string) => {
       );
     }
 
-    console.error("Create recurring transaction error:", error);
+    logError("Create recurring transaction error", error, { userId });
     return NextResponse.json(
       { error: "Failed to create recurring transaction" },
       { status: 500 }

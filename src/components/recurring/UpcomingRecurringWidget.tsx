@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Repeat, Calendar, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { logError } from "@/lib/logger";
 
 interface RecurringTransactionResponse {
   id: string;
@@ -72,7 +73,7 @@ export function UpcomingRecurringWidget() {
 
       setUpcomingTransactions(upcoming);
     } catch (err) {
-      console.error("Fetch upcoming recurring error:", err);
+      logError("Fetch upcoming recurring error", err);
       setError("Failed to load upcoming transactions");
     } finally {
       setIsLoading(false);

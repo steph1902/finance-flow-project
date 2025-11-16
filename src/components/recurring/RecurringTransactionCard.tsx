@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { logError } from "@/lib/logger";
 
 interface RecurringTransactionCardProps {
   id: string;
@@ -75,7 +76,7 @@ export function RecurringTransactionCard({
       setIsTogglingActive(true);
       await onToggleActive(id, !isActive);
     } catch (error) {
-      console.error("Failed to toggle active status:", error);
+      logError("Failed to toggle active status", error, { id });
     } finally {
       setIsTogglingActive(false);
     }
@@ -86,7 +87,7 @@ export function RecurringTransactionCard({
       setIsDeleting(true);
       await onDelete(id);
     } catch (error) {
-      console.error("Failed to delete recurring transaction:", error);
+      logError("Failed to delete recurring transaction", error, { id });
       setIsDeleting(false);
     }
   };

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withApiAuth } from '@/lib/auth-helpers';
 import { categorizationService } from '@/lib/ai/categorization-service';
 import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/logger';
 
 export const POST = withApiAuth(async (req: NextRequest, userId) => {
   try {
@@ -38,7 +39,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Feedback API error:', error);
+    logError('Feedback API error', error, { userId });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { CategorySuggestion, Transaction, TransactionType } from "@/types";
+import { logError } from "@/lib/logger";
 
 const formSchema = z.object({
   amount: z.string().min(1, "Amount is required").refine(
@@ -112,7 +113,7 @@ export function TransactionForm({
             }
           }
         } catch (error) {
-          console.error("AI categorization error:", error);
+          logError("AI categorization error", error);
           setAiError("Network error. AI suggestions temporarily unavailable.");
         } finally {
           setIsLoadingAI(false);

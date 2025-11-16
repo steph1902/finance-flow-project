@@ -2,6 +2,7 @@ import { geminiClient } from "./gemini-client";
 import { getChatPrompt } from "./prompts/assistant";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
+import { logError } from "@/lib/logger";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -106,7 +107,7 @@ export async function chatWithAssistant({
     try {
       aiResponse = await geminiClient.generateContentWithRetry(fullPrompt);
     } catch (aiError) {
-      console.error("Gemini API error:", aiError);
+      logError("Gemini API error in chat service", aiError);
       aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";
     }
 
@@ -139,7 +140,7 @@ export async function chatWithAssistant({
       conversationId,
     };
   } catch (error) {
-    console.error("Chat service error:", error);
+    logError("Chat service error", error, { userId });
     throw new Error("Failed to process chat message");
   }
 }

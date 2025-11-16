@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import type { CategorySuggestion } from "@/types";
+import { logError } from "@/lib/logger";
 
 interface UseAICategorizationProps {
   description?: string;
@@ -62,7 +63,7 @@ export function useAICategorization({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
-      console.error("AI categorization error:", err);
+      logError("AI categorization error", err, { description, amount, type });
     } finally {
       setIsLoading(false);
     }

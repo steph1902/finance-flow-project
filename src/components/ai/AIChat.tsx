@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AILoading } from "./AILoading";
+import { logError } from "@/lib/logger";
 
 interface ChatMessage {
   id: string;
@@ -73,7 +74,7 @@ export function AIChat(_props: AIChatProps) {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Chat error:", error);
+      logError("Chat error", error);
       const errorMessage: ChatMessage = {
         id: `error-${Date.now()}`,
         role: "assistant",

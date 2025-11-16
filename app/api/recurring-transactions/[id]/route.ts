@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withApiAuth } from "@/lib/auth-helpers";
+import { logError } from "@/lib/logger";
 
 const updateRecurringSchema = z.object({
   amount: z.number().positive().optional(),
@@ -36,7 +37,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
 
     return NextResponse.json({ recurringTransaction });
   } catch (error) {
-    console.error("Get recurring transaction error:", error);
+    logError("Get recurring transaction error", error, { userId });
     return NextResponse.json(
       { error: "Failed to fetch recurring transaction" },
       { status: 500 }
@@ -81,7 +82,7 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
       );
     }
 
-    console.error("Update recurring transaction error:", error);
+    logError("Update recurring transaction error", error, { userId });
     return NextResponse.json(
       { error: "Failed to update recurring transaction" },
       { status: 500 }
@@ -112,7 +113,7 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId: string) => {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete recurring transaction error:", error);
+    logError("Delete recurring transaction error", error, { userId });
     return NextResponse.json(
       { error: "Failed to delete recurring transaction" },
       { status: 500 }

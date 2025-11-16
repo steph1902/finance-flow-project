@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { logError } from "@/lib/logger";
 
 // API response type
 interface RecurringTransactionResponse {
@@ -69,7 +70,7 @@ export function useRecurringTransactions() {
 
       setRecurringTransactions(parsed);
     } catch (err) {
-      console.error("Fetch recurring transactions error:", err);
+      logError("Fetch recurring transactions error", err);
       setError(err instanceof Error ? err.message : "Failed to load recurring transactions");
     } finally {
       setIsLoading(false);
@@ -95,7 +96,7 @@ export function useRecurringTransactions() {
       await fetchRecurringTransactions();
       return true;
     } catch (err) {
-      console.error("Create recurring transaction error:", err);
+      logError("Create recurring transaction error", err);
       throw err;
     }
   };
@@ -119,7 +120,7 @@ export function useRecurringTransactions() {
       await fetchRecurringTransactions();
       return true;
     } catch (err) {
-      console.error("Update recurring transaction error:", err);
+      logError("Update recurring transaction error", err, { id });
       throw err;
     }
   };
@@ -137,7 +138,7 @@ export function useRecurringTransactions() {
       await fetchRecurringTransactions();
       return true;
     } catch (err) {
-      console.error("Delete recurring transaction error:", err);
+      logError("Delete recurring transaction error", err, { id });
       throw err;
     }
   };

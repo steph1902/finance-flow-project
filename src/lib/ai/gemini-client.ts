@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
+import { logError, logWarn } from '@/lib/logger';
 
 class GeminiClient {
   private genAI: GoogleGenerativeAI;
@@ -31,7 +32,7 @@ class GeminiClient {
       const response = await result.response;
       return response.text();
     } catch (error) {
-      console.error('Gemini API Error:', error);
+      logError('Gemini API Error', error, { context: 'gemini-client' });
       throw new Error('Failed to generate AI response');
     }
   }
@@ -47,7 +48,7 @@ class GeminiClient {
         return await this.generateContent(prompt);
       } catch (error) {
         lastError = error as Error;
-        console.error(`Attempt ${attempt} failed:`, error);
+        logWarn(`Gemini retry attempt ${attempt} failed`, { error, attempt, maxRetries });
         
         if (attempt < maxRetries) {
           // Exponential backoff
@@ -77,8 +78,8 @@ class GeminiClient {
       
       const jsonString = jsonMatch ? jsonMatch[1] : response;
       return JSON.parse(jsonString.trim()) as T;
-    } catch {
-      console.error('Failed to parse AI response as JSON:', response);
+    } catch (parseError) {
+      logError('Failed to parse AI response as JSON', parseError, { response });
       throw new Error('Invalid JSON response from AI');
     }
   }

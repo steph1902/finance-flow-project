@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { logError } from "@/lib/logger";
 
 export function AIInsights() {
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -34,7 +35,7 @@ export function AIInsights() {
       const data = await response.json();
       setInsights(data.insights);
     } catch (err) {
-      console.error("Insights fetch error:", err);
+      logError("Insights fetch error", err, { period });
       setError("Failed to load insights. Please try again.");
     } finally {
       setIsLoading(false);
