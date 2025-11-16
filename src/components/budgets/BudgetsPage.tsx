@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { BudgetList } from "@/components/budgets/BudgetList";
+import { BudgetOptimizer } from "@/components/budgets/BudgetOptimizer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -108,6 +109,9 @@ export function BudgetsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* AI Budget Optimizer */}
+      <BudgetOptimizer />
 
       <div className="rounded-lg border bg-card p-4 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3">
