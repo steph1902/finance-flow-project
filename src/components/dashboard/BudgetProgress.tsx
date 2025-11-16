@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, TrendingUp, Wallet } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
@@ -47,8 +48,23 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex h-32 items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="space-y-2 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-3 w-10" />
+                </div>
+                <Skeleton className="h-2 w-full rounded-full" />
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : topBudgets.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center text-neutral-500">

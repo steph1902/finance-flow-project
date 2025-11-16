@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pie, PieChart, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { SpendingByCategory } from "@/types";
 import { motion } from "framer-motion";
 
@@ -36,8 +37,24 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
       </CardHeader>
       <CardContent className="h-[400px]">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="flex h-full flex-col items-center justify-center gap-4">
+            {/* Circular skeleton for pie chart */}
+            <div className="relative h-48 w-48">
+              <Skeleton className="h-full w-full rounded-full" />
+              <div className="absolute inset-8">
+                <Skeleton className="h-full w-full rounded-full bg-background" />
+              </div>
+            </div>
+            {/* Legend skeleton */}
+            <div className="w-full max-w-xs space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Skeleton className="h-3 w-3 rounded-full" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-neutral-500">

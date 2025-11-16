@@ -14,6 +14,7 @@ import {
   AreaChart,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { DailyTrendPoint } from "@/types";
 import { motion } from "framer-motion";
 
@@ -61,8 +62,37 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
       </CardHeader>
       <CardContent className="h-[400px]">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="flex h-full flex-col gap-4 p-4">
+            {/* Chart area skeleton */}
+            <div className="flex-1 flex flex-col justify-end gap-2">
+              {/* Bar chart skeleton representation */}
+              <div className="flex items-end justify-between gap-2 h-48">
+                {[40, 65, 45, 80, 55, 70, 50, 75, 60, 85].map((height, i) => (
+                  <Skeleton 
+                    key={i} 
+                    className="flex-1 rounded-t" 
+                    style={{ height: `${height}%` }}
+                  />
+                ))}
+              </div>
+              {/* X-axis skeleton */}
+              <div className="flex justify-between gap-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                  <Skeleton key={i} className="h-3 flex-1" />
+                ))}
+              </div>
+            </div>
+            {/* Legend skeleton */}
+            <div className="flex justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-8 rounded-full" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-8 rounded-full" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
           </div>
         ) : data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-neutral-500">
