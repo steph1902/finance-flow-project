@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { InsightsCard, Insight } from "./InsightsCard";
 import { AILoading } from "./AILoading";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { logError } from "@/lib/logger";
 
 export function AIInsights() {
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -34,7 +36,7 @@ export function AIInsights() {
       const data = await response.json();
       setInsights(data.insights);
     } catch (err) {
-      console.error("Insights fetch error:", err);
+      logError("Insights fetch error", err, { period });
       setError("Failed to load insights. Please try again.");
     } finally {
       setIsLoading(false);
@@ -78,8 +80,23 @@ export function AIInsights() {
       </CardHeader>
       <CardContent>
         {isLoading && (
-          <div className="py-8">
-            <AILoading message="Analyzing your spending patterns..." />
+          <div className="space-y-3">
+            {/* Skeleton for insights cards */}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-8 w-8 rounded-full flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-5/6" />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="pt-2">
+              <AILoading message="Analyzing your spending patterns..." />
+            </div>
           </div>
         )}
 

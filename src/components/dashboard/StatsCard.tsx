@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { DURATION, STAGGER_DELAY } from "@/config/animations";
 
 type StatsCardProps = {
   title: string;
@@ -22,7 +23,7 @@ export function StatsCard({ title, value, description, icon, trend, index = 0 }:
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      transition={{ duration: DURATION.slow, delay: index * STAGGER_DELAY.slow }}
     >
       <Card className="relative overflow-hidden border-neutral-200 dark:border-neutral-800 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 group">
         {/* Background Gradient */}

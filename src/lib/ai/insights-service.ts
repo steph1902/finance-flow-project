@@ -1,6 +1,7 @@
 import { geminiClient } from "./gemini-client";
 import { createInsightsPrompt } from "./prompts/assistant";
 import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/logger";
 
 export interface Insight {
   type: "spending_alert" | "trend" | "recommendation" | "achievement";
@@ -194,13 +195,13 @@ export async function generateInsights({
         insights = generateFallbackInsights(analysisData, budgets);
       }
     } catch (parseError) {
-      console.error("Failed to parse AI insights:", parseError);
+      logError("Failed to parse AI insights", parseError, { userId });
       insights = generateFallbackInsights(analysisData, budgets);
     }
 
     return insights;
   } catch (error) {
-    console.error("Insights generation error:", error);
+    logError("Insights generation error", error, { userId });
     throw new Error("Failed to generate insights");
   }
 }

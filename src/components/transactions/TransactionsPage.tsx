@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { TransactionFilters, FilterState } from "@/components/transactions/TransactionFilters";
 import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
+import { ReceiptScanner } from "@/components/transactions/ReceiptScanner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
@@ -126,6 +127,14 @@ export function TransactionsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Receipt Scanner */}
+      <ReceiptScanner
+        onTransactionCreated={() => {
+          // Refresh transactions list
+          window.location.reload();
+        }}
+      />
 
       <TransactionFilters
         value={filters}

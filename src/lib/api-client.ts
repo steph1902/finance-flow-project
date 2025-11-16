@@ -1,5 +1,6 @@
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: Record<string, unknown> | unknown;
+  timeout?: number; // Timeout in milliseconds (default: 30000)
 };
 
 async function parseResponse<T>(response: Response): Promise<T> {
@@ -19,13 +20,44 @@ export async function apiFetch<T>(url: string, options: RequestOptions = {}): Pr
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
+  // Setup timeout with AbortController
+  const timeout = options.timeout ?? 30000; // Default 30 seconds
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  return parseResponse<T>(response);
+  try {
+    // Prepare body as string or undefined
+    const bodyString = options.body ? JSON.stringify(options.body) : undefined;
+    
+    // Extract custom options and prepare fetch options
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { timeout: _timeout, body: _body, ...restOptions } = options;
+    
+    // Build fetch options, only including body if it exists
+    const fetchInit: RequestInit = {
+      ...restOptions,
+      headers,
+      signal: controller.signal,
+    };
+    
+    if (bodyString) {
+      fetchInit.body = bodyString;
+    }
+    
+    const response = await fetch(url, fetchInit);
+
+    clearTimeout(timeoutId);
+    return parseResponse<T>(response);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    // Handle abort errors
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${timeout}ms`);
+    }
+    
+    throw error;
+  }
 }
 
 export function buildQueryString(params: Record<string, unknown>): string {

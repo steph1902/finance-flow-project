@@ -1,9 +1,11 @@
 "use client";
 
+import { memo } from "react";
 import { Edit, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/formatters";
 import type { Budget } from "@/types";
 
 type BudgetListProps = {
@@ -11,11 +13,6 @@ type BudgetListProps = {
   onEdit: (budget: Budget) => void;
   onDelete: (budget: Budget) => void;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 function ProgressBar({ value }: { value: number }) {
   return (
@@ -28,7 +25,7 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
+const BudgetListComponent = ({ budgets, onEdit, onDelete }: BudgetListProps) => {
   if (budgets.length === 0) {
     return (
       <Card>
@@ -59,27 +56,27 @@ export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
                 </span>
               </div>
               <CardDescription>Monthly budget limit</CardDescription>
-              <div className="text-2xl font-semibold">{currencyFormatter.format(budget.amount)}</div>
+              <div className="text-2xl font-semibold">{formatCurrency(budget.amount)}</div>
             </CardHeader>
 
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Spent</span>
-                <span className={`font-medium ${statusColor}`}>{currencyFormatter.format(spent)}</span>
+                <span className={`font-medium ${statusColor}`}>{formatCurrency(spent)}</span>
               </div>
               <ProgressBar value={progress} />
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>Remaining</span>
-                <span className="font-medium text-foreground">{currencyFormatter.format(remaining)}</span>
+                <span className="font-medium text-foreground">{formatCurrency(remaining)}</span>
               </div>
             </CardContent>
 
             <CardFooter className="mt-auto flex justify-end gap-2">
-              <Button variant="ghost" size="icon" onClick={() => onEdit(budget)}>
+              <Button variant="ghost" size="icon" onClick={() => onEdit(budget)} aria-label={`Edit budget: ${budget.category}`}>
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit budget</span>
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => onDelete(budget)}>
+              <Button variant="ghost" size="icon" onClick={() => onDelete(budget)} aria-label={`Delete budget: ${budget.category}`}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete budget</span>
               </Button>
@@ -89,5 +86,17 @@ export function BudgetList({ budgets, onEdit, onDelete }: BudgetListProps) {
       })}
     </div>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const BudgetList = memo(BudgetListComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.budgets.length === nextProps.budgets.length &&
+    JSON.stringify(prevProps.budgets) === JSON.stringify(nextProps.budgets) &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+BudgetList.displayName = 'BudgetList';
 

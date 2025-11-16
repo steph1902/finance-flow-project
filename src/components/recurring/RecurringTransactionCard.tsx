@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency, formatDate } from "@/lib/formatters";
 import { 
   Repeat, 
   Calendar, 
@@ -26,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { logError } from "@/lib/logger";
 
 interface RecurringTransactionCardProps {
   id: string;
@@ -75,7 +77,7 @@ export function RecurringTransactionCard({
       setIsTogglingActive(true);
       await onToggleActive(id, !isActive);
     } catch (error) {
-      console.error("Failed to toggle active status:", error);
+      logError("Failed to toggle active status", error, { id });
     } finally {
       setIsTogglingActive(false);
     }
@@ -86,28 +88,13 @@ export function RecurringTransactionCard({
       setIsDeleting(true);
       await onDelete(id);
     } catch (error) {
-      console.error("Failed to delete recurring transaction:", error);
+      logError("Failed to delete recurring transaction", error, { id });
       setIsDeleting(false);
     }
   };
 
   const isOverdue = nextDate <= new Date() && isActive;
   const hasEnded = endDate ? endDate < new Date() : false;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
-  };
 
   const formatRelativeDate = (date: Date) => {
     const now = new Date();
@@ -261,6 +248,7 @@ export function RecurringTransactionCard({
                 size="sm"
                 disabled={isDeleting}
                 className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                aria-label={`Delete recurring transaction: ${description}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

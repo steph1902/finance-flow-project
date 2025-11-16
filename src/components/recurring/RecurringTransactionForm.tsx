@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Repeat, DollarSign, Info, AlertCircle } from "lucide-react";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/constants/categories";
+import { logError } from "@/lib/logger";
 
 const recurringTransactionSchema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -141,7 +142,7 @@ export function RecurringTransactionForm({
 
       onSuccess?.();
     } catch (err) {
-      console.error("Submit error:", err);
+      logError("Submit error for recurring transaction", err);
       setError(err instanceof Error ? err.message : "Failed to create recurring transaction");
     } finally {
       setIsSubmitting(false);

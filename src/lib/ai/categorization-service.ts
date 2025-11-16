@@ -6,6 +6,7 @@ import {
   CategorizationResponse,
 } from './prompts/categorization';
 import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/logger';
 
 export class CategorizationService {
   async categorizeTransaction(
@@ -24,7 +25,7 @@ export class CategorizationService {
 
       return response;
     } catch (error) {
-      console.error('Categorization error:', error);
+      logError('Categorization error', error, { userId, description: input.description });
       
       // Fallback to rule-based categorization
       return this.fallbackCategorization(input);

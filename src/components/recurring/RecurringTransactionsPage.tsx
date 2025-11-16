@@ -5,6 +5,7 @@ import { useRecurringTransactions } from "@/hooks/useRecurringTransactions";
 import { RecurringTransactionForm } from "./RecurringTransactionForm";
 import { RecurringTransactionCard } from "./RecurringTransactionCard";
 import { RecurringTransactionSkeleton } from "./RecurringTransactionSkeleton";
+import { formatCurrency } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -15,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Repeat, Loader2, AlertCircle, CheckCircle, Clock, PauseCircle } from "lucide-react";
+import { Plus, Repeat, AlertCircle, CheckCircle, Clock, PauseCircle } from "lucide-react";
 
 export function RecurringTransactionsPage() {
   const {
@@ -113,13 +114,6 @@ export function RecurringTransactionsPage() {
       }
       return sum + monthlyAmount;
     }, 0);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
 
   if (isLoading) {
     return (
@@ -266,12 +260,12 @@ export function RecurringTransactionsPage() {
                   amount={transaction.amount}
                   type={transaction.type}
                   category={transaction.category}
-                  description={transaction.description}
+                  {...(transaction.description && { description: transaction.description })}
                   frequency={transaction.frequency}
                   nextDate={transaction.nextDate}
                   isActive={transaction.isActive}
-                  lastGenerated={transaction.lastGenerated}
-                  endDate={transaction.endDate}
+                  {...(transaction.lastGenerated && { lastGenerated: transaction.lastGenerated })}
+                  {...(transaction.endDate && { endDate: transaction.endDate })}
                   onToggleActive={toggleActive}
                   onDelete={deleteRecurringTransaction}
                 />

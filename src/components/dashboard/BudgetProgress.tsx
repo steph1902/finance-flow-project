@@ -1,19 +1,17 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, TrendingUp, Wallet } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 import type { Budget } from "@/types";
+import { DURATION, STAGGER_DELAY } from "@/config/animations";
 
 type BudgetProgressProps = {
   budgets: Array<Budget & { spent?: number; remaining?: number; progress?: number }>;
   isLoading?: boolean;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressProps) {
   // Only show top 5 budgets by progress percentage
@@ -51,8 +49,23 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex h-32 items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="space-y-2 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-3 w-10" />
+                </div>
+                <Skeleton className="h-2 w-full rounded-full" />
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : topBudgets.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center text-neutral-500">
@@ -71,7 +84,7 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
                   key={budget.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * STAGGER_DELAY.medium }}
                   className="space-y-2 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
@@ -98,23 +111,23 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 }}
+                        transition={{ duration: DURATION.slowest, delay: index * STAGGER_DELAY.slow }}
                         className={`h-full rounded-full ${getProgressColor(progress)} transition-colors`}
                       />
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-600 dark:text-neutral-400">
-                      Spent: <span className="font-medium text-neutral-900 dark:text-white">{currencyFormatter.format(budget.spent)}</span>
+                      Spent: <span className="font-medium text-neutral-900 dark:text-white">{formatCurrency(budget.spent)}</span>
                     </span>
                     <span className="text-neutral-600 dark:text-neutral-400">
-                      of <span className="font-medium">{currencyFormatter.format(budget.amount)}</span>
+                      of <span className="font-medium">{formatCurrency(budget.amount)}</span>
                     </span>
                   </div>
                   {remaining === 0 && progress >= 100 && (
                     <div className="text-xs text-danger-600 dark:text-danger-400 font-medium flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
-                      Budget exceeded by {currencyFormatter.format(budget.spent - budget.amount)}
+                      Budget exceeded by {formatCurrency(budget.spent - budget.amount)}
                     </div>
                   )}
                 </motion.div>

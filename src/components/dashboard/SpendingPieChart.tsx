@@ -1,28 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Pie, PieChart, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { SpendingByCategory } from "@/types";
 import { motion } from "framer-motion";
-
-const COLORS = [
-  "#3B82F6", // primary-500
-  "#10B981", // success-500
-  "#F59E0B", // warning-500
-  "#EF4444", // danger-500
-  "#8B5CF6", // purple-500
-  "#14B8A6", // teal-500
-  "#F97316", // orange-500
-  "#EC4899", // pink-500
-];
+import { getChartColor } from "@/config/charts";
+import { STAGGER_DELAY } from "@/config/animations";
 
 type SpendingPieChartProps = {
   data: SpendingByCategory[];
   isLoading?: boolean;
 };
 
-export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartProps) {
+const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChartProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const total = data.reduce((sum, item) => sum + item.amount, 0);
 
@@ -36,8 +28,24 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
       </CardHeader>
       <CardContent className="h-[400px]">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="flex h-full flex-col items-center justify-center gap-4">
+            {/* Circular skeleton for pie chart */}
+            <div className="relative h-48 w-48">
+              <Skeleton className="h-full w-full rounded-full" />
+              <div className="absolute inset-8">
+                <Skeleton className="h-full w-full rounded-full bg-background" />
+              </div>
+            </div>
+            {/* Legend skeleton */}
+            <div className="w-full max-w-xs space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Skeleton className="h-3 w-3 rounded-full" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-neutral-500">
@@ -66,7 +74,7 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
                   {data.map((entry, index) => (
                     <Cell 
                       key={entry.category} 
-                      fill={COLORS[index % COLORS.length]}
+                      fill={getChartColor(index)}
                       opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
                       style={{ 
                         cursor: 'pointer',
@@ -102,7 +110,7 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
                     key={item.category}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * STAGGER_DELAY.medium }}
                     className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
                       isActive ? 'bg-primary-50 dark:bg-primary-950/20' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                     }`}
@@ -111,7 +119,7 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
                   >
                     <span
                       className="h-3 w-3 rounded-full shrink-0"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      style={{ backgroundColor: getChartColor(index) }}
                       aria-hidden
                     />
                     <span className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-medium">
@@ -132,5 +140,17 @@ export function SpendingPieChart({ data, isLoading = false }: SpendingPieChartPr
       </CardContent>
     </Card>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders when parent state changes
+export const SpendingPieChart = memo(SpendingPieChartComponent, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if data or loading state actually changed
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data.length === nextProps.data.length &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});
+
+SpendingPieChart.displayName = 'SpendingPieChart';
 

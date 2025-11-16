@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { ENV } from "@/lib/env";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "your-secret-key-change-this"
-);
+const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth-token")?.value;
@@ -24,7 +23,7 @@ export async function GET(req: NextRequest) {
         name: payload.name,
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ user: null });
   }
 }

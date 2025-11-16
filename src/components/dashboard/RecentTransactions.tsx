@@ -2,19 +2,16 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/formatters";
 import type { RecentTransaction } from "@/types";
 import { motion } from "framer-motion";
 import { ArrowUpCircle, ArrowDownCircle, Clock } from "lucide-react";
+import { STAGGER_DELAY } from "@/config/animations";
 
 type RecentTransactionsProps = {
   transactions: RecentTransaction[];
   isLoading?: boolean;
 };
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export function RecentTransactions({ transactions, isLoading = false }: RecentTransactionsProps) {
   return (
@@ -46,9 +43,9 @@ export function RecentTransactions({ transactions, isLoading = false }: RecentTr
             {transactions.map((transaction, index) => (
               <motion.div
                 key={transaction.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * STAGGER_DELAY.medium }}
                 className="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors group"
               >
                 <div className={`p-2 rounded-full ${
@@ -80,7 +77,7 @@ export function RecentTransactions({ transactions, isLoading = false }: RecentTr
                     : "text-danger-600 dark:text-danger-400"
                 }`}>
                   {transaction.type === "EXPENSE" ? "-" : "+"}
-                  {currencyFormatter.format(transaction.amount)}
+                  {formatCurrency(transaction.amount)}
                 </div>
               </motion.div>
             ))}

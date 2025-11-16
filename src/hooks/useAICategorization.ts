@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
 import type { CategorySuggestion } from "@/types";
+import { logError } from "@/lib/logger";
 
 interface UseAICategorizationProps {
   description?: string;
@@ -62,7 +64,8 @@ export function useAICategorization({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
-      console.error("AI categorization error:", err);
+      toast.error(`AI categorization failed: ${errorMessage}`);
+      logError("AI categorization error", err, { description, amount, type });
     } finally {
       setIsLoading(false);
     }

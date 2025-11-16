@@ -8,13 +8,7 @@ import { Menu, LogOut, Settings, HelpCircle, Bell, Search, TrendingUp } from "lu
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/transactions", label: "Transactions" },
-  { href: "/budgets", label: "Budgets" },
-  { href: "/settings", label: "Settings" },
-];
+import { NAV_ITEMS } from "@/config/navigation";
 
 export default function Header() {
   const router = useRouter();
@@ -49,7 +43,7 @@ export default function Header() {
                 FinanceFlow
               </span>
             </Link>
-            {navItems.map((item) => {
+            {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -61,7 +55,9 @@ export default function Header() {
                       ? "bg-linear-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                       : "text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30"
                   )}
+                  aria-current={isActive ? "page" : undefined}
                 >
+                  <item.icon className="h-4 w-4" />
                   {item.label}
                 </Link>
               );
@@ -89,12 +85,14 @@ export default function Header() {
           variant="ghost" 
           size="icon" 
           className="relative hover:bg-primary-50 dark:hover:bg-primary-950/30"
+          aria-label="View notifications"
         >
           <Bell className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
           <motion.span
             className="absolute top-1.5 right-1.5 h-2 w-2 bg-danger-500 rounded-full"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
+            aria-hidden="true"
           />
           <span className="sr-only">Notifications</span>
         </Button>
@@ -106,6 +104,7 @@ export default function Header() {
               variant="ghost" 
               size="icon" 
               className="rounded-full hover:bg-primary-50 dark:hover:bg-primary-950/30"
+              aria-label="Open user menu"
             >
               <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-medium text-sm shadow-lg">
                 D

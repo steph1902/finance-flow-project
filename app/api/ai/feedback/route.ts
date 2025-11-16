@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withApiAuth } from '@/lib/auth-helpers';
 import { categorizationService } from '@/lib/ai/categorization-service';
 import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/logger';
 
 export const POST = withApiAuth(async (req: NextRequest, userId) => {
   try {
@@ -15,15 +16,13 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
       );
     }
 
-    // Verify suggestion belongs to user
-    const suggestion = await prisma.$queryRaw<Array<{ user_id: string }>>`
-      SELECT user_id
-      FROM ai_suggestions
-      WHERE id = ${suggestionId}::uuid
-      LIMIT 1
-    `;
+    // Verify suggestion belongs to user - Use Prisma's type-safe query builder
+    const suggestion = await prisma.aISuggestion.findUnique({
+      where: { id: suggestionId },
+      select: { userId: true },
+    });
 
-    if (!suggestion.length || suggestion[0].user_id !== userId) {
+    if (!suggestion || suggestion.userId !== userId) {
       return NextResponse.json(
         { error: 'Suggestion not found' },
         { status: 404 }
@@ -38,7 +37,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Feedback API error:', error);
+    logError('Feedback API error', error, { userId });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

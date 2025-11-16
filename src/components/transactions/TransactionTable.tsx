@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { format } from "date-fns";
 import { Edit, Trash2, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/formatters";
 import type { Transaction } from "@/types";
 import { motion } from "framer-motion";
+import { getStaggerDelay } from "@/config/animations";
+
+/**
+ * TransactionTable Component
+ * 
+ * Displays transactions in a table format with edit/delete actions.
+ * 
+ * **Performance Note**: This component is optimized for paginated data.
+ * It's recommended to pass no more than 50 transactions at a time for optimal
+ * animation performance. Use server-side pagination or virtual scrolling for
+ * larger datasets.
+ * 
+ * Current implementation includes:
+ * - Stagger animations with max delay cap (0.3s)
+ * - Memoization to prevent unnecessary re-renders
+ * - Responsive design with mobile support
+ */
 
 type TransactionTableProps = {
   transactions: Transaction[];
@@ -20,12 +39,15 @@ type TransactionTableProps = {
   onDelete: (transaction: Transaction) => void;
 };
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+const TransactionTableComponent = ({ transactions, onEdit, onDelete }: TransactionTableProps) => {
+  // Performance warning for developers
+  if (process.env.NODE_ENV === 'development' && transactions.length > 100) {
+    console.warn(
+      `TransactionTable: Rendering ${transactions.length} transactions may impact performance. ` +
+      `Consider implementing pagination or virtual scrolling for better UX.`
+    );
+  }
 
-export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
       <Table>
@@ -55,15 +77,15 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
             </TableRow>
           ) : (
             transactions.map((transaction, index) => {
-              const amount = currencyFormatter.format(transaction.amount);
+              const amount = formatCurrency(transaction.amount);
               const formattedDate = format(new Date(transaction.date), "PPP");
 
               return (
                 <motion.tr
                   key={transaction.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.02 }}
+                  transition={{ delay: getStaggerDelay(index) }}
                   className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border-b border-neutral-200 dark:border-neutral-800 last:border-0"
                 >
                   <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">
@@ -107,6 +129,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                         size="icon" 
                         onClick={() => onEdit(transaction)}
                         className="h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-950/30 hover:text-primary-600 dark:hover:text-primary-400"
+                        aria-label={`Edit transaction: ${transaction.description}`}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit transaction</span>
@@ -116,6 +139,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                         size="icon" 
                         onClick={() => onDelete(transaction)}
                         className="h-8 w-8 hover:bg-danger-50 dark:hover:bg-danger-950/30 hover:text-danger-600 dark:hover:text-danger-400"
+                        aria-label={`Delete transaction: ${transaction.description}`}
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Delete transaction</span>
@@ -130,5 +154,18 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
       </Table>
     </div>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const TransactionTable = memo(TransactionTableComponent, (prevProps, nextProps) => {
+  // Re-render only if transactions array changes or callbacks change
+  return (
+    prevProps.transactions.length === nextProps.transactions.length &&
+    JSON.stringify(prevProps.transactions) === JSON.stringify(nextProps.transactions) &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete
+  );
+});
+
+TransactionTable.displayName = 'TransactionTable';
 

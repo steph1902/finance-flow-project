@@ -12,19 +12,8 @@ const serializeBudget = (budget: Prisma.BudgetGetPayload<true>) => ({
   updatedAt: budget.updatedAt.toISOString(),
 });
 
-async function getBudgetOr404(id: string, userId: string) {
-  return prisma.budget.findFirst({
-    where: { id, userId },
-  });
-}
-
 export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
   const id = req.nextUrl.pathname.split("/").pop()!;
-  const existing = await getBudgetOr404(id, userId);
-
-  if (!existing) {
-    return NextResponse.json({ error: "Not Found" }, { status: 404 });
-  }
 
   const json = await req.json();
   const parsed = budgetUpdateSchema.safeParse(json);
@@ -43,12 +32,23 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
   const { amount, ...rest } = parsed.data;
 
   try {
-    const budget = await prisma.budget.update({
-      where: { id: existing.id },
-      data: {
-        ...rest,
-        ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
-      },
+    // Use transaction to ensure ownership check and update are atomic
+    const budget = await prisma.$transaction(async (tx) => {
+      const existing = await tx.budget.findFirst({
+        where: { id, userId },
+      });
+
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
+
+      return await tx.budget.update({
+        where: { id: existing.id },
+        data: {
+          ...rest,
+          ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
+        },
+      });
     });
 
     return NextResponse.json({
@@ -56,6 +56,10 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
       data: serializeBudget(budget),
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
         { error: "Budget for this category already exists for the selected month" },
@@ -69,14 +73,28 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
 
 export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
   const id = req.nextUrl.pathname.split("/").pop()!;
-  const existing = await getBudgetOr404(id, userId);
 
-  if (!existing) {
-    return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  try {
+    // Use transaction to ensure ownership check and delete are atomic
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.budget.findFirst({
+        where: { id, userId },
+      });
+
+      if (!existing) {
+        throw new Error("NOT_FOUND");
+      }
+
+      await tx.budget.delete({ where: { id: existing.id } });
+    });
+
+    return NextResponse.json({ message: "Budget deleted" });
+  } catch (error) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
+    }
+
+    throw error;
   }
-
-  await prisma.budget.delete({ where: { id: existing.id } });
-
-  return NextResponse.json({ message: "Budget deleted" });
 });
 

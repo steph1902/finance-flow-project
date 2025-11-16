@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -14,15 +14,17 @@ import {
   AreaChart,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { DailyTrendPoint } from "@/types";
 import { motion } from "framer-motion";
+import { CHART_COLORS } from "@/config/charts";
 
 type SpendingLineChartProps = {
   data: DailyTrendPoint[];
   isLoading?: boolean;
 };
 
-export function SpendingLineChart({ data, isLoading = false }: SpendingLineChartProps) {
+const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineChartProps) => {
   const [activeChart, setActiveChart] = useState<'line' | 'area'>('area');
 
   return (
@@ -61,8 +63,37 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
       </CardHeader>
       <CardContent className="h-[400px]">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div className="flex h-full flex-col gap-4 p-4">
+            {/* Chart area skeleton */}
+            <div className="flex-1 flex flex-col justify-end gap-2">
+              {/* Bar chart skeleton representation */}
+              <div className="flex items-end justify-between gap-2 h-48">
+                {[40, 65, 45, 80, 55, 70, 50, 75, 60, 85].map((height, i) => (
+                  <Skeleton 
+                    key={i} 
+                    className="flex-1 rounded-t" 
+                    style={{ height: `${height}%` }}
+                  />
+                ))}
+              </div>
+              {/* X-axis skeleton */}
+              <div className="flex justify-between gap-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                  <Skeleton key={i} className="h-3 flex-1" />
+                ))}
+              </div>
+            </div>
+            {/* Legend skeleton */}
+            <div className="flex justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-8 rounded-full" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-8 rounded-full" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
           </div>
         ) : data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-neutral-500">
@@ -85,12 +116,12 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
                 <AreaChart data={data} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
                   <defs>
                     <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                      <stop offset="5%" stopColor={CHART_COLORS[1]} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLORS[1]} stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                      <stop offset="5%" stopColor={CHART_COLORS[3]} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLORS[3]} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="#94A3B8" />
@@ -126,21 +157,21 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
                   <Area 
                     type="monotone" 
                     dataKey="income" 
-                    stroke="#10B981" 
+                    stroke={CHART_COLORS[1]} 
                     strokeWidth={2.5} 
                     fill="url(#incomeGradient)" 
                     name="Income"
-                    dot={{ fill: '#10B981', r: 3 }}
+                    dot={{ fill: CHART_COLORS[1], r: 3 }}
                     activeDot={{ r: 5 }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="expenses" 
-                    stroke="#EF4444" 
+                    stroke={CHART_COLORS[3]} 
                     strokeWidth={2.5} 
                     fill="url(#expensesGradient)" 
                     name="Expenses"
-                    dot={{ fill: '#EF4444', r: 3 }}
+                    dot={{ fill: CHART_COLORS[3], r: 3 }}
                     activeDot={{ r: 5 }}
                   />
                 </AreaChart>
@@ -202,5 +233,16 @@ export function SpendingLineChart({ data, isLoading = false }: SpendingLineChart
       </CardContent>
     </Card>
   );
-}
+};
+
+// Memoize to prevent unnecessary re-renders
+export const SpendingLineChart = memo(SpendingLineChartComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data.length === nextProps.data.length &&
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  );
+});
+
+SpendingLineChart.displayName = 'SpendingLineChart';
 

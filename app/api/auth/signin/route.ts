@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
+import { ENV } from "@/lib/env";
+import { logError } from "@/lib/logger";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "your-secret-key-change-this"
-);
+const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Sign in error:", error);
+    logError("Sign in error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

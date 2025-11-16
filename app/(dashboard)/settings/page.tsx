@@ -41,12 +41,26 @@ export default function SettingsPage() {
   const handleExportData = async () => {
     try {
       toast.info("Preparing your data export...");
-      // TODO: Implement data export functionality
-      setTimeout(() => {
-        toast.success("Data export ready for download!");
-      }, 2000);
+      
+      const response = await fetch("/api/export/data");
+      
+      if (!response.ok) {
+        throw new Error("Export failed");
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `financeflow-data-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Data exported successfully!");
     } catch {
-      toast.error("Failed to export data");
+      toast.error("Failed to export data. Please try again later.");
     }
   };
 
@@ -55,9 +69,41 @@ export default function SettingsPage() {
       "Are you absolutely sure? This action cannot be undone. All your data will be permanently deleted."
     );
     
-    if (confirmed) {
-      toast.error("Account deletion is not yet implemented");
-      // TODO: Implement account deletion
+    if (!confirmed) return;
+    
+    // Second confirmation for extra safety
+    const doubleConfirmed = confirm(
+      "This is your last chance. Type 'DELETE' in the next prompt to confirm."
+    );
+    
+    if (!doubleConfirmed) return;
+    
+    const userInput = prompt('Please type "DELETE" to confirm account deletion:');
+    
+    if (userInput !== "DELETE") {
+      toast.error("Account deletion cancelled - confirmation text did not match");
+      return;
+    }
+    
+    try {
+      toast.loading("Deleting account...");
+      
+      const response = await fetch("/api/account/delete", {
+        method: "DELETE",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Deletion failed");
+      }
+      
+      toast.success("Account deleted successfully");
+      
+      // Redirect to home page after brief delay
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    } catch {
+      toast.error("Failed to delete account. Please contact support.");
     }
   };
 
