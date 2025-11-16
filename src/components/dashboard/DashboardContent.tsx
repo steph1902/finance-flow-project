@@ -7,6 +7,7 @@ import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { SpendingLineChart } from "@/components/dashboard/SpendingLineChart";
 import { SpendingPieChart } from "@/components/dashboard/SpendingPieChart";
+import { SpendingForecast } from "@/components/dashboard/SpendingForecast";
 import { AIInsights } from "@/components/ai/AIInsights";
 import { UpcomingRecurringWidget } from "@/components/recurring/UpcomingRecurringWidget";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,8 @@ export function DashboardContent() {
       <DashboardSummary summary={data?.summary} isLoading={isLoading} />
 
       <AIInsights />
+
+      <SpendingForecast />
 
       <UpcomingRecurringWidget />
 
