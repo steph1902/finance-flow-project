@@ -100,7 +100,7 @@ export async function chatWithAssistant({
 
     // Get AI response - build prompt with conversation
     const fullPrompt = `${systemPrompt}\n\nConversation:\n${conversationForAI
-      .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.parts[0].text}`)
+      .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.parts[0]?.text ?? ''}`)
       .join("\n")}`;
 
     let aiResponse: string;

@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Repeat, Loader2, AlertCircle, CheckCircle, Clock, PauseCircle } from "lucide-react";
+import { Plus, Repeat, AlertCircle, CheckCircle, Clock, PauseCircle } from "lucide-react";
 
 export function RecurringTransactionsPage() {
   const {

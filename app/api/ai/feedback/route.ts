@@ -24,7 +24,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
       LIMIT 1
     `;
 
-    if (!suggestion.length || suggestion[0].user_id !== userId) {
+    if (!suggestion.length || suggestion[0]?.user_id !== userId) {
       return NextResponse.json(
         { error: 'Suggestion not found' },
         { status: 404 }

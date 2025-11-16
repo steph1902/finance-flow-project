@@ -45,7 +45,7 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
 }
 
 // GET /api/recurring-transactions - List all recurring transactions
-export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
+export const GET = withApiAuth(async (_req: NextRequest, userId: string) => {
   try {
     const recurringTransactions = await prisma.recurringTransaction.findMany({
       where: { userId },

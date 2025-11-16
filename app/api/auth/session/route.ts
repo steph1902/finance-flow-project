@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { ENV } from "@/lib/env";
@@ -23,7 +23,7 @@ export async function GET() {
         name: payload.name,
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ user: null });
   }
 }

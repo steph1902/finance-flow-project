@@ -125,6 +125,7 @@ export function TransactionForm({
       // Clear suggestions when conditions aren't met
       setAiSuggestion(null);
       setAiError(null);
+      return undefined;
     }
   }, [currentDescription, currentAmount, selectedType, transaction]);
 
@@ -157,6 +158,7 @@ export function TransactionForm({
             date: values.date,
           });
           form.reset();
+          return;
         })}
         className="space-y-4"
       >

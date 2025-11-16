@@ -76,7 +76,7 @@ class GeminiClient {
       const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
                        response.match(/```\n([\s\S]*?)\n```/);
       
-      const jsonString = jsonMatch ? jsonMatch[1] : response;
+      const jsonString = jsonMatch?.[1] ?? response;
       return JSON.parse(jsonString.trim()) as T;
     } catch (parseError) {
       logError('Failed to parse AI response as JSON', parseError, { response });
