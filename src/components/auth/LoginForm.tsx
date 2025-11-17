@@ -73,9 +73,9 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+    <form onSubmit={handleSubmit} className="grid gap-6">
+      <div className="grid gap-3">
+        <Label htmlFor="email" className="font-medium">Email</Label>
         <Input
           id="email"
           type="email"
@@ -89,12 +89,12 @@ export default function LoginForm() {
               setErrors(restErrors);
             }
           }}
-          className={errors.email ? "border-red-500" : ""}
+          className={`${errors.email ? "border-destructive focus-visible:ring-destructive" : ""} shadow-soft`}
         />
-        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+        {errors.email && <p className="type-small text-destructive">{errors.email}</p>}
       </div>
-      <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+      <div className="grid gap-3">
+        <Label htmlFor="password" className="font-medium">Password</Label>
         <Input
           id="password"
           type="password"
@@ -107,11 +107,11 @@ export default function LoginForm() {
               setErrors(restErrors);
             }
           }}
-          className={errors.password ? "border-red-500" : ""}
+          className={`${errors.password ? "border-destructive focus-visible:ring-destructive" : ""} shadow-soft`}
         />
-        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+        {errors.password && <p className="type-small text-destructive">{errors.password}</p>}
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full font-semibold shadow-md" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Login"}
       </Button>
     </form>

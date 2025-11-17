@@ -110,85 +110,89 @@ export function RecurringTransactionCard({
   };
 
   return (
-    <Card className={`relative ${!isActive ? "opacity-60" : ""} ${isOverdue ? "border-orange-500" : ""}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
+    <Card className={`relative transition-all hover:shadow-mist ${!isActive ? "opacity-60" : ""} ${isOverdue ? "border-orange-500/50 shadow-sm shadow-orange-500/20" : "shadow-card"}`}>
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <CardTitle className="text-base truncate">
+            <div className="flex items-center gap-2 flex-wrap mb-2">
+              <CardTitle className="type-h4 truncate">
                 {description || category}
               </CardTitle>
-              <Badge variant={type === "INCOME" ? "default" : "secondary"} className="shrink-0">
+              <Badge variant={type === "INCOME" ? "default" : "secondary"} className="shrink-0 font-medium">
                 {category}
               </Badge>
             </div>
-            <CardDescription className="flex items-center gap-2">
-              <Repeat className="h-3 w-3" />
+            <CardDescription className="flex items-center gap-2 type-small">
+              <Repeat className="h-3.5 w-3.5" />
               {FREQUENCY_LABELS[frequency]}
             </CardDescription>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {type === "INCOME" ? (
-              <TrendingUp className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <TrendingUp className="h-5 w-5 text-success" />
+              </div>
             ) : (
-              <TrendingDown className="h-5 w-5 text-red-600" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <TrendingDown className="h-5 w-5 text-destructive" />
+              </div>
             )}
-            <div className={`text-lg font-semibold ${type === "INCOME" ? "text-green-600" : "text-red-600"}`}>
+            <div className={`text-2xl font-bold ${type === "INCOME" ? "text-success" : "text-destructive"}`}>
               {type === "INCOME" ? "+" : "-"}{formatCurrency(amount)}
             </div>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {/* Status Badges */}
         <div className="flex flex-wrap gap-2">
           {isActive ? (
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300 dark:bg-green-950 dark:text-green-400">
-              <Play className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-success/10 text-success border-success/30 font-medium">
+              <Play className="h-3 w-3 mr-1.5" />
               Active
             </Badge>
           ) : (
-            <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-900 dark:text-gray-400">
-              <Pause className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-border/50 font-medium">
+              <Pause className="h-3 w-3 mr-1.5" />
               Paused
             </Badge>
           )}
 
           {isOverdue && (
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300 dark:bg-orange-950 dark:text-orange-400">
-              <Clock className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/30 font-medium dark:text-orange-400">
+              <Clock className="h-3 w-3 mr-1.5" />
               Due
             </Badge>
           )}
 
           {hasEnded && (
-            <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-300">
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-border/50 font-medium">
               Ended
             </Badge>
           )}
         </div>
 
         {/* Next Occurrence */}
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-muted/30 border border-border/30">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
-            <span>Next occurrence:</span>
+            <span className="font-medium">Next occurrence:</span>
           </div>
-          <div className={`font-medium ${isOverdue ? "text-orange-600" : ""}`}>
+          <div className={`font-semibold ${isOverdue ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>
             {formatRelativeDate(nextDate)}
           </div>
         </div>
 
         {/* Last Generated */}
         {lastGenerated && (
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between type-small">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4" />
               <span>Last generated:</span>
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-muted-foreground font-medium">
               {formatDate(lastGenerated)}
             </div>
           </div>
@@ -196,25 +200,25 @@ export function RecurringTransactionCard({
 
         {/* End Date */}
         {endDate && (
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between type-small">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar className="h-4 w-4" />
               <span>Ends on:</span>
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-muted-foreground font-medium">
               {formatDate(endDate)}
             </div>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2 border-t">
+        <div className="flex gap-2 pt-3 border-t border-border/50">
           {onEdit && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onEdit(id)}
-              className="flex-1"
+              className="flex-1 font-medium transition-all hover:shadow-soft"
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit
@@ -226,7 +230,7 @@ export function RecurringTransactionCard({
             size="sm"
             onClick={handleToggleActive}
             disabled={isTogglingActive || hasEnded}
-            className="flex-1"
+            className="flex-1 font-medium transition-all hover:shadow-soft"
           >
             {isActive ? (
               <>
@@ -247,25 +251,25 @@ export function RecurringTransactionCard({
                 variant="outline"
                 size="sm"
                 disabled={isDeleting}
-                className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                className="text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all hover:shadow-soft"
                 aria-label={`Delete recurring transaction: ${description}`}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Recurring Transaction?</AlertDialogTitle>
-                <AlertDialogDescription>
+            <AlertDialogContent className="rounded-xl shadow-lg">
+              <AlertDialogHeader className="space-y-3">
+                <AlertDialogTitle className="type-h3">Delete Recurring Transaction?</AlertDialogTitle>
+                <AlertDialogDescription className="type-body">
                   This will permanently delete this recurring transaction. Any transactions already
                   created from this pattern will remain in your history.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="font-medium">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-medium shadow-sm"
                 >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </AlertDialogAction>
