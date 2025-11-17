@@ -26,7 +26,7 @@ describe('GeminiClient', () => {
       () =>
         ({
           getGenerativeModel: mockGetGenerativeModel,
-        } as any)
+        }) as unknown as GoogleGenerativeAI
     );
 
     // Set API key
@@ -117,13 +117,13 @@ describe('GeminiClient', () => {
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
-      const schema = {
+      const schema = JSON.stringify({
         type: 'object',
         properties: {
           category: { type: 'string' },
           confidence: { type: 'number' },
         },
-      };
+      });
 
       const result = await client.generateStructuredContent('Categorize this', schema);
 
@@ -138,7 +138,7 @@ describe('GeminiClient', () => {
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
-      const result = await client.generateStructuredContent('Test', {});
+      const result = await client.generateStructuredContent('Test');
 
       expect(result).toEqual({ key: 'value' });
     });
@@ -151,7 +151,7 @@ describe('GeminiClient', () => {
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
-      await expect(client.generateStructuredContent('Test', {})).rejects.toThrow();
+      await expect(client.generateStructuredContent('Test')).rejects.toThrow();
     });
   });
 });

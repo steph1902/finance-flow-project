@@ -107,10 +107,21 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // 7. Generate forecast using Gemini AI
+    // 7. Convert Prisma Decimal to number for AI service
+    const convertedTransactions = transactions.map(t => ({
+      ...t,
+      amount: t.amount.toNumber(),
+    }));
+
+    const convertedRecurringTransactions = recurringTransactions.map(rt => ({
+      ...rt,
+      amount: rt.amount.toNumber(),
+    }));
+
+    // 8. Generate forecast using Gemini AI
     const forecast = await generateForecast({
-      transactions,
-      recurringTransactions,
+      transactions: convertedTransactions,
+      recurringTransactions: convertedRecurringTransactions,
       months,
       userId: user.id,
     });

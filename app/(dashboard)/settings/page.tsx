@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
@@ -37,6 +37,17 @@ export default function SettingsPage() {
     budgetAlerts: true,
     recurringReminders: true,
   });
+
+  // Show loading state while session is being fetched
+  if (status === "loading") {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  // Redirect if not authenticated
+  if (!session) {
+    router.push('/login');
+    return null;
+  }
 
   const handleExportData = async () => {
     try {

@@ -16,7 +16,7 @@ interface Transaction {
   category: string;
   type: "INCOME" | "EXPENSE";
   date: Date;
-  description: string;
+  description?: string | null;
 }
 
 interface RecurringTransaction {
@@ -24,7 +24,7 @@ interface RecurringTransaction {
   category: string;
   type: "INCOME" | "EXPENSE";
   frequency: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
-  description: string;
+  description?: string | null;
 }
 
 interface ForecastInput {

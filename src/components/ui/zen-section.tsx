@@ -6,7 +6,7 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 
-export type ZenSectionSpacing = "none" | "sm" | "md" | "lg" | "xl";
+export type ZenSectionSpacing = "none" | "sm" | "md" | "lg" | "xl" | "epic";
 
 interface ZenSectionProps extends HTMLAttributes<HTMLElement> {
   spacing?: ZenSectionSpacing;
@@ -19,6 +19,7 @@ const spacingClasses: Record<ZenSectionSpacing, string> = {
   md: "py-12 md:py-16 lg:py-20",
   lg: "py-16 md:py-24 lg:py-32",
   xl: "py-24 md:py-32 lg:py-40",
+  epic: "py-32 md:py-40 lg:py-48",
 };
 
 const backgroundClasses = {

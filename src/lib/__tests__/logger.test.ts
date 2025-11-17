@@ -9,16 +9,11 @@ import {
   apiError,
 } from '../logger';
 
-// Mock console methods
-const originalConsoleLog = console.log;
-const originalConsoleWarn = console.warn;
-const originalConsoleError = console.error;
-const originalNodeEnv = process.env.NODE_ENV;
-
 describe('logger', () => {
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
   let consoleErrorSpy: jest.SpyInstance;
+  const originalNodeEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
@@ -30,12 +25,21 @@ describe('logger', () => {
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-    process.env.NODE_ENV = originalNodeEnv;
+    // Restore original NODE_ENV
+    if (originalNodeEnv !== undefined) {
+      process.env.NODE_ENV = originalNodeEnv;
+    } else {
+      delete process.env.NODE_ENV;
+    }
   });
 
   describe('logInfo', () => {
     it('should log info message in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true,
+      });
       logInfo('Test info message');
 
       expect(consoleLogSpy).toHaveBeenCalled();
@@ -45,7 +49,11 @@ describe('logger', () => {
     });
 
     it('should log with context in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true,
+      });
       logInfo('Test message', { userId: '123', action: 'test' });
 
       expect(consoleLogSpy).toHaveBeenCalled();
@@ -54,7 +62,7 @@ describe('logger', () => {
     });
 
     it('should sanitize sensitive keys in context', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test message', {
         password: 'secret',
         apiKey: 'key123',
@@ -75,7 +83,7 @@ describe('logger', () => {
     });
 
     it('should not log in production (info level)', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       logInfo('Test message');
 
       expect(consoleLogSpy).not.toHaveBeenCalled();
@@ -84,7 +92,7 @@ describe('logger', () => {
 
   describe('logWarn', () => {
     it('should log warning message in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logWarn('Test warning');
 
       expect(consoleWarnSpy).toHaveBeenCalled();
@@ -94,7 +102,7 @@ describe('logger', () => {
     });
 
     it('should log with context', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logWarn('Warning message', { code: 'WARN_001' });
 
       expect(consoleWarnSpy).toHaveBeenCalled();
@@ -103,7 +111,7 @@ describe('logger', () => {
     });
 
     it('should not log in production', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       logWarn('Test warning');
 
       expect(consoleWarnSpy).not.toHaveBeenCalled();
@@ -112,7 +120,7 @@ describe('logger', () => {
 
   describe('logError', () => {
     it('should log error message in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Test error');
       logError('Error occurred', error);
 
@@ -120,7 +128,7 @@ describe('logger', () => {
     });
 
     it('should sanitize error in production', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       const error = new Error('Sensitive error message');
       logError('Error occurred', error);
 
@@ -132,7 +140,7 @@ describe('logger', () => {
     });
 
     it('should include stack trace in development only', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Test error');
       logError('Error occurred', error);
 
@@ -141,21 +149,21 @@ describe('logger', () => {
     });
 
     it('should handle non-Error objects', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logError('Error occurred', 'string error');
 
       expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it('should handle null/undefined errors', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logError('Error occurred', undefined);
 
       expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it('should sanitize sensitive context in errors', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Test error');
       logError('Error occurred', error, {
         password: 'secret',
@@ -170,7 +178,7 @@ describe('logger', () => {
 
   describe('logDebug', () => {
     it('should log debug message in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logDebug('Debug info');
 
       expect(consoleLogSpy).toHaveBeenCalled();
@@ -180,14 +188,14 @@ describe('logger', () => {
     });
 
     it('should never log in production', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       logDebug('Debug info');
 
       expect(consoleLogSpy).not.toHaveBeenCalled();
     });
 
     it('should log with context in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logDebug('Debug message', { debugData: 'value' });
 
       expect(consoleLogSpy).toHaveBeenCalled();
@@ -198,7 +206,7 @@ describe('logger', () => {
 
   describe('apiError', () => {
     it('should log error and return error object in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('API error');
       const result = apiError('API failed', error, 500);
 
@@ -210,7 +218,7 @@ describe('logger', () => {
     });
 
     it('should return generic message in production', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       const error = new Error('Detailed error');
       const result = apiError('Specific error message', error, 500);
 
@@ -221,7 +229,7 @@ describe('logger', () => {
     });
 
     it('should default to status 500', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Error');
       const result = apiError('Error message', error);
 
@@ -229,7 +237,7 @@ describe('logger', () => {
     });
 
     it('should handle custom status codes', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Not found');
       const result = apiError('Resource not found', error, 404);
 
@@ -239,7 +247,7 @@ describe('logger', () => {
 
   describe('Context Sanitization', () => {
     it('should redact keys containing "password"', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', {
         userPassword: 'secret',
         Password: 'secret2',
@@ -253,7 +261,7 @@ describe('logger', () => {
     });
 
     it('should redact keys containing "token"', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', { authToken: 'abc123', refreshToken: 'xyz789' });
 
       const context = consoleLogSpy.mock.calls[0][1];
@@ -262,7 +270,7 @@ describe('logger', () => {
     });
 
     it('should redact keys containing "secret"', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', { clientSecret: 'secret123', apiSecret: 'secret456' });
 
       const context = consoleLogSpy.mock.calls[0][1];
@@ -271,7 +279,7 @@ describe('logger', () => {
     });
 
     it('should redact keys containing "apikey"', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', { apiKey: 'key123', API_KEY: 'key456' });
 
       const context = consoleLogSpy.mock.calls[0][1];
@@ -280,7 +288,7 @@ describe('logger', () => {
     });
 
     it('should redact keys containing "authorization"', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', { authorization: 'Bearer token' });
 
       const context = consoleLogSpy.mock.calls[0][1];
@@ -288,7 +296,7 @@ describe('logger', () => {
     });
 
     it('should redact nested objects', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', {
         user: { name: 'John', password: 'secret' },
         metadata: { count: 5 },
@@ -300,7 +308,7 @@ describe('logger', () => {
     });
 
     it('should not redact safe keys', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test', {
         userId: '123',
         email: 'test@example.com',
@@ -318,7 +326,7 @@ describe('logger', () => {
 
   describe('Timestamp Format', () => {
     it('should include ISO timestamp in logs', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       logInfo('Test message');
 
       const logCall = consoleLogSpy.mock.calls[0][0];
@@ -329,7 +337,7 @@ describe('logger', () => {
 
   describe('Error Sanitization', () => {
     it('should sanitize Error instances in production', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       const error = new Error('Detailed error message');
       error.stack = 'Error stack trace...';
       
@@ -342,7 +350,7 @@ describe('logger', () => {
     });
 
     it('should include error details in development', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Detailed error message');
       
       logError('Test', error);

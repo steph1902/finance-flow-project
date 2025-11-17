@@ -83,20 +83,27 @@ export function BudgetsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Budgets</h1>
-          <p className="text-sm text-muted-foreground">Plan your spending and stay on track with monthly budgets.</p>
+    <div className="space-y-8">
+      {/* Premium Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-2">
+          <h1 className="type-h2 text-foreground">Budgets</h1>
+          <p className="type-body text-muted-foreground max-w-2xl">
+            Plan your spending and stay on track with monthly budgets.
+          </p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
           <DialogTrigger asChild>
-            <Button>Add budget</Button>
+            <Button className="shadow-sm hover:shadow-md transition-shadow">
+              Add budget
+            </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{editingBudget ? "Edit budget" : "Create budget"}</DialogTitle>
+              <DialogTitle className="type-h4">
+                {editingBudget ? "Edit budget" : "Create budget"}
+              </DialogTitle>
             </DialogHeader>
             <BudgetForm
               budget={editingBudget ?? undefined}
@@ -113,15 +120,15 @@ export function BudgetsPage() {
       {/* AI Budget Optimizer */}
       <BudgetOptimizer />
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm">
+      <div className="rounded-xl border border-border/30 bg-card/50 p-6 shadow-soft">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-1">
-            <Label>Month</Label>
+          <div className="space-y-2">
+            <Label className="type-body font-medium">Month</Label>
             <Select
               value={String(filters.month ?? "")}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, month: Number(value) }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="transition-shadow hover:shadow-sm">
                 <SelectValue placeholder="Select month" />
               </SelectTrigger>
               <SelectContent>

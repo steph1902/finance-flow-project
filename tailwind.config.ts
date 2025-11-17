@@ -9,6 +9,23 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1rem',
+        md: '1.5rem',
+        lg: '2rem',
+        xl: '2rem',
+      },
+      screens: {
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1280px', // Premium standard — not 1536px
+      },
+    },
     extend: {
       colors: {
         background: 'hsl(var(--background))',
@@ -72,9 +89,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Noto Sans JP"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-        serif: ['"Noto Serif JP"', '"Noto Sans JP"', 'serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        serif: ['var(--font-shippori)', '"Shippori Mincho B1"', 'serif'],
+        mono: ['"SF Mono"', '"Monaco"', '"Cascadia Code"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius-lg)',
@@ -85,14 +102,52 @@ const config: Config = {
         full: 'var(--radius-full)',
       },
       spacing: {
-        'zen-xs': 'var(--space-zen-xs)',
-        'zen-sm': 'var(--space-zen-sm)',
-        'zen-md': 'var(--space-zen-md)',
-        'zen-lg': 'var(--space-zen-lg)',
-        'zen-xl': 'var(--space-zen-xl)',
-        'zen-2xl': 'var(--space-zen-2xl)',
-        'zen-3xl': 'var(--space-zen-3xl)',
-        'zen-4xl': 'var(--space-zen-4xl)',
+        // Premium 8pt grid spacing
+        '0': 'var(--space-0)',
+        '1': 'var(--space-1)',
+        '2': 'var(--space-2)',
+        '3': 'var(--space-3)',
+        '4': 'var(--space-4)',
+        '5': 'var(--space-5)',
+        '6': 'var(--space-6)',
+        '8': 'var(--space-8)',
+        '10': 'var(--space-10)',
+        '12': 'var(--space-12)',
+        '16': 'var(--space-16)',
+        '20': 'var(--space-20)',
+        '24': 'var(--space-24)',
+        '32': 'var(--space-32)',
+        '40': 'var(--space-40)',
+        '48': 'var(--space-48)',
+        
+        // Ma (間) — Japanese negative space
+        'ma-micro': 'var(--ma-micro)',
+        'ma-sm': 'var(--ma-small)',
+        'ma-md': 'var(--ma-medium)',
+        'ma-lg': 'var(--ma-large)',
+        'ma-xl': 'var(--ma-xlarge)',
+        'ma-epic': 'var(--ma-epic)',
+      },
+      gridTemplateColumns: {
+        '12': 'repeat(12, minmax(0, 1fr))',
+      },
+      gridColumn: {
+        'span-1': 'span 1 / span 1',
+        'span-2': 'span 2 / span 2',
+        'span-3': 'span 3 / span 3',
+        'span-4': 'span 4 / span 4',
+        'span-5': 'span 5 / span 5',
+        'span-6': 'span 6 / span 6',
+        'span-7': 'span 7 / span 7',
+        'span-8': 'span 8 / span 8',
+        'span-9': 'span 9 / span 9',
+        'span-10': 'span 10 / span 10',
+        'span-11': 'span 11 / span 11',
+        'span-12': 'span 12 / span 12',
+      },
+      maxWidth: {
+        'content': '720px',
+        'prose': '65ch',
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',
@@ -102,11 +157,11 @@ const config: Config = {
         'floating': 'var(--shadow-floating)',
       },
       animation: {
-        'fade-in': 'fadeIn var(--transition-smooth) var(--ease-zen)',
-        'fade-in-up': 'fadeInUp var(--transition-calm) var(--ease-zen)',
-        'fade-in-down': 'fadeInDown var(--transition-calm) var(--ease-zen)',
-        'scale-in': 'scaleIn var(--transition-smooth) var(--ease-zen)',
-        'slide-in-right': 'slideInRight var(--transition-calm) var(--ease-gentle)',
+        'fade-in': 'fadeIn var(--duration-medium) var(--ease-zen-calm)',
+        'fade-in-up': 'fadeInUp var(--duration-slow) var(--ease-zen-calm)',
+        'fade-in-down': 'fadeInDown var(--duration-slow) var(--ease-zen-calm)',
+        'scale-in': 'scaleIn var(--duration-medium) var(--ease-apple)',
+        'slide-in-right': 'slideInRight var(--duration-slow) var(--ease-luxury)',
       },
       keyframes: {
         fadeIn: {
@@ -131,16 +186,20 @@ const config: Config = {
         },
       },
       transitionDuration: {
-        'instant': 'var(--transition-instant)',
-        'fast': 'var(--transition-fast)',
-        'smooth': 'var(--transition-smooth)',
-        'calm': 'var(--transition-calm)',
-        'slow': 'var(--transition-slow)',
+        'instant': 'var(--duration-instant)',
+        'fast': 'var(--duration-fast)',
+        'medium': 'var(--duration-medium)',
+        'slow': 'var(--duration-slow)',
+        'zen': 'var(--duration-zen)',
+        'cinematic': 'var(--duration-cinematic)',
       },
       transitionTimingFunction: {
-        'zen': 'var(--ease-zen)',
-        'gentle': 'var(--ease-gentle)',
-        'bounce': 'var(--ease-bounce)',
+        'apple': 'var(--ease-apple)',
+        'zen': 'var(--ease-zen-calm)',
+        'luxury': 'var(--ease-luxury)',
+        'material': 'var(--ease-material)',
+        'bounce': 'var(--ease-bounce-subtle)',
+        'spring': 'var(--ease-spring)',
       },
       backdropBlur: {
         xs: '2px',

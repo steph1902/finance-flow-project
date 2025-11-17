@@ -63,14 +63,35 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
         throw new Error("NOT_FOUND");
       }
 
+      // Build update data with explicit undefined filtering for exactOptionalPropertyTypes
+      const updateData: {
+        amount?: number;
+        type?: "INCOME" | "EXPENSE";
+        category?: string;
+        description?: string;
+        notes?: string;
+        frequency?: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
+        startDate?: Date;
+        endDate?: Date | null;
+        isActive?: boolean;
+      } = {};
+
+      if (validatedData.amount !== undefined) updateData.amount = validatedData.amount;
+      if (validatedData.type !== undefined) updateData.type = validatedData.type;
+      if (validatedData.category !== undefined) updateData.category = validatedData.category;
+      if (validatedData.description !== undefined) updateData.description = validatedData.description;
+      if (validatedData.notes !== undefined) updateData.notes = validatedData.notes;
+      if (validatedData.frequency !== undefined) updateData.frequency = validatedData.frequency;
+      if (validatedData.startDate !== undefined) updateData.startDate = new Date(validatedData.startDate);
+      if (validatedData.endDate !== undefined) {
+        updateData.endDate = validatedData.endDate ? new Date(validatedData.endDate) : null;
+      }
+      if (validatedData.isActive !== undefined) updateData.isActive = validatedData.isActive;
+
       // Update the recurring transaction
       return await tx.recurringTransaction.update({
         where: { id },
-        data: {
-          ...validatedData,
-          startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
-          endDate: validatedData.endDate ? new Date(validatedData.endDate) : undefined,
-        },
+        data: updateData,
       });
     });
 

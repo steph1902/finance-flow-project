@@ -63,8 +63,9 @@ function toNumber(value: number | { toNumber: () => number }): number {
 
 /**
  * Calculate actual spending by category
+ * @internal - Exported for testing
  */
-function calculateActualSpending(
+export function calculateActualSpending(
   transactions: Transaction[],
   months: number
 ): Map<string, number> {
@@ -86,8 +87,9 @@ function calculateActualSpending(
 
 /**
  * Analyze variance between budgets and actual spending
+ * @internal - Exported for testing
  */
-function analyzeVariance(
+export function analyzeVariance(
   budgets: Budget[],
   actualSpending: Map<string, number>
 ) {

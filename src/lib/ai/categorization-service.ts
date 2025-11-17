@@ -106,6 +106,7 @@ export class CategorizationService {
 
     return {
       category: input.type === 'income' ? 'Other' : 'Other',
+      subcategory: undefined,
       confidence: 0.3,
       reasoning: 'No matching pattern found',
     };

@@ -95,13 +95,26 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
         throw new Error("NOT_FOUND");
       }
 
+      // Build update data with explicit undefined filtering for exactOptionalPropertyTypes
+      const updateData: {
+        type?: "INCOME" | "EXPENSE";
+        category?: string;
+        description?: string | null;
+        notes?: string | null;
+        amount?: Prisma.Decimal;
+        date?: Date;
+      } = {};
+
+      if (rest.type !== undefined) updateData.type = rest.type;
+      if (rest.category !== undefined) updateData.category = rest.category;
+      if (rest.description !== undefined) updateData.description = rest.description;
+      if (rest.notes !== undefined) updateData.notes = rest.notes;
+      if (amount !== undefined) updateData.amount = new Prisma.Decimal(amount);
+      if (date !== undefined) updateData.date = date;
+
       return await tx.transaction.update({
         where: { id: existing.id },
-        data: {
-          ...rest,
-          ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
-          ...(date !== undefined ? { date } : {}),
-        },
+        data: updateData,
         select: transactionSelect,
       });
     });

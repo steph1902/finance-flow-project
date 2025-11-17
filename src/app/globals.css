@@ -135,51 +135,70 @@
 
 @layer base {
   :root {
-    /* ===== Core Background Tokens (Japanese Rice Paper & Stone) ===== */
-    --color-bg-base: 30 20% 99%;               /* Rice paper white - warmth */
-    --color-bg-card: 0 0% 100%;                /* Pure white - elevated */
-    --color-bg-surface: 30 15% 97%;            /* Subtle warm gray */
-    --color-bg-surface-glass: 0 0% 100% / 0.8; /* Glass morphism */
-    --color-bg-muted: 210 20% 96%;             /* Soft neutral */
+    /* ===== PREMIUM COLOR SYSTEM (2025) ===== */
+    /* Japanese-Inspired Muted Elegance + Apple Sophistication */
     
-    /* ===== Text Tokens (Charcoal Ink) ===== */
-    --color-text-primary: 220 25% 10%;         /* Deep charcoal */
-    --color-text-secondary: 220 15% 40%;       /* Mid gray */
-    --color-text-tertiary: 220 10% 60%;        /* Light gray */
-    --color-text-inverse: 0 0% 98%;            /* Near white */
+    /* === BACKGROUND LAYERS (Light Mode — Warm Neutrals) === */
+    --color-bg-app: 30 20% 98%;                /* Rice paper white — app base */
+    --color-bg-page: 30 15% 99%;               /* Softer white — page wrapper */
+    --color-bg-surface: 30 12% 97%;            /* Elevated surface */
+    --color-bg-card: 0 0% 100%;                /* Pure white cards */
+    --color-bg-surface-glass: 0 0% 100% / 0.7; /* Glass morphism (selective use) */
+    --color-bg-muted: 220 20% 96%;             /* Subtle background variant */
+    --color-bg-overlay: 220 15% 10% / 0.6;     /* Modal/dropdown overlays */
     
-    /* ===== Border & Divider Tokens ===== */
-    --color-border-soft: 220 15% 88%;          /* Subtle border */
-    --color-border-medium: 220 20% 80%;        /* Standard border */
-    --color-border-strong: 220 25% 70%;        /* Emphasized border */
+    /* === TEXT HIERARCHY (Light Mode — Charcoal Ink) === */
+    --color-text-primary: 220 25% 12%;         /* Deep charcoal — main text */
+    --color-text-secondary: 220 15% 42%;       /* Mid gray — secondary */
+    --color-text-tertiary: 220 12% 62%;        /* Light gray — labels */
+    --color-text-quaternary: 220 8% 72%;       /* Subtle — placeholders */
+    --color-text-inverse: 0 0% 98%;            /* Light text on dark */
+    --color-text-link: 220 60% 48%;            /* Link color */
     
-    /* ===== Japanese-Inspired Accent Colors ===== */
-    --color-accent-indigo: 230 60% 55%;        /* Muted indigo - calm */
-    --color-accent-indigo-foreground: 0 0% 98%;
-    --color-accent-gold: 42 78% 58%;           /* Luxury gold accent */
-    --color-accent-gold-foreground: 30 25% 15%;
-    --color-accent-charcoal: 220 25% 20%;      /* Deep charcoal accent */
-    --color-accent-charcoal-foreground: 0 0% 98%;
+    /* === BORDER & DIVIDERS (Light Mode) === */
+    --color-border-soft: 220 15% 88%;          /* Subtle borders */
+    --color-border-medium: 220 18% 82%;        /* Standard borders */
+    --color-border-strong: 220 22% 72%;        /* Emphasized borders */
+    --color-border-interactive: 220 60% 65%;   /* Hover/active states */
     
-    /* ===== Semantic Status Colors ===== */
-    --color-success: 142 65% 42%;              /* Green - balanced */
-    --color-success-foreground: 0 0% 98%;
-    --color-warning: 38 85% 55%;               /* Amber - attention */
-    --color-warning-foreground: 30 25% 15%;
-    --color-error: 0 70% 55%;                  /* Red - soft error */
-    --color-error-foreground: 0 0% 98%;
-    --color-info: 205 85% 50%;                 /* Blue - informative */
-    --color-info-foreground: 0 0% 98%;
+    /* === BRAND COLORS (Muted Japanese Palette) === */
+    --brand-indigo-ink: 220 35% 48%;           /* Primary indigo — subdued */
+    --brand-kintsukuroi-gold: 38 55% 46%;      /* Luxury gold — muted */
+    --brand-charcoal: 220 25% 20%;             /* Deep charcoal accent */
     
-    /* ===== Shadcn/UI Compatible Tokens ===== */
-    --background: var(--color-bg-base);
+    /* === INTERACTIVE STATES === */
+    --color-interactive-primary: 220 35% 48%;       /* Default state */
+    --color-interactive-hover: 220 40% 42%;         /* Hover (darker) */
+    --color-interactive-active: 220 45% 38%;        /* Active/pressed */
+    --color-interactive-disabled: 220 10% 75%;      /* Disabled state */
+    --color-interactive-focus: 220 60% 65% / 0.15;  /* Focus ring */
+    
+    /* === SEMANTIC STATUS COLORS (Natural, Muted) === */
+    --color-success: 145 40% 42%;              /* Moss green — balanced */
+    --color-success-muted: 145 35% 92%;        /* Success background */
+    --color-success-foreground: 0 0% 98%;      /* Text on success */
+    
+    --color-warning: 38 75% 48%;               /* Amber — controlled */
+    --color-warning-muted: 38 70% 92%;         /* Warning background */
+    --color-warning-foreground: 30 25% 15%;    /* Text on warning */
+    
+    --color-error: 0 65% 52%;                  /* Red — soft error */
+    --color-error-muted: 0 60% 94%;            /* Error background */
+    --color-error-foreground: 0 0% 98%;        /* Text on error */
+    
+    --color-info: 205 75% 48%;                 /* Blue — informative */
+    --color-info-muted: 205 70% 92%;           /* Info background */
+    --color-info-foreground: 0 0% 98%;         /* Text on info */
+    
+    /* === SHADCN/UI COMPATIBILITY (Semantic Mapping) === */
+    --background: var(--color-bg-page);
     --foreground: var(--color-text-primary);
     --card: var(--color-bg-card);
     --card-foreground: var(--color-text-primary);
     --popover: var(--color-bg-card);
     --popover-foreground: var(--color-text-primary);
-    --primary: var(--color-accent-indigo);
-    --primary-foreground: var(--color-accent-indigo-foreground);
+    --primary: var(--brand-indigo-ink);
+    --primary-foreground: var(--color-text-inverse);
     --secondary: var(--color-bg-muted);
     --secondary-foreground: var(--color-text-primary);
     --muted: var(--color-bg-muted);
@@ -194,98 +213,147 @@
     --warning-foreground: var(--color-warning-foreground);
     --border: var(--color-border-soft);
     --input: var(--color-border-medium);
-    --ring: var(--color-accent-indigo);
+    --ring: var(--color-interactive-primary);
     
-    /* ===== Japanese Ma (間) Spacing Scale ===== */
-    --space-zen-xs: 0.25rem;   /* 4px - minimal breath */
-    --space-zen-sm: 0.5rem;    /* 8px - tight */
-    --space-zen-md: 1rem;      /* 16px - comfortable */
-    --space-zen-lg: 1.5rem;    /* 24px - breathing */
-    --space-zen-xl: 2rem;      /* 32px - spacious */
-    --space-zen-2xl: 3rem;     /* 48px - generous */
-    --space-zen-3xl: 4rem;     /* 64px - vast */
-    --space-zen-4xl: 6rem;     /* 96px - monumental */
+    /* === ACCENT COLORS (For Backward Compatibility) === */
+    --color-accent-indigo: var(--brand-indigo-ink);
+    --color-accent-gold: var(--brand-kintsukuroi-gold);
+    --color-accent-charcoal: var(--brand-charcoal);
+    --color-accent-indigo-foreground: var(--color-text-inverse);
+    --color-accent-gold-foreground: 30 25% 15%;
+    --color-accent-charcoal-foreground: var(--color-text-inverse);
     
-    /* ===== Border Radius Tokens ===== */
-    --radius-sm: 0.25rem;      /* 4px - subtle */
-    --radius-md: 0.5rem;       /* 8px - standard */
-    --radius-lg: 0.75rem;      /* 12px - card */
-    --radius-xl: 1rem;         /* 16px - prominent */
-    --radius-2xl: 1.5rem;      /* 24px - hero */
-    --radius-full: 9999px;     /* Pill shape */
-    --radius: var(--radius-md);
-    
-    /* ===== Elevation Tokens (Soft Shadows) ===== */
+    /* === ELEVATION (Shadows) === */
     --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.03);
     --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
     --shadow-glass: 0 8px 16px -4px rgb(0 0 0 / 0.08), 0 4px 8px -4px rgb(0 0 0 / 0.05);
     --shadow-mist: 0 12px 24px -6px rgb(0 0 0 / 0.1), 0 6px 12px -6px rgb(0 0 0 / 0.06);
     --shadow-floating: 0 20px 40px -12px rgb(0 0 0 / 0.12), 0 8px 16px -8px rgb(0 0 0 / 0.08);
     
-    /* ===== Motion Tokens (Calm, Subtle) ===== */
-    --transition-instant: 0.1s;
-    --transition-fast: 0.2s;
-    --transition-smooth: 0.3s;
-    --transition-calm: 0.5s;
-    --transition-slow: 0.8s;
-    --ease-zen: cubic-bezier(0.4, 0.0, 0.2, 1);
-    --ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
-    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    
-    /* ===== Chart Colors for Data Visualization ===== */
-    --chart-1: var(--color-accent-indigo);
+    /* === CHART COLORS === */
+    --chart-1: var(--brand-indigo-ink);
     --chart-2: var(--color-success);
     --chart-3: var(--color-warning);
-    --chart-4: 280 55% 60%;                    /* Purple */
-    --chart-5: 340 70% 60%;                    /* Pink */
+    --chart-4: 280 50% 55%;
+    --chart-5: 340 60% 58%;
+    
+    /* ===== SPACING SYSTEM (8pt Grid) ===== */
+    /* Based on 8px base unit for optical alignment */
+    --space-0: 0px;
+    --space-1: 4px;      /* 0.5 × 8 — Minimal (icon padding, tight spacing) */
+    --space-2: 8px;      /* 1 × 8 — Base unit */
+    --space-3: 12px;     /* 1.5 × 8 — Small (button padding-y) */
+    --space-4: 16px;     /* 2 × 8 — Medium (button padding-x, card padding) */
+    --space-5: 20px;     /* 2.5 × 8 — Comfortable */
+    --space-6: 24px;     /* 3 × 8 — Large (section padding-y) */
+    --space-8: 32px;     /* 4 × 8 — XL (section margins) */
+    --space-10: 40px;    /* 5 × 8 — 2XL */
+    --space-12: 48px;    /* 6 × 8 — 3XL (section spacing) */
+    --space-16: 64px;    /* 8 × 8 — 4XL (hero spacing) */
+    --space-20: 80px;    /* 10 × 8 — 5XL */
+    --space-24: 96px;    /* 12 × 8 — 6XL (epic spacing) */
+    --space-32: 128px;   /* 16 × 8 — 7XL */
+    --space-40: 160px;   /* 20 × 8 — 8XL */
+    --space-48: 192px;   /* 24 × 8 — 9XL (cinematic) */
+    
+    /* === MA (間) SPACING — Japanese Negative Space === */
+    --ma-micro: var(--space-2);    /* 8px — Breathing room */
+    --ma-small: var(--space-4);    /* 16px — Comfortable */
+    --ma-medium: var(--space-6);   /* 24px — Distinct */
+    --ma-large: var(--space-12);   /* 48px — Clear separation */
+    --ma-xlarge: var(--space-20);  /* 80px — Section divider */
+    --ma-epic: var(--space-32);    /* 128px — Hero spacing */
+    
+    /* ===== MOTION SYSTEM (Premium Easing) ===== */
+    /* Duration tokens */
+    --duration-instant: 50ms;
+    --duration-fast: 150ms;
+    --duration-medium: 250ms;
+    --duration-slow: 400ms;
+    --duration-zen: 600ms;
+    --duration-cinematic: 1200ms;
+    
+    /* Premium easing curves (Apple/MUJI/Hermès standard) */
+    --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);          /* Apple signature */
+    --ease-zen-calm: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Zen UI motion */
+    --ease-luxury: cubic-bezier(0.22, 0.61, 0.36, 1);      /* Hermès elegance */
+    --ease-material: cubic-bezier(0.4, 0, 0.2, 1);         /* Material Design */
+    --ease-bounce-subtle: cubic-bezier(0.34, 1.56, 0.64, 1); /* Micro-bounce */
+    --ease-spring: cubic-bezier(0.5, 1.75, 0.75, 1);       /* Spring physics */
+    
+    /* Convenience tokens */
+    --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
+    --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .dark {
-    /* ===== Core Background Tokens (Night Stone & Ink) ===== */
-    --color-bg-base: 220 25% 8%;               /* Deep charcoal */
-    --color-bg-card: 220 22% 10%;              /* Slightly elevated */
-    --color-bg-surface: 220 20% 12%;           /* Surface layer */
-    --color-bg-surface-glass: 220 22% 10% / 0.8; /* Glass morphism dark */
-    --color-bg-muted: 220 18% 15%;             /* Muted background */
+    /* ===== PREMIUM DARK MODE (Apple/Hermès Standard) ===== */
+    /* Soft charcoal backgrounds, not pure black */
+    /* Muted white text, not harsh 100% white */
+    /* Layered depth through subtle color shifts */
     
-    /* ===== Text Tokens (Moonlight & Mist) ===== */
-    --color-text-primary: 0 0% 95%;            /* Soft white */
-    --color-text-secondary: 220 10% 65%;       /* Light gray */
-    --color-text-tertiary: 220 8% 45%;         /* Mid gray */
-    --color-text-inverse: 220 25% 10%;         /* Dark for light backgrounds */
+    /* === BACKGROUND LAYERS (Dark Mode — Soft Charcoal) === */
+    --color-bg-app: 220 20% 10%;               /* Soft charcoal — not black */
+    --color-bg-page: 220 18% 12%;              /* App base (layered) */
+    --color-bg-surface: 220 16% 16%;           /* Elevated surface */
+    --color-bg-card: 220 15% 18%;              /* Cards (distinct layer) */
+    --color-bg-surface-glass: 220 15% 18% / 0.7; /* Glass (selective) */
+    --color-bg-muted: 220 14% 22%;             /* Muted background */
+    --color-bg-overlay: 0 0% 0% / 0.75;        /* Modal overlays */
     
-    /* ===== Border & Divider Tokens ===== */
-    --color-border-soft: 220 15% 20%;          /* Subtle dark border */
-    --color-border-medium: 220 18% 25%;        /* Standard dark border */
-    --color-border-strong: 220 20% 35%;        /* Emphasized dark border */
+    /* === TEXT HIERARCHY (Dark Mode — Soft White) === */
+    --color-text-primary: 220 15% 90%;         /* Soft white — not harsh */
+    --color-text-secondary: 220 12% 68%;       /* Mid gray — readable */
+    --color-text-tertiary: 220 10% 52%;        /* Light gray — labels */
+    --color-text-quaternary: 220 8% 40%;       /* Subtle — placeholders */
+    --color-text-inverse: 220 25% 12%;         /* Dark text on light */
+    --color-text-link: 220 65% 68%;            /* Link color (brighter) */
     
-    /* ===== Japanese-Inspired Accent Colors (Night Palette) ===== */
-    --color-accent-indigo: 230 65% 60%;        /* Brighter indigo for dark */
-    --color-accent-indigo-foreground: 220 25% 8%;
-    --color-accent-gold: 42 85% 62%;           /* Brighter gold */
-    --color-accent-gold-foreground: 220 25% 8%;
-    --color-accent-charcoal: 220 10% 85%;      /* Light charcoal for dark mode */
-    --color-accent-charcoal-foreground: 220 25% 8%;
+    /* === BORDER & DIVIDERS (Dark Mode) === */
+    --color-border-soft: 220 15% 24%;          /* Subtle borders */
+    --color-border-medium: 220 16% 28%;        /* Standard borders */
+    --color-border-strong: 220 18% 35%;        /* Emphasized borders */
+    --color-border-interactive: 220 60% 65%;   /* Hover/active */
     
-    /* ===== Semantic Status Colors (Dark Adjusted) ===== */
-    --color-success: 142 60% 48%;              /* Green - softer */
-    --color-success-foreground: 220 25% 8%;
-    --color-warning: 38 80% 58%;               /* Amber - toned */
-    --color-warning-foreground: 220 25% 8%;
-    --color-error: 0 65% 58%;                  /* Red - softer */
-    --color-error-foreground: 220 25% 8%;
-    --color-info: 205 80% 55%;                 /* Blue - softer */
-    --color-info-foreground: 220 25% 8%;
+    /* === BRAND COLORS (Brighter for Dark Backgrounds) === */
+    --brand-indigo-ink: 220 45% 62%;           /* Brighter indigo */
+    --brand-kintsukuroi-gold: 38 65% 58%;      /* Enhanced gold glow */
+    --brand-charcoal: 220 12% 85%;             /* Light charcoal for dark */
     
-    /* ===== Shadcn/UI Compatible Tokens ===== */
-    --background: var(--color-bg-base);
+    /* === INTERACTIVE STATES === */
+    --color-interactive-primary: 220 45% 62%;       /* Default (brighter) */
+    --color-interactive-hover: 220 50% 68%;         /* Hover (lighter) */
+    --color-interactive-active: 220 55% 72%;        /* Active */
+    --color-interactive-disabled: 220 10% 35%;      /* Disabled */
+    --color-interactive-focus: 220 60% 65% / 0.2;   /* Focus ring */
+    
+    /* === SEMANTIC STATUS COLORS (Dark Optimized) === */
+    --color-success: 145 45% 52%;              /* Moss green (softer) */
+    --color-success-muted: 145 30% 20%;        /* Success background */
+    --color-success-foreground: 220 15% 90%;   /* Text on success */
+    
+    --color-warning: 38 75% 58%;               /* Amber (warmer) */
+    --color-warning-muted: 38 40% 22%;         /* Warning background */
+    --color-warning-foreground: 220 15% 90%;   /* Text on warning */
+    
+    --color-error: 0 65% 60%;                  /* Red (softer) */
+    --color-error-muted: 0 40% 22%;            /* Error background */
+    --color-error-foreground: 220 15% 90%;     /* Text on error */
+    
+    --color-info: 205 75% 58%;                 /* Blue (softer) */
+    --color-info-muted: 205 40% 22%;           /* Info background */
+    --color-info-foreground: 220 15% 90%;      /* Text on info */
+    
+    /* === SHADCN/UI COMPATIBILITY (Remapped) === */
+    --background: var(--color-bg-page);
     --foreground: var(--color-text-primary);
     --card: var(--color-bg-card);
     --card-foreground: var(--color-text-primary);
     --popover: var(--color-bg-card);
     --popover-foreground: var(--color-text-primary);
-    --primary: var(--color-accent-indigo);
-    --primary-foreground: var(--color-accent-indigo-foreground);
+    --primary: var(--brand-indigo-ink);
+    --primary-foreground: var(--color-text-inverse);
     --secondary: var(--color-bg-muted);
     --secondary-foreground: var(--color-text-primary);
     --muted: var(--color-bg-muted);
@@ -300,139 +368,196 @@
     --warning-foreground: var(--color-warning-foreground);
     --border: var(--color-border-soft);
     --input: var(--color-border-medium);
-    --ring: var(--color-accent-indigo);
+    --ring: var(--color-interactive-primary);
     
-    /* ===== Elevation Tokens (Enhanced for Dark) ===== */
-    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.15);
-    --shadow-glass: 0 8px 16px -4px rgb(0 0 0 / 0.25), 0 4px 8px -4px rgb(0 0 0 / 0.2);
-    --shadow-mist: 0 12px 24px -6px rgb(0 0 0 / 0.3), 0 6px 12px -6px rgb(0 0 0 / 0.25);
-    --shadow-floating: 0 20px 40px -12px rgb(0 0 0 / 0.35), 0 8px 16px -8px rgb(0 0 0 / 0.3);
+    /* === ACCENT COLORS (Compatibility) === */
+    --color-accent-indigo: var(--brand-indigo-ink);
+    --color-accent-gold: var(--brand-kintsukuroi-gold);
+    --color-accent-charcoal: var(--brand-charcoal);
+    --color-accent-indigo-foreground: var(--color-text-inverse);
+    --color-accent-gold-foreground: 220 25% 12%;
+    --color-accent-charcoal-foreground: var(--color-text-inverse);
     
-    /* ===== Chart Colors (Dark Optimized) ===== */
-    --chart-1: 230 65% 60%;
-    --chart-2: 142 60% 48%;
-    --chart-3: 38 80% 58%;
-    --chart-4: 280 60% 65%;
-    --chart-5: 340 65% 65%;
+    /* === ELEVATION (Enhanced for Dark) === */
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.15);
+    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+    --shadow-glass: 0 8px 16px -4px rgb(0 0 0 / 0.4), 0 4px 8px -4px rgb(0 0 0 / 0.3);
+    --shadow-mist: 0 12px 24px -6px rgb(0 0 0 / 0.5), 0 6px 12px -6px rgb(0 0 0 / 0.4);
+    --shadow-floating: 0 20px 40px -12px rgb(0 0 0 / 0.6), 0 8px 16px -8px rgb(0 0 0 / 0.5);
+    
+    /* === CHART COLORS (Dark Optimized) === */
+    --chart-1: 220 45% 62%;
+    --chart-2: 145 45% 52%;
+    --chart-3: 38 75% 58%;
+    --chart-4: 280 55% 65%;
+    --chart-5: 340 60% 65%;
   }
 }
 
 /* ============================================================================
-   JAPANESE TYPOGRAPHY SYSTEM
-   Enhanced for readability with Noto Sans JP & Noto Serif JP
-   Optical adjustments for Latin + Japanese text harmony
+   PREMIUM TYPOGRAPHY SYSTEM (2025)
+   Award-Winning Japanese-Inspired Typography
+   
+   Fonts:
+   - Primary UI: Inter (Google Fonts) - Excellent readability
+   - Display: Shippori Mincho B1 - Japanese elegance
+   - Fallback: Geist Sans (local) - Premium alternative
+   
+   Type Scale: 1.250 (Major Third - Harmonious Ratio)
+   Base: 16px (1rem)
+   
+   Philosophy: 
+   - Modular scale for perfect proportions
+   - Optical line-heights optimized per size
+   - Premium letter-spacing for elegance
+   - CJK (Chinese/Japanese/Korean) character consideration
+   - Fluid responsive scaling with controlled ranges
    ============================================================================ */
 
 @layer base {
-  /* Base typography setup */
+  /* Base font setup with premium rendering */
   body {
-    font-family: var(--font-sans, 'Noto Sans JP', sans-serif);
+    font-family: var(--font-inter), var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     font-weight: 400;
-    letter-spacing: 0.01em;
+    font-size: 1rem; /* 16px base */
+    letter-spacing: -0.011em; /* Tighter for premium feel */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
-  /* Japanese-optimized heading hierarchy with clamp */
-  h1, .jp-h1 {
-    font-family: var(--font-serif, 'Noto Serif JP', serif);
-    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+  /* ===== PREMIUM TYPE SCALE (1.250 MODULAR RATIO) ===== */
+  
+  /* Display — Cinematic Hero Text */
+  .type-display,
+  .jp-display {
+    font-family: var(--font-shippori), var(--font-serif, 'Shippori Mincho B1', serif);
+    font-size: clamp(3rem, 4vw + 2rem, 4.768rem); /* 48px → 76.29px */
+    font-weight: 700;
+    line-height: 1.05; /* Tight, dramatic */
+    letter-spacing: -0.03em; /* Premium tightness */
+    margin-bottom: var(--space-8);
+  }
+
+  /* H1 — Primary Headings */
+  h1,
+  .type-h1,
+  .jp-h1 {
+    font-family: var(--font-shippori), var(--font-serif, 'Shippori Mincho B1', serif);
+    font-size: clamp(2.25rem, 3vw + 1.5rem, 3.815rem); /* 36px → 61.04px */
     font-weight: 600;
-    line-height: 1.1;
+    line-height: 1.15; /* Breathing room */
     letter-spacing: -0.025em;
-    margin-bottom: var(--space-zen-lg);
+    margin-bottom: var(--space-6);
   }
 
-  h2, .jp-h2 {
-    font-family: var(--font-serif, 'Noto Serif JP', serif);
-    font-size: clamp(1.5rem, 3vw + 0.75rem, 2.5rem);
+  /* H2 — Section Headings */
+  h2,
+  .type-h2,
+  .jp-h2 {
+    font-family: var(--font-shippori), var(--font-serif, 'Shippori Mincho B1', serif);
+    font-size: clamp(1.875rem, 2.5vw + 1rem, 3.052rem); /* 30px → 48.83px */
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.25; /* Balanced */
     letter-spacing: -0.02em;
-    margin-bottom: var(--space-zen-md);
+    margin-bottom: var(--space-5);
   }
 
-  h3, .jp-h3 {
-    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.875rem);
+  /* H3 — Subsection Headings */
+  h3,
+  .type-h3,
+  .jp-h3 {
+    font-size: clamp(1.5rem, 2vw + 0.75rem, 2.441rem); /* 24px → 39.06px */
     font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    margin-bottom: var(--space-zen-md);
+    line-height: 1.35; /* Comfortable */
+    letter-spacing: -0.015em;
+    margin-bottom: var(--space-4);
   }
 
-  h4, .jp-h4 {
-    font-size: clamp(1.125rem, 1.5vw + 0.25rem, 1.5rem);
+  /* H4 — Small Headings */
+  h4,
+  .type-h4,
+  .jp-h4 {
+    font-size: clamp(1.25rem, 1.5vw + 0.5rem, 1.953rem); /* 20px → 31.25px */
     font-weight: 600;
     line-height: 1.4;
-    letter-spacing: 0;
-    margin-bottom: var(--space-zen-sm);
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-3);
   }
 
-  h5, .jp-h5 {
-    font-size: clamp(1rem, 1vw + 0.125rem, 1.25rem);
+  /* H5 — Micro Headings */
+  h5,
+  .type-h5,
+  .jp-h5 {
+    font-size: clamp(1.125rem, 1vw + 0.375rem, 1.563rem); /* 18px → 25.00px */
     font-weight: 600;
     line-height: 1.5;
-    letter-spacing: 0.005em;
-    margin-bottom: var(--space-zen-sm);
+    letter-spacing: -0.005em;
+    margin-bottom: var(--space-3);
   }
 
-  h6, .jp-h6 {
-    font-size: clamp(0.875rem, 0.75vw + 0.125rem, 1rem);
+  /* H6 — Label Headings */
+  h6,
+  .type-h6,
+  .jp-h6 {
+    font-size: clamp(0.875rem, 0.5vw + 0.625rem, 1.25rem); /* 14px → 20.00px */
     font-weight: 700;
     line-height: 1.5;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: var(--space-zen-xs);
+    letter-spacing: 0.05em; /* Refined uppercase tracking */
+    margin-bottom: var(--space-2);
   }
 
-  /* Body text with optimal reading */
-  p, .jp-body {
-    font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1.125rem);
-    line-height: 1.75;
-    letter-spacing: 0.01em;
-    max-width: 65ch; /* Optimal reading width */
-    margin-bottom: var(--space-zen-md);
-  }
-
-  /* Small text / captions */
-  small, .jp-caption {
-    font-size: clamp(0.75rem, 0.25vw + 0.625rem, 0.875rem);
-    line-height: 1.5;
-    letter-spacing: 0.02em;
-    color: hsl(var(--color-text-secondary));
-  }
-
-  /* Lead text - larger intro paragraphs */
-  .jp-lead {
-    font-size: clamp(1.125rem, 1vw + 0.875rem, 1.5rem);
-    line-height: 1.6;
-    letter-spacing: -0.005em;
+  /* Body Text — Standard Reading */
+  p,
+  .type-body,
+  .jp-body {
+    font-size: clamp(0.9375rem, 0.5vw + 0.8125rem, 1.125rem); /* 15px → 18px */
     font-weight: 400;
+    line-height: 1.65; /* Optimal readability */
+    letter-spacing: -0.011em;
+    max-width: 65ch; /* Optimal reading width */
+    margin-bottom: var(--space-4);
+  }
+
+  /* Lead Text — Intro Paragraphs */
+  .type-lead,
+  .jp-lead {
+    font-size: clamp(1.125rem, 1vw + 0.875rem, 1.563rem); /* 18px → 25px */
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.015em;
     color: hsl(var(--color-text-secondary));
+    max-width: 60ch;
+    margin-bottom: var(--space-6);
   }
 
-  /* Display text - hero sections */
-  .jp-display {
-    font-family: var(--font-serif, 'Noto Serif JP', serif);
-    font-size: clamp(2.5rem, 6vw + 1.5rem, 5rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.03em;
-    margin-bottom: var(--space-zen-xl);
+  /* Caption/Small Text */
+  small,
+  .type-caption,
+  .jp-caption {
+    font-size: clamp(0.75rem, 0.25vw + 0.6875rem, 0.875rem); /* 12px → 14px */
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: hsl(var(--color-text-tertiary));
   }
 
-  /* Financial numbers - tabular formatting */
-  .jp-numeric, .currency {
-    font-variant-numeric: tabular-nums;
+  /* Financial Numbers — Tabular */
+  .type-numeric,
+  .jp-numeric,
+  .currency {
+    font-variant-numeric: tabular-nums lining-nums;
     font-feature-settings: "tnum" 1, "lnum" 1;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
-  /* Monospace for code */
-  code, pre, .jp-code {
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  /* Code & Monospace */
+  code,
+  pre,
+  .type-code {
+    font-family: var(--font-mono, 'SF Mono', 'Monaco', 'Cascadia Code', monospace);
     font-feature-settings: "liga" 0;
   }
 
@@ -442,57 +567,67 @@
     background-color: hsl(var(--muted));
     border-radius: var(--radius-sm);
     border: 1px solid hsl(var(--border));
+    font-weight: 500;
   }
 
   pre {
     font-size: 0.875rem;
     line-height: 1.6;
-    padding: var(--space-zen-md);
+    padding: var(--space-4);
     background-color: hsl(var(--muted));
     border-radius: var(--radius-md);
     overflow-x: auto;
-    margin-bottom: var(--space-zen-lg);
+    margin-bottom: var(--space-6);
   }
 
   pre code {
     background: none;
     padding: 0;
     border: none;
+    font-weight: 400;
   }
 
   /* Blockquotes with Japanese aesthetic */
   blockquote {
-    border-left: 4px solid hsl(var(--primary));
-    padding-left: var(--space-zen-lg);
+    border-left: 3px solid hsl(var(--primary));
+    padding-left: var(--space-6);
     margin-left: 0;
-    margin-bottom: var(--space-zen-lg);
+    margin-bottom: var(--space-6);
     font-style: italic;
+    font-size: 1.125rem;
     color: hsl(var(--color-text-secondary));
+    line-height: 1.7;
   }
 
-  /* Links with subtle styling */
+  /* Links with premium styling */
   a {
     color: hsl(var(--primary));
     text-decoration: none;
-    transition: color var(--transition-fast) var(--ease-zen);
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--ease-zen-calm);
   }
 
   a:hover {
     color: hsl(var(--color-accent-indigo));
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-underline-offset: 3px;
   }
 
   /* Dark mode typography adjustments */
   .dark {
-    h1, h2, h3, h4, h5, h6 {
-      font-weight: 500; /* Slightly lighter for dark backgrounds */
-    }
-
     body {
       font-weight: 400;
-      letter-spacing: 0.015em; /* Slightly more spacing in dark mode */
+      letter-spacing: -0.008em; /* Slightly more open */
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 500; /* Lighter for OLED/dark screens */
+    }
+
+    .type-display,
+    .jp-display {
+      font-weight: 600; /* Display stays prominent */
     }
   }
 }
@@ -503,57 +638,156 @@
    ============================================================================ */
 
 @layer components {
-  /* Container widths */
+  /* ===== PREMIUM LAYOUT SYSTEM (2025) ===== */
+  
+  /* === CONTAINER WIDTHS (Apple/Awwwards Standard) === */
+  /* Narrower containers for premium feel, better readability */
   .container-sm {
     width: 100%;
     max-width: 640px;
     margin-inline: auto;
-    padding-inline: 1rem;
+    padding-inline: var(--space-4);
   }
 
   .container-md {
     width: 100%;
     max-width: 768px;
     margin-inline: auto;
-    padding-inline: 1rem;
+    padding-inline: var(--space-5);
   }
 
   .container-lg {
     width: 100%;
     max-width: 1024px;
     margin-inline: auto;
-    padding-inline: 1.5rem;
+    padding-inline: var(--space-6);
   }
 
   .container-xl {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1280px; /* Premium standard — not 1536px */
     margin-inline: auto;
-    padding-inline: 2rem;
+    padding-inline: var(--space-8);
   }
 
   .container-2xl {
     width: 100%;
-    max-width: 1536px;
+    max-width: 1280px; /* Match XL for consistency */
     margin-inline: auto;
-    padding-inline: 2rem;
+    padding-inline: var(--space-8);
+  }
+  
+  /* Content containers (for text-heavy sections) */
+  .container-content {
+    width: 100%;
+    max-width: 720px; /* Optimal reading width */
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+  }
+  
+  .container-prose {
+    width: 100%;
+    max-width: 65ch; /* Character-based width for articles */
+    margin-inline: auto;
+    padding-inline: var(--space-6);
   }
 
-  /* Section spacing */
-  .section {
-    padding-block: 3rem;
+  /* === 12-COLUMN GRID SYSTEM === */
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-6);
   }
-
-  @media (min-width: 768px) {
-    .section {
-      padding-block: 4rem;
+  
+  /* Responsive grid spans */
+  .col-span-1 { grid-column: span 1; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+  .col-span-4 { grid-column: span 4; }
+  .col-span-5 { grid-column: span 5; }
+  .col-span-6 { grid-column: span 6; }
+  .col-span-7 { grid-column: span 7; }
+  .col-span-8 { grid-column: span 8; }
+  .col-span-9 { grid-column: span 9; }
+  .col-span-10 { grid-column: span 10; }
+  .col-span-11 { grid-column: span 11; }
+  .col-span-12 { grid-column: span 12; }
+  
+  @media (max-width: 768px) {
+    .col-span-4, .col-span-6, .col-span-8 {
+      grid-column: span 12; /* Full width on mobile */
     }
+  }
+
+  /* === SECTION SPACING SCALE (8pt Grid Aligned) === */
+  /* Micro: Tight sections (within cards) */
+  .section-micro {
+    padding-block: var(--space-12); /* 48px */
+  }
+
+  /* Small: Compact sections */
+  .section-sm {
+    padding-block: var(--space-16); /* 64px */
+  }
+
+  /* Medium: Standard sections */
+  .section {
+    padding-block: var(--space-20); /* 80px */
+  }
+
+  /* Large: Important sections */
+  .section-lg {
+    padding-block: var(--space-24); /* 96px */
+  }
+
+  /* XL: Hero/feature sections */
+  .section-xl {
+    padding-block: var(--space-32); /* 128px */
+  }
+
+  /* Epic: Cinematic landing sections */
+  .section-epic {
+    padding-block: var(--space-40); /* 160px */
+  }
+
+  /* Responsive scaling */
+  @media (min-width: 768px) {
+    .section-micro { padding-block: var(--space-16); } /* 64px */
+    .section-sm { padding-block: var(--space-20); }    /* 80px */
+    .section { padding-block: var(--space-24); }       /* 96px */
+    .section-lg { padding-block: var(--space-32); }    /* 128px */
+    .section-xl { padding-block: var(--space-40); }    /* 160px */
+    .section-epic { padding-block: var(--space-48); }  /* 192px */
   }
 
   @media (min-width: 1024px) {
-    .section {
-      padding-block: 6rem;
-    }
+    .section-micro { padding-block: var(--space-16); } /* 64px */
+    .section-sm { padding-block: var(--space-24); }    /* 96px */
+    .section { padding-block: var(--space-32); }       /* 128px */
+    .section-lg { padding-block: var(--space-40); }    /* 160px */
+    .section-xl { padding-block: var(--space-48); }    /* 192px */
+  }
+  
+  /* === VERTICAL RHYTHM === */
+  /* Stack spacing for content elements */
+  .stack-tight > * + * {
+    margin-block-start: var(--space-2);
+  }
+  
+  .stack-sm > * + * {
+    margin-block-start: var(--space-4);
+  }
+  
+  .stack-md > * + * {
+    margin-block-start: var(--space-6);
+  }
+  
+  .stack-lg > * + * {
+    margin-block-start: var(--space-8);
+  }
+  
+  .stack-xl > * + * {
+    margin-block-start: var(--space-12);
   }
 }
 

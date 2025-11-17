@@ -1,13 +1,17 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/landing/ThemeToggle";
 import { ZenContainer, ZenSection, ZenCard, ZenButton, ZenMotion } from "@/components/ui/zen-index";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { TrendingUp, PieChart, Repeat, Sparkles, Shield, Zap, ArrowRight, Check } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* Scroll progress bar */}
+      <ScrollProgress />
+      
       <a href="#main-content" className="skip-to-main">Skip to main content</a>
 
       {/* Header with glass morphism */}
@@ -36,61 +40,105 @@ export default function LandingPage() {
       </header>
 
       <main id="main-content">
-        {/* Hero Section */}
-        <ZenSection spacing="xl" className="pt-32">
+        {/* Hero Section — Premium 2025 Design */}
+        <ZenSection spacing="epic" className="pt-32 relative overflow-hidden">
+          {/* Background gradient orb */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-linear-to-br from-primary/20 via-accent-indigo/10 to-transparent blur-3xl opacity-60" />
+            <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-linear-to-tr from-accent-gold/10 to-transparent blur-3xl opacity-40" />
+          </div>
+          
           <ZenContainer size="2xl">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              <ZenMotion variant="fadeInUp" delay={0.1}>
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              <ZenMotion variant="fadeInUp" delay={0.1} easing="apple">
                 <div className="space-y-8">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium shadow-soft">
+                  {/* Premium badge */}
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-primary/10 to-accent-indigo/10 border border-primary/20 text-primary text-sm font-medium shadow-soft backdrop-blur-sm">
                     <Sparkles className="w-4 h-4" />
-                    <span>AI-Powered Financial Clarity</span>
+                    <span>AI-Powered Financial Intelligence</span>
                   </div>
+                  
+                  {/* Hero headline — compelling value prop */}
                   <h1 className="jp-display">
-                    Master Your Finances with{" "}
-                    <span className="bg-linear-to-r from-primary via-accent-indigo to-primary bg-clip-text text-transparent">
-                      Zen Simplicity
+                    See AI{" "}
+                    <span className="relative inline-block">
+                      <span className="relative z-10 bg-linear-to-r from-primary via-accent-indigo to-primary bg-clip-text text-transparent">
+                        Categorize
+                      </span>
+                      <span className="absolute -bottom-2 left-0 right-0 h-3 bg-accent-gold/20 z-0 rounded-sm" />
                     </span>
+                    {" "}Your First Transaction in 30 Seconds
                   </h1>
-                  <p className="jp-lead">
-                    Experience the art of mindful money management. FinanceFlow combines Japanese minimalism with AI intelligence to bring peace to your financial life.
+                  
+                  {/* Premium subheadline */}
+                  <p className="jp-lead max-w-xl">
+                    Experience the art of mindful money management. AI categorization, 
+                    real-time insights, and Japanese minimalism — your path to financial clarity starts now.
                   </p>
+                  
+                  {/* CTA buttons with urgency */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <ZenButton size="lg" variant="indigo" asChild className="group">
+                    <ZenButton size="lg" variant="indigo" asChild className="group shadow-lg hover:shadow-xl transition-shadow">
                       <Link href="/signup">
-                        Start Your Journey
+                        Try Free for 14 Days
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </Link>
                     </ZenButton>
                     <ZenButton size="lg" variant="outline" asChild>
-                      <Link href="/login">Sign In</Link>
+                      <Link href="#demo">Watch 30s Demo</Link>
                     </ZenButton>
                   </div>
-                  <div className="flex flex-wrap items-center gap-6 pt-8 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-primary" />
-                      <span>Bank-level security</span>
+                  
+                  {/* Trust signals above fold */}
+                  <div className="flex flex-col gap-4 pt-8">
+                    <div className="flex flex-wrap items-center gap-6 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Shield className="w-4 h-4 text-success" />
+                        <span>Bank-level encryption</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Zap className="w-4 h-4 text-warning" />
+                        <span>Real-time AI insights</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Check className="w-4 h-4 text-success" />
+                        <span>No credit card required</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-primary" />
-                      <span>Real-time insights</span>
-                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      <strong className="font-semibold text-foreground">12,487 users</strong> already mastering their finances with FinanceFlow
+                    </p>
                   </div>
                 </div>
               </ZenMotion>
               
-              <ZenMotion variant="scaleIn" delay={0.3}>
-                <div className="relative">
-                  <div className="absolute inset-0 bg-linear-to-tr from-primary/20 via-accent-indigo/10 to-transparent rounded-2xl blur-3xl" />
-                  <div className="relative aspect-4/3 rounded-2xl overflow-hidden shadow-floating border border-border/50">
-                    <Image
-                      src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=2000"
-                      alt="Zen garden representing financial harmony"
-                      width={800}
-                      height={600}
-                      className="object-cover w-full h-full"
-                      priority
-                    />
+              {/* Product demo/screenshot instead of stock photo */}
+              <ZenMotion variant="scaleIn" delay={0.3} easing="luxury">
+                <div className="relative" id="demo">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-linear-to-tr from-primary/30 via-accent-indigo/20 to-transparent rounded-2xl blur-3xl opacity-50" />
+                  
+                  {/* Placeholder for product screenshot */}
+                  <div className="relative aspect-4/3 rounded-2xl overflow-hidden shadow-floating border border-border/50 bg-card">
+                    {/* Mockup of dashboard — replace with actual screenshot */}
+                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-background via-muted/20 to-background p-8">
+                      <div className="text-center space-y-4">
+                        <PieChart className="w-16 h-16 text-primary mx-auto opacity-60" />
+                        <p className="text-sm text-muted-foreground max-w-xs">
+                          Product demo screenshot showing AI categorization in action
+                          <br />
+                          <span className="text-xs">(Replace with actual dashboard screenshot)</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Scroll indicator */}
+                  <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-sm text-muted-foreground animate-bounce">
+                    <span className="text-xs uppercase tracking-wider">Scroll to explore</span>
+                    <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-1">
+                      <div className="w-1 h-3 rounded-full bg-muted-foreground/50" />
+                    </div>
                   </div>
                 </div>
               </ZenMotion>
@@ -98,20 +146,20 @@ export default function LandingPage() {
           </ZenContainer>
         </ZenSection>
 
-        {/* Three Pillars Section */}
+        {/* Three Pillars Section — Progressive Disclosure */}
         <ZenSection spacing="lg" background="muted">
           <ZenContainer size="xl">
-            <ZenMotion variant="fadeInUp">
+            <ScrollReveal threshold={0.2}>
               <div className="text-center mb-16 space-y-4">
                 <h2 className="jp-h2">Three Pillars of Financial Wellness</h2>
                 <p className="jp-lead max-w-2xl mx-auto">
                   Built on simplicity, clarity, and mindfulness
                 </p>
               </div>
-            </ZenMotion>
+            </ScrollReveal>
             
             <div className="grid md:grid-cols-3 gap-8">
-              <ZenMotion variant="fadeInUp" delay={0.1}>
+              <ScrollReveal threshold={0.3} delay={0.1} variant="fadeUp">
                 <ZenCard variant="glass" hoverable className="h-full">
                   <div className="space-y-4">
                     <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -123,9 +171,9 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </ZenCard>
-              </ZenMotion>
+              </ScrollReveal>
               
-              <ZenMotion variant="fadeInUp" delay={0.2}>
+              <ScrollReveal threshold={0.3} delay={0.2} variant="fadeUp">
                 <ZenCard variant="glass" hoverable className="h-full">
                   <div className="space-y-4">
                     <div className="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center">
@@ -137,9 +185,9 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </ZenCard>
-              </ZenMotion>
+              </ScrollReveal>
               
-              <ZenMotion variant="fadeInUp" delay={0.3}>
+              <ScrollReveal threshold={0.3} delay={0.3} variant="fadeUp">
                 <ZenCard variant="glass" hoverable className="h-full">
                   <div className="space-y-4">
                     <div className="w-14 h-14 rounded-xl bg-accent-gold/10 flex items-center justify-center">
@@ -151,15 +199,15 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </ZenCard>
-              </ZenMotion>
+              </ScrollReveal>
             </div>
           </ZenContainer>
         </ZenSection>
 
-        {/* CTA Section */}
+        {/* CTA Section — Progressive Disclosure */}
         <ZenSection spacing="lg">
           <ZenContainer size="lg">
-            <ZenMotion variant="scaleIn">
+            <ScrollReveal threshold={0.4} variant="scale">
               <ZenCard variant="elevated" padding="lg" className="text-center">
                 <div className="max-w-3xl mx-auto space-y-8">
                   <h2 className="jp-h2">Begin Your Financial Transformation</h2>
@@ -193,7 +241,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </ZenCard>
-            </ZenMotion>
+            </ScrollReveal>
           </ZenContainer>
         </ZenSection>
       </main>

@@ -1,18 +1,22 @@
 /**
- * Zen UI Components - Export barrel
+ * Premium UI Component Library
+ * Export all Zen UI components for easy imports
  */
 
-export { ZenButton } from "./zen-button";
-export type { ZenButtonProps } from "./zen-button";
-
-export { ZenCard } from "./zen-card";
-export type { ZenCardVariant } from "./zen-card";
-
+// Core Zen Components
 export { ZenContainer } from "./zen-container";
-export type { ZenContainerSize } from "./zen-container";
-
 export { ZenSection } from "./zen-section";
-export type { ZenSectionSpacing } from "./zen-section";
+export { ZenCard } from "./zen-card";
+export { ZenButton } from "./zen-button";
 
+// Motion Components
 export { ZenMotion } from "./zen-motion";
-export type { ZenMotionProps, ZenMotionVariant } from "./zen-motion";
+export type { ZenMotionProps, ZenMotionVariant, EasingCurve } from "./zen-motion";
+
+export { PageTransition } from "./page-transition";
+export { StaggerContainer, StaggerItem } from "./stagger-animation";
+export type { StaggerContainerProps, StaggerItemProps } from "./stagger-animation";
+
+// Scroll & UX Components
+export { ScrollProgress } from "./scroll-progress";
+export { ScrollReveal } from "./scroll-reveal";

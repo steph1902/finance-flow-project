@@ -31,7 +31,7 @@ const schema = z.object({
 export type BudgetFormValues = z.infer<typeof schema>;
 
 type BudgetFormProps = {
-  budget?: Budget;
+  budget?: Budget | undefined;
   onSubmit: (values: {
     category: string;
     amount: number;
@@ -39,7 +39,7 @@ type BudgetFormProps = {
     year: number;
   }) => Promise<void> | void;
   onCancel?: () => void;
-  onDelete?: () => Promise<void> | void;
+  onDelete?: (() => Promise<void> | void) | undefined;
   isSubmitting?: boolean;
   submitLabel?: string;
 };

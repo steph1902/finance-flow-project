@@ -40,16 +40,16 @@ const formSchema = z.object({
 export type TransactionFormValues = z.infer<typeof formSchema>;
 
 type TransactionFormProps = {
-  transaction?: Transaction;
+  transaction?: Transaction | undefined;
   onSubmit: (values: {
     amount: number;
     type: "INCOME" | "EXPENSE";
     category: string;
-    description?: string;
-    notes?: string;
+    description?: string | undefined;
+    notes?: string | undefined;
     date: string;
   }) => Promise<void> | void;
-  onDelete?: () => Promise<void> | void;
+  onDelete?: (() => Promise<void> | void) | undefined;
   onCancel?: () => void;
   isSubmitting?: boolean;
   submitLabel?: string;

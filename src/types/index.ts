@@ -16,11 +16,11 @@ export type Transaction = {
 export type TransactionFilters = {
   page?: number;
   limit?: number;
-  type?: TransactionType | "ALL";
-  category?: string;
-  startDate?: string;
-  endDate?: string;
-  search?: string;
+  type?: TransactionType | "ALL" | undefined;
+  category?: string | undefined;
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+  search?: string | undefined;
   sort?: "date" | "amount";
   order?: "asc" | "desc";
 };

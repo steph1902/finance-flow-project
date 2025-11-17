@@ -101,7 +101,11 @@ export default function SignupForm() {
           value={name}
           onChange={(e) => {
             setName(e.target.value);
-            if (errors.name) setErrors({ ...errors, name: undefined });
+            if (errors.name) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { name: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
           className={errors.name ? "border-red-500" : ""}
         />
@@ -116,7 +120,11 @@ export default function SignupForm() {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (errors.email) setErrors({ ...errors, email: undefined });
+            if (errors.email) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { email: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
           className={errors.email ? "border-red-500" : ""}
         />
@@ -130,7 +138,11 @@ export default function SignupForm() {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            if (errors.password) setErrors({ ...errors, password: undefined });
+            if (errors.password) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { password: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
           className={errors.password ? "border-red-500" : ""}
         />

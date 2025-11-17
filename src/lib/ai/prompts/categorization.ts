@@ -10,7 +10,7 @@ export interface TransactionInput {
 
 export interface CategorizationResponse {
   category: string;
-  subcategory?: string;
+  subcategory?: string | undefined;
   confidence: number;
   reasoning: string;
 }

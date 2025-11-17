@@ -3,6 +3,8 @@ import Sidebar from "@/components/layout/Sidebar";
 import { ReactNode } from "react";
 import { ErrorBoundary } from "@/components/errors/ErrorBoundary";
 
+export const dynamic = 'force-dynamic';
+
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary fallbackTitle="Dashboard Error" fallbackMessage="The dashboard encountered an error. Please try again.">

@@ -59,6 +59,8 @@ export function RecurringTransactionForm({
   const [error, setError] = useState<string | null>(null);
   const [nextOccurrence, setNextOccurrence] = useState<Date | null>(null);
 
+  const defaultStartDate = (initialData?.startDate || new Date().toISOString().split("T")[0]) as string;
+  
   const {
     register,
     handleSubmit,
@@ -68,11 +70,15 @@ export function RecurringTransactionForm({
   } = useForm<RecurringTransactionFormData>({
     resolver: zodResolver(recurringTransactionSchema),
     defaultValues: {
-      type: initialData?.type || "EXPENSE",
-      frequency: initialData?.frequency || "MONTHLY",
+      type: initialData?.type ?? "EXPENSE",
+      frequency: initialData?.frequency ?? "MONTHLY",
       isActive: initialData?.isActive ?? true,
-      startDate: initialData?.startDate || new Date().toISOString().split("T")[0],
-      ...initialData,
+      startDate: defaultStartDate,
+      ...(initialData?.amount !== undefined && { amount: initialData.amount }),
+      ...(initialData?.category !== undefined && { category: initialData.category }),
+      ...(initialData?.description !== undefined && { description: initialData.description }),
+      ...(initialData?.notes !== undefined && { notes: initialData.notes }),
+      ...(initialData?.endDate !== undefined && { endDate: initialData.endDate }),
     },
   });
 

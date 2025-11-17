@@ -47,13 +47,13 @@ describe('budget-optimizer-service', () => {
 
       const result = calculateActualSpending(transactions, 2);
 
-      expect(result.Food).toBe(75); // (100 + 50) / 2 months
-      expect(result.Transport).toBe(15); // 30 / 2 months
+      expect(result.get('Food')).toBe(75); // (100 + 50) / 2 months
+      expect(result.get('Transport')).toBe(15); // 30 / 2 months
     });
 
     it('should handle empty transactions', () => {
       const result = calculateActualSpending([], 3);
-      expect(result).toEqual({});
+      expect(result.size).toBe(0);
     });
 
     it('should handle single month', () => {
@@ -73,7 +73,7 @@ describe('budget-optimizer-service', () => {
       ];
 
       const result = calculateActualSpending(transactions, 1);
-      expect(result.Food).toBe(100);
+      expect(result.get('Food')).toBe(100);
     });
   });
 
@@ -112,11 +112,11 @@ describe('budget-optimizer-service', () => {
         },
       ];
 
-      const actualSpending = {
-        Food: 150, // 50% over budget
-        Transport: 25, // 50% under budget
-        Entertainment: 95, // 5% under (balanced)
-      };
+      const actualSpending = new Map<string, number>([
+        ['Food', 150], // 50% over budget
+        ['Transport', 25], // 50% under budget
+        ['Entertainment', 95], // 5% under (balanced)
+      ]);
 
       const result = analyzeVariance(budgets, actualSpending);
 
@@ -146,7 +146,7 @@ describe('budget-optimizer-service', () => {
         },
       ];
 
-      const actualSpending = {}; // No spending
+      const actualSpending = new Map<string, number>(); // No spending
 
       const result = analyzeVariance(budgets, actualSpending);
 

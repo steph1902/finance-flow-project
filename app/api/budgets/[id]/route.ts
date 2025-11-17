@@ -42,12 +42,22 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
         throw new Error("NOT_FOUND");
       }
 
+      // Build update data with explicit undefined filtering for exactOptionalPropertyTypes
+      const updateData: {
+        category?: string;
+        month?: number;
+        year?: number;
+        amount?: Prisma.Decimal;
+      } = {};
+
+      if (rest.category !== undefined) updateData.category = rest.category;
+      if (rest.month !== undefined) updateData.month = rest.month;
+      if (rest.year !== undefined) updateData.year = rest.year;
+      if (amount !== undefined) updateData.amount = new Prisma.Decimal(amount);
+
       return await tx.budget.update({
         where: { id: existing.id },
-        data: {
-          ...rest,
-          ...(amount !== undefined ? { amount: new Prisma.Decimal(amount) } : {}),
-        },
+        data: updateData,
       });
     });
 

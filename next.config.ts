@@ -4,6 +4,18 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   
+  // Image optimization
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+  
   // Security headers
   async headers() {
     return [
