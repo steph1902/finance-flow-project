@@ -201,7 +201,7 @@ export function TransactionForm({
                 <FormLabel>Type</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select transaction type">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                   </FormControl>
@@ -226,7 +226,7 @@ export function TransactionForm({
                 <FormLabel>Category</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select transaction category">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                   </FormControl>
