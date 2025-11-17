@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/formatters";
 import type { DashboardSummary as DashboardSummaryType } from "@/types";
 
 type DashboardSummaryProps = {
-  summary?: DashboardSummaryType;
+  summary?: DashboardSummaryType | undefined;
   isLoading?: boolean;
 };
 

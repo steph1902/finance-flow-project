@@ -27,7 +27,7 @@ export async function chatWithAssistant({
 }: ChatRequest): Promise<ChatResponse> {
   try {
     // Get user's financial data for context
-    const [transactions, budgets] = await Promise.all([
+    const [transactions, budgets, recurringTransactions] = await Promise.all([
       prisma.transaction.findMany({
         where: { userId },
         orderBy: { date: "desc" },
@@ -49,6 +49,16 @@ export async function chatWithAssistant({
           year: true,
         },
       }),
+      prisma.recurringTransaction.findMany({
+        where: { userId, isActive: true },
+        select: {
+          amount: true,
+          category: true,
+          frequency: true,
+          nextDate: true,
+          type: true,
+        },
+      }),
     ]);
 
     // Calculate spending by category
@@ -58,6 +68,20 @@ export async function chatWithAssistant({
         acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
         return acc;
       }, {});
+
+    // Calculate upcoming recurring obligations
+    const monthlyRecurringTotal = recurringTransactions
+      .filter((r) => r.type === "EXPENSE")
+      .reduce((sum, r) => {
+        const multiplier = 
+          r.frequency === "DAILY" ? 30 :
+          r.frequency === "WEEKLY" ? 4 :
+          r.frequency === "BIWEEKLY" ? 2 :
+          r.frequency === "MONTHLY" ? 1 :
+          r.frequency === "QUARTERLY" ? 0.33 :
+          r.frequency === "YEARLY" ? 0.083 : 0;
+        return sum + (Number(r.amount) * multiplier);
+      }, 0);
 
     // Build context for AI
     const financialContext = {
@@ -81,6 +105,17 @@ export async function chatWithAssistant({
         date: t.date.toISOString(),
         type: t.type,
       })),
+      recurringObligations: {
+        count: recurringTransactions.length,
+        monthlyTotal: monthlyRecurringTotal,
+        breakdown: recurringTransactions.map((r) => ({
+          category: r.category,
+          amount: Number(r.amount),
+          frequency: r.frequency,
+          nextDate: r.nextDate.toISOString(),
+          type: r.type,
+        })),
+      },
     };
 
     // Get AI prompt with financial context

@@ -116,10 +116,13 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
 
   const transaction = await prisma.transaction.create({
     data: {
-      ...rest,
       userId,
       amount: new Prisma.Decimal(amount),
       date,
+      type: rest.type,
+      category: rest.category,
+      description: rest.description ?? null,
+      notes: rest.notes ?? null,
     },
     select: transactionSelect,
   });

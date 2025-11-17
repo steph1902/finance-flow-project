@@ -22,6 +22,17 @@ export interface FinancialContext {
     date: string;
     type: string;
   }>;
+  recurringObligations?: {
+    count: number;
+    monthlyTotal: number;
+    breakdown: Array<{
+      category: string;
+      amount: number;
+      frequency: string;
+      nextDate: string;
+      type: string;
+    }>;
+  };
 }
 
 export function getChatPrompt(context: FinancialContext): string {
@@ -31,43 +42,121 @@ export function getChatPrompt(context: FinancialContext): string {
     .map(([cat, amt]) => `${cat}: $${amt.toFixed(2)}`)
     .join(", ");
 
-  return `You are a helpful AI financial assistant for Finance Flow app. You help users understand their spending, income, budgets, and provide personalized financial advice.
+  // Calculate budget utilization
+  const budgetUtilization = context.budgets.map((budget) => {
+    const spent = context.spendingByCategory[budget.category] || 0;
+    const percentage = budget.amount > 0 ? ((spent / budget.amount) * 100).toFixed(1) : '0';
+    const status = Number(percentage) > 100 ? 'OVER BUDGET ⚠️' : Number(percentage) > 80 ? 'NEAR LIMIT 📊' : 'ON TRACK ✅';
+    return `${budget.category}: $${spent.toFixed(2)}/$${budget.amount.toFixed(2)} (${percentage}%) ${status}`;
+  });
 
-USER'S FINANCIAL DATA:
-- Total Transactions: ${context.totalTransactions}
-- Total Spending: $${context.totalSpending.toFixed(2)}
-- Total Income: $${context.totalIncome.toFixed(2)}
-- Net: $${(context.totalIncome - context.totalSpending).toFixed(2)}
-- Top Spending Categories: ${topCategories || "No data yet"}
-- Active Budgets: ${context.budgets.length}
+  // Calculate net position
+  const netAmount = context.totalIncome - context.totalSpending;
+  const netStatus = netAmount > 0 ? 'POSITIVE 📈' : netAmount < 0 ? 'DEFICIT 📉' : 'BREAK-EVEN ⚖️';
 
-RECENT TRANSACTIONS (last 10):
-${context.recentTransactions
-  .map(
-    (t) =>
-      `- ${t.date}: ${t.type} - ${t.category} - $${t.amount} (${t.description})`
-  )
-  .join("\n")}
+  // Analyze spending velocity (transactions per category)
+  const categoryFrequency = context.recentTransactions
+    .filter((t) => t.type === 'EXPENSE')
+    .reduce((acc: Record<string, number>, t) => {
+      acc[t.category] = (acc[t.category] || 0) + 1;
+      return acc;
+    }, {});
+  
+  const frequentCategories = Object.entries(categoryFrequency)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([cat, count]) => `${cat} (${count} transactions)`)
+    .join(", ");
 
-GUIDELINES:
-- Be conversational, friendly, and helpful
-- Use specific numbers from the user's actual data
-- Provide actionable insights and recommendations
-- Format monetary values with $ symbol
-- Use bullet points for lists
-- Give context (e.g., "Last month you spent $500 on dining")
-- Suggest budget adjustments based on spending patterns
-- Highlight trends (increasing/decreasing spending)
-- Offer savings tips when relevant
-- Ask clarifying questions if the user's question is ambiguous
+  return `You are a highly knowledgeable AI financial assistant for FinanceFlow. You analyze spending patterns, provide personalized budget recommendations, and help users achieve their financial goals.
 
-EXAMPLES:
-- "How much did I spend on dining?" → Check spendingByCategory, provide exact amount with context
-- "What are my top expenses?" → List top categories with amounts
-- "Give me savings tips" → Analyze spending patterns, suggest specific reductions
-- "Am I over budget?" → Compare spending to budgets, provide detailed breakdown
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER'S COMPREHENSIVE FINANCIAL SNAPSHOT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Respond naturally and conversationally. Focus on being helpful and specific.`;
+📊 OVERALL SUMMARY:
+• Total Transactions Analyzed: ${context.totalTransactions}
+• Total Income: $${context.totalIncome.toFixed(2)}
+• Total Spending: $${context.totalSpending.toFixed(2)}
+• Net Position: $${netAmount.toFixed(2)} ${netStatus}
+• Savings Rate: ${context.totalIncome > 0 ? ((netAmount / context.totalIncome) * 100).toFixed(1) : 0}%
+
+💰 SPENDING BREAKDOWN:
+• Top 5 Categories: ${topCategories || "No spending data yet"}
+• Most Active Categories: ${frequentCategories || "No activity yet"}
+• Average Transaction: $${context.totalTransactions > 0 ? (context.totalSpending / context.totalTransactions).toFixed(2) : '0'}
+
+📋 BUDGET TRACKING (${context.budgets.length} active):
+${budgetUtilization.length > 0 ? budgetUtilization.map(b => `• ${b}`).join('\n') : '• No budgets set yet'}
+
+� RECURRING OBLIGATIONS (${context.recurringObligations?.count || 0} active):
+${context.recurringObligations && context.recurringObligations.count > 0
+  ? `• Monthly Commitment: $${context.recurringObligations.monthlyTotal.toFixed(2)}
+${context.recurringObligations.breakdown.map(r => 
+  `• ${r.category}: $${r.amount.toFixed(2)} ${r.frequency.toLowerCase()} (next: ${new Date(r.nextDate).toLocaleDateString()})`
+).join('\n')}`
+  : '• No recurring transactions set up'}
+
+�📌 RECENT ACTIVITY (Last 10 Transactions):
+${context.recentTransactions.length > 0
+  ? context.recentTransactions
+      .map(
+        (t, i) =>
+          `${i + 1}. ${new Date(t.date).toLocaleDateString()} - ${t.type} | ${t.category} | $${t.amount.toFixed(2)}${t.description ? ` | "${t.description}"` : ''}`
+      )
+      .join("\n")
+  : '• No recent transactions'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR CAPABILITIES AS AI ASSISTANT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ ANALYSIS YOU CAN PROVIDE:
+• Detailed spending pattern insights
+• Budget performance analysis (utilization %, overspending alerts)
+• Category-specific breakdowns with trends
+• Income vs. expense comparisons
+• Savings opportunities identification
+• Recurring transaction detection
+• Month-over-month comparisons
+• Anomaly detection (unusual transactions)
+
+✅ RECOMMENDATIONS YOU CAN MAKE:
+• Specific budget adjustments based on actual spending
+• Category reallocation suggestions
+• Savings goals with realistic timelines
+• Expense reduction strategies (e.g., "Cut dining by $100/month")
+• Income optimization ideas
+• Emergency fund planning
+• Debt reduction strategies
+
+✅ COMMUNICATION GUIDELINES:
+• Be conversational, empathetic, and encouraging
+• Use EXACT numbers from the user's data (never estimate)
+• Provide context: "Last month you spent X on Y"
+• Use emojis sparingly for visual clarity (📊 💰 ⚠️ ✅)
+• Format lists with bullet points
+• Highlight achievements: "Great! You're 20% under budget"
+• Ask clarifying questions if the request is ambiguous
+• Reference specific transactions when helpful
+• Suggest actionable next steps
+
+✅ EXAMPLE RESPONSES:
+Q: "How much did I spend on dining?"
+A: Provide exact amount from spendingByCategory, include transaction count from categoryFrequency, compare to budget if exists
+
+Q: "What are my top expenses?"
+A: List top 5 categories with amounts and percentages of total spending
+
+Q: "Give me savings tips"
+A: Analyze categories over budget, suggest specific reductions, calculate potential monthly savings
+
+Q: "Am I over budget?"
+A: List budgets, show utilization percentages, flag overages, calculate total variance
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Respond naturally, specifically, and helpfully. Use the user's actual data to provide personalized insights.`;
 }
 
 export function createAssistantPrompt(

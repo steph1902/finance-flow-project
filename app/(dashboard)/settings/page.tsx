@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
@@ -37,6 +37,17 @@ export default function SettingsPage() {
     budgetAlerts: true,
     recurringReminders: true,
   });
+
+  // Show loading state while session is being fetched
+  if (status === "loading") {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  // Redirect if not authenticated
+  if (!session) {
+    router.push('/login');
+    return null;
+  }
 
   const handleExportData = async () => {
     try {
@@ -109,101 +120,105 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground mt-2">
+      <div className="space-y-3">
+        <h1 className="type-h2">Settings</h1>
+        <p className="type-body text-muted-foreground max-w-2xl">
           Manage your account settings and preferences
         </p>
       </div>
 
       {/* Profile Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <User className="h-5 w-5 text-primary" />
+            </div>
             Profile
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Your personal information and account details
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label>Name</Label>
-            <p className="text-sm text-muted-foreground">
+            <Label className="font-medium">Name</Label>
+            <p className="type-small text-muted-foreground">
               {session?.user?.name || "Not set"}
             </p>
           </div>
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
+            <Label className="flex items-center gap-2 font-medium">
               <Mail className="h-4 w-4" />
               Email
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="type-small text-muted-foreground">
               {session?.user?.email || "Not set"}
             </p>
           </div>
-          <Button variant="outline" onClick={() => router.push("/profile")}>
+          <Button variant="outline" onClick={() => router.push("/profile")} className="font-medium shadow-soft">
             Edit Profile
           </Button>
         </CardContent>
       </Card>
 
       {/* Appearance Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Palette className="h-5 w-5 text-primary" />
+            </div>
             Appearance
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Customize how FinanceFlow looks and feels
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <Label>Theme</Label>
-            <div className="grid grid-cols-3 gap-3">
+        <CardContent className="space-y-5">
+          <div className="space-y-4">
+            <Label className="font-medium">Theme</Label>
+            <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => setTheme("light")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
                   theme === "light"
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
+                    ? "border-primary bg-primary/5 shadow-md"
+                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
                 }`}
               >
-                <Sun className="h-6 w-6" />
-                <span className="text-sm font-medium">Light</span>
+                <Sun className="h-7 w-7" />
+                <span className="text-sm font-semibold">Light</span>
                 {theme === "light" && <Check className="h-4 w-4 text-primary" />}
               </button>
               
               <button
                 onClick={() => setTheme("dark")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
                   theme === "dark"
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
+                    ? "border-primary bg-primary/5 shadow-md"
+                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
                 }`}
               >
-                <Moon className="h-6 w-6" />
-                <span className="text-sm font-medium">Dark</span>
+                <Moon className="h-7 w-7" />
+                <span className="text-sm font-semibold">Dark</span>
                 {theme === "dark" && <Check className="h-4 w-4 text-primary" />}
               </button>
               
               <button
                 onClick={() => setTheme("system")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
                   theme === "system"
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
+                    ? "border-primary bg-primary/5 shadow-md"
+                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
                 }`}
               >
-                <Monitor className="h-6 w-6" />
-                <span className="text-sm font-medium">System</span>
+                <Monitor className="h-7 w-7" />
+                <span className="text-sm font-semibold">System</span>
                 {theme === "system" && <Check className="h-4 w-4 text-primary" />}
               </button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="type-small text-muted-foreground">
               {theme === "system" 
                 ? "Automatically switches between light and dark mode based on your system preferences" 
                 : theme === "dark"
@@ -215,21 +230,23 @@ export default function SettingsPage() {
       </Card>
 
       {/* Notifications Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
             Notifications
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Manage how you receive notifications
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Email Notifications</Label>
-              <p className="text-sm text-muted-foreground">
+        <CardContent className="space-y-5">
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-1">
+              <Label className="font-medium">Email Notifications</Label>
+              <p className="type-small text-muted-foreground">
                 Receive updates via email
               </p>
             </div>
@@ -237,20 +254,21 @@ export default function SettingsPage() {
               variant={notifications.email ? "default" : "outline"}
               size="sm"
               onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
+              className="font-medium shadow-soft"
             >
               {notifications.email ? "Enabled" : "Disabled"}
             </Button>
           </div>
           
-          <Separator />
+          <Separator className="opacity-50" />
           
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="flex items-center gap-2">
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-1">
+              <Label className="flex items-center gap-2 font-medium">
                 <Smartphone className="h-4 w-4" />
                 Push Notifications
               </Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="type-small text-muted-foreground">
                 Receive push notifications on your device
               </p>
             </div>
@@ -258,17 +276,18 @@ export default function SettingsPage() {
               variant={notifications.push ? "default" : "outline"}
               size="sm"
               onClick={() => setNotifications(prev => ({ ...prev, push: !prev.push }))}
+              className="font-medium shadow-soft"
             >
               {notifications.push ? "Enabled" : "Disabled"}
             </Button>
           </div>
           
-          <Separator />
+          <Separator className="opacity-50" />
           
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Budget Alerts</Label>
-              <p className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-1">
+              <Label className="font-medium">Budget Alerts</Label>
+              <p className="type-small text-muted-foreground">
                 Get notified when approaching budget limits
               </p>
             </div>
@@ -276,17 +295,18 @@ export default function SettingsPage() {
               variant={notifications.budgetAlerts ? "default" : "outline"}
               size="sm"
               onClick={() => setNotifications(prev => ({ ...prev, budgetAlerts: !prev.budgetAlerts }))}
+              className="font-medium shadow-soft"
             >
               {notifications.budgetAlerts ? "Enabled" : "Disabled"}
             </Button>
           </div>
           
-          <Separator />
+          <Separator className="opacity-50" />
           
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Recurring Transaction Reminders</Label>
-              <p className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-1">
+              <Label className="font-medium">Recurring Transaction Reminders</Label>
+              <p className="type-small text-muted-foreground">
                 Reminders for upcoming recurring transactions
               </p>
             </div>
@@ -294,6 +314,7 @@ export default function SettingsPage() {
               variant={notifications.recurringReminders ? "default" : "outline"}
               size="sm"
               onClick={() => setNotifications(prev => ({ ...prev, recurringReminders: !prev.recurringReminders }))}
+              className="font-medium shadow-soft"
             >
               {notifications.recurringReminders ? "Enabled" : "Disabled"}
             </Button>
@@ -302,66 +323,70 @@ export default function SettingsPage() {
       </Card>
 
       {/* Security Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Lock className="h-5 w-5 text-primary" />
+            </div>
             Security
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Manage your password and security preferences
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
+            <Label className="flex items-center gap-2 font-medium">
               <Shield className="h-4 w-4" />
               Password
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="type-small text-muted-foreground">
               Last changed: Never
             </p>
           </div>
-          <Button variant="outline">Change Password</Button>
+          <Button variant="outline" className="font-medium shadow-soft">Change Password</Button>
         </CardContent>
       </Card>
 
       {/* Data & Privacy Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Database className="h-5 w-5 text-primary" />
+            </div>
             Data & Privacy
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Manage your data and privacy settings
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
+        <CardContent className="space-y-5">
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2 font-medium">
               <Download className="h-4 w-4" />
               Export Your Data
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="type-small text-muted-foreground">
               Download all your transactions, budgets, and account data
             </p>
-            <Button variant="outline" onClick={handleExportData}>
+            <Button variant="outline" onClick={handleExportData} className="font-medium shadow-soft">
               Export Data
             </Button>
           </div>
           
-          <Separator />
+          <Separator className="opacity-50" />
           
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-destructive">
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2 font-medium text-destructive">
               <Trash2 className="h-4 w-4" />
               Delete Account
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="type-small text-muted-foreground">
               Permanently delete your account and all associated data
             </p>
-            <Button variant="destructive" onClick={handleDeleteAccount}>
+            <Button variant="destructive" onClick={handleDeleteAccount} className="font-medium shadow-sm">
               Delete Account
             </Button>
           </div>
@@ -369,30 +394,32 @@ export default function SettingsPage() {
       </Card>
 
       {/* Language & Region Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Globe className="h-5 w-5 text-primary" />
+            </div>
             Language & Region
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="type-body">
             Customize language and regional preferences
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label>Language</Label>
-            <p className="text-sm text-muted-foreground">English (US)</p>
+            <Label className="font-medium">Language</Label>
+            <p className="type-small text-muted-foreground">English (US)</p>
           </div>
           <div className="space-y-2">
-            <Label>Currency</Label>
-            <p className="text-sm text-muted-foreground">USD ($)</p>
+            <Label className="font-medium">Currency</Label>
+            <p className="type-small text-muted-foreground">USD ($)</p>
           </div>
           <div className="space-y-2">
-            <Label>Date Format</Label>
-            <p className="text-sm text-muted-foreground">MM/DD/YYYY</p>
+            <Label className="font-medium">Date Format</Label>
+            <p className="type-small text-muted-foreground">MM/DD/YYYY</p>
           </div>
-          <Button variant="outline" disabled>
+          <Button variant="outline" disabled className="font-medium">
             Change Settings (Coming Soon)
           </Button>
         </CardContent>

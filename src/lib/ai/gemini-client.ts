@@ -2,13 +2,13 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
 import { logError, logWarn } from '@/lib/logger';
 
-class GeminiClient {
+export class GeminiClient {
   private genAI: GoogleGenerativeAI;
   private model: GenerativeModel;
 
   constructor() {
     if (!AI_CONFIG.apiKey) {
-      throw new Error('GEMINI_API_KEY is not set in environment variables');
+      throw new Error('GEMINI_API_KEY not configured');
     }
 
     this.genAI = new GoogleGenerativeAI(AI_CONFIG.apiKey);

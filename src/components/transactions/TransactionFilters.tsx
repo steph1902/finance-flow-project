@@ -11,11 +11,11 @@ import { Search, X, Calendar, Filter } from "lucide-react";
 import { motion } from "framer-motion";
 
 export type FilterState = {
-  type: TransactionFilters["type"];
-  category?: string;
-  search?: string;
-  startDate?: string;
-  endDate?: string;
+  type: TransactionFilters["type"] | undefined;
+  category?: string | undefined;
+  search?: string | undefined;
+  startDate?: string | undefined;
+  endDate?: string | undefined;
 };
 
 type TransactionFiltersProps = {

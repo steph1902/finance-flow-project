@@ -40,16 +40,16 @@ const formSchema = z.object({
 export type TransactionFormValues = z.infer<typeof formSchema>;
 
 type TransactionFormProps = {
-  transaction?: Transaction;
+  transaction?: Transaction | undefined;
   onSubmit: (values: {
     amount: number;
     type: "INCOME" | "EXPENSE";
     category: string;
-    description?: string;
-    notes?: string;
+    description?: string | undefined;
+    notes?: string | undefined;
     date: string;
   }) => Promise<void> | void;
-  onDelete?: () => Promise<void> | void;
+  onDelete?: (() => Promise<void> | void) | undefined;
   onCancel?: () => void;
   isSubmitting?: boolean;
   submitLabel?: string;
@@ -201,7 +201,7 @@ export function TransactionForm({
                 <FormLabel>Type</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select transaction type">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                   </FormControl>
@@ -226,7 +226,7 @@ export function TransactionForm({
                 <FormLabel>Category</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select transaction category">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                   </FormControl>

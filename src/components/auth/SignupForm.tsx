@@ -91,9 +91,9 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor="name">Name</Label>
+    <form onSubmit={handleSubmit} className="grid gap-6">
+      <div className="grid gap-3">
+        <Label htmlFor="name" className="font-medium">Name</Label>
         <Input
           id="name"
           type="text"
@@ -101,14 +101,18 @@ export default function SignupForm() {
           value={name}
           onChange={(e) => {
             setName(e.target.value);
-            if (errors.name) setErrors({ ...errors, name: undefined });
+            if (errors.name) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { name: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
-          className={errors.name ? "border-red-500" : ""}
+          className={`${errors.name ? "border-destructive focus-visible:ring-destructive" : ""} shadow-soft`}
         />
-        {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+        {errors.name && <p className="type-small text-destructive">{errors.name}</p>}
       </div>
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+      <div className="grid gap-3">
+        <Label htmlFor="email" className="font-medium">Email</Label>
         <Input
           id="email"
           type="email"
@@ -116,30 +120,38 @@ export default function SignupForm() {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (errors.email) setErrors({ ...errors, email: undefined });
+            if (errors.email) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { email: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
-          className={errors.email ? "border-red-500" : ""}
+          className={`${errors.email ? "border-destructive focus-visible:ring-destructive" : ""} shadow-soft`}
         />
-        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+        {errors.email && <p className="type-small text-destructive">{errors.email}</p>}
       </div>
-      <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+      <div className="grid gap-3">
+        <Label htmlFor="password" className="font-medium">Password</Label>
         <Input
           id="password"
           type="password"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            if (errors.password) setErrors({ ...errors, password: undefined });
+            if (errors.password) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { password: _, ...restErrors } = errors;
+              setErrors(restErrors);
+            }
           }}
-          className={errors.password ? "border-red-500" : ""}
+          className={`${errors.password ? "border-destructive focus-visible:ring-destructive" : ""} shadow-soft`}
         />
-        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
-        <p className="text-xs text-muted-foreground">
+        {errors.password && <p className="type-small text-destructive">{errors.password}</p>}
+        <p className="type-small text-muted-foreground">
           Must be at least 8 characters with uppercase, lowercase, and number
         </p>
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full font-semibold shadow-md" disabled={isLoading}>
         {isLoading ? "Signing up..." : "Sign Up"}
       </Button>
     </form>

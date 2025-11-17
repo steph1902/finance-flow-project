@@ -31,7 +31,7 @@ const schema = z.object({
 export type BudgetFormValues = z.infer<typeof schema>;
 
 type BudgetFormProps = {
-  budget?: Budget;
+  budget?: Budget | undefined;
   onSubmit: (values: {
     category: string;
     amount: number;
@@ -39,7 +39,7 @@ type BudgetFormProps = {
     year: number;
   }) => Promise<void> | void;
   onCancel?: () => void;
-  onDelete?: () => Promise<void> | void;
+  onDelete?: (() => Promise<void> | void) | undefined;
   isSubmitting?: boolean;
   submitLabel?: string;
 };
@@ -87,7 +87,7 @@ export function BudgetForm({
               <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Select budget category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                 </FormControl>
@@ -111,7 +111,7 @@ export function BudgetForm({
             <FormItem>
               <FormLabel>Monthly budget amount</FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" min="0" {...field} />
+                <Input type="number" step="0.01" min="0" aria-label="Budget amount" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -127,7 +127,7 @@ export function BudgetForm({
                 <FormLabel>Month</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select month">
                       <SelectValue placeholder="Select month" />
                     </SelectTrigger>
                   </FormControl>
@@ -152,7 +152,7 @@ export function BudgetForm({
                 <FormLabel>Year</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Select year">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                   </FormControl>

@@ -56,24 +56,28 @@ export function TransactionsPage() {
     amount: number;
     type: "INCOME" | "EXPENSE";
     category: string;
-    description?: string;
-    notes?: string;
+    description?: string | undefined;
+    notes?: string | undefined;
     date: string;
   }) => {
     setIsSubmitting(true);
 
     try {
+      // Convert undefined to null for API compatibility
+      const payload = {
+        amount: values.amount,
+        type: values.type,
+        category: values.category,
+        description: values.description ?? null,
+        notes: values.notes ?? null,
+        date: values.date,
+      };
+
       if (editingTransaction) {
-        await updateTransaction(editingTransaction.id, {
-          ...values,
-          date: values.date,
-        });
+        await updateTransaction(editingTransaction.id, payload);
         toast.success("Transaction updated");
       } else {
-        await createTransaction({
-          ...values,
-          date: values.date,
-        });
+        await createTransaction(payload);
         toast.success("Transaction created");
       }
       handleCloseDialog();
@@ -101,20 +105,27 @@ export function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-          <p className="text-sm text-muted-foreground">Manage your income and expenses across all categories.</p>
+    <div className="space-y-8">
+      {/* Premium Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-2">
+          <h1 className="type-h2 text-foreground">Transactions</h1>
+          <p className="type-body text-muted-foreground max-w-2xl">
+            Manage your income and expenses across all categories.
+          </p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
           <DialogTrigger asChild>
-            <Button>Add transaction</Button>
+            <Button className="shadow-sm hover:shadow-md transition-shadow">
+              Add transaction
+            </Button>
           </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle>{editingTransaction ? "Edit transaction" : "Add transaction"}</DialogTitle>
+              <DialogTitle className="type-h4">
+                {editingTransaction ? "Edit transaction" : "Add transaction"}
+              </DialogTitle>
             </DialogHeader>
             <TransactionForm
               transaction={editingTransaction ?? undefined}
@@ -149,14 +160,20 @@ export function TransactionsPage() {
       />
 
       {isError ? (
-        <div className="rounded-lg border border-destructive bg-destructive/5 p-4 text-sm text-destructive">
-          Failed to load transactions: {error?.message}
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive shadow-soft">
+          <p className="font-medium mb-1">Failed to load transactions</p>
+          <p className="text-destructive/80">{error?.message}</p>
         </div>
       ) : null}
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm">
+      <div className="rounded-xl border border-border/50 bg-card shadow-card overflow-hidden">
         {isLoading ? (
-          <div className="flex h-48 items-center justify-center text-muted-foreground">Loading transactions...</div>
+          <div className="flex h-64 items-center justify-center">
+            <div className="text-center space-y-3">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="type-body text-muted-foreground">Loading transactions...</p>
+            </div>
+          </div>
         ) : (
           <TransactionTable
             transactions={transactions}
@@ -167,9 +184,11 @@ export function TransactionsPage() {
       </div>
 
       {meta ? (
-        <div className="flex flex-col items-center justify-between gap-3 rounded-lg border bg-card p-4 shadow-sm text-sm md:flex-row">
-          <p className="text-muted-foreground">
-            Showing page {meta.page} of {meta.totalPages} · {meta.total.toLocaleString()} transactions total
+        <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border/30 bg-card/50 p-6 shadow-soft text-sm md:flex-row">
+          <p className="type-body text-muted-foreground">
+            Page <span className="font-medium text-foreground">{meta.page}</span> of{" "}
+            <span className="font-medium text-foreground">{meta.totalPages}</span> ·{" "}
+            <span className="font-medium text-foreground">{meta.total.toLocaleString()}</span> transactions total
           </p>
           <div className="flex gap-2">
             <Button
@@ -177,6 +196,7 @@ export function TransactionsPage() {
               size="sm"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={meta.page <= 1}
+              className="transition-all hover:shadow-sm"
             >
               Previous
             </Button>
@@ -185,6 +205,7 @@ export function TransactionsPage() {
               size="sm"
               onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
               disabled={meta.page >= meta.totalPages}
+              className="transition-all hover:shadow-sm"
             >
               Next
             </Button>
