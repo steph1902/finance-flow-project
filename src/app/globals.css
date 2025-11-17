@@ -1,0 +1,908 @@
+/**
+ * FinanceFlow Global Stylesheet
+ * Japanese Zen-Minimalist Design System
+ * 
+ * Architecture:
+ * 1. Tailwind Directives
+ * 2. Japanese Typography (Noto Sans JP)
+ * 3. CSS Reset & Base Styles  
+ * 4. Design Tokens (Light/Dark with Wabi-Sabi Aesthetic)
+ * 5. Typography System (Japanese-optimized)
+ * 6. Layout & Containers
+ * 7. Accessibility & Motion
+ * 8. Zen Utility Classes
+ * 
+ * Philosophy: Ma (間) - Negative space, Kanso (簡素) - Simplicity
+ * Optimized for: Next.js 16 + Turbopack + React 19
+ * 
+ * @version 2.0.0
+ * @license MIT
+ */
+
+/* ============================================================================
+   TAILWIND DIRECTIVES (v4)
+   ============================================================================ */
+
+@import "tailwindcss";
+
+/* ============================================================================
+   CSS RESET & BASE STYLES
+   Modern, minimal reset that works with Tailwind
+   ============================================================================ */
+
+@layer base {
+  /* Box sizing normalization */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Root & body setup */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    height: 100%;
+    /* Prevent font size adjustment after orientation changes in iOS */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100%;
+    line-height: 1.5;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Media elements */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Form elements */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Remove default button styles */
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Typography defaults */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* List reset */
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  /* Table reset */
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  /* Link defaults */
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  /* Remove default fieldset styles */
+  fieldset {
+    border: none;
+  }
+
+  /* Ensure consistent border colors */
+  * {
+    border-color: hsl(var(--border));
+  }
+}
+
+/* ============================================================================
+   DESIGN SYSTEM VARIABLES
+   HSL color system for perfect light/dark mode transitions
+   Matches Tailwind config for consistent theming
+   ============================================================================ */
+
+@layer base {
+  :root {
+    /* ===== Core Background Tokens (Japanese Rice Paper & Stone) ===== */
+    --color-bg-base: 30 20% 99%;               /* Rice paper white - warmth */
+    --color-bg-card: 0 0% 100%;                /* Pure white - elevated */
+    --color-bg-surface: 30 15% 97%;            /* Subtle warm gray */
+    --color-bg-surface-glass: 0 0% 100% / 0.8; /* Glass morphism */
+    --color-bg-muted: 210 20% 96%;             /* Soft neutral */
+    
+    /* ===== Text Tokens (Charcoal Ink) ===== */
+    --color-text-primary: 220 25% 10%;         /* Deep charcoal */
+    --color-text-secondary: 220 15% 40%;       /* Mid gray */
+    --color-text-tertiary: 220 10% 60%;        /* Light gray */
+    --color-text-inverse: 0 0% 98%;            /* Near white */
+    
+    /* ===== Border & Divider Tokens ===== */
+    --color-border-soft: 220 15% 88%;          /* Subtle border */
+    --color-border-medium: 220 20% 80%;        /* Standard border */
+    --color-border-strong: 220 25% 70%;        /* Emphasized border */
+    
+    /* ===== Japanese-Inspired Accent Colors ===== */
+    --color-accent-indigo: 230 60% 55%;        /* Muted indigo - calm */
+    --color-accent-indigo-foreground: 0 0% 98%;
+    --color-accent-gold: 42 78% 58%;           /* Luxury gold accent */
+    --color-accent-gold-foreground: 30 25% 15%;
+    --color-accent-charcoal: 220 25% 20%;      /* Deep charcoal accent */
+    --color-accent-charcoal-foreground: 0 0% 98%;
+    
+    /* ===== Semantic Status Colors ===== */
+    --color-success: 142 65% 42%;              /* Green - balanced */
+    --color-success-foreground: 0 0% 98%;
+    --color-warning: 38 85% 55%;               /* Amber - attention */
+    --color-warning-foreground: 30 25% 15%;
+    --color-error: 0 70% 55%;                  /* Red - soft error */
+    --color-error-foreground: 0 0% 98%;
+    --color-info: 205 85% 50%;                 /* Blue - informative */
+    --color-info-foreground: 0 0% 98%;
+    
+    /* ===== Shadcn/UI Compatible Tokens ===== */
+    --background: var(--color-bg-base);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-bg-card);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-bg-card);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-accent-indigo);
+    --primary-foreground: var(--color-accent-indigo-foreground);
+    --secondary: var(--color-bg-muted);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-bg-muted);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-bg-surface);
+    --accent-foreground: var(--color-text-primary);
+    --destructive: var(--color-error);
+    --destructive-foreground: var(--color-error-foreground);
+    --success: var(--color-success);
+    --success-foreground: var(--color-success-foreground);
+    --warning: var(--color-warning);
+    --warning-foreground: var(--color-warning-foreground);
+    --border: var(--color-border-soft);
+    --input: var(--color-border-medium);
+    --ring: var(--color-accent-indigo);
+    
+    /* ===== Japanese Ma (間) Spacing Scale ===== */
+    --space-zen-xs: 0.25rem;   /* 4px - minimal breath */
+    --space-zen-sm: 0.5rem;    /* 8px - tight */
+    --space-zen-md: 1rem;      /* 16px - comfortable */
+    --space-zen-lg: 1.5rem;    /* 24px - breathing */
+    --space-zen-xl: 2rem;      /* 32px - spacious */
+    --space-zen-2xl: 3rem;     /* 48px - generous */
+    --space-zen-3xl: 4rem;     /* 64px - vast */
+    --space-zen-4xl: 6rem;     /* 96px - monumental */
+    
+    /* ===== Border Radius Tokens ===== */
+    --radius-sm: 0.25rem;      /* 4px - subtle */
+    --radius-md: 0.5rem;       /* 8px - standard */
+    --radius-lg: 0.75rem;      /* 12px - card */
+    --radius-xl: 1rem;         /* 16px - prominent */
+    --radius-2xl: 1.5rem;      /* 24px - hero */
+    --radius-full: 9999px;     /* Pill shape */
+    --radius: var(--radius-md);
+    
+    /* ===== Elevation Tokens (Soft Shadows) ===== */
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+    --shadow-glass: 0 8px 16px -4px rgb(0 0 0 / 0.08), 0 4px 8px -4px rgb(0 0 0 / 0.05);
+    --shadow-mist: 0 12px 24px -6px rgb(0 0 0 / 0.1), 0 6px 12px -6px rgb(0 0 0 / 0.06);
+    --shadow-floating: 0 20px 40px -12px rgb(0 0 0 / 0.12), 0 8px 16px -8px rgb(0 0 0 / 0.08);
+    
+    /* ===== Motion Tokens (Calm, Subtle) ===== */
+    --transition-instant: 0.1s;
+    --transition-fast: 0.2s;
+    --transition-smooth: 0.3s;
+    --transition-calm: 0.5s;
+    --transition-slow: 0.8s;
+    --ease-zen: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* ===== Chart Colors for Data Visualization ===== */
+    --chart-1: var(--color-accent-indigo);
+    --chart-2: var(--color-success);
+    --chart-3: var(--color-warning);
+    --chart-4: 280 55% 60%;                    /* Purple */
+    --chart-5: 340 70% 60%;                    /* Pink */
+  }
+
+  .dark {
+    /* ===== Core Background Tokens (Night Stone & Ink) ===== */
+    --color-bg-base: 220 25% 8%;               /* Deep charcoal */
+    --color-bg-card: 220 22% 10%;              /* Slightly elevated */
+    --color-bg-surface: 220 20% 12%;           /* Surface layer */
+    --color-bg-surface-glass: 220 22% 10% / 0.8; /* Glass morphism dark */
+    --color-bg-muted: 220 18% 15%;             /* Muted background */
+    
+    /* ===== Text Tokens (Moonlight & Mist) ===== */
+    --color-text-primary: 0 0% 95%;            /* Soft white */
+    --color-text-secondary: 220 10% 65%;       /* Light gray */
+    --color-text-tertiary: 220 8% 45%;         /* Mid gray */
+    --color-text-inverse: 220 25% 10%;         /* Dark for light backgrounds */
+    
+    /* ===== Border & Divider Tokens ===== */
+    --color-border-soft: 220 15% 20%;          /* Subtle dark border */
+    --color-border-medium: 220 18% 25%;        /* Standard dark border */
+    --color-border-strong: 220 20% 35%;        /* Emphasized dark border */
+    
+    /* ===== Japanese-Inspired Accent Colors (Night Palette) ===== */
+    --color-accent-indigo: 230 65% 60%;        /* Brighter indigo for dark */
+    --color-accent-indigo-foreground: 220 25% 8%;
+    --color-accent-gold: 42 85% 62%;           /* Brighter gold */
+    --color-accent-gold-foreground: 220 25% 8%;
+    --color-accent-charcoal: 220 10% 85%;      /* Light charcoal for dark mode */
+    --color-accent-charcoal-foreground: 220 25% 8%;
+    
+    /* ===== Semantic Status Colors (Dark Adjusted) ===== */
+    --color-success: 142 60% 48%;              /* Green - softer */
+    --color-success-foreground: 220 25% 8%;
+    --color-warning: 38 80% 58%;               /* Amber - toned */
+    --color-warning-foreground: 220 25% 8%;
+    --color-error: 0 65% 58%;                  /* Red - softer */
+    --color-error-foreground: 220 25% 8%;
+    --color-info: 205 80% 55%;                 /* Blue - softer */
+    --color-info-foreground: 220 25% 8%;
+    
+    /* ===== Shadcn/UI Compatible Tokens ===== */
+    --background: var(--color-bg-base);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-bg-card);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-bg-card);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-accent-indigo);
+    --primary-foreground: var(--color-accent-indigo-foreground);
+    --secondary: var(--color-bg-muted);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-bg-muted);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-bg-surface);
+    --accent-foreground: var(--color-text-primary);
+    --destructive: var(--color-error);
+    --destructive-foreground: var(--color-error-foreground);
+    --success: var(--color-success);
+    --success-foreground: var(--color-success-foreground);
+    --warning: var(--color-warning);
+    --warning-foreground: var(--color-warning-foreground);
+    --border: var(--color-border-soft);
+    --input: var(--color-border-medium);
+    --ring: var(--color-accent-indigo);
+    
+    /* ===== Elevation Tokens (Enhanced for Dark) ===== */
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+    --shadow-glass: 0 8px 16px -4px rgb(0 0 0 / 0.25), 0 4px 8px -4px rgb(0 0 0 / 0.2);
+    --shadow-mist: 0 12px 24px -6px rgb(0 0 0 / 0.3), 0 6px 12px -6px rgb(0 0 0 / 0.25);
+    --shadow-floating: 0 20px 40px -12px rgb(0 0 0 / 0.35), 0 8px 16px -8px rgb(0 0 0 / 0.3);
+    
+    /* ===== Chart Colors (Dark Optimized) ===== */
+    --chart-1: 230 65% 60%;
+    --chart-2: 142 60% 48%;
+    --chart-3: 38 80% 58%;
+    --chart-4: 280 60% 65%;
+    --chart-5: 340 65% 65%;
+  }
+}
+
+/* ============================================================================
+   JAPANESE TYPOGRAPHY SYSTEM
+   Enhanced for readability with Noto Sans JP & Noto Serif JP
+   Optical adjustments for Latin + Japanese text harmony
+   ============================================================================ */
+
+@layer base {
+  /* Base typography setup */
+  body {
+    font-family: var(--font-sans, 'Noto Sans JP', sans-serif);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Japanese-optimized heading hierarchy with clamp */
+  h1, .jp-h1 {
+    font-family: var(--font-serif, 'Noto Serif JP', serif);
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-zen-lg);
+  }
+
+  h2, .jp-h2 {
+    font-family: var(--font-serif, 'Noto Serif JP', serif);
+    font-size: clamp(1.5rem, 3vw + 0.75rem, 2.5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-zen-md);
+  }
+
+  h3, .jp-h3 {
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.875rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-zen-md);
+  }
+
+  h4, .jp-h4 {
+    font-size: clamp(1.125rem, 1.5vw + 0.25rem, 1.5rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+    margin-bottom: var(--space-zen-sm);
+  }
+
+  h5, .jp-h5 {
+    font-size: clamp(1rem, 1vw + 0.125rem, 1.25rem);
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+    margin-bottom: var(--space-zen-sm);
+  }
+
+  h6, .jp-h6 {
+    font-size: clamp(0.875rem, 0.75vw + 0.125rem, 1rem);
+    font-weight: 700;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-zen-xs);
+  }
+
+  /* Body text with optimal reading */
+  p, .jp-body {
+    font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1.125rem);
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+    max-width: 65ch; /* Optimal reading width */
+    margin-bottom: var(--space-zen-md);
+  }
+
+  /* Small text / captions */
+  small, .jp-caption {
+    font-size: clamp(0.75rem, 0.25vw + 0.625rem, 0.875rem);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: hsl(var(--color-text-secondary));
+  }
+
+  /* Lead text - larger intro paragraphs */
+  .jp-lead {
+    font-size: clamp(1.125rem, 1vw + 0.875rem, 1.5rem);
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    font-weight: 400;
+    color: hsl(var(--color-text-secondary));
+  }
+
+  /* Display text - hero sections */
+  .jp-display {
+    font-family: var(--font-serif, 'Noto Serif JP', serif);
+    font-size: clamp(2.5rem, 6vw + 1.5rem, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-zen-xl);
+  }
+
+  /* Financial numbers - tabular formatting */
+  .jp-numeric, .currency {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* Monospace for code */
+  code, pre, .jp-code {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-feature-settings: "liga" 0;
+  }
+
+  code {
+    font-size: 0.875em;
+    padding: 0.125rem 0.375rem;
+    background-color: hsl(var(--muted));
+    border-radius: var(--radius-sm);
+    border: 1px solid hsl(var(--border));
+  }
+
+  pre {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    padding: var(--space-zen-md);
+    background-color: hsl(var(--muted));
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin-bottom: var(--space-zen-lg);
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    border: none;
+  }
+
+  /* Blockquotes with Japanese aesthetic */
+  blockquote {
+    border-left: 4px solid hsl(var(--primary));
+    padding-left: var(--space-zen-lg);
+    margin-left: 0;
+    margin-bottom: var(--space-zen-lg);
+    font-style: italic;
+    color: hsl(var(--color-text-secondary));
+  }
+
+  /* Links with subtle styling */
+  a {
+    color: hsl(var(--primary));
+    text-decoration: none;
+    transition: color var(--transition-fast) var(--ease-zen);
+  }
+
+  a:hover {
+    color: hsl(var(--color-accent-indigo));
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* Dark mode typography adjustments */
+  .dark {
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 500; /* Slightly lighter for dark backgrounds */
+    }
+
+    body {
+      font-weight: 400;
+      letter-spacing: 0.015em; /* Slightly more spacing in dark mode */
+    }
+  }
+}
+
+/* ============================================================================
+   LAYOUT & CONTAINERS
+   Consistent spacing and content width constraints
+   ============================================================================ */
+
+@layer components {
+  /* Container widths */
+  .container-sm {
+    width: 100%;
+    max-width: 640px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  .container-md {
+    width: 100%;
+    max-width: 768px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  .container-lg {
+    width: 100%;
+    max-width: 1024px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .container-xl {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 2rem;
+  }
+
+  .container-2xl {
+    width: 100%;
+    max-width: 1536px;
+    margin-inline: auto;
+    padding-inline: 2rem;
+  }
+
+  /* Section spacing */
+  .section {
+    padding-block: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 4rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section {
+      padding-block: 6rem;
+    }
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY & MOTION PREFERENCES
+   WCAG 2.1 AA+ compliant with Japanese aesthetic
+   ============================================================================ */
+
+@layer base {
+  /* Enhanced focus visibility with zen glow */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove outline for mouse users (keep for keyboard) */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Button and interactive element focus states */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px hsl(var(--ring) / 0.1);
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Reduced motion support - respects user preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Disable motion components */
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .animate-fade-in-down,
+    .animate-scale-in,
+    .animate-slide-in-right {
+      animation: none !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    * {
+      border-width: max(1px, 0.0625rem);
+    }
+
+    button,
+    a {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 2px;
+    }
+  }
+
+  /* Dark mode specific accessibility */
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* Light mode */
+  :root {
+    color-scheme: light;
+  }
+
+  /* Smooth theme transitions */
+  html {
+    transition: background-color var(--transition-calm) var(--ease-zen),
+                color var(--transition-calm) var(--ease-zen);
+  }
+
+  body {
+    transition: background-color var(--transition-calm) var(--ease-zen),
+                color var(--transition-calm) var(--ease-zen);
+  }
+}
+
+/* ============================================================================
+   FORM ENHANCEMENTS
+   Better default styles for inputs, selects, and form elements
+   ============================================================================ */
+
+@layer base {
+  /* Input base styles */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  textarea,
+  select {
+    appearance: none;
+    background-color: hsl(var(--background));
+    border: 1px solid hsl(var(--input));
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="search"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
+  }
+
+  /* Disabled state */
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Placeholder styles */
+  ::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 0.6;
+  }
+
+  /* Autofill styles */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--background)) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--card)) inset;
+  }
+}
+
+/* ============================================================================
+   ZEN UTILITY CLASSES
+   Purpose-built utilities following Japanese design principles
+   ============================================================================ */
+
+@layer utilities {
+  /* Glass morphism effects */
+  .glass {
+    background: hsl(var(--color-bg-surface-glass));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-card {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* Gradient text effects */
+  .text-gradient-primary {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--color-accent-indigo))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--color-accent-gold)),
+      hsl(var(--warning))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Smooth scrollbar styling */
+  .scrollbar-zen {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-zen::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-zen::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-zen::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+  }
+
+  .scrollbar-zen::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  /* Financial number styling */
+  .currency, .jp-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  .positive {
+    color: hsl(var(--success));
+  }
+
+  .negative {
+    color: hsl(var(--destructive));
+  }
+
+  /* Text truncation with clamp */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Zen transition helper */
+  .transition-zen {
+    transition-property: all;
+    transition-duration: var(--transition-smooth);
+    transition-timing-function: var(--ease-zen);
+  }
+
+  /* Balance text for better typography */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Skip to main content link */
+  .skip-to-main {
+    position: absolute;
+    top: -48px;
+    left: 0;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    z-index: 10000;
+    border-radius: 0 0 var(--radius-md) 0;
+    font-weight: 600;
+    box-shadow: var(--shadow-card);
+    transition: top var(--transition-fast) var(--ease-zen);
+  }
+
+  .skip-to-main:focus {
+    top: 0;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   Optimized for printing financial reports
+   ============================================================================ */
+
+@media print {
+  @page {
+    margin: 2cm;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 12pt;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  img, table, figure {
+    page-break-inside: avoid;
+  }
+
+  /* Hide non-essential elements when printing */
+  nav,
+  aside,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Expand collapsed sections */
+  details {
+    display: block;
+  }
+
+  summary {
+    display: none;
+  }
+
+  /* Show link URLs in print */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+}
