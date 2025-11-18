@@ -1,26 +1,40 @@
 /**
- * Environment Variable Validation
+ * Environment Variable Validation (Runtime-Only)
  * 
- * Validates and exports required environment variables.
- * Application will fail to start if required variables are missing,
- * preventing runtime errors and security issues.
+ * ⚠️ VERCEL BUILD FIX:
+ * This module now validates env vars ONLY at runtime, not at build time.
+ * This prevents Vercel build failures when env vars are missing during "next build".
+ * 
+ * Variables are lazily evaluated when accessed, not when the module loads.
+ * This allows the build to complete even without production env vars.
  */
 
 /**
- * Gets a required environment variable.
- * Throws an error if the variable is not set or empty.
+ * Checks if code is running during Next.js build phase
+ */
+const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
+
+/**
+ * Gets a required environment variable (runtime-only validation).
+ * During build time, returns empty string to prevent crashes.
  * 
  * @param key - The environment variable name
  * @returns The environment variable value
- * @throws Error if the variable is missing or empty
+ * @throws Error at runtime if the variable is missing
  */
 function getRequiredEnv(key: string): string {
   const value = process.env[key];
   
+  // During build: return empty string (prevents build crash)
+  if (isBuildTime) {
+    return '';
+  }
+  
+  // Runtime validation: throw if missing
   if (!value || value.trim() === '') {
     throw new Error(
-      `❌ FATAL: Missing required environment variable: ${key}\n` +
-      `Please set ${key} in your .env file or environment.\n` +
+      `❌ RUNTIME ERROR: Missing required environment variable: ${key}\n` +
+      `Please set ${key} in your Vercel environment variables.\n` +
       `See .env.example for reference.`
     );
   }
@@ -40,33 +54,32 @@ function getOptionalEnv(key: string, defaultValue: string): string {
 }
 
 /**
- * Validated environment variables
+ * Environment variables (safe for build-time)
  * 
- * All required variables are validated at module load time.
- * This ensures the application fails fast with clear error messages
- * rather than experiencing runtime failures.
+ * ⚠️ IMPORTANT: These values are evaluated lazily via getters.
+ * Required vars will only throw errors at RUNTIME, not during build.
  */
 export const ENV = {
   // Authentication
-  NEXTAUTH_SECRET: getRequiredEnv('NEXTAUTH_SECRET'),
-  NEXTAUTH_URL: getOptionalEnv('NEXTAUTH_URL', 'http://localhost:3000'),
+  get NEXTAUTH_SECRET() { return getRequiredEnv('NEXTAUTH_SECRET'); },
+  get NEXTAUTH_URL() { return getOptionalEnv('NEXTAUTH_URL', 'http://localhost:3000'); },
   
   // Database
-  DATABASE_URL: getRequiredEnv('DATABASE_URL'),
+  get DATABASE_URL() { return getRequiredEnv('DATABASE_URL'); },
   
-  // AI Services
-  GEMINI_API_KEY: getRequiredEnv('GEMINI_API_KEY'),
-  AI_MODEL_VERSION: getOptionalEnv('AI_MODEL_VERSION', 'gemini-1.5-flash'),
-  AI_TEMPERATURE: getOptionalEnv('AI_TEMPERATURE', '0.7'),
-  AI_MAX_TOKENS: getOptionalEnv('AI_MAX_TOKENS', '2048'),
-  AI_AUTO_ACCEPT_THRESHOLD: getOptionalEnv('AI_AUTO_ACCEPT_THRESHOLD', '0'),
+  // AI Services (lazy evaluation prevents build crashes)
+  get GEMINI_API_KEY() { return getRequiredEnv('GEMINI_API_KEY'); },
+  get AI_MODEL_VERSION() { return getOptionalEnv('AI_MODEL_VERSION', 'gemini-1.5-flash'); },
+  get AI_TEMPERATURE() { return getOptionalEnv('AI_TEMPERATURE', '0.7'); },
+  get AI_MAX_TOKENS() { return getOptionalEnv('AI_MAX_TOKENS', '2048'); },
+  get AI_AUTO_ACCEPT_THRESHOLD() { return getOptionalEnv('AI_AUTO_ACCEPT_THRESHOLD', '0'); },
   
   // OAuth (optional)
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+  get GOOGLE_CLIENT_ID() { return process.env.GOOGLE_CLIENT_ID || ''; },
+  get GOOGLE_CLIENT_SECRET() { return process.env.GOOGLE_CLIENT_SECRET || ''; },
   
   // Runtime
-  NODE_ENV: getOptionalEnv('NODE_ENV', 'development'),
+  get NODE_ENV() { return getOptionalEnv('NODE_ENV', 'development'); },
 } as const;
 
 /**
@@ -75,16 +88,34 @@ export const ENV = {
 export type Environment = typeof ENV;
 
 /**
- * Check if running in production
+ * Safely check if running in production (build-safe)
  */
-export const isProduction = ENV.NODE_ENV === 'production';
+export const isProduction = () => process.env.NODE_ENV === 'production';
 
 /**
- * Check if running in development
+ * Safely check if running in development (build-safe)
  */
-export const isDevelopment = ENV.NODE_ENV === 'development';
+export const isDevelopment = () => process.env.NODE_ENV === 'development';
 
 /**
- * Check if running in test
+ * Safely check if running in test (build-safe)
  */
-export const isTest = ENV.NODE_ENV === 'test';
+export const isTest = () => process.env.NODE_ENV === 'test';
+
+/**
+ * Utility: Check if a required env var exists (for runtime validation)
+ */
+export function validateEnvVars(): { valid: boolean; missing: string[] } {
+  const required = [
+    'DATABASE_URL',
+    'NEXTAUTH_SECRET',
+    'GEMINI_API_KEY',
+  ];
+  
+  const missing = required.filter(key => !process.env[key]);
+  
+  return {
+    valid: missing.length === 0,
+    missing,
+  };
+}

@@ -2,13 +2,31 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
 import { logError, logWarn } from '@/lib/logger';
 
-export class GeminiClient {
-  private genAI: GoogleGenerativeAI;
-  private model: GenerativeModel;
+/**
+ * ⚠️ VERCEL BUILD FIX:
+ * GeminiClient now uses lazy initialization to prevent build-time crashes
+ * when GEMINI_API_KEY is missing. The client is only initialized when
+ * actually used (runtime), not when the module loads (build-time).
+ */
 
-  constructor() {
+export class GeminiClient {
+  private genAI: GoogleGenerativeAI | null = null;
+  private model: GenerativeModel | null = null;
+
+  /**
+   * Lazy initialization - only creates client when first used (runtime)
+   * This prevents build failures when env vars are missing
+   */
+  private initialize() {
+    if (this.genAI && this.model) {
+      return; // Already initialized
+    }
+
     if (!AI_CONFIG.apiKey) {
-      throw new Error('GEMINI_API_KEY not configured');
+      throw new Error(
+        'GEMINI_API_KEY not configured. ' +
+        'Please set GEMINI_API_KEY in your Vercel environment variables.'
+      );
     }
 
     this.genAI = new GoogleGenerativeAI(AI_CONFIG.apiKey);
@@ -18,8 +36,10 @@ export class GeminiClient {
   }
 
   async generateContent(prompt: string): Promise<string> {
+    this.initialize(); // Lazy init
+
     try {
-      const result = await this.model.generateContent({
+      const result = await this.model!.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: AI_CONFIG.temperature,
@@ -41,6 +61,8 @@ export class GeminiClient {
     prompt: string,
     maxRetries = 3
   ): Promise<string> {
+    this.initialize(); // Lazy init
+
     let lastError: Error | null = null;
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -65,6 +87,8 @@ export class GeminiClient {
     prompt: string,
     schema?: string
   ): Promise<T> {
+    this.initialize(); // Lazy init
+
     const fullPrompt = schema
       ? `${prompt}\n\nRespond with valid JSON matching this schema:\n${schema}`
       : `${prompt}\n\nRespond with valid JSON only.`;
@@ -85,5 +109,9 @@ export class GeminiClient {
   }
 }
 
-// Export singleton instance
+/**
+ * Export singleton instance (lazy initialization)
+ * ⚠️ VERCEL BUILD FIX: Instance creation is safe now because
+ * the client doesn't initialize until actually used at runtime
+ */
 export const geminiClient = new GeminiClient();

@@ -1,14 +1,20 @@
+/**
+ * Next.js 16 Proxy (formerly middleware.ts)
+ * 
+ * ⚠️ NEXT.JS 16 MIGRATION:
+ * Renamed from middleware.ts to proxy.ts per Next.js 16 conventions.
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
+ * 
+ * ⚠️ VERCEL BUILD FIX:
+ * Proxy now lazily loads NEXTAUTH_SECRET at runtime, not build time.
+ * This prevents build failures when env vars are missing.
+ */
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { logWarn, logError, logInfo } from "@/lib/logger";
 import rateLimiter from "@/lib/rate-limiter";
-
-/**
- * ⚠️ VERCEL BUILD FIX:
- * Middleware now lazily loads NEXTAUTH_SECRET at runtime, not build time.
- * This prevents build failures when env vars are missing.
- */
 
 // Lazy secret loading (runtime-only)
 function getSecret(): Uint8Array {
@@ -19,30 +25,34 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-// Rate limit configuration for middleware
-const MIDDLEWARE_RATE_LIMIT = {
+// Rate limit configuration for proxy
+const PROXY_RATE_LIMIT = {
   limit: 100, // 100 requests
   window: 60 * 1000, // per minute
 };
 
-export async function middleware(req: NextRequest) {
+/**
+ * Next.js 16 Proxy Handler
+ * Handles authentication, rate limiting, and request enrichment
+ */
+export async function proxy(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
   const path = req.nextUrl.pathname;
   const method = req.method;
   
   // Rate limiting by IP address
-  const rateLimitKey = `middleware:${ip}`;
+  const rateLimitKey = `proxy:${ip}`;
   const isAllowed = rateLimiter.check(
     rateLimitKey,
-    MIDDLEWARE_RATE_LIMIT.limit,
-    MIDDLEWARE_RATE_LIMIT.window
+    PROXY_RATE_LIMIT.limit,
+    PROXY_RATE_LIMIT.window
   );
 
   if (!isAllowed) {
     const resetTime = rateLimiter.getResetTime(rateLimitKey);
     const retryAfter = resetTime ? Math.ceil(resetTime / 1000) : 60;
 
-    logWarn("Rate limit exceeded in middleware", {
+    logWarn("Rate limit exceeded in proxy", {
       ip,
       path,
       method,
@@ -53,9 +63,9 @@ export async function middleware(req: NextRequest) {
       status: 429,
       headers: {
         "Retry-After": String(retryAfter),
-        "X-RateLimit-Limit": String(MIDDLEWARE_RATE_LIMIT.limit),
+        "X-RateLimit-Limit": String(PROXY_RATE_LIMIT.limit),
         "X-RateLimit-Remaining": "0",
-        "X-RateLimit-Reset": String(resetTime || Date.now() + MIDDLEWARE_RATE_LIMIT.window),
+        "X-RateLimit-Reset": String(resetTime || Date.now() + PROXY_RATE_LIMIT.window),
       },
     });
   }
@@ -108,7 +118,7 @@ export async function middleware(req: NextRequest) {
     requestHeaders.set("x-user-email", (payload.email as string) || "");
     
     // Add rate limit info to headers
-    const remaining = rateLimiter.getRemaining(rateLimitKey, MIDDLEWARE_RATE_LIMIT.limit);
+    const remaining = rateLimiter.getRemaining(rateLimitKey, PROXY_RATE_LIMIT.limit);
     requestHeaders.set("x-ratelimit-remaining", String(remaining));
 
     return NextResponse.next({
@@ -118,7 +128,7 @@ export async function middleware(req: NextRequest) {
     });
   } catch (error) {
     // Log authentication failures with context
-    logError("JWT verification failed in middleware", error, {
+    logError("JWT verification failed in proxy", error, {
       ip,
       path,
       method,

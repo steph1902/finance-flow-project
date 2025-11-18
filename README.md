@@ -604,6 +604,26 @@ Vercel automatically deploys on git push.
 - **Missing `NEXTAUTH_SECRET`** → Authentication breaks
 - **Incorrect `NEXTAUTH_URL`** → OAuth redirect fails
 - **Prisma generate not run** → TypeScript errors (ensure `postinstall` script runs)
+- **Missing `GEMINI_API_KEY`** → AI features fail at runtime (build will succeed)
+
+### ⚠️ Vercel Build Requirements (2025)
+
+**Critical**: This project uses lazy environment variable loading to prevent build failures when env vars are missing. The build will **succeed** even without env vars, but the app will throw runtime errors when AI features are accessed without `GEMINI_API_KEY`.
+
+**Required Environment Variables for Production:**
+```
+DATABASE_URL=<your-postgres-url>
+NEXTAUTH_SECRET=<generate-with-openssl-rand-base64-32>
+NEXTAUTH_URL=https://your-domain.vercel.app
+GEMINI_API_KEY=<your-gemini-key>
+```
+
+**How the build works:**
+1. Build phase: Env vars are NOT validated (prevents build crashes)
+2. Runtime phase: Env vars are validated when accessed
+3. Missing vars throw clear runtime errors with instructions
+
+This allows Vercel preview deployments to build successfully while protecting production from missing configurations.
 
 ---
 

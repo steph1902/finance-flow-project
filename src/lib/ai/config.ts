@@ -1,13 +1,18 @@
 import { ENV } from '@/lib/env';
 
+/**
+ * ⚠️ VERCEL BUILD FIX:
+ * AI_CONFIG now uses getters for lazy evaluation.
+ * This prevents accessing ENV values during build time.
+ */
 export const AI_CONFIG = {
-  apiKey: ENV.GEMINI_API_KEY,
-  model: ENV.AI_MODEL_VERSION,
-  temperature: parseFloat(ENV.AI_TEMPERATURE),
-  maxTokens: parseInt(ENV.AI_MAX_TOKENS),
+  get apiKey() { return ENV.GEMINI_API_KEY; },
+  get model() { return ENV.AI_MODEL_VERSION; },
+  get temperature() { return parseFloat(ENV.AI_TEMPERATURE); },
+  get maxTokens() { return parseInt(ENV.AI_MAX_TOKENS); },
   topP: 0.8,
   topK: 40,
-  autoAcceptThreshold: parseFloat(ENV.AI_AUTO_ACCEPT_THRESHOLD), // 0 = manual approval required
+  get autoAcceptThreshold() { return parseFloat(ENV.AI_AUTO_ACCEPT_THRESHOLD); },
 } as const;
 
 export const CATEGORIES = {
