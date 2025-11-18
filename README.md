@@ -1226,8 +1226,6 @@ See [LICENSE](./LICENSE) for the full license text.
 
 ## Maintainer
 
-**Stephanus Sujatmoko**
-
 - GitHub: [@steph1902](https://github.com/steph1902)
 - Repository: [finance-flow-project](https://github.com/steph1902/finance-flow-project)
 
