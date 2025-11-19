@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname, // Explicitly set workspace root
+  },
+  
   // Image optimization
   images: {
     remotePatterns: [

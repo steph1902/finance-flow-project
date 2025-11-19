@@ -5,7 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { ENV } from "@/lib/env";
 import { logError } from "@/lib/logger";
 
-const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
+/**
+ * Lazy secret initialization to prevent build-time env var access
+ */
+function getSecret(): Uint8Array {
+  return new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +44,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create JWT token
+    // Create JWT token (lazy load secret at runtime)
     const token = await new SignJWT({
       id: user.id,
       email: user.email,
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
-      .sign(SECRET);
+      .sign(getSecret());
 
     const response = NextResponse.json({
       user: {

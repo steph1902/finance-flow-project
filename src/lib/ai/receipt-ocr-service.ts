@@ -5,8 +5,8 @@
  */
 
 import { logInfo, logWarn, logError } from "@/lib/logger";
+import { ENV } from "@/lib/env";
 
-const VISION_API_KEY = process.env.GOOGLE_CLOUD_API_KEY;
 const VISION_API_URL = "https://vision.googleapis.com/v1/images:annotate";
 
 interface VisionAPIResponse {
@@ -40,9 +40,11 @@ interface OCRResult {
 export async function extractTextFromReceipt(
   imageBase64: string
 ): Promise<OCRResult> {
-  if (!VISION_API_KEY) {
+  const VISION_API_KEY = ENV.GOOGLE_CLOUD_API_KEY;
+  
+  if (!VISION_API_KEY || VISION_API_KEY.trim() === '') {
     throw new Error(
-      "GOOGLE_CLOUD_API_KEY not configured. Please add it to your .env file."
+      "GOOGLE_CLOUD_API_KEY not configured. Please add it to your .env file to use receipt scanning."
     );
   }
 

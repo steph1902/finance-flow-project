@@ -3,7 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { ENV } from "@/lib/env";
 
-const SECRET = new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
+/**
+ * Lazy initialization to prevent build-time env var access
+ */
+function getSecret(): Uint8Array {
+  return new TextEncoder().encode(ENV.NEXTAUTH_SECRET);
+}
 
 export async function getSession() {
   const cookieStore = await cookies();
@@ -14,7 +19,7 @@ export async function getSession() {
   }
 
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return {
       user: {
         id: payload.id as string,

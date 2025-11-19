@@ -1,20 +1,19 @@
-/**
- * Next.js 16 Proxy (formerly middleware.ts)
- * 
- * ⚠️ NEXT.JS 16 MIGRATION:
- * Renamed from middleware.ts to proxy.ts per Next.js 16 conventions.
- * See: https://nextjs.org/docs/messages/middleware-to-proxy
- * 
- * ⚠️ VERCEL BUILD FIX:
- * Proxy now lazily loads NEXTAUTH_SECRET at runtime, not build time.
- * This prevents build failures when env vars are missing.
- */
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { logWarn, logError, logInfo } from "@/lib/logger";
 import rateLimiter from "@/lib/rate-limiter";
+
+/**
+ * Next.js 16 Proxy (Authentication & Rate Limiting)
+ * 
+ * ⚠️ NEXT.JS 16 MIGRATION:
+ * Renamed from middleware to proxy per Next.js 16 conventions.
+ * 
+ * ⚠️ VERCEL BUILD FIX:
+ * Proxy now lazily loads NEXTAUTH_SECRET at runtime, not build time.
+ * This prevents build failures when env vars are missing.
+ */
 
 // Lazy secret loading (runtime-only)
 function getSecret(): Uint8Array {
@@ -31,10 +30,6 @@ const PROXY_RATE_LIMIT = {
   window: 60 * 1000, // per minute
 };
 
-/**
- * Next.js 16 Proxy Handler
- * Handles authentication, rate limiting, and request enrichment
- */
 export async function proxy(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
   const path = req.nextUrl.pathname;

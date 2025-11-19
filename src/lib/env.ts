@@ -74,9 +74,12 @@ export const ENV = {
   get AI_MAX_TOKENS() { return getOptionalEnv('AI_MAX_TOKENS', '2048'); },
   get AI_AUTO_ACCEPT_THRESHOLD() { return getOptionalEnv('AI_AUTO_ACCEPT_THRESHOLD', '0'); },
   
+  // Google Cloud Services (optional)
+  get GOOGLE_CLOUD_API_KEY() { return getOptionalEnv('GOOGLE_CLOUD_API_KEY', ''); },
+  
   // OAuth (optional)
-  get GOOGLE_CLIENT_ID() { return process.env.GOOGLE_CLIENT_ID || ''; },
-  get GOOGLE_CLIENT_SECRET() { return process.env.GOOGLE_CLIENT_SECRET || ''; },
+  get GOOGLE_CLIENT_ID() { return getOptionalEnv('GOOGLE_CLIENT_ID', ''); },
+  get GOOGLE_CLIENT_SECRET() { return getOptionalEnv('GOOGLE_CLIENT_SECRET', ''); },
   
   // Runtime
   get NODE_ENV() { return getOptionalEnv('NODE_ENV', 'development'); },

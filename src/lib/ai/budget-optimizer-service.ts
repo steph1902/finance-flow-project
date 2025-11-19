@@ -9,7 +9,16 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ENV } from "@/lib/env";
 import { logInfo, logError } from "@/lib/logger";
 
-const genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
+/**
+ * Lazy initialization to prevent build-time env var access
+ */
+let genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  if (!genAI) {
+    genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
+  }
+  return genAI;
+}
 
 interface Budget {
   id: string;
@@ -152,7 +161,7 @@ export async function optimizeBudgets(input: OptimizationInput): Promise<Optimiz
     const analysis = analyzeVariance(budgets, actualSpending);
 
     // 3. Use Gemini to generate optimization suggestions
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const prompt = `You are a financial budget optimization expert. Analyze this budget variance data and suggest optimal reallocations.
 
