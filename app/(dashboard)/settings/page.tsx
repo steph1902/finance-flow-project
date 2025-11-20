@@ -419,9 +419,6 @@ export default function SettingsPage() {
             <Label className="font-medium">Date Format</Label>
             <p className="type-small text-muted-foreground">MM/DD/YYYY</p>
           </div>
-          <Button variant="outline" disabled className="font-medium">
-            Change Settings (Coming Soon)
-          </Button>
         </CardContent>
       </Card>
     </div>
