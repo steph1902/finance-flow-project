@@ -1,4 +1,4 @@
-import { Home, DollarSign, Wallet, Settings, MessageSquare, Repeat, type LucideIcon } from "lucide-react";
+import { Home, DollarSign, Wallet, Settings, MessageSquare, Repeat, Target, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -10,6 +10,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/transactions", label: "Transactions", icon: DollarSign },
   { href: "/budgets", label: "Budgets", icon: Wallet },
+  { href: "/goals", label: "Goals", icon: Target },
   { href: "/recurring", label: "Recurring", icon: Repeat },
   { href: "/ai-assistant", label: "AI Assistant", icon: MessageSquare },
   { href: "/settings", label: "Settings", icon: Settings },

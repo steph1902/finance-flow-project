@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, Settings, HelpCircle, Bell, Search, TrendingUp } from "lucide-react";
+import { Menu, LogOut, Settings, HelpCircle, Search, TrendingUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export default function Header() {
   const router = useRouter();
@@ -81,21 +82,7 @@ export default function Header() {
       {/* Right Section */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Notifications */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative hover:bg-primary-50 dark:hover:bg-primary-950/30"
-          aria-label="View notifications"
-        >
-          <Bell className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-          <motion.span
-            className="absolute top-1.5 right-1.5 h-2 w-2 bg-danger-500 rounded-full"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            aria-hidden="true"
-          />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         {/* User Menu */}
         <DropdownMenu>
