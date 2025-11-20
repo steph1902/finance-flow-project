@@ -1,32 +1,11 @@
 /**
  * Receipt OCR Service
- * Uses Google Cloud Vision API to extract text from receipt images
- * and Gemini AI to parse structured data
+ * Uses Gemini Vision API to extract text from receipt images
  */
 
 import { logInfo, logWarn, logError } from "@/lib/logger";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ENV } from "@/lib/env";
-
-const VISION_API_URL = "https://vision.googleapis.com/v1/images:annotate";
-
-interface VisionAPIResponse {
-  responses: Array<{
-    textAnnotations?: Array<{
-      description: string;
-      boundingPoly?: {
-        vertices: Array<{ x: number; y: number }>;
-      };
-    }>;
-    fullTextAnnotation?: {
-      text: string;
-    };
-    error?: {
-      code: number;
-      message: string;
-      status: string;
-    };
-  }>;
-}
 
 interface OCRResult {
   fullText: string;
@@ -35,68 +14,51 @@ interface OCRResult {
 }
 
 /**
- * Extract text from receipt image using Google Cloud Vision API
+ * Extract text from receipt image using Gemini Vision API
  */
 export async function extractTextFromReceipt(
   imageBase64: string
 ): Promise<OCRResult> {
-  const VISION_API_KEY = ENV.GOOGLE_CLOUD_API_KEY;
+  const API_KEY = ENV.GOOGLE_GENERATIVE_AI_API_KEY;
   
-  if (!VISION_API_KEY || VISION_API_KEY.trim() === '') {
+  if (!API_KEY || API_KEY.trim() === '') {
     throw new Error(
-      "GOOGLE_CLOUD_API_KEY not configured. Please add it to your .env file to use receipt scanning."
+      "GOOGLE_GENERATIVE_AI_API_KEY not configured. Please add it to your .env file to use receipt scanning."
     );
   }
 
   try {
-    logInfo("Starting receipt OCR with Google Cloud Vision API");
+    logInfo("Starting receipt OCR with Gemini Vision API");
 
     // Remove data URL prefix if present
     const base64Image = imageBase64.replace(/^data:image\/\w+;base64,/, "");
 
-    // Call Google Cloud Vision API
-    const response = await fetch(`${VISION_API_URL}?key=${VISION_API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    // Extract mime type
+    const mimeMatch = imageBase64.match(/^data:(image\/\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg";
+
+    // Initialize Gemini AI
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Extract ALL text visible in this receipt image. 
+Return the text exactly as it appears, line by line, preserving the order and spacing.
+Do not summarize or interpret - just extract the raw text.`;
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Image,
+          mimeType,
+        },
       },
-      body: JSON.stringify({
-        requests: [
-          {
-            image: {
-              content: base64Image,
-            },
-            features: [
-              {
-                type: "TEXT_DETECTION",
-                maxResults: 1,
-              },
-            ],
-          },
-        ],
-      }),
-    });
+    ]);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logError("Vision API error", null, { status: response.status, errorText });
-      throw new Error(`Vision API request failed: ${response.status}`);
-    }
+    const response = await result.response;
+    const fullText = response.text();
 
-    const data: VisionAPIResponse = await response.json();
-
-    // Check for API errors
-    if (data.responses[0]?.error) {
-      const error = data.responses[0].error;
-      logError("Vision API returned error", error);
-      throw new Error(`Vision API error: ${error.message}`);
-    }
-
-    // Extract full text
-    const fullTextAnnotation = data.responses[0]?.fullTextAnnotation;
-    const textAnnotations = data.responses[0]?.textAnnotations;
-
-    if (!fullTextAnnotation && (!textAnnotations || textAnnotations.length === 0)) {
+    if (!fullText || fullText.trim().length === 0) {
       logWarn("No text detected in image");
       return {
         fullText: "",
@@ -104,9 +66,6 @@ export async function extractTextFromReceipt(
         confidence: 0,
       };
     }
-
-    // Get full text (most reliable)
-    const fullText = fullTextAnnotation?.text || textAnnotations?.[0]?.description || "";
 
     // Split into lines and clean up
     const lines = fullText
@@ -122,7 +81,7 @@ export async function extractTextFromReceipt(
     return {
       fullText,
       lines,
-      confidence: fullText.length > 0 ? 0.85 : 0, // Vision API doesn't provide confidence for TEXT_DETECTION
+      confidence: fullText.length > 0 ? 0.9 : 0,
     };
   } catch (error) {
     logError("Receipt OCR failed", error);

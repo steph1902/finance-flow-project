@@ -97,14 +97,14 @@ export async function POST(req: NextRequest) {
 
     // Check for specific errors
     if (error instanceof Error) {
-      if (error.message.includes("GOOGLE_CLOUD_API_KEY")) {
+      if (error.message.includes("GOOGLE_GENERATIVE_AI_API_KEY")) {
         return NextResponse.json(
           { error: "Receipt scanning not configured. Please contact support." },
           { status: 503 }
         );
       }
 
-      if (error.message.includes("Vision API")) {
+      if (error.message.includes("Vision") || error.message.includes("Gemini")) {
         return NextResponse.json(
           { error: "OCR service unavailable. Please try again later." },
           { status: 503 }
