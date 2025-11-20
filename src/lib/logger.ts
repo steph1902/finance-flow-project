@@ -146,3 +146,13 @@ export function apiError(
     status: statusCode,
   };
 }
+
+/**
+ * Default logger object for compatibility
+ */
+export const logger = {
+  info: logInfo,
+  warn: logWarn,
+  error: logError,
+  debug: logDebug,
+};

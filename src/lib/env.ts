@@ -81,6 +81,32 @@ export const ENV = {
   get GOOGLE_CLIENT_ID() { return getOptionalEnv('GOOGLE_CLIENT_ID', ''); },
   get GOOGLE_CLIENT_SECRET() { return getOptionalEnv('GOOGLE_CLIENT_SECRET', ''); },
   
+  // Stripe (optional)
+  get STRIPE_SECRET_KEY() { return getOptionalEnv('STRIPE_SECRET_KEY', ''); },
+  get STRIPE_PUBLISHABLE_KEY() { return getOptionalEnv('STRIPE_PUBLISHABLE_KEY', ''); },
+  get STRIPE_WEBHOOK_SECRET() { return getOptionalEnv('STRIPE_WEBHOOK_SECRET', ''); },
+  get STRIPE_PRICE_BASIC() { return getOptionalEnv('STRIPE_PRICE_BASIC', ''); },
+  get STRIPE_PRICE_PREMIUM() { return getOptionalEnv('STRIPE_PRICE_PREMIUM', ''); },
+  get STRIPE_PRICE_ENTERPRISE() { return getOptionalEnv('STRIPE_PRICE_ENTERPRISE', ''); },
+  
+  // Resend (optional)
+  get RESEND_API_KEY() { return getOptionalEnv('RESEND_API_KEY', ''); },
+  get RESEND_FROM_EMAIL() { return getOptionalEnv('RESEND_FROM_EMAIL', 'noreply@financeflow.app'); },
+  
+  // Currency API (optional)
+  get FIXER_API_KEY() { return getOptionalEnv('FIXER_API_KEY', ''); },
+  
+  // Plaid (optional)
+  get PLAID_CLIENT_ID() { return getOptionalEnv('PLAID_CLIENT_ID', ''); },
+  get PLAID_SECRET() { return getOptionalEnv('PLAID_SECRET', ''); },
+  get PLAID_ENV() { return getOptionalEnv('PLAID_ENV', 'sandbox'); },
+  
+  // Vercel KV / Redis (optional)
+  get KV_URL() { return getOptionalEnv('KV_URL', ''); },
+  get KV_REST_API_URL() { return getOptionalEnv('KV_REST_API_URL', ''); },
+  get KV_REST_API_TOKEN() { return getOptionalEnv('KV_REST_API_TOKEN', ''); },
+  get KV_REST_API_READ_ONLY_TOKEN() { return getOptionalEnv('KV_REST_API_READ_ONLY_TOKEN', ''); },
+  
   // Runtime
   get NODE_ENV() { return getOptionalEnv('NODE_ENV', 'development'); },
 } as const;

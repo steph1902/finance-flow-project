@@ -1,13 +1,21 @@
 /**
  * AI Spending Forecast Service
  * 
- * Analyzes historical spending patterns and generates predictive forecasts
- * using Google Gemini AI with statistical analysis.
+ * Advanced forecasting with:
+ * - 3-month predictions
+ * - Seasonal pattern detection
+ * - Anomaly detection
+ * - What-if scenario modeling
+ * - Confidence intervals
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ENV } from "@/lib/env";
 import { logInfo, logError } from "@/lib/logger";
+import { withRetry, RateLimiter } from './retry-handler';
+
+// Rate limiter: 60 requests per minute (Gemini free tier)
+const rateLimiter = new RateLimiter(60, 1);
 
 /**
  * Lazy initialization to prevent build-time env var access

@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+// PWA configuration
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -18,7 +21,19 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
+  },
+  
+  // Internationalization
+  i18n: {
+    locales: ['en', 'es', 'fr', 'de', 'ja', 'zh'],
+    defaultLocale: 'en',
   },
   
   // Security headers
@@ -55,11 +70,12 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://generativelanguage.googleapis.com",
+              "connect-src 'self' https://generativelanguage.googleapis.com https://api.fixer.io https://vitals.vercel-insights.com",
+              "frame-src https://js.stripe.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'"
