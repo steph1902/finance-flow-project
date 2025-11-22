@@ -5,12 +5,14 @@ import { useState } from "react";
 import { BudgetForm } from "@/components/budgets/BudgetForm";
 import { BudgetList } from "@/components/budgets/BudgetList";
 import { BudgetOptimizer } from "@/components/budgets/BudgetOptimizer";
+import { BudgetsSkeleton } from "@/components/skeletons/BudgetsSkeleton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { useBudgets } from "@/hooks/useBudgets";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Budget } from "@/types";
 
 const now = new Date();
@@ -43,6 +45,11 @@ export function BudgetsPage() {
     setEditingBudget(null);
   };
 
+  // Keyboard shortcuts (Cmd/Ctrl+B to create new budget)
+  useKeyboardShortcuts({
+    onNewBudget: handleOpen,
+  });
+
   const handleSubmit = async (values: {
     category: string;
     amount: number;
@@ -53,10 +60,16 @@ export function BudgetsPage() {
     try {
       if (editingBudget) {
         await updateBudget(editingBudget.id, values);
-        toast.success("Budget updated");
+        toast.success("Budget updated successfully", {
+          description: `${values.category}: $${values.amount.toFixed(2)} per month`,
+          duration: 3000,
+        });
       } else {
         await createBudget(values);
-        toast.success("Budget created");
+        toast.success("Budget created successfully", {
+          description: `${values.category}: $${values.amount.toFixed(2)} per month`,
+          duration: 3000,
+        });
       }
       handleClose();
     } catch (submitError) {
@@ -74,7 +87,10 @@ export function BudgetsPage() {
 
     try {
       await deleteBudget(budget.id);
-      toast.success("Budget deleted");
+      toast.success("Budget deleted", {
+        description: `${budget.category} budget has been removed`,
+        duration: 3000,
+      });
     } catch (deleteError) {
       toast.error("Unable to delete budget", {
         description: deleteError instanceof Error ? deleteError.message : "An error occurred",
@@ -95,7 +111,7 @@ export function BudgetsPage() {
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
           <DialogTrigger asChild>
-            <Button className="shadow-sm hover:shadow-md transition-shadow">
+            <Button className="shadow-sm hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
               Add budget
             </Button>
           </DialogTrigger>
@@ -128,7 +144,7 @@ export function BudgetsPage() {
               value={String(filters.month ?? "")}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, month: Number(value) }))}
             >
-              <SelectTrigger className="transition-shadow hover:shadow-sm">
+              <SelectTrigger className="transition-all hover:shadow-sm focus:shadow-md">
                 <SelectValue placeholder="Select month" />
               </SelectTrigger>
               <SelectContent>
@@ -147,7 +163,7 @@ export function BudgetsPage() {
               value={String(filters.year ?? "")}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, year: Number(value) }))}
             >
-              <SelectTrigger>
+              <SelectTrigger className="transition-all hover:shadow-sm focus:shadow-md">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent>
@@ -175,13 +191,13 @@ export function BudgetsPage() {
         </div>
       ) : null}
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm">
-        {isLoading ? (
-          <div className="flex h-48 items-center justify-center text-muted-foreground">Loading budgets...</div>
-        ) : (
+      {isLoading ? (
+        <BudgetsSkeleton />
+      ) : (
+        <div className="rounded-lg border bg-card p-4 shadow-sm">
           <BudgetList budgets={budgets} onEdit={handleEdit} onDelete={handleDelete} />
-        )}
-      </div>
+        </div>
+      )}
 
       {period ? (
         <p className="text-sm text-muted-foreground">

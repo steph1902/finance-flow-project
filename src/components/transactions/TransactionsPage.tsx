@@ -6,10 +6,12 @@ import { TransactionFilters, FilterState } from "@/components/transactions/Trans
 import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
 import { ReceiptScanner } from "@/components/transactions/ReceiptScanner";
+import { TransactionsSkeleton } from "@/components/skeletons/TransactionsSkeleton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useTransactions } from "@/hooks/useTransactions";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Transaction } from "@/types";
 
 const defaultFilters: FilterState = {
@@ -41,6 +43,11 @@ export function TransactionsPage() {
     setEditingTransaction(null);
     setIsDialogOpen(true);
   };
+
+  // Keyboard shortcuts (Cmd/Ctrl+N to create new transaction)
+  useKeyboardShortcuts({
+    onNewTransaction: handleOpenCreate,
+  });
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);
@@ -75,15 +82,22 @@ export function TransactionsPage() {
 
       if (editingTransaction) {
         await updateTransaction(editingTransaction.id, payload);
-        toast.success("Transaction updated");
+        toast.success("Transaction updated successfully", {
+          description: `${payload.type === "INCOME" ? "Income" : "Expense"} of $${payload.amount.toFixed(2)} in ${payload.category}`,
+          duration: 3000,
+        });
       } else {
         await createTransaction(payload);
-        toast.success("Transaction created");
+        toast.success("Transaction created successfully", {
+          description: `${payload.type === "INCOME" ? "Income" : "Expense"} of $${payload.amount.toFixed(2)} added to ${payload.category}`,
+          duration: 3000,
+        });
       }
       handleCloseDialog();
     } catch (submitError) {
       toast.error("Unable to save transaction", {
-        description: submitError instanceof Error ? submitError.message : "An error occurred",
+        description: submitError instanceof Error ? submitError.message : "An error occurred. Please try again.",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
@@ -96,7 +110,10 @@ export function TransactionsPage() {
 
     try {
       await deleteTransaction(transaction.id);
-      toast.success("Transaction deleted");
+      toast.success("Transaction deleted", {
+        description: "The transaction has been permanently removed",
+        duration: 3000,
+      });
     } catch (deleteError) {
       toast.error("Unable to delete transaction", {
         description: deleteError instanceof Error ? deleteError.message : "An error occurred",
@@ -117,7 +134,7 @@ export function TransactionsPage() {
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
           <DialogTrigger asChild>
-            <Button className="shadow-sm hover:shadow-md transition-shadow">
+            <Button className="shadow-sm hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
               Add transaction
             </Button>
           </DialogTrigger>
@@ -166,22 +183,17 @@ export function TransactionsPage() {
         </div>
       ) : null}
 
-      <div className="rounded-xl border border-border/50 bg-card shadow-card overflow-hidden">
-        {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <div className="text-center space-y-3">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="type-body text-muted-foreground">Loading transactions...</p>
-            </div>
-          </div>
-        ) : (
+      {isLoading ? (
+        <TransactionsSkeleton />
+      ) : (
+        <div className="rounded-xl border border-border/50 bg-card shadow-card overflow-hidden">
           <TransactionTable
             transactions={transactions}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {meta ? (
         <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border/30 bg-card/50 p-6 shadow-soft text-sm md:flex-row">
@@ -196,7 +208,7 @@ export function TransactionsPage() {
               size="sm"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={meta.page <= 1}
-              className="transition-all hover:shadow-sm"
+              className="transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
             >
               Previous
             </Button>
@@ -205,7 +217,7 @@ export function TransactionsPage() {
               size="sm"
               onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
               disabled={meta.page >= meta.totalPages}
-              className="transition-all hover:shadow-sm"
+              className="transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
             >
               Next
             </Button>

@@ -10,6 +10,7 @@ import { SpendingPieChart } from "@/components/dashboard/SpendingPieChart";
 import { SpendingForecast } from "@/components/dashboard/SpendingForecast";
 import { AIInsights } from "@/components/ai/AIInsights";
 import { UpcomingRecurringWidget } from "@/components/recurring/UpcomingRecurringWidget";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/hooks/useDashboard";
 
@@ -30,6 +31,10 @@ export function DashboardContent() {
       endDate: data.period.end.slice(0, 10),
     };
   }, [data]);
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   if (isError) {
     return (

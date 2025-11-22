@@ -170,7 +170,14 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    placeholder="0.00" 
+                    className="transition-all focus:shadow-md" 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -184,7 +191,11 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel>Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input 
+                    type="date" 
+                    className="transition-all focus:shadow-md" 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -293,7 +304,11 @@ export function TransactionForm({
             <FormItem>
               <FormLabel>Notes</FormLabel>
               <FormControl>
-                <Textarea placeholder="Optional notes" {...field} />
+                <Textarea 
+                  placeholder="Optional notes" 
+                  className="transition-all focus:shadow-md" 
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -303,7 +318,13 @@ export function TransactionForm({
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
           <div>
             {onDelete ? (
-              <Button type="button" variant="destructive" onClick={() => onDelete()} disabled={isSubmitting}>
+              <Button 
+                type="button" 
+                variant="destructive" 
+                onClick={() => onDelete()} 
+                disabled={isSubmitting}
+                className="transition-all hover:shadow-md"
+              >
                 Delete
               </Button>
             ) : (
@@ -313,12 +334,29 @@ export function TransactionForm({
 
           <div className="flex flex-col gap-2 sm:flex-row">
             {onCancel ? (
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onCancel} 
+                disabled={isSubmitting}
+                className="transition-all hover:shadow-sm"
+              >
                 Cancel
               </Button>
             ) : null}
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : submitLabel}
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="transition-all hover:shadow-md disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Saving...
+                </span>
+              ) : (
+                submitLabel
+              )}
             </Button>
           </div>
         </div>
