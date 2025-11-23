@@ -127,7 +127,7 @@ export async function generateReport(input: GenerateReportInput) {
         startDate,
         endDate,
         filters: filters || {},
-        data: reportData,
+        data: reportData as any,
       },
     });
 

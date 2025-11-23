@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -30,7 +31,7 @@ export async function GET() {
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
     });
   } catch (error) {
-    console.error('Subscription fetch error:', error);
+    logger.error('Failed to fetch subscription', error);
     return NextResponse.json({ error: 'Failed to fetch subscription' }, { status: 500 });
   }
 }

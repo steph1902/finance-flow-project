@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { importTransactionsFromCSV } from '@/lib/services/import-export-service';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/import-export/import
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Failed to import transactions:', error);
+    logger.error('Failed to import transactions', error);
     return NextResponse.json(
       { error: 'Failed to import transactions' },
       { status: 500 }

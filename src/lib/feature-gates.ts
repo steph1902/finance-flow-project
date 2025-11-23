@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'FREE' | 'BASIC' | 'PREMIUM' | 'BUSINESS';
+export type SubscriptionTier = 'FREE' | 'BASIC' | 'PREMIUM' | 'ENTERPRISE';
 
 export interface FeatureLimits {
   transactions: number;
@@ -34,7 +34,7 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     sharedBudgets: 10,
     reports: -1,
   },
-  BUSINESS: {
+  ENTERPRISE: {
     transactions: -1,
     aiRequests: -1,
     goals: -1,

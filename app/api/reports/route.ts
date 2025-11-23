@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getUserReports, generateReport } from '@/lib/services/report-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const createReportSchema = z.object({
   name: z.string().min(1).max(100),
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ reports });
   } catch (error) {
-    console.error('Failed to fetch reports:', error);
+    logger.error('Failed to fetch reports', error);
     return NextResponse.json(
       { error: 'Failed to fetch reports' },
       { status: 500 }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ report }, { status: 201 });
   } catch (error) {
-    console.error('Failed to generate report:', error);
+    logger.error('Failed to generate report', error);
     return NextResponse.json(
       { error: 'Failed to generate report' },
       { status: 500 }

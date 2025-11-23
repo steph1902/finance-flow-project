@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { convertCurrency } from '@/lib/services/currency-service';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/currency/convert
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       converted,
     });
   } catch (error) {
-    console.error('Currency conversion failed:', error);
+    logger.error('Currency conversion failed', error);
     return NextResponse.json(
       { error: 'Currency conversion failed' },
       { status: 500 }

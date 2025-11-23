@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { exportTransactionsToCSV } from '@/lib/services/import-export-service';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/import-export/export
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to export transactions:', error);
+    logger.error('Failed to export transactions', error);
     return NextResponse.json(
       { error: 'Failed to export transactions' },
       { status: 500 }

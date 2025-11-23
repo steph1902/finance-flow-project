@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const onboardingSchema = z.object({
   completed: z.boolean(),
@@ -19,12 +20,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { completed, step } = onboardingSchema.parse(body);
 
+    const updateData: { onboardingCompleted: boolean; onboardingStep?: number } = {
+      onboardingCompleted: completed,
+    };
+    
+    if (step !== undefined) {
+      updateData.onboardingStep = step;
+    }
+
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: {
-        onboardingCompleted: completed,
-        onboardingStep: step,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ 
@@ -33,7 +39,7 @@ export async function POST(request: NextRequest) {
       onboardingStep: user.onboardingStep,
     });
   } catch (error) {
-    console.error('Onboarding update error:', error);
+    logger.error('Onboarding update error', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -73,7 +79,7 @@ export async function GET() {
       onboardingStep: user.onboardingStep,
     });
   } catch (error) {
-    console.error('Onboarding status error:', error);
+    logger.error('Onboarding status error', error);
     return NextResponse.json(
       { error: 'Failed to fetch onboarding status' },
       { status: 500 }

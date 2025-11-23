@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { markAsRead, deleteNotification } from '@/lib/services/notification-service';
+import { logger } from '@/lib/logger';
 
 /**
  * PATCH /api/notifications/[id]
@@ -16,7 +17,7 @@ import { markAsRead, deleteNotification } from '@/lib/services/notification-serv
  */
 export async function PATCH(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -28,11 +29,12 @@ export async function PATCH(
       );
     }
 
-    await markAsRead(params.id, session.user.id);
+    const { id } = await params;
+    await markAsRead(id, session.user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to mark notification as read:', error);
+    logger.error('Failed to mark notification as read', error);
     return NextResponse.json(
       { error: 'Failed to mark notification as read' },
       { status: 500 }
@@ -46,7 +48,7 @@ export async function PATCH(
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -58,11 +60,12 @@ export async function DELETE(
       );
     }
 
-    await deleteNotification(params.id, session.user.id);
+    const { id } = await params;
+    await deleteNotification(id, session.user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete notification:', error);
+    logger.error('Failed to delete notification', error);
     return NextResponse.json(
       { error: 'Failed to delete notification' },
       { status: 500 }

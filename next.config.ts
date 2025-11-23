@@ -1,8 +1,5 @@
 import type { NextConfig } from "next";
 
-// PWA configuration
-const isProd = process.env.NODE_ENV === 'production';
-
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -30,11 +27,9 @@ const nextConfig: NextConfig = {
     ],
   },
   
-  // Internationalization
-  i18n: {
-    locales: ['en', 'es', 'fr', 'de', 'ja', 'zh'],
-    defaultLocale: 'en',
-  },
+  // NOTE: i18n is not supported in App Router (Next.js 16+)
+  // For internationalization, use next-intl or App Router i18n patterns
+  // See: https://nextjs.org/docs/app/building-your-application/routing/internationalization
   
   // Security headers
   async headers() {

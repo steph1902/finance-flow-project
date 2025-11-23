@@ -24,7 +24,7 @@ const TIER_COLORS: Record<SubscriptionTier, 'default' | 'secondary'> = {
   FREE: 'secondary',
   BASIC: 'default',
   PREMIUM: 'default',
-  BUSINESS: 'default',
+  ENTERPRISE: 'default',
 };
 
 export function SubscriptionCard({ tier, usage, billingDate, amount }: SubscriptionCardProps) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   _request: NextRequest,
@@ -19,39 +20,42 @@ export async function POST(
 
     const { id } = await params;
 
-    // Check if user is a member
-    const member = await prisma.sharedBudgetMember.findFirst({
+    // Check if user has permission
+    const permission = await prisma.budgetPermission.findFirst({
       where: {
         sharedBudgetId: id,
         userId: session.user.id,
       },
+      include: {
+        sharedBudget: true,
+      },
     });
 
-    if (!member) {
+    if (!permission) {
       return NextResponse.json(
-        { error: 'Not a member of this budget' },
+        { error: 'You do not have access to this budget' },
         { status: 404 }
       );
     }
 
     // Owners cannot leave (must transfer ownership or delete)
-    if (member.role === 'OWNER') {
+    if (permission.sharedBudget.ownerId === session.user.id) {
       return NextResponse.json(
         { error: 'Owner cannot leave. Transfer ownership or delete the budget.' },
         { status: 400 }
       );
     }
 
-    // Remove member
-    await prisma.sharedBudgetMember.delete({
+    // Remove permission
+    await prisma.budgetPermission.delete({
       where: {
-        id: member.id,
+        id: permission.id,
       },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to leave budget:', error);
+    logger.error('Failed to leave budget', error);
     return NextResponse.json(
       { error: 'Failed to leave budget' },
       { status: 500 }

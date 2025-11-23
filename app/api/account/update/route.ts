@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const updateAccountSchema = z.object({
   name: z.string().optional(),
@@ -21,9 +22,16 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const validatedData = updateAccountSchema.parse(body);
 
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const updateData: Record<string, string> = {};
+    if (validatedData.name !== undefined) updateData.name = validatedData.name;
+    if (validatedData.preferredCurrency !== undefined) updateData.preferredCurrency = validatedData.preferredCurrency;
+    if (validatedData.timezone !== undefined) updateData.timezone = validatedData.timezone;
+    if (validatedData.language !== undefined) updateData.language = validatedData.language;
+
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: validatedData,
+      data: updateData,
       select: {
         id: true,
         name: true,
@@ -36,7 +44,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Account update error:', error);
+    logger.error('Account update error', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

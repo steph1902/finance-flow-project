@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { exportAllUserData } from '@/lib/services/import-export-service';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/import-export/export-all
@@ -31,7 +32,7 @@ export async function GET(_request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to export all data:', error);
+    logger.error('Failed to export all data', error);
     return NextResponse.json(
       { error: 'Failed to export all data' },
       { status: 500 }

@@ -11,6 +11,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { updateGoal, deleteGoal, getGoalProgress } from '@/lib/services/goal-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const updateGoalSchema = z.object({
@@ -29,7 +30,7 @@ const updateGoalSchema = z.object({
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -41,11 +42,12 @@ export async function GET(
       );
     }
 
-    const progress = await getGoalProgress(params.id, session.user.id);
+    const { id } = await params;
+    const progress = await getGoalProgress(id, session.user.id);
 
     return NextResponse.json({ progress });
   } catch (error) {
-    console.error('Failed to fetch goal:', error);
+    logger.error('Failed to fetch goal', error);
     return NextResponse.json(
       { error: 'Failed to fetch goal' },
       { status: 500 }
@@ -59,7 +61,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -71,6 +73,7 @@ export async function PATCH(
       );
     }
 
+    const { id } = await params;
     const body = await request.json();
     
     // Validate input
@@ -93,11 +96,11 @@ export async function PATCH(
     if (data.priority !== undefined) updateData.priority = data.priority;
     if (data.status !== undefined) updateData.status = data.status;
     
-    await updateGoal(params.id, session.user.id, updateData);
+    await updateGoal(id, session.user.id, updateData);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to update goal:', error);
+    logger.error('Failed to update goal', error);
     return NextResponse.json(
       { error: 'Failed to update goal' },
       { status: 500 }
@@ -111,7 +114,7 @@ export async function PATCH(
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -123,11 +126,12 @@ export async function DELETE(
       );
     }
 
-    await deleteGoal(params.id, session.user.id);
+    const { id } = await params;
+    await deleteGoal(id, session.user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete goal:', error);
+    logger.error('Failed to delete goal', error);
     return NextResponse.json(
       { error: 'Failed to delete goal' },
       { status: 500 }

@@ -33,14 +33,17 @@ export function CreateGoalDialog() {
     e.preventDefault()
 
     try {
-      await createGoal({
+      const goalData: any = {
         name: formData.name,
-        description: formData.description || undefined,
         targetAmount: parseFloat(formData.targetAmount),
-        targetDate: formData.targetDate || undefined,
-        category: formData.category || undefined,
         priority: parseInt(formData.priority),
-      })
+      }
+
+      if (formData.description) goalData.description = formData.description
+      if (formData.targetDate) goalData.targetDate = formData.targetDate
+      if (formData.category) goalData.category = formData.category
+
+      await createGoal(goalData)
 
       // Reset form
       setFormData({

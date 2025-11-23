@@ -1,9 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { MicIcon, MicOffIcon } from "lucide-react"
 import { toast } from "sonner"
+
+// Extend Window interface for Speech Recognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 interface VoiceInputProps {
   onTranscript?: (text: string) => void;
@@ -21,7 +29,7 @@ interface VoiceCommand {
 
 export function VoiceInput({ onTranscript, onCommand }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<any>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -32,7 +40,7 @@ export function VoiceInput({ onTranscript, onCommand }: VoiceInputProps) {
       recognitionInstance.interimResults = false
       recognitionInstance.lang = 'en-US'
 
-      recognitionInstance.onresult = (event) => {
+      recognitionInstance.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript
         onTranscript?.(transcript)
         
@@ -43,7 +51,7 @@ export function VoiceInput({ onTranscript, onCommand }: VoiceInputProps) {
         toast.success(`Heard: "${transcript}"`)
       }
 
-      recognitionInstance.onerror = (event) => {
+      recognitionInstance.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error)
         toast.error('Voice recognition failed. Please try again.')
         setIsListening(false)
@@ -101,7 +109,7 @@ function parseVoiceCommand(transcript: string): VoiceCommand {
 
   // Add transaction: "add $50 coffee", "spent 30 dollars on lunch"
   const addMatch = lower.match(/(?:add|spent|paid)\s+(?:\$)?(\d+(?:\.\d+)?)\s+(?:dollars?\s+)?(?:on\s+)?(.+)/i)
-  if (addMatch) {
+  if (addMatch && addMatch[1] && addMatch[2]) {
     const amount = parseFloat(addMatch[1])
     const description = addMatch[2].trim()
     const category = inferCategory(description)
@@ -116,7 +124,7 @@ function parseVoiceCommand(transcript: string): VoiceCommand {
 
   // Search: "find coffee transactions", "search for walmart"
   const searchMatch = lower.match(/(?:find|search|show)\s+(.+)/i)
-  if (searchMatch) {
+  if (searchMatch && searchMatch[1]) {
     return {
       action: 'search',
       query: searchMatch[1].trim(),
@@ -125,7 +133,7 @@ function parseVoiceCommand(transcript: string): VoiceCommand {
 
   // Navigate: "go to budgets", "open settings"
   const navMatch = lower.match(/(?:go to|open|show)\s+(dashboard|budgets?|goals?|settings?|transactions?)/i)
-  if (navMatch) {
+  if (navMatch && navMatch[1]) {
     return {
       action: 'navigate',
       destination: navMatch[1].toLowerCase(),
@@ -148,12 +156,4 @@ function inferCategory(description: string): string {
   if (lower.match(/doctor|pharmacy|medicine|health/)) return 'Health'
   
   return 'Other'
-}
-
-// TypeScript declarations for Web Speech API
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
 }

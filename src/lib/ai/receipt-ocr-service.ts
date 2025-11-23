@@ -19,7 +19,7 @@ interface OCRResult {
 export async function extractTextFromReceipt(
   imageBase64: string
 ): Promise<OCRResult> {
-  const API_KEY = ENV.GOOGLE_GENERATIVE_AI_API_KEY;
+  const API_KEY = ENV.GEMINI_API_KEY;
   
   if (!API_KEY || API_KEY.trim() === '') {
     throw new Error(
@@ -35,7 +35,7 @@ export async function extractTextFromReceipt(
 
     // Extract mime type
     const mimeMatch = imageBase64.match(/^data:(image\/\w+);base64,/);
-    const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg";
+    const mimeType: string = (mimeMatch && mimeMatch[1]) ? mimeMatch[1] : "image/jpeg";
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(API_KEY);

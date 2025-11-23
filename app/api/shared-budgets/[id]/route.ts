@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const updateSharedBudgetSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -30,11 +31,16 @@ export async function GET(
     const sharedBudget = await prisma.sharedBudget.findFirst({
       where: {
         id,
-        members: {
-          some: {
-            userId: session.user.id,
+        OR: [
+          { ownerId: session.user.id },
+          {
+            permissions: {
+              some: {
+                userId: session.user.id,
+              },
+            },
           },
-        },
+        ],
       },
       include: {
         owner: {
@@ -44,7 +50,7 @@ export async function GET(
             email: true,
           },
         },
-        members: {
+        permissions: {
           include: {
             user: {
               select: {
@@ -67,7 +73,7 @@ export async function GET(
 
     return NextResponse.json({ sharedBudget });
   } catch (error) {
-    console.error('Failed to fetch shared budget:', error);
+    logger.error('Failed to fetch shared budget', error);
     return NextResponse.json(
       { error: 'Failed to fetch shared budget' },
       { status: 500 }
@@ -91,16 +97,21 @@ export async function PATCH(
 
     const { id } = await params;
 
-    // Check if user is owner or editor
-    const member = await prisma.sharedBudgetMember.findFirst({
+    // Check if user has edit permission
+    const permission = await prisma.budgetPermission.findFirst({
       where: {
         sharedBudgetId: id,
         userId: session.user.id,
-        role: { in: ['OWNER', 'EDITOR'] },
+        canEdit: true,
       },
     });
 
-    if (!member) {
+    // Also allow owner even without explicit permission
+    const budget = await prisma.sharedBudget.findFirst({
+      where: { id },
+    });
+
+    if (!permission && budget?.ownerId !== session.user.id) {
       return NextResponse.json(
         { error: 'Insufficient permissions' },
         { status: 403 }
@@ -117,9 +128,16 @@ export async function PATCH(
       );
     }
 
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const updateData: Record<string, any> = {};
+    if (validation.data.name !== undefined) updateData.name = validation.data.name;
+    if (validation.data.category !== undefined) updateData.category = validation.data.category;
+    if (validation.data.limit !== undefined) updateData.limit = validation.data.limit;
+    if (validation.data.period !== undefined) updateData.period = validation.data.period;
+
     const sharedBudget = await prisma.sharedBudget.update({
       where: { id },
-      data: validation.data,
+      data: updateData,
       include: {
         owner: {
           select: {
@@ -128,7 +146,7 @@ export async function PATCH(
             email: true,
           },
         },
-        members: {
+        permissions: {
           include: {
             user: {
               select: {
@@ -144,7 +162,7 @@ export async function PATCH(
 
     return NextResponse.json({ sharedBudget });
   } catch (error) {
-    console.error('Failed to update shared budget:', error);
+    logger.error('Failed to update shared budget', error);
     return NextResponse.json(
       { error: 'Failed to update shared budget' },
       { status: 500 }
@@ -189,7 +207,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete shared budget:', error);
+    logger.error('Failed to delete shared budget', error);
     return NextResponse.json(
       { error: 'Failed to delete shared budget' },
       { status: 500 }

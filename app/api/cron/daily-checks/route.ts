@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createNotification } from '@/lib/services/notification-service';
+import { logger } from '@/lib/logger';
 
 /**
  * Daily Cron Job - Budget Alerts & Bill Reminders
@@ -143,7 +144,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Daily cron job failed:', error);
+    logger.error('Daily cron job failed', error);
     return NextResponse.json(
       { error: 'Cron job failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

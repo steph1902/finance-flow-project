@@ -10,6 +10,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createGoal, getUserGoals } from '@/lib/services/goal-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const createGoalSchema = z.object({
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ goals });
   } catch (error) {
-    console.error('Failed to fetch goals:', error);
+    logger.error('Failed to fetch goals', error);
     return NextResponse.json(
       { error: 'Failed to fetch goals' },
       { status: 500 }
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ goal }, { status: 201 });
   } catch (error) {
-    console.error('Failed to create goal:', error);
+    logger.error('Failed to create goal', error);
     return NextResponse.json(
       { error: 'Failed to create goal' },
       { status: 500 }

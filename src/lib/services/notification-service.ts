@@ -28,17 +28,20 @@ export interface CreateNotificationInput {
  */
 export async function createNotification(input: CreateNotificationInput) {
   try {
+    const notificationData: any = {
+      userId: input.userId,
+      type: input.type,
+      title: input.title,
+      message: input.message,
+      priority: input.priority || 0,
+      metadata: input.metadata || {},
+      status: 'UNREAD',
+    }
+
+    if (input.actionUrl) notificationData.actionUrl = input.actionUrl
+
     const notification = await prisma.notification.create({
-      data: {
-        userId: input.userId,
-        type: input.type,
-        title: input.title,
-        message: input.message,
-        priority: input.priority || 0,
-        metadata: input.metadata || {},
-        actionUrl: input.actionUrl,
-        status: 'UNREAD',
-      },
+      data: notificationData,
     });
 
     logger.info('Notification created', { notificationId: notification.id, type: input.type });
@@ -102,7 +105,7 @@ async function sendEmailNotification(notification: any) {
       `,
     });
 
-    logger.info('Email notification sent', { userId: user.id, type: notification.type });
+    logger.info('Email notification sent', { userId: notification.userId, type: notification.type });
   } catch (error) {
     logger.error('Failed to send email notification', error);
     // Don't throw - email is optional

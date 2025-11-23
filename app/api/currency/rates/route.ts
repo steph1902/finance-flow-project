@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/currency/rates
@@ -32,7 +33,7 @@ export async function GET() {
       rates: mockRates,
     });
   } catch (error) {
-    console.error('Failed to fetch exchange rates:', error);
+    logger.error('Failed to fetch exchange rates', error);
     return NextResponse.json(
       { error: 'Failed to fetch exchange rates' },
       { status: 500 }

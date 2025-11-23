@@ -3,10 +3,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const updatePermissionsSchema = z.object({
-  memberId: z.string(),
-  role: z.enum(['OWNER', 'EDITOR', 'VIEWER']),
+  userId: z.string(),
+  role: z.enum(['ADMIN', 'CONTRIBUTOR', 'VIEWER']),
 });
 
 export async function GET(
@@ -25,7 +26,7 @@ export async function GET(
 
     const { id } = await params;
 
-    const members = await prisma.sharedBudgetMember.findMany({
+    const permissions = await prisma.budgetPermission.findMany({
       where: {
         sharedBudgetId: id,
       },
@@ -43,9 +44,9 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ members });
+    return NextResponse.json({ permissions });
   } catch (error) {
-    console.error('Failed to fetch permissions:', error);
+    logger.error('Failed to fetch permissions', error);
     return NextResponse.json(
       { error: 'Failed to fetch permissions' },
       { status: 500 }
@@ -70,15 +71,11 @@ export async function PATCH(
     const { id } = await params;
 
     // Only owner can change permissions
-    const ownerMember = await prisma.sharedBudgetMember.findFirst({
-      where: {
-        sharedBudgetId: id,
-        userId: session.user.id,
-        role: 'OWNER',
-      },
+    const sharedBudget = await prisma.sharedBudget.findUnique({
+      where: { id },
     });
 
-    if (!ownerMember) {
+    if (!sharedBudget || sharedBudget.ownerId !== session.user.id) {
       return NextResponse.json(
         { error: 'Only owner can change permissions' },
         { status: 403 }
@@ -95,14 +92,19 @@ export async function PATCH(
       );
     }
 
-    const { memberId, role } = validation.data;
+    const { userId, role } = validation.data;
 
-    const updatedMember = await prisma.sharedBudgetMember.update({
+    const updatedPermission = await prisma.budgetPermission.update({
       where: {
-        id: memberId,
+        sharedBudgetId_userId: {
+          sharedBudgetId: id,
+          userId,
+        },
       },
       data: {
         role,
+        canEdit: role === 'ADMIN' || role === 'CONTRIBUTOR',
+        canDelete: role === 'ADMIN',
       },
       include: {
         user: {
@@ -115,9 +117,9 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json({ member: updatedMember });
+    return NextResponse.json({ permission: updatedPermission });
   } catch (error) {
-    console.error('Failed to update permissions:', error);
+    logger.error('Failed to update permissions', error);
     return NextResponse.json(
       { error: 'Failed to update permissions' },
       { status: 500 }

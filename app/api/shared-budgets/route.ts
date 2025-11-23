@@ -3,12 +3,15 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const createSharedBudgetSchema = z.object({
   name: z.string().min(1).max(100),
+  description: z.string().optional(),
   category: z.string(),
-  limit: z.number().positive(),
-  period: z.enum(['MONTHLY', 'YEARLY']),
+  amount: z.number().positive(),
+  month: z.number().min(1).max(12),
+  year: z.number().min(2000),
 });
 
 export async function GET() {
@@ -24,11 +27,16 @@ export async function GET() {
 
     const sharedBudgets = await prisma.sharedBudget.findMany({
       where: {
-        members: {
-          some: {
-            userId: session.user.id,
+        OR: [
+          { ownerId: session.user.id },
+          {
+            permissions: {
+              some: {
+                userId: session.user.id,
+              },
+            },
           },
-        },
+        ],
       },
       include: {
         owner: {
@@ -38,7 +46,7 @@ export async function GET() {
             email: true,
           },
         },
-        members: {
+        permissions: {
           include: {
             user: {
               select: {
@@ -51,7 +59,7 @@ export async function GET() {
         },
         _count: {
           select: {
-            members: true,
+            permissions: true,
           },
         },
       },
@@ -60,7 +68,7 @@ export async function GET() {
 
     return NextResponse.json({ sharedBudgets });
   } catch (error) {
-    console.error('Failed to fetch shared budgets:', error);
+    logger.error('Failed to fetch shared budgets', error);
     return NextResponse.json(
       { error: 'Failed to fetch shared budgets' },
       { status: 500 }
@@ -89,21 +97,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, category, limit, period } = validation.data;
+    const { name, description, category, amount, month, year } = validation.data;
 
     const sharedBudget = await prisma.sharedBudget.create({
       data: {
         name,
+        ...(description !== undefined && { description }),
         category,
-        limit,
-        period,
+        amount,
+        month,
+        year,
         ownerId: session.user.id,
-        members: {
-          create: {
-            userId: session.user.id,
-            role: 'OWNER',
-          },
-        },
       },
       include: {
         owner: {
@@ -113,7 +117,7 @@ export async function POST(request: NextRequest) {
             email: true,
           },
         },
-        members: {
+        permissions: {
           include: {
             user: {
               select: {
@@ -129,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sharedBudget }, { status: 201 });
   } catch (error) {
-    console.error('Failed to create shared budget:', error);
+    logger.error('Failed to create shared budget', error);
     return NextResponse.json(
       { error: 'Failed to create shared budget' },
       { status: 500 }

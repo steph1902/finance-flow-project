@@ -6,7 +6,7 @@
 import useSWR from 'swr';
 import { useState } from 'react';
 
-interface Goal {
+export interface Goal {
   id: string;
   name: string;
   description: string | null;

@@ -47,8 +47,11 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
 
   const handleUpdateBudget = (index: number, field: keyof BudgetData, value: string | number) => {
     const updated = [...budgets];
-    updated[index] = { ...updated[index], [field]: value };
-    setBudgets(updated);
+    const current = updated[index];
+    if (current) {
+      updated[index] = { ...current, [field]: value };
+      setBudgets(updated);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

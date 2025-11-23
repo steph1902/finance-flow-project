@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { useDropzone } from "react-dropzone"
+import { useDropzone, FileRejection } from "react-dropzone"
 import { UploadCloudIcon, FileTextIcon, XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -22,7 +22,7 @@ export function FileUpload({
   const [error, setError] = useState<string | null>(null)
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: Array<{ errors: Array<{ code: string }> }>) => {
+    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       setError(null)
 
       if (rejectedFiles.length > 0) {

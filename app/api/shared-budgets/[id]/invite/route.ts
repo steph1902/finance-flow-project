@@ -3,10 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const inviteSchema = z.object({
   email: z.string().email(),
-  role: z.enum(['EDITOR', 'VIEWER']),
+  role: z.enum(['ADMIN', 'CONTRIBUTOR', 'VIEWER']),
+  canEdit: z.boolean().optional(),
+  canDelete: z.boolean().optional(),
 });
 
 export async function POST(
@@ -25,18 +28,18 @@ export async function POST(
 
     const { id } = await params;
 
-    // Check if user is owner or editor
-    const member = await prisma.sharedBudgetMember.findFirst({
+    // Check if user is owner or has ADMIN permission
+    const permission = await prisma.budgetPermission.findFirst({
       where: {
         sharedBudgetId: id,
         userId: session.user.id,
-        role: { in: ['OWNER', 'EDITOR'] },
+        role: 'ADMIN',
       },
     });
 
-    if (!member) {
+    if (!permission) {
       return NextResponse.json(
-        { error: 'Insufficient permissions' },
+        { error: 'Insufficient permissions - Admin access required' },
         { status: 403 }
       );
     }
@@ -51,7 +54,7 @@ export async function POST(
       );
     }
 
-    const { email, role } = validation.data;
+    const { email, role, canEdit, canDelete } = validation.data;
 
     // Find user by email
     const invitedUser = await prisma.user.findUnique({
@@ -65,27 +68,29 @@ export async function POST(
       );
     }
 
-    // Check if already a member
-    const existingMember = await prisma.sharedBudgetMember.findFirst({
+    // Check if already has permission
+    const existingPermission = await prisma.budgetPermission.findFirst({
       where: {
         sharedBudgetId: id,
         userId: invitedUser.id,
       },
     });
 
-    if (existingMember) {
+    if (existingPermission) {
       return NextResponse.json(
         { error: 'User is already a member' },
         { status: 400 }
       );
     }
 
-    // Add member
-    const newMember = await prisma.sharedBudgetMember.create({
+    // Add permission
+    const newPermission = await prisma.budgetPermission.create({
       data: {
         sharedBudgetId: id,
         userId: invitedUser.id,
         role,
+        canEdit: canEdit ?? (role === 'CONTRIBUTOR' || role === 'ADMIN'),
+        canDelete: canDelete ?? (role === 'ADMIN'),
       },
       include: {
         user: {
@@ -102,16 +107,15 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: invitedUser.id,
-        type: 'BUDGET_SHARED',
+        type: 'SYSTEM',
         title: 'Budget Shared',
         message: `${session.user.name || 'Someone'} invited you to collaborate on a budget`,
-        metadata: { sharedBudgetId: id },
       },
     });
 
-    return NextResponse.json({ member: newMember }, { status: 201 });
+    return NextResponse.json({ permission: newPermission }, { status: 201 });
   } catch (error) {
-    console.error('Failed to invite user:', error);
+    logger.error('Failed to invite user', error);
     return NextResponse.json(
       { error: 'Failed to invite user' },
       { status: 500 }

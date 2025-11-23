@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getReportById } from '@/lib/services/report-service';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -47,7 +48,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Failed to download report:', error);
+    logger.error('Failed to download report', error);
     return NextResponse.json(
       { error: 'Failed to download report' },
       { status: 500 }

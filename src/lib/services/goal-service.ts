@@ -58,18 +58,21 @@ export interface GoalProgress {
  */
 export async function createGoal(input: CreateGoalInput) {
   try {
+    const goalData: any = {
+      userId: input.userId,
+      name: input.name,
+      targetAmount: new Decimal(input.targetAmount),
+      category: input.category || 'General',
+      priority: input.priority || 0,
+      currentAmount: new Decimal(0),
+      status: 'ACTIVE',
+    }
+
+    if (input.description) goalData.description = input.description
+    if (input.targetDate) goalData.targetDate = input.targetDate
+
     const goal = await prisma.goal.create({
-      data: {
-        userId: input.userId,
-        name: input.name,
-        description: input.description,
-        targetAmount: new Decimal(input.targetAmount),
-        targetDate: input.targetDate,
-        category: input.category || 'General',
-        priority: input.priority || 0,
-        currentAmount: new Decimal(0),
-        status: 'ACTIVE',
-      },
+      data: goalData,
       include: {
         milestones: true,
         contributions: true,
@@ -101,12 +104,19 @@ export async function createGoal(input: CreateGoalInput) {
  */
 export async function updateGoal(goalId: string, userId: string, input: UpdateGoalInput) {
   try {
+    const updateData: any = {}
+    
+    if (input.name !== undefined) updateData.name = input.name
+    if (input.description !== undefined) updateData.description = input.description
+    if (input.targetDate !== undefined) updateData.targetDate = input.targetDate
+    if (input.category !== undefined) updateData.category = input.category
+    if (input.priority !== undefined) updateData.priority = input.priority
+    if (input.status !== undefined) updateData.status = input.status
+    if (input.targetAmount !== undefined) updateData.targetAmount = new Decimal(input.targetAmount)
+
     const goal = await prisma.goal.updateMany({
       where: { id: goalId, userId },
-      data: {
-        ...input,
-        targetAmount: input.targetAmount ? new Decimal(input.targetAmount) : undefined,
-      },
+      data: updateData,
     });
 
     if (goal.count === 0) {
@@ -136,12 +146,15 @@ export async function addContribution(input: AddContributionInput, userId: strin
     }
 
     // Create contribution
+    const contributionData: any = {
+      goalId: input.goalId,
+      amount: new Decimal(input.amount),
+    }
+    
+    if (input.notes) contributionData.notes = input.notes
+
     const contribution = await prisma.goalContribution.create({
-      data: {
-        goalId: input.goalId,
-        amount: new Decimal(input.amount),
-        notes: input.notes,
-      },
+      data: contributionData,
     });
 
     // Update goal current amount

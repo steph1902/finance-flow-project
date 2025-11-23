@@ -19,7 +19,7 @@ interface InviteDialogProps {
 
 export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
   const [email, setEmail] = useState("")
-  const [role, setRole] = useState<'EDITOR' | 'VIEWER'>('VIEWER')
+  const [role, setRole] = useState<'CONTRIBUTOR' | 'VIEWER'>('VIEWER')
   const [isInviting, setIsInviting] = useState(false)
 
   const handleInvite = async () => {
@@ -75,13 +75,13 @@ export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
 
           <div className="space-y-2">
             <Label htmlFor="invite-role">Role</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as 'EDITOR' | 'VIEWER')}>
+            <Select value={role} onValueChange={(value) => setRole(value as 'CONTRIBUTOR' | 'VIEWER')}>
               <SelectTrigger id="invite-role">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="VIEWER">Viewer - Can only view</SelectItem>
-                <SelectItem value="EDITOR">Editor - Can view and edit</SelectItem>
+                <SelectItem value="CONTRIBUTOR">Contributor - Can view and edit</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -90,8 +90,8 @@ export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
             <p className="font-medium">Permissions:</p>
             <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
               <li><strong>Viewer:</strong> Can see budget and transactions</li>
-              <li><strong>Editor:</strong> Can add transactions and edit budget</li>
-              <li><strong>Owner:</strong> Full control including deleting</li>
+              <li><strong>Contributor:</strong> Can add transactions and edit budget</li>
+              <li><strong>Admin:</strong> Full control including deleting</li>
             </ul>
           </div>
         </div>

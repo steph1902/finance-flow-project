@@ -34,8 +34,10 @@ export function BudgetSimulator() {
 
   const updateCategory = (index: number, value: number) => {
     const newCategories = [...categories]
-    newCategories[index].current = value
-    setCategories(newCategories)
+    if (newCategories[index]) {
+      newCategories[index].current = value
+      setCategories(newCategories)
+    }
   }
 
   const chartData = categories.map(cat => ({
@@ -152,7 +154,7 @@ export function BudgetSimulator() {
                 </div>
                 <Slider
                   value={[category.current]}
-                  onValueChange={([value]) => updateCategory(index, value)}
+                  onValueChange={([value]) => value !== undefined && updateCategory(index, value)}
                   min={category.min}
                   max={category.max}
                   step={10}

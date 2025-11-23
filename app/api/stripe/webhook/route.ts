@@ -1,15 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
+// Lazy initialization to prevent build-time errors
+let stripe: Stripe | null = null;
+let webhookSecret: string | null = null;
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+function getStripe() {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY is not defined');
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-02-24.acacia',
+    });
+  }
+  return stripe;
+}
+
+function getWebhookSecret() {
+  if (!webhookSecret) {
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      throw new Error('STRIPE_WEBHOOK_SECRET is not defined');
+    }
+    webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  }
+  return webhookSecret;
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripeClient = getStripe();
+    const secret = getWebhookSecret();
+    
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
 
@@ -20,10 +44,10 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = stripeClient.webhooks.constructEvent(body, signature, secret);
     } catch (err) {
-      console.error('Webhook signature verification failed:', err);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+      logger.error('Webhook signature verification failed', err);
+      return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
     }
 
     switch (event.type) {
@@ -58,12 +82,12 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.info('Unhandled Stripe event type', { eventType: event.type });
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook handler failed', error);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
@@ -72,9 +96,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.userId;
   if (!userId) return;
 
-  const subscription = await stripe.subscriptions.retrieve(
+  const subscription = await getStripe().subscriptions.retrieve(
     session.subscription as string
   );
+
+  if (!subscription.items.data[0]) return;
 
   const tier = getPlanTier(subscription.items.data[0].price.id);
 
@@ -109,7 +135,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
   if (!sub) return;
 
-  const tier = getPlanTier(subscription.items.data[0].price.id);
+  const stripeSubscription = await getStripe().subscriptions.retrieve(subscription.id);
+  if (!stripeSubscription.items.data[0]) return;
+
+  const tier = getPlanTier(stripeSubscription.items.data[0].price.id);
 
   await prisma.subscription.update({
     where: { id: sub.id },
@@ -140,7 +169,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
-  const subscription = await stripe.subscriptions.retrieve(
+  const subscription = await getStripe().subscriptions.retrieve(
     invoice.subscription as string
   );
 
@@ -159,7 +188,7 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  const subscription = await stripe.subscriptions.retrieve(
+  const subscription = await getStripe().subscriptions.retrieve(
     invoice.subscription as string
   );
 
@@ -179,11 +208,11 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   // TODO: Send email notification about payment failure
 }
 
-function getPlanTier(priceId: string): 'FREE' | 'BASIC' | 'PREMIUM' | 'BUSINESS' {
-  const priceTierMap: Record<string, 'BASIC' | 'PREMIUM' | 'BUSINESS'> = {
+function getPlanTier(priceId: string): 'FREE' | 'BASIC' | 'PREMIUM' | 'ENTERPRISE' {
+  const priceTierMap: Record<string, 'BASIC' | 'PREMIUM' | 'ENTERPRISE'> = {
     'price_basic_monthly': 'BASIC',
     'price_premium_monthly': 'PREMIUM',
-    'price_business_monthly': 'BUSINESS',
+    'price_business_monthly': 'ENTERPRISE',
   };
 
   return priceTierMap[priceId] || 'FREE';

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShieldIcon, CrownIcon, Edit2Icon, EyeIcon } from "lucide-react"
-import { type SharedBudgetMember } from "@/hooks/useSharedBudgets"
+import { type BudgetPermission } from "@/hooks/useSharedBudgets"
 import { updateMemberPermissions } from "@/hooks/useSharedBudgets"
 import { toast } from "sonner"
 import { mutate } from "swr"
@@ -12,27 +12,27 @@ import { useState } from "react"
 
 interface PermissionsManagerProps {
   budgetId: string;
-  members: SharedBudgetMember[];
+  members: BudgetPermission[];
   currentUserId: string;
   isOwner: boolean;
 }
 
 const ROLE_ICONS = {
-  OWNER: CrownIcon,
-  EDITOR: Edit2Icon,
+  ADMIN: CrownIcon,
+  CONTRIBUTOR: Edit2Icon,
   VIEWER: EyeIcon,
 }
 
 const ROLE_COLORS = {
-  OWNER: 'default',
-  EDITOR: 'secondary',
+  ADMIN: 'default',
+  CONTRIBUTOR: 'secondary',
   VIEWER: 'outline',
 } as const;
 
 export function PermissionsManager({ budgetId, members, currentUserId, isOwner }: PermissionsManagerProps) {
   const [updating, setUpdating] = useState<string | null>(null)
 
-  const handleRoleChange = async (memberId: string, newRole: 'OWNER' | 'EDITOR' | 'VIEWER') => {
+  const handleRoleChange = async (memberId: string, newRole: 'ADMIN' | 'CONTRIBUTOR' | 'VIEWER') => {
     setUpdating(memberId)
     try {
       await updateMemberPermissions(budgetId, memberId, newRole)
@@ -94,8 +94,8 @@ export function PermissionsManager({ budgetId, members, currentUserId, isOwner }
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="OWNER">Owner</SelectItem>
-                    <SelectItem value="EDITOR">Editor</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="CONTRIBUTOR">Contributor</SelectItem>
                     <SelectItem value="VIEWER">Viewer</SelectItem>
                   </SelectContent>
                 </Select>

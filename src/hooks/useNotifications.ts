@@ -6,7 +6,7 @@
 import useSWR from 'swr';
 import { useState } from 'react';
 
-interface Notification {
+export interface Notification {
   id: string;
   type: 'BUDGET_ALERT' | 'BILL_REMINDER' | 'GOAL_MILESTONE' | 'GOAL_ACHIEVED' | 'SHARED_BUDGET_INVITE' | 'SYSTEM_ANNOUNCEMENT';
   title: string;

@@ -10,10 +10,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getUserNotifications, createNotification } from '@/lib/services/notification-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const createNotificationSchema = z.object({
-  type: z.enum(['BUDGET_ALERT', 'BILL_REMINDER', 'GOAL_MILESTONE', 'GOAL_ACHIEVED', 'SHARED_BUDGET_INVITE', 'SYSTEM_ANNOUNCEMENT']),
+  type: z.enum(['BUDGET_ALERT', 'BILL_REMINDER', 'GOAL_MILESTONE', 'ANOMALY_DETECTION', 'SUBSCRIPTION_RENEWAL', 'SYSTEM']),
   title: z.string().min(1).max(200),
   message: z.string().min(1),
   priority: z.number().min(0).max(2).optional(),
@@ -39,14 +40,15 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    const notifications = await getUserNotifications(session.user.id, {
-      unreadOnly,
-      limit,
-    });
+    const notifications = await getUserNotifications(
+      session.user.id,
+      unreadOnly ? 'UNREAD' : undefined,
+      limit
+    );
 
     return NextResponse.json({ notifications });
   } catch (error) {
-    console.error('Failed to fetch notifications:', error);
+    logger.error('Failed to fetch notifications', error);
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
       { status: 500 }
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ notification }, { status: 201 });
   } catch (error) {
-    console.error('Failed to create notification:', error);
+    logger.error('Failed to create notification', error);
     return NextResponse.json(
       { error: 'Failed to create notification' },
       { status: 500 }

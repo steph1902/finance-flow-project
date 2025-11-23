@@ -13,13 +13,13 @@ interface SharedBudgetCardProps {
 }
 
 const ROLE_COLORS = {
-  OWNER: 'default',
-  EDITOR: 'secondary',
+  ADMIN: 'default',
+  CONTRIBUTOR: 'secondary',
   VIEWER: 'outline',
 } as const;
 
 export function SharedBudgetCard({ budget, onManage }: SharedBudgetCardProps) {
-  const memberCount = budget._count?.members || budget.members.length;
+  const memberCount = budget.permissions?.length || 0;
   
   return (
     <Card>
@@ -29,12 +29,12 @@ export function SharedBudgetCard({ budget, onManage }: SharedBudgetCardProps) {
             <CardTitle className="text-base">{budget.name}</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">{budget.category}</p>
           </div>
-          <Badge variant="outline">{budget.period}</Badge>
+          <Badge variant="outline">{new Date(budget.year, budget.month - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <div className="text-2xl font-bold">{formatCurrency(budget.limit)}</div>
+          <div className="text-2xl font-bold">{formatCurrency(budget.amount)}</div>
           <p className="text-xs text-muted-foreground">Budget limit</p>
         </div>
 
@@ -44,13 +44,13 @@ export function SharedBudgetCard({ budget, onManage }: SharedBudgetCardProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {budget.members.slice(0, 3).map((member) => (
-            <div key={member.id} className="flex items-center gap-1">
+          {budget.permissions.slice(0, 3).map((permission) => (
+            <div key={permission.id} className="flex items-center gap-1">
               <div className="size-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
-                {member.user.name?.charAt(0) || member.user.email.charAt(0)}
+                {permission.user.name?.charAt(0) || permission.user.email.charAt(0)}
               </div>
-              <Badge variant={ROLE_COLORS[member.role]} className="text-xs">
-                {member.role}
+              <Badge variant={ROLE_COLORS[permission.role]} className="text-xs">
+                {permission.role}
               </Badge>
             </div>
           ))}

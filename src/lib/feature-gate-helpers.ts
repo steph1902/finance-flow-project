@@ -22,17 +22,20 @@ export async function checkFeatureAccess(
 
   const canUse = canUseFeature(tier, feature, currentUsage)
 
-  return {
+  const result: FeatureGateResult = {
     canUse,
     showUpgrade: !canUse,
-    message: !canUse
-      ? `You've reached your ${tier} plan limit for ${feature}. Upgrade to continue.`
-      : undefined,
   }
+
+  if (!canUse) {
+    result.message = `You've reached your ${tier} plan limit for ${feature}. Upgrade to continue.`
+  }
+
+  return result
 }
 
 export function withFeatureGate<T extends (...args: unknown[]) => unknown>(
-  feature: 'transactions' | 'aiRequests' | 'goals' | 'budgets' | 'sharedBudgets' | 'reports',
+  _feature: 'transactions' | 'aiRequests' | 'goals' | 'budgets' | 'sharedBudgets' | 'reports',
   fn: T
 ): T {
   return (async (...args: unknown[]) => {

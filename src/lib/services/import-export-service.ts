@@ -43,11 +43,18 @@ function parseCSV(csvContent: string): TransactionCSVRow[] {
     throw new Error('CSV file must contain headers and at least one data row');
   }
 
+  if (!lines[0]) {
+    throw new Error('CSV file must contain header row');
+  }
+
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
   const rows: TransactionCSVRow[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim());
+    const line = lines[i]
+    if (!line) continue
+    
+    const values = line.split(',').map(v => v.trim());
     const row: any = {};
 
     headers.forEach((header, index) => {
@@ -120,6 +127,8 @@ export async function importTransactionsFromCSV(
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
+      if (!row) continue
+      
       const validation = validateRow(row);
 
       if (!validation.valid) {

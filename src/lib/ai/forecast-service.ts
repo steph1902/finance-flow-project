@@ -12,10 +12,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ENV } from "@/lib/env";
 import { logInfo, logError } from "@/lib/logger";
-import { withRetry, RateLimiter } from './retry-handler';
-
-// Rate limiter: 60 requests per minute (Gemini free tier)
-const rateLimiter = new RateLimiter(60, 1);
 
 /**
  * Lazy initialization to prevent build-time env var access

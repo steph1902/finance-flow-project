@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getReportById, deleteReport } from '@/lib/services/report-service';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _request: NextRequest,
@@ -23,7 +24,7 @@ export async function GET(
 
     return NextResponse.json({ report });
   } catch (error) {
-    console.error('Failed to fetch report:', error);
+    logger.error('Failed to fetch report', error);
     return NextResponse.json(
       { error: 'Failed to fetch report' },
       { status: 500 }
@@ -51,7 +52,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete report:', error);
+    logger.error('Failed to delete report', error);
     return NextResponse.json(
       { error: 'Failed to delete report' },
       { status: 500 }

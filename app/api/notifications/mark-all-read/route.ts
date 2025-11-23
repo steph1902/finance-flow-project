@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { markAllAsRead } from '@/lib/services/notification-service';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/notifications/mark-all-read
@@ -26,7 +27,7 @@ export async function POST(_request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to mark all as read:', error);
+    logger.error('Failed to mark all as read', error);
     return NextResponse.json(
       { error: 'Failed to mark all as read' },
       { status: 500 }

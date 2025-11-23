@@ -4,35 +4,37 @@ import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export interface SharedBudgetMember {
+export interface BudgetPermission {
   id: string;
   userId: string;
   sharedBudgetId: string;
-  role: 'OWNER' | 'EDITOR' | 'VIEWER';
+  role: 'ADMIN' | 'CONTRIBUTOR' | 'VIEWER';
+  canEdit: boolean;
+  canDelete: boolean;
   user: {
     id: string;
     name: string | null;
     email: string;
   };
-  joinedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SharedBudget {
   id: string;
   name: string;
   category: string;
-  limit: number;
-  period: 'MONTHLY' | 'YEARLY';
+  amount: number;
+  month: number;
+  year: number;
   ownerId: string;
   owner: {
     id: string;
     name: string | null;
     email: string;
   };
-  members: SharedBudgetMember[];
-  _count?: {
-    members: number;
-  };
+  permissions: BudgetPermission[];
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -91,7 +93,7 @@ export async function createSharedBudget(
 
 export async function updateSharedBudget(
   id: string,
-  updates: Partial<Pick<SharedBudget, 'name' | 'category' | 'limit' | 'period'>>
+  updates: Partial<Pick<SharedBudget, 'name' | 'category' | 'amount' | 'month' | 'year'>>
 ): Promise<SharedBudget> {
   const response = await fetch(`/api/shared-budgets/${id}`, {
     method: 'PATCH',
@@ -120,12 +122,14 @@ export async function deleteSharedBudget(id: string): Promise<void> {
 export async function inviteToSharedBudget(
   budgetId: string,
   email: string,
-  role: 'EDITOR' | 'VIEWER'
-): Promise<SharedBudgetMember> {
+  role: 'ADMIN' | 'CONTRIBUTOR' | 'VIEWER',
+  canEdit?: boolean,
+  canDelete?: boolean
+): Promise<BudgetPermission> {
   const response = await fetch(`/api/shared-budgets/${budgetId}/invite`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, role }),
+    body: JSON.stringify({ email, role, canEdit, canDelete }),
   });
 
   if (!response.ok) {
@@ -133,8 +137,8 @@ export async function inviteToSharedBudget(
     throw new Error(error.error || 'Failed to invite user');
   }
 
-  const { member } = await response.json();
-  return member;
+  const { permission } = await response.json();
+  return permission;
 }
 
 export async function leaveSharedBudget(budgetId: string): Promise<void> {
@@ -150,19 +154,19 @@ export async function leaveSharedBudget(budgetId: string): Promise<void> {
 
 export async function updateMemberPermissions(
   budgetId: string,
-  memberId: string,
-  role: 'OWNER' | 'EDITOR' | 'VIEWER'
-): Promise<SharedBudgetMember> {
+  userId: string,
+  role: 'ADMIN' | 'CONTRIBUTOR' | 'VIEWER'
+): Promise<BudgetPermission> {
   const response = await fetch(`/api/shared-budgets/${budgetId}/permissions`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ memberId, role }),
+    body: JSON.stringify({ userId, role }),
   });
 
   if (!response.ok) {
     throw new Error('Failed to update permissions');
   }
 
-  const { member } = await response.json();
-  return member;
+  const { permission } = await response.json();
+  return permission;
 }

@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { addContribution } from '@/lib/services/goal-service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Validation schema
 const addContributionSchema = z.object({
@@ -22,7 +23,7 @@ const addContributionSchema = z.object({
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -34,6 +35,7 @@ export async function POST(
       );
     }
 
+    const { id } = await params;
     const body = await request.json();
     
     // Validate input
@@ -49,7 +51,7 @@ export async function POST(
 
     const contribution = await addContribution(
       {
-        goalId: params.id,
+        goalId: id,
         amount,
         ...(notes && { notes }),
       },
@@ -58,7 +60,7 @@ export async function POST(
 
     return NextResponse.json({ contribution }, { status: 201 });
   } catch (error) {
-    console.error('Failed to add contribution:', error);
+    logger.error('Failed to add contribution', error);
     return NextResponse.json(
       { error: 'Failed to add contribution' },
       { status: 500 }

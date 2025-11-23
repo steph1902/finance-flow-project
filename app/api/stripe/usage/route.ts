@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -45,7 +46,7 @@ export async function GET() {
       reports: 0, // TODO: Add reports count when Report model is available
     });
   } catch (error) {
-    console.error('Usage fetch error:', error);
+    logger.error('Failed to fetch usage data', error);
     return NextResponse.json({ error: 'Failed to fetch usage' }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 /**
  * Weekly Summary Cron Job
@@ -122,7 +123,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Weekly summary cron job failed:', error);
+    logger.error('Weekly summary cron job failed', error);
     return NextResponse.json(
       { error: 'Cron job failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
