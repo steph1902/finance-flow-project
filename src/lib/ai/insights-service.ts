@@ -181,7 +181,14 @@ export async function generateInsights({
       previousPeriodData: analysisData,
     });
 
-    const aiResponse = await geminiClient.generateContent(prompt);
+    let aiResponse: string;
+    try {
+      aiResponse = await geminiClient.generateContentWithRetry(prompt, 2);
+    } catch (aiError) {
+      logError("AI insights generation failed, using fallback", aiError, { userId });
+      // Return fallback insights if AI fails
+      return generateFallbackInsights(analysisData, budgets);
+    }
 
     // Parse AI response (expecting JSON array)
     let insights: Insight[] = [];
