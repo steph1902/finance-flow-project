@@ -163,6 +163,24 @@ export async function generateForecast(input: ForecastInput): Promise<ForecastRe
       ...recurringByCategory.keys(),
     ]);
 
+    // Check if there's any data to forecast
+    if (allCategories.size === 0) {
+      logInfo("No data available for forecast", { userId });
+      return {
+        months: [],
+        totalProjected: 0,
+        totalIncome: 0,
+        totalExpense: 0,
+        confidence: 0,
+        methodology: "No historical data or recurring transactions available for forecasting.",
+        insights: [
+          "No transaction data available yet. Start by adding some transactions or recurring expenses to generate a forecast.",
+          "Once you have at least a few weeks of transaction history, the forecast will become more accurate."
+        ],
+        generatedAt: new Date().toISOString(),
+      };
+    }
+
     const categoryForecasts: CategoryForecast[] = [];
 
     for (const category of allCategories) {
@@ -188,9 +206,17 @@ export async function generateForecast(input: ForecastInput): Promise<ForecastRe
     }
 
     // 4. Use Gemini to generate insights and explanations
-    const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    let geminiData: {
+      categoryExplanations: Record<string, string>;
+      insights: string[];
+      confidence: number;
+      methodology: string;
+    };
 
-    const prompt = `You are a financial forecasting assistant. Analyze this spending data and provide insights.
+    try {
+      const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+      const prompt = `You are a financial forecasting assistant. Analyze this spending data and provide insights.
 
 Historical Data (last 6 months):
 - Total transactions: ${transactions.length}
@@ -220,28 +246,33 @@ Return as JSON:
   "methodology": "description"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
+      const result = await model.generateContent(prompt);
+      const response = result.response.text();
 
-    // Parse Gemini response
-    let geminiData: {
-      categoryExplanations: Record<string, string>;
-      insights: string[];
-      confidence: number;
-      methodology: string;
-    };
-
-    try {
-      // Extract JSON from response (Gemini sometimes wraps in markdown)
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      geminiData = JSON.parse(jsonMatch?.[0] || "{}");
-    } catch {
-      // Fallback if parsing fails
+      // Parse Gemini response
+      try {
+        // Extract JSON from response (Gemini sometimes wraps in markdown)
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        geminiData = JSON.parse(jsonMatch?.[0] || "{}");
+      } catch (parseError) {
+        logError("Failed to parse Gemini response", parseError);
+        throw parseError;
+      }
+    } catch (geminiError) {
+      // Fallback to basic forecast if Gemini fails
+      logError("Gemini API failed, using fallback", geminiError);
+      
       geminiData = {
         categoryExplanations: {},
-        insights: ["Forecast based on historical spending patterns"],
-        confidence: 0.75,
-        methodology: "Statistical analysis of historical transactions combined with recurring expense patterns.",
+        insights: [
+          "Forecast based on historical spending patterns from the last 6 months",
+          "Recurring transactions have been included in projections",
+          transactions.length > 0 
+            ? `Analyzed ${transactions.length} transactions across ${categoryAverages.size} categories`
+            : "No historical data available - forecast based on recurring transactions only"
+        ],
+        confidence: transactions.length > 20 ? 0.75 : 0.5,
+        methodology: "Statistical analysis of historical transactions combined with recurring expense patterns. Forecast uses historical averages and trend analysis.",
       };
     }
 

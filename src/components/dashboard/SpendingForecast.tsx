@@ -55,15 +55,35 @@ export function SpendingForecast() {
           toast.error("Rate limit exceeded. Please try again later.");
           return;
         }
-        throw new Error("Failed to load forecast");
+        
+        // Try to get detailed error message from response
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.error || `Failed to load forecast (${res.status})`;
+        
+        console.error("Forecast API error:", {
+          status: res.status,
+          statusText: res.statusText,
+          error: errorData
+        });
+        
+        toast.error(errorMessage);
+        return;
       }
 
       const data = await res.json();
+      
+      if (!data.data) {
+        console.error("Invalid forecast response:", data);
+        toast.error("Invalid forecast data received");
+        return;
+      }
+      
       setForecast(data.data);
       toast.success(`${months}-month forecast generated!`);
     } catch (error) {
       console.error("Forecast error:", error);
-      toast.error("Failed to generate forecast");
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate forecast";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -146,6 +166,21 @@ export function SpendingForecast() {
 
         {!loading && forecast && (
           <div className="space-y-6">
+            {/* Check if forecast has no data */}
+            {forecast.months.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">
+                  {forecast.insights[0] || "Not enough data to generate forecast"}
+                </p>
+                {forecast.insights.slice(1).map((insight, idx) => (
+                  <p key={idx} className="text-sm text-muted-foreground mt-2">
+                    {insight}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <>
             {/* Summary */}
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
@@ -273,6 +308,8 @@ export function SpendingForecast() {
             <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
               <strong>Methodology:</strong> {forecast.methodology}
             </div>
+            </>
+            )}
           </div>
         )}
       </CardContent>

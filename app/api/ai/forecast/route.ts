@@ -140,8 +140,15 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     logError("Forecast generation failed", error);
+    
+    // Provide more specific error messages
+    const errorMessage = error instanceof Error ? error.message : "Failed to generate forecast";
+    
     return NextResponse.json(
-      { error: "Failed to generate forecast" },
+      { 
+        error: errorMessage,
+        details: error instanceof Error ? error.stack : undefined 
+      },
       { status: 500 }
     );
   }
