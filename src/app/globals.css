@@ -297,7 +297,7 @@
     --color-bg-app: 220 20% 10%;               /* Soft charcoal — not black */
     --color-bg-page: 220 18% 12%;              /* App base (layered) */
     --color-bg-surface: 220 16% 16%;           /* Elevated surface */
-    --color-bg-card: 220 15% 18%;              /* Cards (distinct layer) */
+    --color-bg-card: 220 14% 24%;              /* Cards (distinct layer) - increased for contrast */
     --color-bg-surface-glass: 220 15% 18% / 0.7; /* Glass (selective) */
     --color-bg-muted: 220 14% 22%;             /* Muted background */
     --color-bg-overlay: 0 0% 0% / 0.75;        /* Modal overlays */

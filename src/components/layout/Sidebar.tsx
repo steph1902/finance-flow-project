@@ -16,10 +16,10 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Header with Menu Button */}
-      <div className="fixed top-0 left-0 right-0 z-20 flex h-[60px] items-center justify-between border-b bg-background px-4 lg:hidden">
-        <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <Package2 className="h-6 w-6" />
-          <span className="">FinanceFlow</span>
+      <div className="fixed top-0 left-0 right-0 z-20 flex h-[60px] items-center justify-between border-b border-border/50 bg-background/95 backdrop-blur-sm px-4 lg:hidden shadow-sm transition-colors duration-300">
+        <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+          <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
+          <span className="text-foreground">FinanceFlow</span>
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -28,7 +28,7 @@ export default function Sidebar() {
             size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
-            className="lg:hidden"
+            className="lg:hidden transition-all hover:bg-accent active:scale-95"
           >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
@@ -38,7 +38,7 @@ export default function Sidebar() {
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-10 bg-background/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-10 bg-background/80 backdrop-blur-sm lg:hidden animate-fade-in"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -47,17 +47,17 @@ export default function Sidebar() {
       {/* Mobile Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-20 w-64 flex-col border-r bg-background transition-transform duration-300 lg:hidden",
+          "fixed inset-y-0 left-0 z-20 w-64 flex-col border-r border-border/50 bg-background shadow-xl transition-transform duration-300 ease-out lg:hidden",
           isMobileMenuOpen ? "translate-x-0 flex" : "-translate-x-full"
         )}
       >
-        <div className="flex h-[60px] items-center border-b px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Package2 className="h-6 w-6" />
-            <span className="">FinanceFlow</span>
+        <div className="flex h-[60px] items-center border-b border-border/50 px-6">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+            <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
+            <span className="text-foreground">FinanceFlow</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-auto py-2">
+        <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           <nav className="grid items-start px-4 text-sm font-medium" aria-label="Main navigation">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
@@ -67,10 +67,10 @@ export default function Sidebar() {
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-primary hover:bg-accent"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -84,14 +84,14 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background lg:flex">
-        <div className="flex h-[60px] items-center border-b px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Package2 className="h-6 w-6" />
-            <span className="">FinanceFlow</span>
+      <div className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r border-border/50 bg-background lg:flex shadow-sm transition-colors duration-300">
+        <div className="flex h-[60px] items-center border-b border-border/50 px-6">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+            <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
+            <span className="text-foreground">FinanceFlow</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-auto py-2">
+        <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           <nav className="grid items-start px-4 text-sm font-medium" aria-label="Main navigation">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
@@ -100,10 +100,10 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-primary hover:bg-accent"
+                      ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -114,9 +114,9 @@ export default function Sidebar() {
             })}
           </nav>
         </div>
-        <div className="border-t p-4">
+        <div className="border-t border-border/50 p-4 bg-muted/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Theme</span>
+            <span className="text-xs text-muted-foreground font-medium">Theme</span>
             <ThemeToggle />
           </div>
         </div>

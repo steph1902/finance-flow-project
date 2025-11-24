@@ -25,25 +25,25 @@ export function BudgetProgress({ budgets, isLoading = false }: BudgetProgressPro
     .slice(0, 5);
 
   const getStatusIcon = (progress: number) => {
-    if (progress >= 90) return <AlertCircle className="h-4 w-4 text-danger-600 dark:text-danger-400" />;
-    if (progress >= 70) return <TrendingUp className="h-4 w-4 text-warning-600 dark:text-warning-400" />;
-    return <CheckCircle className="h-4 w-4 text-success-600 dark:text-success-400" />;
+    if (progress >= 90) return <AlertCircle className="h-4 w-4 text-destructive" />;
+    if (progress >= 70) return <TrendingUp className="h-4 w-4 text-warning" />;
+    return <CheckCircle className="h-4 w-4 text-success" />;
   };
 
   const getProgressColor = (progress: number) => {
-    if (progress >= 90) return "bg-danger-500";
-    if (progress >= 70) return "bg-warning-500";
-    return "bg-success-500";
+    if (progress >= 90) return "bg-destructive";
+    if (progress >= 70) return "bg-warning";
+    return "bg-success";
   };
 
   return (
-    <Card className="border-neutral-200 dark:border-neutral-800 hover:shadow-lg transition-shadow duration-300">
+    <Card className="border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       <CardHeader>
-        <CardTitle className="text-neutral-900 dark:text-white flex items-center gap-2">
-          <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+        <CardTitle className="text-foreground flex items-center gap-2">
+          <Wallet className="h-5 w-5 text-primary" />
           Budget Overview
         </CardTitle>
-        <CardDescription className="text-neutral-600 dark:text-neutral-400">
+        <CardDescription className="text-muted-foreground">
           Track your spending against monthly budgets
         </CardDescription>
       </CardHeader>

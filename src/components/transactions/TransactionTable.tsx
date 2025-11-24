@@ -49,28 +49,28 @@ const TransactionTableComponent = ({ transactions, onEdit, onDelete }: Transacti
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+    <div className="overflow-x-auto rounded-lg border border-border/50 bg-card shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
-            <TableHead className="font-semibold text-neutral-900 dark:text-white">Date</TableHead>
-            <TableHead className="font-semibold text-neutral-900 dark:text-white">Category</TableHead>
-            <TableHead className="font-semibold text-neutral-900 dark:text-white">Description</TableHead>
-            <TableHead className="text-right font-semibold text-neutral-900 dark:text-white">Amount</TableHead>
-            <TableHead className="w-[120px] text-right font-semibold text-neutral-900 dark:text-white">Actions</TableHead>
+          <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border">
+            <TableHead className="font-semibold text-foreground">Date</TableHead>
+            <TableHead className="font-semibold text-foreground">Category</TableHead>
+            <TableHead className="font-semibold text-foreground">Description</TableHead>
+            <TableHead className="text-right font-semibold text-foreground">Amount</TableHead>
+            <TableHead className="w-[120px] text-right font-semibold text-foreground">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {transactions.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-12">
-                <div className="flex flex-col items-center gap-3 text-neutral-500">
-                  <svg className="h-16 w-16 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                  <svg className="h-16 w-16 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                   <div>
                     <p className="text-sm font-medium">No transactions found</p>
-                    <p className="text-xs text-neutral-400 mt-1">Try adjusting your filters or add a new transaction</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Try adjusting your filters or add a new transaction</p>
                   </div>
                 </div>
               </TableCell>
@@ -85,50 +85,50 @@ const TransactionTableComponent = ({ transactions, onEdit, onDelete }: Transacti
                   key={transaction.id}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: getStaggerDelay(index) }}
-                  className="group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors border-b border-neutral-200 dark:border-neutral-800 last:border-0"
+                  transition={{ delay: getStaggerDelay(index), duration: 0.2 }}
+                  className="group hover:bg-accent/50 transition-all duration-200 border-b border-border last:border-0 cursor-pointer active:scale-[0.99]"
                 >
-                  <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableCell className="font-medium text-foreground">
                     {formattedDate}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-full ${
+                      <div className={`p-1.5 rounded-full transition-transform group-hover:scale-110 ${
                         transaction.type === "INCOME"
-                          ? "bg-success-50 dark:bg-success-950/30"
-                          : "bg-danger-50 dark:bg-danger-950/30"
+                          ? "bg-success/10"
+                          : "bg-destructive/10"
                       }`}>
                         {transaction.type === "INCOME" ? (
-                          <ArrowUpCircle className="h-4 w-4 text-success-600 dark:text-success-400" />
+                          <ArrowUpCircle className="h-4 w-4 text-success" />
                         ) : (
-                          <ArrowDownCircle className="h-4 w-4 text-danger-600 dark:text-danger-400" />
+                          <ArrowDownCircle className="h-4 w-4 text-destructive" />
                         )}
                       </div>
                       <div>
-                        <span className="font-medium text-neutral-900 dark:text-white">{transaction.category}</span>
-                        <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                        <span className="font-medium text-foreground">{transaction.category}</span>
+                        <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                           {transaction.type === "INCOME" ? "Income" : "Expense"}
                         </span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-60 truncate text-neutral-700 dark:text-neutral-300" title={transaction.description ?? ""}>
-                    {transaction.description ?? <span className="text-neutral-400">—</span>}
+                  <TableCell className="max-w-60 truncate text-muted-foreground" title={transaction.description ?? ""}>
+                    {transaction.description ?? <span className="text-muted-foreground/50">—</span>}
                   </TableCell>
                   <TableCell className={`text-right font-semibold tabular-nums ${
                     transaction.type === "INCOME"
-                      ? "text-success-600 dark:text-success-400"
-                      : "text-danger-600 dark:text-danger-400"
+                      ? "text-success"
+                      : "text-destructive"
                   }`}>
                     {transaction.type === "EXPENSE" ? `-${amount}` : `+${amount}`}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => onEdit(transaction)}
-                        className="h-8 w-8 hover:bg-primary-50 dark:hover:bg-primary-950/30 hover:text-primary-600 dark:hover:text-primary-400"
+                        className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
                         aria-label={`Edit transaction: ${transaction.description}`}
                       >
                         <Edit className="h-4 w-4" />
@@ -138,7 +138,7 @@ const TransactionTableComponent = ({ transactions, onEdit, onDelete }: Transacti
                         variant="ghost" 
                         size="icon" 
                         onClick={() => onDelete(transaction)}
-                        className="h-8 w-8 hover:bg-danger-50 dark:hover:bg-danger-950/30 hover:text-danger-600 dark:hover:text-danger-400"
+                        className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive transition-all active:scale-95"
                         aria-label={`Delete transaction: ${transaction.description}`}
                       >
                         <Trash2 className="h-4 w-4" />

@@ -28,32 +28,32 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
   const [activeChart, setActiveChart] = useState<'line' | 'area'>('area');
 
   return (
-    <Card className="h-full border-neutral-200 dark:border-neutral-800 hover:shadow-lg transition-shadow duration-300">
+    <Card className="h-full border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-neutral-900 dark:text-white">Income vs. Expenses</CardTitle>
-            <CardDescription className="text-neutral-600 dark:text-neutral-400">
+            <CardTitle className="text-foreground">Income vs. Expenses</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Track how your spending compares to income over time
             </CardDescription>
           </div>
-          <div className="flex gap-1 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg">
+          <div className="flex gap-1 bg-muted p-1 rounded-lg">
             <button
               onClick={() => setActiveChart('area')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all ${
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
                 activeChart === 'area'
-                  ? 'bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400 shadow-sm'
-                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  ? 'bg-background text-primary shadow-sm scale-105'
+                  : 'text-muted-foreground hover:text-foreground active:scale-95'
               }`}
             >
               Area
             </button>
             <button
               onClick={() => setActiveChart('line')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all ${
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
                 activeChart === 'line'
-                  ? 'bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400 shadow-sm'
-                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  ? 'bg-background text-primary shadow-sm scale-105'
+                  : 'text-muted-foreground hover:text-foreground active:scale-95'
               }`}
             >
               Line
@@ -96,8 +96,8 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
             </div>
           </div>
         ) : data.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-neutral-500">
-            <svg className="h-16 w-16 mb-4 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+            <svg className="h-16 w-16 mb-4 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
             </svg>
             <p className="text-sm">Not enough data yet</p>

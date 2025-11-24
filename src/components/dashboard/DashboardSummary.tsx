@@ -18,7 +18,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         {Array.from({ length: 4 }).map((_, index) => (
           <div 
             key={index} 
-            className="h-36 animate-pulse rounded-xl bg-linear-to-br from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-lg" 
+            className="h-36 animate-pulse rounded-xl bg-linear-to-br from-muted/50 to-muted shadow-md" 
           />
         ))}
       </div>
@@ -41,7 +41,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         title="Total Balance"
         value={formatCurrency(summary.totalBalance)}
         description="Income minus expenses"
-        icon={<DollarSign className="h-5 w-5 text-primary-600 dark:text-primary-400" />}
+        icon={<DollarSign className="h-5 w-5 text-primary" />}
         {...(balanceTrend && { trend: balanceTrend })}
         index={0}
       />
@@ -49,7 +49,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         title="Total Income"
         value={formatCurrency(summary.totalIncome)}
         description="Total income for period"
-        icon={<TrendingUp className="h-5 w-5 text-success-600 dark:text-success-400" />}
+        icon={<TrendingUp className="h-5 w-5 text-success" />}
         trend={incomeTrend}
         index={1}
       />
@@ -57,7 +57,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         title="Total Expenses"
         value={formatCurrency(summary.totalExpenses)}
         description="Total spending for period"
-        icon={<TrendingDown className="h-5 w-5 text-danger-600 dark:text-danger-400" />}
+        icon={<TrendingDown className="h-5 w-5 text-destructive" />}
         trend={expensesTrend}
         index={2}
       />
@@ -65,7 +65,7 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
         title="Transactions"
         value={summary.transactionCount.toLocaleString()}
         description="Number of transactions"
-        icon={<CreditCard className="h-5 w-5 text-primary-600 dark:text-primary-400" />}
+        icon={<CreditCard className="h-5 w-5 text-primary" />}
         trend={transactionsTrend}
         index={3}
       />

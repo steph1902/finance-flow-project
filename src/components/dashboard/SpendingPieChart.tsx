@@ -19,10 +19,10 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
   const total = data.reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <Card className="h-full border-neutral-200 dark:border-neutral-800 hover:shadow-lg transition-shadow duration-300">
+    <Card className="h-full border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       <CardHeader>
-        <CardTitle className="text-neutral-900 dark:text-white">Spending by Category</CardTitle>
-        <CardDescription className="text-neutral-600 dark:text-neutral-400">
+        <CardTitle className="text-foreground">Spending by Category</CardTitle>
+        <CardDescription className="text-muted-foreground">
           Distribution of expenses for the selected period
         </CardDescription>
       </CardHeader>
@@ -48,12 +48,12 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
             </div>
           </div>
         ) : data.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-neutral-500">
-            <svg className="h-16 w-16 mb-4 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+            <svg className="h-16 w-16 mb-4 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <p className="text-sm">No expense data yet</p>
-            <p className="text-xs text-neutral-400 mt-1">Add transactions to see spending breakdown</p>
+            <p className="text-sm font-medium">No expense data yet</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Add transactions to see spending breakdown</p>
           </div>
         ) : (
           <>
