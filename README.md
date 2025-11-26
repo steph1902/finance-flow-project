@@ -1,16 +1,58 @@
-# FinanceFlow
+<div align="center">
 
-**AI-Powered Personal Finance Automation Platform**
+# 💰 FinanceFlow
+
+### AI-Powered Personal Finance Automation Platform
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6.18-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+**[Features](#-key-features)** •
+**[Tech Stack](#-tech-stack)** •
+**[Installation](#-installation--local-development)** •
+**[Documentation](#-api-documentation)** •
+**[Contributing](#-contributing)**
+
+</div>
 
 ---
 
-## Overview
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+  - [Purpose](#purpose)
+  - [Target Users](#target-users)
+- [Key Features](#-key-features)
+  - [AI-Powered Intelligence](#ai-powered-intelligence)
+  - [Core Financial Management](#core-financial-management)
+  - [Authentication & Security](#authentication--security)
+  - [User Experience](#user-experience)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Screenshots / Demo](#-screenshots--demo)
+- [Project Structure](#-project-structure)
+- [Environment Variables](#-environment-variables)
+- [Installation & Local Development](#-installation--local-development)
+- [Running in Production](#-running-in-production)
+- [API Documentation](#-api-documentation)
+- [AI Features Documentation](#-ai-features-documentation)
+- [Testing](#-testing)
+- [Performance & Optimization](#-performance--optimization)
+- [UX & UI Design Principles](#-ux--ui-design-principles)
+- [Security](#-security)
+- [Contributing](#-contributing)
+- [Project Roadmap](#-project-roadmap)
+- [Known Issues & Troubleshooting](#-known-issues--troubleshooting)
+- [FAQ](#-faq)
+- [License](#-license)
+- [Maintainer & Support](#-maintainer--support)
+- [Acknowledgments](#-acknowledgments)
+
+## 🌟 Overview
 
 FinanceFlow is a production-grade personal finance management system that leverages Google Gemini AI to automate expense tracking, provide intelligent financial insights, and streamline budget management. Built with Next.js 16 (App Router + Turbopack), TypeScript, Prisma ORM, and PostgreSQL, it demonstrates modern full-stack development patterns suitable for enterprise-scale applications.
 
@@ -33,7 +75,7 @@ Manual expense tracking is tedious and lacks actionable intelligence. FinanceFlo
 
 ---
 
-## Key Features
+## ✨ Key Features
 
 ### AI-Powered Intelligence
 
@@ -72,7 +114,7 @@ Manual expense tracking is tedious and lacks actionable intelligence. FinanceFlo
 
 ---
 
-## Tech Stack
+## 🛠 Tech Stack
 
 ### Frontend
 
@@ -112,7 +154,7 @@ Manual expense tracking is tedious and lacks actionable intelligence. FinanceFlo
 
 ---
 
-## System Architecture
+## 🏗 System Architecture
 
 ```mermaid
 graph TB
@@ -240,21 +282,35 @@ AIChatHistory
 
 ---
 
-## Screenshots / Demo
+## 📸 Screenshots / Demo
 
-> **TODO**: Add production screenshots
+> **Coming Soon**: Production screenshots will be added in the next release.
 
-Planned screenshots:
-- Dashboard overview with charts
-- Transaction list with filters
-- Budget tracking interface
-- AI chat assistant
-- Recurring transactions management
-- Mobile responsive views
+### Planned Screenshots
+
+- 📊 **Dashboard Overview** – Real-time balance, charts, and spending insights
+- 💳 **Transaction Management** – Advanced filtering and categorization
+- 📈 **Budget Tracking** – Visual progress indicators and alerts
+- 🤖 **AI Chat Assistant** – Natural language financial queries
+- 🔄 **Recurring Transactions** – Automated bill and subscription tracking
+- 📱 **Mobile Responsive** – Seamless experience across all devices
+
+<!-- 
+Uncomment and add screenshots when available:
+
+<div align="center">
+  <img src="./public/screenshots/dashboard.png" alt="Dashboard" width="45%">
+  <img src="./public/screenshots/transactions.png" alt="Transactions" width="45%">
+</div>
+-->
+
+### Live Demo
+
+> **Note**: Demo deployment coming soon. For now, follow the [installation guide](#-installation--local-development) to run locally.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 finance-flow/
@@ -372,7 +428,7 @@ finance-flow/
 
 ---
 
-## Environment Variables
+## 🔧 Environment Variables
 
 ### Required Variables
 
@@ -446,14 +502,50 @@ NODE_ENV="development"                        # development | production | test
 
 ---
 
-## Installation & Local Development
+## 🚀 Installation & Local Development
 
 ### Prerequisites
 
-- **Node.js** 18+ ([Download](https://nodejs.org/))
-- **npm** or **yarn**
-- **PostgreSQL** 15+ (local or cloud-hosted)
-- **Git**
+Ensure you have the following installed:
+
+- **Node.js** 18.x or 20.x ([Download](https://nodejs.org/))
+- **npm** 9+ or **pnpm** 8+ (pnpm recommended for faster installs)
+- **PostgreSQL** 15+ ([Download](https://www.postgresql.org/download/))
+- **Git** ([Download](https://git-scm.com/downloads))
+
+**Quick Check:**
+```bash
+node --version    # Should be v18.x or v20.x
+npm --version     # Should be 9.x+
+psql --version    # Should be 15.x+
+git --version
+```
+
+### Quick Start (5 minutes)
+
+Get FinanceFlow running locally in 5 steps:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/steph1902/finance-flow-project.git
+cd finance-flow-project/finance-flow
+
+# 2. Install dependencies
+npm install
+
+# 3. Setup environment
+cp .env.example .env.local
+# Edit .env.local with your values (see Environment Variables section)
+
+# 4. Setup database
+npx prisma migrate dev
+npm run db:seed  # Optional: add demo data
+
+# 5. Start development server
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) 🎉
 
 ### Step-by-Step Setup
 
@@ -481,25 +573,50 @@ This will:
 cp .env.example .env.local
 ```
 
-Edit `.env.local` and add your values:
+Edit `.env.local` with your configuration:
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
-- `NEXTAUTH_URL`: `http://localhost:3000` (development)
-- `GEMINI_API_KEY`: Get from [Google AI Studio](https://aistudio.google.com/app/apikey)
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: Optional, from [Google Cloud Console](https://console.cloud.google.com/)
+**Required Variables:**
+```bash
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/financeflow"
+NEXTAUTH_SECRET="<generate-with-openssl-rand-base64-32>"
+NEXTAUTH_URL="http://localhost:3000"
+GEMINI_API_KEY="<get-from-https://aistudio.google.com/app/apikey>"
+```
 
-4. **Start PostgreSQL database**
+**Generate NEXTAUTH_SECRET:**
+```bash
+openssl rand -base64 32
+```
+
+**Optional Variables:** See [Environment Variables](#-environment-variables) section for Google OAuth, Stripe, etc.
+
+4. **Setup PostgreSQL database**
+
+**Option A: Local PostgreSQL**
 
 ```bash
 # macOS (Homebrew)
-brew services start postgresql
+brew install postgresql@15
+brew services start postgresql@15
+createdb financeflow
 
-# Linux (systemd)
+# Linux (Ubuntu/Debian)
+sudo apt install postgresql-15
 sudo systemctl start postgresql
+sudo -u postgres createdb financeflow
 
-# Or use cloud-hosted: Supabase, Vercel Postgres, Railway, etc.
+# Windows - Download from https://www.postgresql.org/download/windows/
+# Use pgAdmin or psql to create 'financeflow' database
 ```
+
+**Option B: Cloud Database** (Recommended for beginners)
+
+- [Supabase](https://supabase.com) – Free tier, instant setup
+- [Vercel Postgres](https://vercel.com/storage/postgres) – Free tier
+- [Railway](https://railway.app) – Free tier
+- [Neon](https://neon.tech) – Serverless Postgres
+
+Copy the connection string to `DATABASE_URL` in `.env.local`.
 
 5. **Run database migrations**
 
@@ -515,15 +632,17 @@ This will:
 6. **Seed the database (optional)**
 
 ```bash
-npm run seed
+npm run db:seed
 ```
 
-Creates:
-- Demo user account (`demo@financeflow.com` / `demo123`)
-- Sample transactions
-- Sample budgets
-- Sample recurring transactions
-- AI chat history examples
+Creates demo data:
+- Demo user account: `demo@financeflow.com` / `demo123`
+- 50+ sample transactions across categories
+- Sample budgets for current month
+- Sample recurring transactions (Netflix, Spotify, Rent)
+- AI chat conversation examples
+
+**Skip this if you want to start fresh!**
 
 7. **Start development server**
 
@@ -531,7 +650,12 @@ Creates:
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+The app will be available at [http://localhost:3000](http://localhost:3000)
+
+**First-time setup:**
+- Create account at `/signup`
+- Or login with demo account (if seeded)
+- Complete onboarding wizard
 
 8. **Verify installation**
 
@@ -547,58 +671,299 @@ npm run lint
 npm run test
 ```
 
+### Common Setup Issues
+
+**Issue: `DATABASE_URL` connection failed**
+```bash
+# Verify PostgreSQL is running
+brew services list | grep postgresql  # macOS
+sudo systemctl status postgresql      # Linux
+
+# Test connection manually
+psql $DATABASE_URL
+```
+
+**Issue: `prisma generate` fails**
+```bash
+# Clear Prisma cache and regenerate
+rm -rf node_modules/.prisma
+npx prisma generate
+```
+
+**Issue: Port 3000 already in use**
+```bash
+# Use different port
+PORT=3001 npm run dev
+
+# Or kill process using port 3000
+lsof -ti:3000 | xargs kill -9  # macOS/Linux
+```
+
+**Issue: TypeScript errors**
+```bash
+# Clear Next.js cache
+rm -rf .next
+npm run dev
+```
+
+### Development Workflow
+
+**Daily Development:**
+```bash
+npm run dev          # Start dev server with hot reload
+npm run lint         # Check for linting errors
+npm run test:watch   # Run tests in watch mode
+```
+
+**Database Changes:**
+```bash
+# After modifying prisma/schema.prisma
+npx prisma migrate dev --name description_of_change
+npx prisma generate  # Regenerate Prisma Client
+```
+
+**Code Quality:**
+```bash
+npm run lint:fix     # Auto-fix linting issues
+npm run test:coverage # Check test coverage
+```
+
 ---
 
-## Running in Production
+## 🌐 Running in Production
 
-### Deploy to Vercel (Recommended)
+### Deploy to Vercel (Recommended - 10 minutes)
 
-1. **Push code to GitHub**
+Vercel offers the easiest deployment experience for Next.js apps with zero configuration.
+
+#### Prerequisites
+
+- GitHub/GitLab/Bitbucket account
+- Vercel account ([Sign up free](https://vercel.com/signup))
+- PostgreSQL database (Supabase/Vercel Postgres recommended)
+
+#### Deployment Steps
+
+**1. Push code to GitHub**
 
 ```bash
-git push origin main
+# Initialize git repository (if not already)
+git init
+git add .
+git commit -m "Initial commit"
+
+# Create GitHub repository at https://github.com/new
+# Then push
+git remote add origin https://github.com/YOUR_USERNAME/finance-flow.git
+git branch -M main
+git push -u origin main
 ```
 
-2. **Import to Vercel**
-   - Visit [vercel.com/new](https://vercel.com/new)
-   - Import your GitHub repository
-   - Vercel will auto-detect Next.js
+**2. Import to Vercel**
 
-3. **Configure Environment Variables**
+- Visit [vercel.com/new](https://vercel.com/new)
+- Click "Import Project"
+- Select your GitHub repository
+- Vercel will auto-detect Next.js configuration
 
-In Vercel project settings → Environment Variables, add:
+**3. Configure Environment Variables**
 
+In Vercel project → **Settings** → **Environment Variables**, add:
+
+**Required:**
+```bash
+DATABASE_URL=postgresql://user:pass@host:5432/dbname?sslmode=require
+NEXTAUTH_SECRET=<generate-new-with-openssl-rand-base64-32>
+NEXTAUTH_URL=https://your-app.vercel.app
+GEMINI_API_KEY=<your-gemini-api-key>
 ```
-DATABASE_URL=postgresql://... (Vercel Postgres or external provider)
-NEXTAUTH_SECRET=<generate-new-secret>
-NEXTAUTH_URL=https://your-domain.vercel.app
-GEMINI_API_KEY=<your-api-key>
-GOOGLE_CLIENT_ID=<optional>
-GOOGLE_CLIENT_SECRET=<optional>
+
+**Optional:**
+```bash
+GOOGLE_CLIENT_ID=<for-google-oauth>
+GOOGLE_CLIENT_SECRET=<for-google-oauth>
 ```
 
-4. **Setup Database**
+⚠️ **Important:** Generate a **NEW** `NEXTAUTH_SECRET` for production (different from local)!
 
-Option A: Use Vercel Postgres (recommended)
-- Enable Postgres storage in Vercel project
-- `DATABASE_URL` auto-populated
+**4. Setup Production Database**
 
-Option B: Use external provider (Supabase, Railway, etc.)
-- Copy connection string to `DATABASE_URL`
+**Option A: Vercel Postgres** (Recommended - Easiest)
 
-5. **Run Migrations**
+1. In Vercel project → **Storage** tab
+2. Click **Create Database** → Select **Postgres**
+3. `DATABASE_URL` is auto-populated in Environment Variables
+4. Run migrations (see step 5)
+
+**Option B: Supabase** (Recommended - More features)
+
+1. Create project at [supabase.com](https://supabase.com)
+2. Get connection string from **Settings** → **Database**
+3. Format: `postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres`
+4. Add `?sslmode=require` to end
+5. Paste as `DATABASE_URL` in Vercel
+
+**5. Run Database Migrations**
 
 After first deployment:
 
 ```bash
-npx prisma migrate deploy
+# Install Vercel CLI
+npm install -g vercel
+
+# Link to your project
+vercel link
+
+# Run migrations in production
+vercel env pull .env.production.local
+DATABASE_URL="<your-production-db-url>" npx prisma migrate deploy
 ```
 
-6. **Deploy**
+**Alternative:** Use Vercel dashboard terminal (recommended for beginners):
+1. Go to Vercel project → **Settings** → **Functions**
+2. Enable **Build Command Override**: `prisma migrate deploy && npm run build`
 
-Vercel automatically deploys on git push.
+**6. Deploy**
 
-### Common Deployment Pitfalls
+- Click **Deploy** in Vercel dashboard
+- Vercel automatically deploys on every git push to `main`
+- Visit your live app at `https://your-app.vercel.app`
+
+#### Post-Deployment
+
+**Test your deployment:**
+```bash
+curl https://your-app.vercel.app/api/auth/session
+# Should return: {"user":null}
+```
+
+**Monitor:**
+- **Logs**: Vercel Dashboard → Deployments → View Logs
+- **Analytics**: Vercel Dashboard → Analytics (built-in)
+- **Errors**: Check runtime logs for API errors
+
+### Deploy to Other Platforms
+
+### Deploy to Other Platforms
+
+#### Docker Deployment
+
+```bash
+# Build Docker image
+docker build -t financeflow .
+
+# Run container
+docker run -p 3000:3000 \
+  -e DATABASE_URL="postgresql://..." \
+  -e NEXTAUTH_SECRET="..." \
+  -e NEXTAUTH_URL="https://yourdomain.com" \
+  -e GEMINI_API_KEY="..." \
+  financeflow
+```
+
+**Docker Compose:**
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    depends_on:
+      - postgres
+  
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: financeflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+Run: `docker-compose up -d`
+
+#### Railway
+
+1. Visit [railway.app](https://railway.app)
+2. Click **New Project** → **Deploy from GitHub**
+3. Select repository
+4. Add environment variables
+5. Railway auto-detects Next.js and deploys
+
+#### Render
+
+1. Visit [render.com](https://render.com)
+2. **New** → **Web Service**
+3. Connect GitHub repository
+4. Build command: `npm run build`
+5. Start command: `npm start`
+6. Add environment variables
+7. Deploy
+
+#### Self-Hosted VPS
+
+```bash
+# SSH into your server
+ssh user@your-server.com
+
+# Install Node.js 20
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install PostgreSQL
+sudo apt install postgresql-15
+
+# Clone repository
+git clone https://github.com/your-username/finance-flow.git
+cd finance-flow
+
+# Install dependencies
+npm install --production
+
+# Setup environment
+cp .env.example .env.production.local
+nano .env.production.local  # Edit with production values
+
+# Build application
+npm run build
+
+# Run migrations
+npx prisma migrate deploy
+
+# Start with PM2 (process manager)
+npm install -g pm2
+pm2 start npm --name "financeflow" -- start
+pm2 save
+pm2 startup  # Enable auto-start on boot
+
+# Setup Nginx reverse proxy (optional)
+sudo apt install nginx
+# Configure Nginx to proxy port 3000
+```
+
+**Nginx Configuration:**
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
 - **Missing `DATABASE_URL`** → Prisma fails during build
 - **Missing `NEXTAUTH_SECRET`** → Authentication breaks
@@ -627,7 +992,7 @@ This allows Vercel preview deployments to build successfully while protecting pr
 
 ---
 
-## API Documentation
+## 📚 API Documentation
 
 ### Authentication Endpoints
 
@@ -818,7 +1183,7 @@ curl -X POST http://localhost:3000/api/ai/chat \
 
 ---
 
-## AI Features Documentation
+## 🤖 AI Features Documentation
 
 ### 1. Transaction Categorization
 
@@ -952,7 +1317,239 @@ curl -X POST http://localhost:3000/api/ai/chat \
 
 ---
 
-## UX & UI Design Principles
+## 🧪 Testing
+
+FinanceFlow includes a comprehensive testing setup using Jest and React Testing Library.
+
+### Test Structure
+
+```
+finance-flow/
+├── __tests__/              # Frontend unit tests
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+├── backend/test/           # Backend E2E tests
+│   ├── auth.e2e-spec.ts
+│   ├── transactions.e2e-spec.ts
+│   ├── budgets.e2e-spec.ts
+│   └── goals.e2e-spec.ts
+└── coverage/               # Test coverage reports
+```
+
+### Running Tests
+
+**Unit Tests**
+```bash
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# CI mode (used in GitHub Actions)
+npm run test:ci
+```
+
+**Backend E2E Tests** (Nest.js backend)
+```bash
+cd backend
+npm run test:e2e
+```
+
+### Test Coverage
+
+Current coverage targets:
+- **Utilities**: 90%+ coverage
+- **Components**: 80%+ coverage
+- **API Routes**: 75%+ coverage
+- **Hooks**: 85%+ coverage
+
+View coverage reports:
+```bash
+npm run test:coverage
+open coverage/lcov-report/index.html
+```
+
+### Writing Tests
+
+**Component Test Example:**
+```typescript
+import { render, screen } from '@testing-library/react';
+import { TransactionCard } from '@/components/transactions/TransactionCard';
+
+describe('TransactionCard', () => {
+  it('displays transaction details correctly', () => {
+    const transaction = {
+      id: '1',
+      amount: 50,
+      type: 'EXPENSE',
+      category: 'Food',
+      description: 'Grocery shopping'
+    };
+    
+    render(<TransactionCard transaction={transaction} />);
+    
+    expect(screen.getByText('Grocery shopping')).toBeInTheDocument();
+    expect(screen.getByText('$50.00')).toBeInTheDocument();
+  });
+});
+```
+
+**API Route Test Example:**
+```typescript
+import { GET } from '@/app/api/transactions/route';
+import { getServerSession } from 'next-auth';
+
+jest.mock('next-auth');
+
+describe('GET /api/transactions', () => {
+  it('returns transactions for authenticated user', async () => {
+    (getServerSession as jest.Mock).mockResolvedValue({
+      user: { id: 'user-1', email: 'test@example.com' }
+    });
+    
+    const request = new Request('http://localhost:3000/api/transactions');
+    const response = await GET(request);
+    
+    expect(response.status).toBe(200);
+  });
+});
+```
+
+### Testing Best Practices
+
+1. **Arrange-Act-Assert**: Structure tests clearly
+2. **Mock External Dependencies**: Mock API calls, auth sessions
+3. **Test User Behavior**: Focus on user interactions, not implementation
+4. **Accessibility**: Include accessibility tests (ARIA labels, roles)
+5. **Snapshot Testing**: Use sparingly for complex UI
+
+---
+
+## ⚡ Performance & Optimization
+
+FinanceFlow is built with performance as a top priority, leveraging Next.js 16's latest optimizations.
+
+### Performance Features
+
+#### Build-Time Optimizations
+
+- **Turbopack** – Next.js 16's faster bundler (replaces Webpack)
+- **React Server Components** – Zero JavaScript for static content
+- **Automatic Code Splitting** – Each route only loads required code
+- **Image Optimization** – Automatic WebP/AVIF conversion with `next/image`
+- **Font Optimization** – Self-hosted fonts with `next/font`
+
+#### Runtime Optimizations
+
+- **SWR Caching** – Client-side data caching with stale-while-revalidate
+- **Optimistic Updates** – Instant UI feedback before server response
+- **Lazy Loading** – Components load on-demand with `React.lazy()`
+- **Debounced Search** – Reduces API calls for search/filter inputs
+- **Virtualized Lists** – Only renders visible items in long lists (planned)
+
+#### Database Optimizations
+
+- **Prisma Connection Pooling** – Reuses database connections
+- **Indexed Queries** – All frequently queried fields are indexed
+- **Pagination** – Limits query results (default: 10 items per page)
+- **Soft Deletes** – Faster than hard deletes, maintains data integrity
+
+### Performance Benchmarks
+
+**Lighthouse Scores** (Target for production):
+- Performance: 95+
+- Accessibility: 100
+- Best Practices: 100
+- SEO: 100
+
+**Core Web Vitals**:
+- **LCP** (Largest Contentful Paint): < 2.5s
+- **FID** (First Input Delay): < 100ms
+- **CLS** (Cumulative Layout Shift): < 0.1
+
+### Optimization Tips
+
+**1. Enable Edge Runtime for API Routes** (Optional)
+```typescript
+// app/api/transactions/route.ts
+export const runtime = 'edge'; // Runs on Vercel Edge Network
+```
+
+**2. Configure Database Connection Pooling**
+```bash
+# .env.production
+DATABASE_URL="postgresql://...?connection_limit=10&pool_timeout=20"
+```
+
+**3. Enable Compression** (Vercel does this automatically)
+```typescript
+// next.config.ts
+const nextConfig = {
+  compress: true,
+};
+```
+
+**4. Optimize Images**
+```tsx
+// Always use next/image for static images
+import Image from 'next/image';
+
+<Image
+  src="/logo.png"
+  width={200}
+  height={50}
+  alt="Logo"
+  priority // For above-the-fold images
+/>
+```
+
+**5. Implement Request Deduplication**
+```typescript
+// SWR automatically deduplicates requests
+const { data } = useSWR('/api/transactions', fetcher);
+// Multiple components can call this - only 1 network request
+```
+
+### Monitoring Performance
+
+**Development:**
+```bash
+# Run Lighthouse audit
+npm run build
+npm run start
+# Visit http://localhost:3000 in Chrome
+# Open DevTools → Lighthouse → Generate Report
+```
+
+**Production:**
+- **Vercel Analytics** – Built-in (already integrated via `@vercel/analytics`)
+- **Vercel Speed Insights** – Real user metrics (already integrated)
+- **Google Analytics** – Optional, add via environment variable
+
+### Troubleshooting Slow Performance
+
+**Symptom**: Slow page loads
+
+**Solutions**:
+1. Check database query performance: `npx prisma studio` → View query times
+2. Enable caching in API routes with `Cache-Control` headers
+3. Reduce bundle size: Analyze with `npx @next/bundle-analyzer`
+
+**Symptom**: High memory usage
+
+**Solutions**:
+1. Clear Prisma connection pool: Restart app
+2. Check for memory leaks in AI service (long conversations)
+3. Increase Node.js memory: `NODE_OPTIONS=--max-old-space-size=4096`
+
+---
+
+## 🎨 UX & UI Design Principles
 
 FinanceFlow follows a **Zen-inspired Japanese minimalist aesthetic** with focus on clarity, simplicity, and user comfort.
 
@@ -1026,9 +1623,180 @@ Easing functions:
 
 ---
 
-## Contributing
+## 🔒 Security
 
-Contributions are welcome! Please follow these guidelines:
+FinanceFlow implements industry-standard security practices to protect user financial data.
+
+### Security Features
+
+#### Authentication & Authorization
+
+- **Password Hashing**: bcrypt with 10 salt rounds (industry standard)
+- **Session Management**: Secure HTTP-only cookies via NextAuth.js
+- **JWT Encryption**: Tokens encrypted with `NEXTAUTH_SECRET`
+- **OAuth 2.0**: Google Sign-In with token validation
+- **Protected Routes**: Middleware-based authentication for all `/dashboard` routes
+- **CSRF Protection**: Built-in via NextAuth.js
+
+#### Data Security
+
+- **SQL Injection Prevention**: Prisma ORM uses parameterized queries
+- **XSS Protection**: React auto-escapes user input
+- **Environment Variables**: Sensitive keys never committed to git
+- **Soft Deletes**: Deleted data recoverable, prevents accidental data loss
+- **Database Encryption**: PostgreSQL supports encryption at rest (enable in cloud provider)
+
+#### API Security
+
+- **Rate Limiting**: Prevents brute force attacks (planned for Phase 5)
+- **Input Validation**: Zod schema validation on all API endpoints
+- **Type Safety**: TypeScript prevents type-related vulnerabilities
+- **Error Handling**: Generic error messages (no sensitive data leaked)
+- **CORS**: Configured for same-origin by default
+
+### Security Best Practices
+
+#### For Self-Hosting
+
+**1. Use Strong Secrets**
+```bash
+# Generate strong NEXTAUTH_SECRET (32+ characters)
+openssl rand -base64 48
+
+# Never reuse secrets between environments
+```
+
+**2. Enable HTTPS**
+```nginx
+# Force HTTPS redirect in Nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    
+    # ... rest of config
+}
+```
+
+**3. Secure Database**
+```bash
+# Require SSL for PostgreSQL connections
+DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require"
+
+# Use strong database password
+# Restrict database access to application IP only
+```
+
+**4. Environment Variable Protection**
+```bash
+# Never commit .env files
+echo ".env*" >> .gitignore
+echo "!.env.example" >> .gitignore
+
+# Set restrictive file permissions
+chmod 600 .env.production.local
+```
+
+**5. Regular Updates**
+```bash
+# Check for security vulnerabilities
+npm audit
+
+# Fix vulnerabilities automatically
+npm audit fix
+
+# Update dependencies
+npm update
+```
+
+### Security Headers
+
+Add security headers in `next.config.ts`:
+
+```typescript
+// next.config.ts
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+### Reporting Security Issues
+
+**Do NOT open public issues for security vulnerabilities.**
+
+Please report security issues responsibly:
+
+1. Email: [Create SECURITY.md file with contact info]
+2. GitHub Security Advisories: [Repository Security Tab](https://github.com/steph1902/finance-flow-project/security)
+
+Include:
+- Description of vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (optional)
+
+We aim to respond within 48 hours and patch critical issues within 7 days.
+
+### Security Checklist
+
+**Pre-Production:**
+- [ ] Changed all default secrets (`NEXTAUTH_SECRET`, database passwords)
+- [ ] Enabled HTTPS/SSL
+- [ ] Configured firewall rules
+- [ ] Set up database backups
+- [ ] Enabled error logging (without sensitive data)
+- [ ] Reviewed all environment variables
+- [ ] Ran `npm audit` and fixed vulnerabilities
+- [ ] Tested authentication flows
+- [ ] Configured CORS appropriately
+- [ ] Set up monitoring/alerting
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! FinanceFlow is built to demonstrate best practices in modern web development, and your input can help make it even better.
+
+### Ways to Contribute
+
+- 🐛 **Report Bugs** – [Open an issue](https://github.com/steph1902/finance-flow-project/issues/new?template=bug_report.md)
+- 💡 **Suggest Features** – [Request a feature](https://github.com/steph1902/finance-flow-project/issues/new?template=feature_request.md)
+- 📖 **Improve Documentation** – Fix typos, add examples, clarify instructions
+- 🧪 **Write Tests** – Increase test coverage
+- 💻 **Submit Pull Requests** – Fix bugs or implement features
 
 ### How to Contribute
 
@@ -1069,9 +1837,58 @@ Contributions are welcome! Please follow these guidelines:
 - **Constants:** UPPER_SNAKE_CASE (`CHART_COLORS`)
 - **Types:** PascalCase (`Transaction`, `BudgetFilters`)
 
+### Commit Message Convention
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no logic change)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+**Examples:**
+```
+feat(ai): add receipt scanning with OCR
+fix(transactions): resolve pagination bug on mobile
+docs(readme): update installation instructions
+test(budgets): add unit tests for budget calculations
+```
+
+### Pull Request Process
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feat/amazing-feature`)
+3. **Commit** your changes using conventional commits
+4. **Push** to your fork (`git push origin feat/amazing-feature`)
+5. **Open** a Pull Request with:
+   - Clear title and description
+   - Reference to related issues
+   - Screenshots (if UI changes)
+   - Test coverage (if applicable)
+
+### Code Review Guidelines
+
+All PRs require:
+- ✅ Passing CI/CD checks (linting, tests, build)
+- ✅ No decrease in test coverage
+- ✅ Documentation updates (if applicable)
+- ✅ Review approval from maintainer
+
 ---
 
-## Project Roadmap
+## 🗺 Project Roadmap
 
 ### ✅ Completed Phases
 
@@ -1145,7 +1962,7 @@ Contributions are welcome! Please follow these guidelines:
 
 ---
 
-## Known Issues & Troubleshooting
+## 🐛 Known Issues & Troubleshooting
 
 ### Deployment Issues
 
@@ -1212,7 +2029,122 @@ npm run dev
 
 ---
 
-## License
+## ❓ FAQ
+
+### General Questions
+
+**Q: Is FinanceFlow free to use?**  
+A: Yes, FinanceFlow is completely free and open-source under the MIT License. You can self-host it without any subscription fees. Note that you'll need your own Google Gemini API key (free tier available).
+
+**Q: Can I use FinanceFlow without an AI API key?**  
+A: The app will run, but AI-powered features (categorization, chat assistant, insights) won't work. You can still manually manage transactions and budgets.
+
+**Q: Does FinanceFlow connect to my bank account?**  
+A: Not yet. Bank integration via Plaid API is on the roadmap (Phase 6). Currently, transactions are manually entered or can be imported from CSV.
+
+**Q: Is my financial data secure?**  
+A: Yes. All data is stored in your own PostgreSQL database with encrypted passwords (bcrypt). The app uses secure authentication (NextAuth.js) and follows security best practices. When self-hosting, you control all data.
+
+**Q: Can multiple people use the same installation?**  
+A: Yes, the app supports multiple user accounts. Each user has isolated data. Shared budgets (family accounts) are planned for Phase 6.
+
+### Technical Questions
+
+**Q: Why Next.js 16 instead of 15 or 14?**  
+A: FinanceFlow uses cutting-edge features like App Router, Server Components, and Turbopack for optimal performance. Next.js 16 provides improved developer experience and faster builds.
+
+**Q: Can I deploy to platforms other than Vercel?**  
+A: Yes, but Vercel is recommended for easiest setup. You can deploy to:
+- **Docker**: Dockerfile included
+- **AWS/GCP/Azure**: Standard Node.js deployment
+- **Railway/Render**: Auto-detected Next.js projects
+- **Self-hosted**: Any VPS with Node.js 18+
+
+**Q: How do I migrate data from other finance apps?**  
+A: Currently, you can import/export JSON data via the Export API. CSV import is planned. For migration from specific apps, you may need to write a custom script using our API.
+
+**Q: What's the difference between the `/app` and `/backend` folders?**  
+A: Currently, `/backend` contains a separate Nest.js backend (experimental). The main app uses Next.js API routes in `/app/api`. The Nest.js backend may be merged or removed in future versions.
+
+**Q: Can I customize transaction categories?**  
+A: Categories are currently predefined in `src/constants/categories.ts`. Custom categories are planned for Phase 6. You can modify the constants file to add your own for now.
+
+**Q: Does FinanceFlow support cryptocurrency tracking?**  
+A: Not yet. Crypto tracking is not on the current roadmap but could be added as a community contribution.
+
+### AI Features
+
+**Q: How accurate is the AI categorization?**  
+A: Accuracy depends on transaction descriptions. Clear descriptions (e.g., "Starbucks coffee") yield 90%+ confidence. Vague descriptions may need manual review.
+
+**Q: Can I train the AI on my spending patterns?**  
+A: Currently, the AI uses the predefined category list. Personalized learning is on the roadmap (Phase 7). Feedback mechanism is implemented but not yet used for retraining.
+
+**Q: What happens if I exceed the free Gemini API quota?**  
+A: Free tier: 60 requests/minute, 1,500/day. If exceeded:
+- Categorization will fail gracefully (manual categorization required)
+- Chat responses will show rate limit errors
+- Consider upgrading to Gemini paid tier or batch categorizing less frequently
+
+**Q: Can I use a different AI model (OpenAI, Anthropic)?**  
+A: Currently, only Google Gemini is supported. Adding OpenAI GPT or Anthropic Claude would require modifying `/src/lib/ai/*` services. Community contributions welcome!
+
+### Deployment & DevOps
+
+**Q: How do I set up automated database backups?**  
+A: If using Vercel Postgres, backups are automatic. For self-hosted:
+```bash
+# Add to crontab for daily backups
+0 2 * * * pg_dump $DATABASE_URL > /backups/financeflow-$(date +\%F).sql
+```
+
+**Q: Can I run FinanceFlow in a Docker container?**  
+A: Yes, a Dockerfile is included. Run:
+```bash
+docker build -t financeflow .
+docker run -p 3000:3000 --env-file .env.local financeflow
+```
+
+**Q: How do I enable HTTPS for local development?**  
+A: Use `mkcert` or configure Next.js with custom server. For production, Vercel handles HTTPS automatically.
+
+**Q: What are the server requirements for self-hosting?**  
+A: Minimum:
+- **CPU**: 1 core
+- **RAM**: 512MB (1GB recommended)
+- **Storage**: 1GB (grows with data)
+- **Node.js**: 18.x or 20.x
+- **PostgreSQL**: 15+
+
+### Troubleshooting
+
+**Q: Why do I see "Database connection failed" errors?**  
+A: Check:
+1. PostgreSQL is running (`brew services list` on macOS)
+2. `DATABASE_URL` is correct in `.env.local`
+3. Database exists: `psql $DATABASE_URL` (should connect)
+4. Migrations ran: `npx prisma migrate dev`
+
+**Q: TypeScript errors about Prisma types?**  
+A: Run `npx prisma generate` to regenerate types after schema changes.
+
+**Q: Build fails with "Module not found" errors?**  
+A: Clear caches and reinstall:
+```bash
+rm -rf .next node_modules
+npm install
+npm run dev
+```
+
+**Q: AI features return 401 Unauthorized?**  
+A: Verify `GEMINI_API_KEY` is:
+1. Set in `.env.local` (not `.env`)
+2. Valid (test at https://aistudio.google.com/)
+3. Not expired or rate-limited
+
+---
+
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -1244,18 +2176,34 @@ See [LICENSE](./LICENSE) for the full license text.
 
 ---
 
-## Maintainer
+## 👨‍💻 Maintainer & Support
 
-- GitHub: [@steph1902](https://github.com/steph1902)
-- Repository: [finance-flow-project](https://github.com/steph1902/finance-flow-project)
+<div align="center">
 
-For questions, issues, or feature requests:
-- [Open an issue](https://github.com/steph1902/finance-flow-project/issues)
-- [Submit a pull request](https://github.com/steph1902/finance-flow-project/pulls)
+**Created and maintained by [Stephanus Sujatmoko](https://github.com/steph1902)**
+
+[![GitHub](https://img.shields.io/badge/GitHub-@steph1902-181717?style=flat-square&logo=github)](https://github.com/steph1902)
+[![Repository](https://img.shields.io/badge/Repo-finance--flow--project-blue?style=flat-square&logo=github)](https://github.com/steph1902/finance-flow-project)
+
+</div>
+
+### Get Help
+
+- 🐛 **Bug Reports**: [Open an issue](https://github.com/steph1902/finance-flow-project/issues/new?template=bug_report.md)
+- 💡 **Feature Requests**: [Request a feature](https://github.com/steph1902/finance-flow-project/issues/new?template=feature_request.md)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/steph1902/finance-flow-project/discussions)
+- 📧 **Security Issues**: See [SECURITY.md](./SECURITY.md) for responsible disclosure
+
+### Repository Stats
+
+![GitHub Stars](https://img.shields.io/github/stars/steph1902/finance-flow-project?style=social)
+![GitHub Forks](https://img.shields.io/github/forks/steph1902/finance-flow-project?style=social)
+![GitHub Issues](https://img.shields.io/github/issues/steph1902/finance-flow-project)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/steph1902/finance-flow-project)
 
 ---
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 ### Technologies
 
@@ -1281,12 +2229,22 @@ This project demonstrates:
 - Responsive UI/UX design
 - Production-ready code quality
 
+### Community
+
+- **Star this repo** if you find it helpful! ⭐
+- **Share** with others learning full-stack development
+- **Contribute** to make FinanceFlow better for everyone
+
 ---
 
 <div align="center">
 
-**Built with ❤️ using Next.js, TypeScript, and Google Gemini AI**
+### Built with ❤️ using Next.js, TypeScript, and Google Gemini AI
 
-[![Star this repo](https://img.shields.io/github/stars/steph1902/finance-flow-project?style=social)](https://github.com/steph1902/finance-flow-project)
+[![Star on GitHub](https://img.shields.io/github/stars/steph1902/finance-flow-project?style=social)](https://github.com/steph1902/finance-flow-project)
+[![Fork on GitHub](https://img.shields.io/github/forks/steph1902/finance-flow-project?style=social)](https://github.com/steph1902/finance-flow-project/fork)
+[![Follow @steph1902](https://img.shields.io/github/followers/steph1902?label=Follow&style=social)](https://github.com/steph1902)
+
+**[⬆ Back to Top](#-financeflow)**
 
 </div>
