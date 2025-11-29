@@ -13,7 +13,7 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "postinstall": "prisma generate",
-    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed-demo.ts"
+    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
