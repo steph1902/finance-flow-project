@@ -77,7 +77,6 @@ async function main() {
       category: category,
       description: `${type === 'INCOME' ? 'Received' : 'Paid for'} ${category} #${i + 1}`,
       date: date,
-      status: 'COMPLETED',
     });
   }
 
