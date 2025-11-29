@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  output: 'standalone',
 
   // Turbopack configuration
   turbopack: {
@@ -12,6 +11,7 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
