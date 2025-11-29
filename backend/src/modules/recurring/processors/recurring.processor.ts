@@ -32,12 +32,11 @@ export class RecurringProcessor {
         try {
           // Create the actual transaction
           await this.transactionsService.create(recurring.userId, {
-            description: recurring.description,
+            description: recurring.description ?? undefined,
             amount: recurring.amount.toNumber(),
             category: recurring.category,
-            type: recurring.type as 'income' | 'expense',
+            type: recurring.type,
             date: new Date(),
-            recurringTransactionId: recurring.id,
           });
 
           // Update next date

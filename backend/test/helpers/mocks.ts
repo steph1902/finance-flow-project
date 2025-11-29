@@ -1,132 +1,107 @@
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
-const moduleMocker = new ModuleMocker(global);
-
-/**
- * Mock implementations for common dependencies
- */
-
-export const mockPrismaService = {
+// Mock Prisma Service with explicit types
+export const mockPrismaService: any = {
   user: {
     findUnique: jest.fn(),
     findMany: jest.fn(),
+    findFirst: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
     count: jest.fn(),
   },
   transaction: {
-    findUnique: jest.fn(),
     findMany: jest.fn(),
+    findUnique: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    deleteMany: jest.fn(),
     count: jest.fn(),
     aggregate: jest.fn(),
     groupBy: jest.fn(),
   },
   budget: {
-    findUnique: jest.fn(),
     findMany: jest.fn(),
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    deleteMany: jest.fn(),
+    count: jest.fn(),
+    aggregate: jest.fn(),
   },
   goal: {
-    findUnique: jest.fn(),
     findMany: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-  recurringTransaction: {
     findUnique: jest.fn(),
-    findMany: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-  notification: {
-    findUnique: jest.fn(),
-    findMany: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
     count: jest.fn(),
   },
-  refreshToken: {
-    findUnique: jest.fn(),
+  notification: {
+    findMany: jest.fn(),
     create: jest.fn(),
-    delete: jest.fn(),
-    deleteMany: jest.fn(),
+    update: jest.fn(),
+    updateMany: jest.fn(),
+    count: jest.fn(),
   },
-  $transaction: jest.fn((callback) => callback(mockPrismaService)),
-  $connect: jest.fn(),
+  recurringTransaction: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  $transaction: jest.fn((callback: any) => callback(mockPrismaService)),
   $disconnect: jest.fn(),
 };
 
-export const mockConfigService = {
-  get: jest.fn((key: string, defaultValue?: any) => {
+// Mock Config Service with explicit types
+export const mockConfigService: any = {
+  get: jest.fn((key: string): any => {
     const config: Record<string, any> = {
-      'database.url': 'postgresql://test:test@localhost:5432/test',
-      'jwt.secret': 'test-secret',
-      'jwt.expiresIn': '15m',
-      'jwt.refreshSecret': 'test-refresh-secret',
-      'jwt.refreshExpiresIn': '7d',
-      'redis.host': 'localhost',
-      'redis.port': 6379,
-      NODE_ENV: 'test',
+      JWT_SECRET: 'test-secret',
+      JWT_EXPIRATION: '1h',
+      DATABASE_URL: 'postgresql://test@localhost/test',
+      PORT: 3001,
     };
-    return config[key] ?? defaultValue;
+    return config[key];
   }),
-  getOrThrow: jest.fn((key: string) => {
-    const value = mockConfigService.get(key);
-    if (!value) throw new Error(`Config key ${key} not found`);
+  getOrThrow: jest.fn((key: string): any => {
+    const value: any = mockConfigService.get(key);
+    if (!value) throw new Error(`Missing config: ${key}`);
     return value;
   }),
 };
 
-export const mockJwtService = {
-  sign: jest.fn((payload) => 'mock-jwt-token'),
-  signAsync: jest.fn((payload) => Promise.resolve('mock-jwt-token')),
-  verify: jest.fn((token) => ({ sub: 'user-123', email: 'test@example.com' })),
-  verifyAsync: jest.fn((token) => Promise.resolve({ sub: 'user-123', email: 'test@example.com' })),
-  decode: jest.fn((token) => ({ sub: 'user-123', email: 'test@example.com' })),
+// Mock JWT Service
+export const mockJwtService: Partial<JwtService> = {
+  sign: jest.fn((_payload: any): string => 'mock-jwt-token'),
+  signAsync: jest.fn((_payload: any): Promise<string> => Promise.resolve('mock-jwt-token')),
+  verify: jest.fn((_token: any): any => ({ sub: 'user-123', email: 'test@example.com' })),
+  verifyAsync: jest.fn((_token: any): Promise<any> => Promise.resolve({ sub: 'user-123', email: 'test@example.com' })),
+  decode: jest.fn((_token: any): any => ({ sub: 'user-123', email: 'test@example.com' })),
 };
 
-export const mockCacheService = {
+// Mock Cache Manager
+export const mockCacheManager = {
   get: jest.fn(),
   set: jest.fn(),
   del: jest.fn(),
-  delPattern: jest.fn(),
-  has: jest.fn(),
-  getOrSet: jest.fn(),
-  increment: jest.fn(),
-  setex: jest.fn(),
   reset: jest.fn(),
 };
 
+// Mock Bull Queue
 export const mockQueue = {
   add: jest.fn(),
   process: jest.fn(),
-  getJob: jest.fn(),
-  getJobs: jest.fn(),
-  getWaitingCount: jest.fn(),
-  getActiveCount: jest.fn(),
-  getCompletedCount: jest.fn(),
-  getFailedCount: jest.fn(),
-  getDelayedCount: jest.fn(),
-  clean: jest.fn(),
-  close: jest.fn(),
+  on: jest.fn(),
 };
 
-export const mockEmailService = {
-  sendEmail: jest.fn(),
-  sendBudgetAlert: jest.fn(),
-  sendGoalAchieved: jest.fn(),
-  sendWelcomeEmail: jest.fn(),
-};
-
+// Mock Logger
 export const mockLogger = {
   log: jest.fn(),
   error: jest.fn(),
@@ -135,34 +110,10 @@ export const mockLogger = {
   verbose: jest.fn(),
 };
 
-/**
- * Create a mock for any provider using metadata
- */
-export function createMock<T = any>(token: any): any {
-  if (typeof token === 'function') {
-    const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
-    const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-    return new Mock();
-  }
-  return {};
-}
-
-/**
- * Reset all mocks
- */
-export function resetAllMocks() {
-  Object.values(mockPrismaService).forEach((mock: any) => {
-    if (typeof mock === 'object') {
-      Object.values(mock).forEach((fn: any) => {
-        if (jest.isMockFunction(fn)) {
-          fn.mockClear();
-        }
-      });
-    }
-    if (jest.isMockFunction(mock)) {
-      mock.mockClear();
-    }
-  });
-
-  jest.clearAllMocks();
+// Create generic mock helper
+export function createMock<T = any>(_token: any): any {
+  return {
+    provide: _token,
+    useValue: {},
+  };
 }

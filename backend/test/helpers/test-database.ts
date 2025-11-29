@@ -1,80 +1,80 @@
 import { PrismaClient } from '@prisma/client';
 
-/**
- * Test database helper
- * Manages test database lifecycle
- */
-export class TestDatabase {
-  private static instance: PrismaClient;
+let prisma: PrismaClient;
 
-  static getInstance(): PrismaClient {
-    if (!this.instance) {
-      this.instance = new PrismaClient({
-        datasources: {
-          db: {
-            url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
-          },
-        },
-      });
+export async function setupTestDatabase(): Promise<PrismaClient> {
+  if (!prisma) {
+    const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+    
+    if (!databaseUrl) {
+      throw new Error('TEST_DATABASE_URL or DATABASE_URL must be set');
     }
-    return this.instance;
-  }
 
-  static async connect(): Promise<void> {
-    const prisma = this.getInstance();
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl,
+        },
+      },
+      log: process.env.DEBUG ? ['query', 'error', 'warn'] : ['error'],
+    });
+
     await prisma.$connect();
   }
 
-  static async disconnect(): Promise<void> {
-    const prisma = this.getInstance();
+  return prisma;
+}
+
+export async function cleanupTestDatabase(): Promise<void> {
+  if (!prisma) return;
+
+  try {
+    // Delete in correct order (respecting foreign keys)
+    await prisma.notification.deleteMany();
+    await prisma.goalContribution.deleteMany();
+    await prisma.goalMilestone.deleteMany();
+    await prisma.goal.deleteMany();
+    await prisma.recurringTransaction.deleteMany();
+    await prisma.transaction.deleteMany();
+    await prisma.budget.deleteMany();
+    await prisma.session.deleteMany();
+    await prisma.account.deleteMany();
+    await prisma.user.deleteMany();
+  } catch (error) {
+    console.error('Error cleaning up test database:', error);
+  }
+}
+
+export async function teardownTestDatabase(): Promise<void> {
+  if (prisma) {
     await prisma.$disconnect();
   }
+}
 
-  /**
-   * Clean all tables in the database
-   */
-  static async cleanup(): Promise<void> {
-    const prisma = this.getInstance();
+export async function createTestUser(data = {}) {
+  return prisma.user.create({
+    data: {
+      email: 'test@example.com',
+      name: 'Test User',
+      password: '$2b$10$test.hash',
+      preferredCurrency: 'USD',
+      timezone: 'UTC',
+      language: 'en',
+      ...data,
+    },
+  });
+}
 
-    // Delete in correct order to avoid foreign key constraints
-    await prisma.notification.deleteMany();
-    await prisma.recurringTransaction.deleteMany();
-    await prisma.goal.deleteMany();
-    await prisma.budget.deleteMany();
-    await prisma.transaction.deleteMany();
-    await prisma.refreshToken.deleteMany();
-    await prisma.user.deleteMany();
-  }
-
-  /**
-   * Seed test data
-   */
-  static async seed(): Promise<{
-    testUser: any;
-    adminUser: any;
-  }> {
-    const prisma = this.getInstance();
-
-    const testUser = await prisma.user.create({
-      data: {
-        email: 'test@example.com',
-        password: '$2b$10$YourHashedPasswordHere', // bcrypt hash of 'password123'
-        firstName: 'Test',
-        lastName: 'User',
-        role: 'USER',
-      },
-    });
-
-    const adminUser = await prisma.user.create({
-      data: {
-        email: 'admin@example.com',
-        password: '$2b$10$YourHashedPasswordHere',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'ADMIN',
-      },
-    });
-
-    return { testUser, adminUser };
-  }
+export async function createAdminUser(data = {}) {
+  return prisma.user.create({
+    data: {
+      email: 'admin@example.com',
+      name: 'Admin User',
+      password: '$2b$10$admin.hash',
+      preferredCurrency: 'USD',
+      timezone: 'UTC',
+      language: 'en',
+      ...data,
+    },
+  });
 }

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsBoolean, IsString, IsNumber, Min } from 'class-validator';
+import { IsOptional, IsBoolean, IsString, IsNumber, Min, IsEnum } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { NotificationType } from '@prisma/client';
 
 export class NotificationQueryDto {
   @ApiProperty({ required: false })
@@ -9,10 +10,10 @@ export class NotificationQueryDto {
   @IsBoolean()
   read?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, enum: NotificationType })
   @IsOptional()
-  @IsString()
-  type?: string;
+  @IsEnum(NotificationType)
+  type?: NotificationType;
 
   @ApiProperty({ required: false, default: 50 })
   @IsOptional()

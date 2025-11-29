@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
-import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import * as Joi from 'joi';
 
 // Core modules
@@ -71,13 +71,19 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 
     // BullMQ for background jobs
     BullModule.forRootAsync({
-      useFactory: () => ({
-        connection: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT || '6379', 10),
-          password: process.env.REDIS_PASSWORD || undefined,
-        },
-      }),
+      useFactory: () => {
+        const config: any = {
+          connection: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          },
+        };
+        const password = process.env.REDIS_PASSWORD;
+        if (password) {
+          config.connection.password = password;
+        }
+        return config;
+      },
     }),
 
     // Core

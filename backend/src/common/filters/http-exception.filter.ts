@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 /**
  * Global exception filter
@@ -40,13 +40,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       }
     }
     // Handle Prisma errors
-    else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    else if (exception instanceof PrismaClientKnownRequestError) {
       status = this.handlePrismaError(exception);
       message = this.getPrismaErrorMessage(exception);
       error = 'Database Error';
     }
     // Handle Prisma validation errors
-    else if (exception instanceof Prisma.PrismaClientValidationError) {
+    else if (exception instanceof PrismaClientValidationError) {
       status = HttpStatus.BAD_REQUEST;
       message = 'Validation error in database query';
       error = 'Validation Error';
@@ -84,7 +84,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
    * Map Prisma error codes to HTTP status codes
    */
   private handlePrismaError(
-    error: Prisma.PrismaClientKnownRequestError,
+    error: PrismaClientKnownRequestError,
   ): number {
     switch (error.code) {
       case 'P2002': // Unique constraint violation
@@ -104,7 +104,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
    * Get user-friendly error messages for Prisma errors
    */
   private getPrismaErrorMessage(
-    error: Prisma.PrismaClientKnownRequestError,
+    error: PrismaClientKnownRequestError,
   ): string {
     switch (error.code) {
       case 'P2002':

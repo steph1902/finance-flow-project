@@ -24,19 +24,35 @@ export class BudgetRepository {
       where.category = query.category;
     }
 
+    // Convert date range to month/year filters
     if (query.startDate || query.endDate) {
+      const startMonth = query.startDate ? query.startDate.getMonth() + 1 : undefined;
+      const startYear = query.startDate ? query.startDate.getFullYear() : undefined;
+      const endMonth = query.endDate ? query.endDate.getMonth() + 1 : undefined;
+      const endYear = query.endDate ? query.endDate.getFullYear() : undefined;
+
       where.AND = [];
-      if (query.startDate) {
-        where.AND.push({ endDate: { gte: query.startDate } });
+      if (startYear && startMonth) {
+        where.AND.push({
+          OR: [
+            { year: { gt: startYear } },
+            { year: startYear, month: { gte: startMonth } }
+          ]
+        });
       }
-      if (query.endDate) {
-        where.AND.push({ startDate: { lte: query.endDate } });
+      if (endYear && endMonth) {
+        where.AND.push({
+          OR: [
+            { year: { lt: endYear } },
+            { year: endYear, month: { lte: endMonth } }
+          ]
+        });
       }
     }
 
     return this.prisma.budget.findMany({
       where,
-      orderBy: { startDate: 'desc' },
+      orderBy: { year: 'desc', month: 'desc' },
     });
   }
 
@@ -46,19 +62,36 @@ export class BudgetRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<Budget[]> {
+    const startMonth = startDate.getMonth() + 1;
+    const startYear = startDate.getFullYear();
+    const endMonth = endDate.getMonth() + 1;
+    const endYear = endDate.getFullYear();
+
     return this.prisma.budget.findMany({
       where: {
         userId,
         category,
         OR: [
+          // Budget starts in the given range
           {
-            AND: [{ startDate: { lte: startDate } }, { endDate: { gte: startDate } }],
+            AND: [
+              { year: startYear, month: { gte: startMonth } },
+              { year: startYear, month: { lte: endMonth } }
+            ]
           },
+          // Budget ends in the given range
           {
-            AND: [{ startDate: { lte: endDate } }, { endDate: { gte: endDate } }],
+            AND: [
+              { year: endYear, month: { gte: startMonth } },
+              { year: endYear, month: { lte: endMonth } }
+            ]
           },
+          // Budget spans the entire range
           {
-            AND: [{ startDate: { gte: startDate } }, { endDate: { lte: endDate } }],
+            AND: [
+              { year: startYear, month: { lte: startMonth } },
+              { year: endYear, month: { gte: endMonth } }
+            ]
           },
         ],
       },
@@ -79,31 +112,17 @@ export class BudgetRepository {
   }
 
   async updateSpent(id: string, spent: Prisma.Decimal): Promise<Budget> {
-    return this.prisma.budget.update({
-      where: { id },
-      data: { spent },
-    });
+    // TODO: Implement when spent field is added to schema
+    throw new Error('updateSpent not implemented - spent field not in schema');
   }
 
   async findRolloverCandidates(userId: string): Promise<Budget[]> {
-    const now = new Date();
-    return this.prisma.budget.findMany({
-      where: {
-        userId,
-        rollover: true,
-        endDate: { lt: now },
-      },
-    });
+    // TODO: Implement when rollover field is added to schema
+    return [];
   }
 
   async incrementSpent(id: string, amount: Prisma.Decimal): Promise<Budget> {
-    return this.prisma.budget.update({
-      where: { id },
-      data: {
-        spent: {
-          increment: amount,
-        },
-      },
-    });
+    // TODO: Implement when spent field is added to schema
+    throw new Error('incrementSpent not implemented - spent field not in schema');
   }
 }

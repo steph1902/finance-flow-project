@@ -1,15 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsDate, IsEnum, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-
-enum RecurringFrequency {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  BIWEEKLY = 'BIWEEKLY',
-  MONTHLY = 'MONTHLY',
-  QUARTERLY = 'QUARTERLY',
-  YEARLY = 'YEARLY',
-}
+import { TransactionType, RecurringFrequency } from '@prisma/client';
 
 export class CreateRecurringDto {
   @ApiProperty({ example: 'Netflix Subscription' })
@@ -23,7 +15,7 @@ export class CreateRecurringDto {
 
   @ApiProperty({ enum: RecurringFrequency, example: 'MONTHLY' })
   @IsEnum(RecurringFrequency)
-  frequency: string;
+  frequency: RecurringFrequency;
 
   @ApiProperty({ example: 'Entertainment' })
   @IsString()
@@ -40,7 +32,7 @@ export class CreateRecurringDto {
   @IsOptional()
   endDate?: Date;
 
-  @ApiProperty({ example: 'expense', enum: ['income', 'expense'] })
-  @IsString()
-  type: string;
+  @ApiProperty({ example: 'EXPENSE', enum: TransactionType })
+  @IsEnum(TransactionType)
+  type: TransactionType;
 }

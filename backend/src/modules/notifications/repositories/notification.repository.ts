@@ -21,7 +21,7 @@ export class NotificationRepository {
     const where: Prisma.NotificationWhereInput = { userId };
 
     if (query.read !== undefined) {
-      where.read = query.read;
+      where.status = query.read ? 'READ' : 'UNREAD';
     }
 
     if (query.type) {
@@ -38,7 +38,7 @@ export class NotificationRepository {
 
   async countUnread(userId: string): Promise<number> {
     return this.prisma.notification.count({
-      where: { userId, read: false },
+      where: { userId, status: 'UNREAD' },
     });
   }
 
@@ -51,8 +51,8 @@ export class NotificationRepository {
 
   async markAllAsRead(userId: string): Promise<void> {
     await this.prisma.notification.updateMany({
-      where: { userId, read: false },
-      data: { read: true },
+      where: { userId, status: 'UNREAD' },
+      data: { status: 'READ', readAt: new Date() },
     });
   }
 

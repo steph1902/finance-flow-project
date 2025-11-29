@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { NotificationRepository } from './repositories/notification.repository';
 import { EmailService } from './services/email.service';
 import { NotificationQueryDto } from './dto';
+import { NotificationStatus } from '@prisma/client';
 
 export interface CreateNotificationData {
   userId: string;
@@ -27,9 +28,9 @@ export class NotificationsService {
       userId: data.userId,
       title: data.title,
       message: data.message,
-      type: data.type,
-      link: data.link,
-      read: false,
+      type: data.type as any, // TODO: Fix type casting
+      actionUrl: data.link,
+      status: 'UNREAD',
     });
 
     // Send email if requested
@@ -68,7 +69,7 @@ export class NotificationsService {
       throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    return this.notificationRepository.update(id, { read: true });
+    return this.notificationRepository.update(id, { status: NotificationStatus.READ });
   }
 
   /**
