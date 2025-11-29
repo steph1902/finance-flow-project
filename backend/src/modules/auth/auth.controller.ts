@@ -13,7 +13,7 @@ import { SignupDto, SigninDto, RefreshTokenDto } from './dto/auth.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import { Throttle } from '@nestjs/throttler';
 
 /**
@@ -23,7 +23,7 @@ import { Throttle } from '@nestjs/throttler';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /**
    * User registration

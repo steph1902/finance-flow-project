@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { GoalRepository } from './repositories/goal.repository';
 import { Decimal } from '@prisma/client/runtime/library';
+import { GoalStatus } from '@prisma/client';
 
 describe('GoalsService', () => {
   let service: GoalsService;
@@ -20,9 +21,12 @@ describe('GoalsService', () => {
     currentAmount: new Decimal(5000),
     targetDate: new Date('2026-12-31'),
     category: 'SAVINGS',
-    priority: 'HIGH',
-    createdAt: new Date('2025-01-01'),
+    priority: 1,
+    createdAt: new Date(),
     updatedAt: new Date(),
+    status: GoalStatus.ACTIVE,
+    reminderEnabled: true,
+    completedAt: null,
   };
 
   const mockGoalRepository = {
@@ -59,7 +63,7 @@ describe('GoalsService', () => {
         currentAmount: 0,
         targetDate: new Date('2026-12-31'),
         category: 'SAVINGS',
-        priority: 'HIGH',
+        priority: 1,
       };
 
       repository.create.mockResolvedValue(mockGoal);
@@ -82,7 +86,7 @@ describe('GoalsService', () => {
         currentAmount: 1000,
         targetDate: new Date('2026-06-01'),
         category: 'TRAVEL',
-        priority: 'MEDIUM',
+        priority: 2,
       };
 
       const goalWithInitialAmount = {
@@ -240,7 +244,7 @@ describe('GoalsService', () => {
   describe('remove', () => {
     it('should delete a goal successfully', async () => {
       repository.findById.mockResolvedValue(mockGoal);
-      repository.delete.mockResolvedValue(undefined);
+      repository.delete.mockResolvedValue(mockGoal);
 
       await service.remove(mockUserId, mockGoalId);
 

@@ -5,6 +5,7 @@ import { TransactionsRepository } from './transactions.repository';
 import { PrismaService } from '@/database/prisma.service';
 import { mockPrismaService } from '../../../test/helpers/mocks';
 import { Decimal } from '@prisma/client/runtime/library';
+import { TransactionType } from '@prisma/client';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
@@ -15,7 +16,7 @@ describe('TransactionsService', () => {
     id: 'trans-123',
     userId: 'user-123',
     amount: new Decimal(100.50),
-    type: 'EXPENSE' as const,
+    type: TransactionType.EXPENSE,
     category: 'Food',
     description: 'Grocery shopping',
     notes: 'Weekly groceries',
@@ -37,14 +38,14 @@ describe('TransactionsService', () => {
           provide: TransactionsRepository,
           useValue: {
             create: jest.fn(),
-            findAll: jest.fn(),
+            findMany: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
             count: jest.fn(),
-            getStatistics: jest.fn(),
-            exportToCSV: jest.fn(),
-            bulkCreate: jest.fn(),
+            aggregate: jest.fn(),
+            groupBy: jest.fn(),
+            createMany: jest.fn(),
           },
         },
       ],
@@ -64,7 +65,7 @@ describe('TransactionsService', () => {
   describe('create', () => {
     const createDto = {
       amount: 100.50,
-      type: 'EXPENSE' as const,
+      type: TransactionType.EXPENSE,
       category: 'Food',
       description: 'Grocery shopping',
       notes: 'Weekly groceries',
@@ -76,7 +77,13 @@ describe('TransactionsService', () => {
 
       const result = await service.create('user-123', createDto);
 
-      expect(result).toEqual(mockTransaction);
+      expect(result).toEqual({
+        ...mockTransaction,
+        amount: 100.5,
+        date: mockTransaction.date.toISOString(),
+        createdAt: mockTransaction.createdAt.toISOString(),
+        updatedAt: mockTransaction.updatedAt.toISOString(),
+      });
       expect(repository.create).toHaveBeenCalledWith({
         userId: 'user-123',
         amount: expect.any(Decimal),
@@ -91,7 +98,7 @@ describe('TransactionsService', () => {
     it('should handle missing optional fields', async () => {
       const minimalDto = {
         amount: 50.00,
-        type: 'INCOME' as const,
+        type: TransactionType.INCOME,
         category: 'Salary',
         date: new Date(),
       };
@@ -99,8 +106,9 @@ describe('TransactionsService', () => {
       const minimalTransaction = {
         ...mockTransaction,
         ...minimalDto,
-        description: undefined,
-        notes: undefined,
+        amount: new Decimal(minimalDto.amount),
+        description: null,
+        notes: null,
       };
 
       repository.create.mockResolvedValue(minimalTransaction);
@@ -116,7 +124,7 @@ describe('TransactionsService', () => {
     const queryDto = {
       page: 1,
       limit: 10,
-      type: 'EXPENSE' as const,
+      type: TransactionType.EXPENSE,
       category: 'Food',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-01-31'),
@@ -124,13 +132,21 @@ describe('TransactionsService', () => {
 
     it('should return paginated transactions', async () => {
       const mockTransactions = [mockTransaction];
-      repository.findAll.mockResolvedValue(mockTransactions);
+      repository.findMany.mockResolvedValue(mockTransactions);
       repository.count.mockResolvedValue(1);
 
       const result = await service.findAll('user-123', queryDto);
 
       expect(result).toEqual({
-        data: mockTransactions,
+        data: [
+          {
+            ...mockTransaction,
+            amount: 100.5,
+            date: mockTransaction.date.toISOString(),
+            createdAt: mockTransaction.createdAt.toISOString(),
+            updatedAt: mockTransaction.updatedAt.toISOString(),
+          },
+        ],
         meta: {
           total: 1,
           page: 1,
@@ -139,7 +155,7 @@ describe('TransactionsService', () => {
         },
       });
 
-      expect(repository.findAll).toHaveBeenCalledWith(
+      expect(repository.findMany).toHaveBeenCalledWith(
         'user-123',
         expect.objectContaining({
           skip: 0,
@@ -153,7 +169,7 @@ describe('TransactionsService', () => {
     });
 
     it('should handle empty results', async () => {
-      repository.findAll.mockResolvedValue([]);
+      repository.findMany.mockResolvedValue([]);
       repository.count.mockResolvedValue(0);
 
       const result = await service.findAll('user-123', {});
@@ -164,12 +180,12 @@ describe('TransactionsService', () => {
 
     it('should apply pagination limits', async () => {
       const largeLimit = { page: 1, limit: 200 };
-      repository.findAll.mockResolvedValue([]);
+      repository.findMany.mockResolvedValue([]);
       repository.count.mockResolvedValue(0);
 
       await service.findAll('user-123', largeLimit);
 
-      expect(repository.findAll).toHaveBeenCalledWith(
+      expect(repository.findMany).toHaveBeenCalledWith(
         'user-123',
         expect.objectContaining({
           take: 100, // Max limit applied
@@ -184,7 +200,13 @@ describe('TransactionsService', () => {
 
       const result = await service.findOne('user-123', 'trans-123');
 
-      expect(result).toEqual(mockTransaction);
+      expect(result).toEqual({
+        ...mockTransaction,
+        amount: 100.5,
+        date: mockTransaction.date.toISOString(),
+        createdAt: mockTransaction.createdAt.toISOString(),
+        updatedAt: mockTransaction.updatedAt.toISOString(),
+      });
       expect(repository.findOne).toHaveBeenCalledWith('trans-123');
     });
 
@@ -215,12 +237,18 @@ describe('TransactionsService', () => {
 
     it('should update transaction successfully', async () => {
       repository.findOne.mockResolvedValue(mockTransaction);
-      const updatedTransaction = { ...mockTransaction, ...updateDto };
+      const updatedTransaction = { ...mockTransaction, ...updateDto, amount: new Decimal(updateDto.amount) };
       repository.update.mockResolvedValue(updatedTransaction);
 
       const result = await service.update('user-123', 'trans-123', updateDto);
 
-      expect(result).toEqual(updatedTransaction);
+      expect(result).toEqual({
+        ...updatedTransaction,
+        amount: 150.75,
+        date: updatedTransaction.date.toISOString(),
+        createdAt: updatedTransaction.createdAt.toISOString(),
+        updatedAt: updatedTransaction.updatedAt.toISOString(),
+      });
       expect(repository.update).toHaveBeenCalledWith(
         'trans-123',
         expect.objectContaining({
@@ -249,21 +277,24 @@ describe('TransactionsService', () => {
     });
   });
 
-  describe('delete', () => {
+  describe('softDelete', () => {
     it('should soft delete transaction successfully', async () => {
       repository.findOne.mockResolvedValue(mockTransaction);
-      repository.delete.mockResolvedValue({ ...mockTransaction, deletedAt: new Date() });
+      repository.update.mockResolvedValue({ ...mockTransaction, deletedAt: new Date() });
 
-      const result = await service.delete('user-123', 'trans-123');
+      const result = await service.softDelete('user-123', 'trans-123');
 
-      expect(result).toHaveProperty('deletedAt');
-      expect(repository.delete).toHaveBeenCalledWith('trans-123');
+      expect(result).toEqual({ message: 'Transaction deleted successfully' });
+      expect(repository.update).toHaveBeenCalledWith({
+        where: { id: 'trans-123' },
+        data: { deletedAt: expect.any(Date) },
+      });
     });
 
     it('should throw NotFoundException when transaction not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.delete('user-123', 'nonexistent')).rejects.toThrow(
+      await expect(service.softDelete('user-123', 'nonexistent')).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -272,79 +303,69 @@ describe('TransactionsService', () => {
       const otherUserTransaction = { ...mockTransaction, userId: 'other-user' };
       repository.findOne.mockResolvedValue(otherUserTransaction);
 
-      await expect(service.delete('user-123', 'trans-123')).rejects.toThrow(
+      await expect(service.softDelete('user-123', 'trans-123')).rejects.toThrow(
         ForbiddenException,
       );
     });
   });
 
-  describe('getStatistics', () => {
+  describe('getStats', () => {
     const mockStats = {
-      totalIncome: new Decimal(5000),
-      totalExpenses: new Decimal(3000),
-      netIncome: new Decimal(2000),
+      totalIncome: 5000,
+      totalExpense: 3000,
+      netSavings: 2000,
       transactionCount: 150,
-      averageTransaction: new Decimal(53.33),
       categoryBreakdown: [
-        { category: 'Food', total: new Decimal(1000), count: 50 },
-        { category: 'Transport', total: new Decimal(500), count: 30 },
+        { category: 'Food', type: TransactionType.EXPENSE, total: 1000, count: 50 },
+        { category: 'Transport', type: TransactionType.EXPENSE, total: 500, count: 30 },
       ],
     };
 
     it('should return statistics for date range', async () => {
-      repository.getStatistics.mockResolvedValue(mockStats);
+      repository.aggregate.mockResolvedValueOnce({ _sum: { amount: new Decimal(5000) } }); // Income
+      repository.aggregate.mockResolvedValueOnce({ _sum: { amount: new Decimal(3000) } }); // Expense
+      repository.count.mockResolvedValue(150);
+      repository.groupBy.mockResolvedValue([
+        { category: 'Food', type: TransactionType.EXPENSE, _sum: { amount: new Decimal(1000) }, _count: 50 },
+        { category: 'Transport', type: TransactionType.EXPENSE, _sum: { amount: new Decimal(500) }, _count: 30 },
+      ] as any);
 
-      const result = await service.getStatistics('user-123', {
-        startDate: new Date('2025-01-01'),
-        endDate: new Date('2025-01-31'),
-      });
+      const result = await service.getStats('user-123', new Date('2025-01-01'), new Date('2025-01-31'));
 
       expect(result).toEqual(mockStats);
-      expect(repository.getStatistics).toHaveBeenCalledWith(
-        'user-123',
-        expect.any(Date),
-        expect.any(Date),
-      );
     });
 
     it('should handle empty statistics', async () => {
-      const emptyStats = {
-        totalIncome: new Decimal(0),
-        totalExpenses: new Decimal(0),
-        netIncome: new Decimal(0),
-        transactionCount: 0,
-        averageTransaction: new Decimal(0),
-        categoryBreakdown: [],
-      };
+      repository.aggregate.mockResolvedValue({ _sum: { amount: null } });
+      repository.count.mockResolvedValue(0);
+      repository.groupBy.mockResolvedValue([]);
 
-      repository.getStatistics.mockResolvedValue(emptyStats);
-
-      const result = await service.getStatistics('user-123', {});
+      const result = await service.getStats('user-123');
 
       expect(result.transactionCount).toBe(0);
-      expect(result.totalIncome).toEqual(new Decimal(0));
+      expect(result.totalIncome).toBe(0);
     });
   });
 
-  describe('exportCSV', () => {
+  describe('exportToCsv', () => {
     it('should export transactions to CSV', async () => {
-      const mockCSV = 'Date,Amount,Type,Category,Description\n2025-01-15,100.50,EXPENSE,Food,Grocery shopping';
-      repository.exportToCSV.mockResolvedValue(mockCSV);
+      const mockTransactions = [mockTransaction];
+      repository.findMany.mockResolvedValue(mockTransactions);
 
-      const result = await service.exportCSV('user-123', {});
+      const result = await service.exportToCsv('user-123', {});
 
-      expect(result).toBe(mockCSV);
-      expect(repository.exportToCSV).toHaveBeenCalledWith('user-123', {});
+      expect(result.content).toContain('Date,Type,Category,Amount,Description,Notes');
+      expect(result.content).toContain('100.5');
+      expect(result.mimeType).toBe('text/csv');
     });
 
     it('should sanitize CSV for injection attacks', async () => {
-      const dangerousCSV = '=cmd|/c calc,100,EXPENSE,Food,Test';
-      const sanitizedCSV = "'=cmd|/c calc,100,EXPENSE,Food,Test";
-      repository.exportToCSV.mockResolvedValue(sanitizedCSV);
+      const dangerousTransaction = { ...mockTransaction, description: '=cmd|/c calc' };
+      repository.findMany.mockResolvedValue([dangerousTransaction]);
 
-      const result = await service.exportCSV('user-123', {});
+      const result = await service.exportToCsv('user-123', {});
 
-      expect(result).not.toContain('=cmd');
+      expect(result.content).toContain("'=cmd|/c calc");
     });
   });
 
@@ -352,39 +373,31 @@ describe('TransactionsService', () => {
     const bulkDto = [
       {
         amount: 100,
-        type: 'EXPENSE' as const,
+        type: TransactionType.EXPENSE,
         category: 'Food',
         date: new Date(),
       },
       {
         amount: 200,
-        type: 'INCOME' as const,
+        type: TransactionType.INCOME,
         category: 'Salary',
         date: new Date(),
       },
     ];
 
     it('should create multiple transactions', async () => {
-      const createdTransactions = bulkDto.map((dto, i) => ({
-        ...mockTransaction,
-        id: `trans-${i}`,
-        ...dto,
-      }));
-
-      repository.bulkCreate.mockResolvedValue(createdTransactions);
+      repository.createMany.mockResolvedValue({ count: 2 });
 
       const result = await service.bulkCreate('user-123', bulkDto);
 
-      expect(result).toHaveLength(2);
-      expect(repository.bulkCreate).toHaveBeenCalled();
+      expect(result.count).toBe(2);
+      expect(repository.createMany).toHaveBeenCalled();
     });
 
-    it('should handle empty array', async () => {
-      repository.bulkCreate.mockResolvedValue([]);
-
-      const result = await service.bulkCreate('user-123', []);
-
-      expect(result).toEqual([]);
+    it('should throw BadRequestException if empty array', async () => {
+      await expect(service.bulkCreate('user-123', [])).rejects.toThrow(
+        'No transactions provided',
+      );
     });
   });
 });

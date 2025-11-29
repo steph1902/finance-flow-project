@@ -4,6 +4,8 @@ import { NotificationsService } from './notifications.service';
 import { NotificationRepository } from './repositories/notification.repository';
 import { EmailService } from './services/email.service';
 
+import { NotificationType, NotificationStatus } from '@prisma/client';
+
 describe('NotificationsService', () => {
   let service: NotificationsService;
   let repository: jest.Mocked<NotificationRepository>;
@@ -17,11 +19,18 @@ describe('NotificationsService', () => {
     userId: mockUserId,
     title: 'Test Notification',
     message: 'This is a test notification',
-    type: 'INFO',
+    type: NotificationType.SYSTEM,
+    status: NotificationStatus.UNREAD,
+    priority: 1,
+    metadata: {},
+    actionUrl: null,
     link: '/dashboard',
     read: false,
     createdAt: new Date(),
     updatedAt: new Date(),
+    archivedAt: null,
+    sentAt: new Date(),
+    readAt: new Date(),
   };
 
   const mockNotificationRepository = {
@@ -66,7 +75,7 @@ describe('NotificationsService', () => {
         userId: mockUserId,
         title: 'Test Notification',
         message: 'This is a test',
-        type: 'INFO',
+        type: NotificationType.SYSTEM,
         sendEmail: false,
       };
 
@@ -78,7 +87,7 @@ describe('NotificationsService', () => {
         userId: mockUserId,
         title: 'Test Notification',
         message: 'This is a test',
-        type: 'INFO',
+        type: NotificationType.SYSTEM,
         link: undefined,
         read: false,
       });
@@ -91,7 +100,7 @@ describe('NotificationsService', () => {
         userId: mockUserId,
         title: 'Important Alert',
         message: 'This requires immediate attention',
-        type: 'ALERT',
+        type: NotificationType.SYSTEM,
         link: '/dashboard/alerts',
         sendEmail: true,
       };
@@ -185,7 +194,7 @@ describe('NotificationsService', () => {
   describe('remove', () => {
     it('should delete a notification successfully', async () => {
       repository.findById.mockResolvedValue(mockNotification);
-      repository.delete.mockResolvedValue(undefined);
+      repository.delete.mockResolvedValue(mockNotification);
 
       await service.remove(mockUserId, mockNotificationId);
 
@@ -220,7 +229,7 @@ describe('NotificationsService', () => {
           userId: mockUserId,
           title: 'Budget Alert',
           message: 'You have used 85% of your GROCERIES budget',
-          type: 'BUDGET_ALERT',
+          type: NotificationType.BUDGET_ALERT,
           read: false,
         }),
       );
@@ -244,7 +253,7 @@ describe('NotificationsService', () => {
 
       await service.sendBudgetAlert(mockUserId, budgetData);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       expect(createCall.message).toContain('100%');
     });
   });
@@ -266,7 +275,7 @@ describe('NotificationsService', () => {
           userId: mockUserId,
           title: 'Goal Milestone',
           message: "Congratulations! You've reached 50% of your Emergency Fund goal",
-          type: 'GOAL_MILESTONE',
+          type: NotificationType.GOAL_MILESTONE,
           read: false,
         }),
       );
@@ -290,7 +299,7 @@ describe('NotificationsService', () => {
 
       await service.sendGoalMilestone(mockUserId, goalData);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       expect(createCall.message).toContain('100%');
     });
   });

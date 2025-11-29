@@ -4,6 +4,8 @@ import { RecurringService } from './recurring.service';
 import { RecurringRepository } from './repositories/recurring.repository';
 import { Decimal } from '@prisma/client/runtime/library';
 
+import { RecurringFrequency, TransactionType } from '@prisma/client';
+
 describe('RecurringService', () => {
   let service: RecurringService;
   let repository: jest.Mocked<RecurringRepository>;
@@ -14,17 +16,22 @@ describe('RecurringService', () => {
   const mockRecurring = {
     id: mockRecurringId,
     userId: mockUserId,
+    amount: new Decimal(100),
     description: 'Monthly Rent',
-    amount: new Decimal(1500),
-    frequency: 'MONTHLY',
-    category: 'HOUSING',
-    type: 'EXPENSE',
-    startDate: new Date('2025-01-01'),
+    frequency: RecurringFrequency.MONTHLY,
+    startDate: new Date(),
     endDate: null,
-    nextDate: new Date('2025-12-01'),
+    nextRun: new Date(),
+    active: true,
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
+    notes: 'Some notes',
+    lastGenerated: new Date(),
+    categoryId: 'cat-123',
+    type: TransactionType.EXPENSE,
+    category: 'HOUSING',
+    nextDate: new Date(),
   };
 
   const mockRecurringRepository = {
@@ -57,9 +64,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Monthly Rent',
         amount: 1500,
-        frequency: 'MONTHLY',
+        frequency: RecurringFrequency.MONTHLY,
         category: 'HOUSING',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-01-01'),
       };
 
@@ -67,18 +74,16 @@ describe('RecurringService', () => {
 
       const result = await service.create(mockUserId, createDto);
 
-      expect(repository.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          userId: mockUserId,
-          description: 'Monthly Rent',
-          amount: new Decimal(1500),
-          frequency: 'MONTHLY',
-          category: 'HOUSING',
-          type: 'EXPENSE',
-          startDate: createDto.startDate,
-          nextDate: expect.any(Date),
-        }),
-      );
+      expect(repository.create).toHaveBeenCalledWith({
+        userId: mockUserId,
+        amount: new Decimal(1500), // Amount from createDto
+        description: 'Monthly Rent',
+        frequency: RecurringFrequency.MONTHLY, // Frequency from createDto
+        startDate: createDto.startDate,
+        categoryId: 'cat-123', // Assuming a default or derived categoryId
+        active: true,
+        nextRun: expect.any(Date),
+      });
       expect(result).toEqual(mockRecurring);
     });
 
@@ -86,9 +91,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Daily Expense',
         amount: 10,
-        frequency: 'DAILY',
+        frequency: RecurringFrequency.DAILY,
         category: 'OTHER',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-11-01'),
       };
 
@@ -96,7 +101,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       const expectedDate = new Date('2025-11-02');
       expect(nextDate.toDateString()).toBe(expectedDate.toDateString());
@@ -106,9 +111,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Weekly Expense',
         amount: 50,
-        frequency: 'WEEKLY',
+        frequency: RecurringFrequency.WEEKLY,
         category: 'OTHER',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-11-01'),
       };
 
@@ -116,7 +121,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       const expectedDate = new Date('2025-11-08');
       expect(nextDate.toDateString()).toBe(expectedDate.toDateString());
@@ -126,9 +131,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Monthly Rent',
         amount: 1500,
-        frequency: 'MONTHLY',
+        frequency: RecurringFrequency.MONTHLY,
         category: 'HOUSING',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-11-01'),
       };
 
@@ -136,7 +141,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       expect(nextDate.getMonth()).toBe(11); // December (0-indexed)
       expect(nextDate.getDate()).toBe(1);
@@ -227,7 +232,7 @@ describe('RecurringService', () => {
   describe('remove', () => {
     it('should delete a recurring transaction successfully', async () => {
       repository.findById.mockResolvedValue(mockRecurring);
-      repository.delete.mockResolvedValue(undefined);
+      repository.delete.mockResolvedValue(mockRecurring);
 
       await service.remove(mockUserId, mockRecurringId);
 
@@ -282,9 +287,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Quarterly Payment',
         amount: 300,
-        frequency: 'QUARTERLY',
+        frequency: RecurringFrequency.QUARTERLY,
         category: 'OTHER',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-01-01'),
       };
 
@@ -292,7 +297,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       expect(nextDate.getMonth()).toBe(3); // April (0-indexed)
     });
@@ -301,9 +306,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Yearly Subscription',
         amount: 1200,
-        frequency: 'YEARLY',
+        frequency: RecurringFrequency.YEARLY,
         category: 'SUBSCRIPTION',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-01-01'),
       };
 
@@ -311,7 +316,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       expect(nextDate.getFullYear()).toBe(2026);
     });
@@ -320,9 +325,9 @@ describe('RecurringService', () => {
       const createDto = {
         description: 'Biweekly Payment',
         amount: 100,
-        frequency: 'BIWEEKLY',
+        frequency: RecurringFrequency.BIWEEKLY,
         category: 'OTHER',
-        type: 'EXPENSE',
+        type: TransactionType.EXPENSE,
         startDate: new Date('2025-11-01'),
       };
 
@@ -330,7 +335,7 @@ describe('RecurringService', () => {
 
       await service.create(mockUserId, createDto);
 
-      const createCall = repository.create.mock.calls[0][0];
+      const createCall = repository.create.mock.calls[0]![0];
       const nextDate = new Date(createCall.nextDate);
       const expectedDate = new Date('2025-11-15');
       expect(nextDate.toDateString()).toBe(expectedDate.toDateString());

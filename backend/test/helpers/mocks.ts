@@ -1,5 +1,4 @@
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 // Mock Prisma Service with explicit types
 export const mockPrismaService: any = {
@@ -111,7 +110,7 @@ export const mockLogger = {
 };
 
 // Create generic mock helper
-export function createMock<T = any>(_token: any): any {
+export function createMock(_token: any): any {
   return {
     provide: _token,
     useValue: {},

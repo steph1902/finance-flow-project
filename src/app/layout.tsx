@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import AuthProvider from "@/components/auth/AuthProvider";
-import ThemeProvider from "@/components/layout/ThemeProvider";
-import ToasterProvider from "@/components/ui/ToasterProvider";
+import AuthProvider from "@/providers/AuthProvider";
+import ThemeProvider from "@/providers/ThemeProvider";
+import ToasterProvider from "@/providers/ToasterProvider";
 import { ErrorBoundary, FullPageErrorFallback } from "@/components/errors/ErrorBoundary";
 import { fontInter, fontShippori } from "@/lib/fonts";
 

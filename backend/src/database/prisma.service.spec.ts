@@ -39,8 +39,8 @@ describe('PrismaService', () => {
   describe('$transaction', () => {
     it('should execute transaction callback', async () => {
       const callback = jest.fn().mockResolvedValue('result');
-      
-      mockPrismaService.$transaction.mockImplementation((cb) => cb(mockPrismaService));
+
+      mockPrismaService.$transaction.mockImplementation((cb: any) => cb(mockPrismaService));
 
       const result = await service.$transaction(callback);
 
