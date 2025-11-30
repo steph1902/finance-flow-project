@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { InvestmentType } from '@prisma/client';
 import {
   createInvestment,
   getUserInvestments,
@@ -30,7 +31,7 @@ const createInvestmentSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const validation = createInvestmentSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid request', details: validation.error.issues },
@@ -78,21 +79,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const investmentData: any = {
+    const investmentData: {
+      symbol: string;
+      name: string;
+      type: InvestmentType;
+      quantity: number;
+      costBasis: number;
+      currentValue: number;
+      currency: string;
+      purchaseDate: Date;
+      notes?: string;
+    } = {
       symbol: validation.data.symbol,
       name: validation.data.name,
-      type: validation.data.type,
+      type: validation.data.type as InvestmentType,
       quantity: validation.data.quantity,
       costBasis: validation.data.costBasis,
       currentValue: validation.data.currentValue ?? validation.data.costBasis,
       currency: validation.data.currency ?? 'USD',
       purchaseDate: validation.data.purchaseDate,
     };
-    
+
     if (validation.data.notes) {
       investmentData.notes = validation.data.notes;
     }
-    
+
     const investment = await createInvestment(session.user.id, investmentData);
 
     return NextResponse.json({ investment }, { status: 201 });

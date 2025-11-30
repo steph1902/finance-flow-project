@@ -44,7 +44,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 
     const client = getResendClient();
 
-    const emailData: any = {
+    const emailData: Parameters<typeof client.emails.send>[0] = {
       from: FROM_EMAIL,
       to: options.to,
       subject: options.subject,
@@ -125,9 +125,9 @@ export async function sendBudgetAlert(
               </div>
             </div>
 
-            <p>${percentage >= 100 
-              ? 'Consider reviewing your spending in this category or adjusting your budget.' 
-              : 'You\'re approaching your budget limit. Keep an eye on your spending!'}</p>
+            <p>${percentage >= 100
+      ? 'Consider reviewing your spending in this category or adjusting your budget.'
+      : 'You\'re approaching your budget limit. Keep an eye on your spending!'}</p>
 
             <center>
               <a href="${process.env.NEXTAUTH_URL}/budgets" class="button">View Budget Details</a>
@@ -153,9 +153,9 @@ Budget: ${formatCurrency(budget)}
 Spent: ${formatCurrency(spent)}
 Remaining: ${formatCurrency(Math.max(0, budget - spent))}
 
-${percentage >= 100 
-  ? 'Your budget has been exceeded. Consider reviewing your spending or adjusting your budget.' 
-  : 'You\'re approaching your budget limit. Keep an eye on your spending!'}
+${percentage >= 100
+      ? 'Your budget has been exceeded. Consider reviewing your spending or adjusting your budget.'
+      : 'You\'re approaching your budget limit. Keep an eye on your spending!'}
 
 View your budget details: ${process.env.NEXTAUTH_URL}/budgets
   `;
@@ -298,9 +298,9 @@ export async function sendGoalMilestone(
 
             <p>Current: <strong>${formatCurrency(currentAmount)}</strong> / Target: <strong>${formatCurrency(targetAmount)}</strong></p>
 
-            ${percentage >= 100 
-              ? '<p>🎊 You\'ve achieved your goal! Time to celebrate and set a new target!</p>' 
-              : '<p>Keep up the great work! You\'re making excellent progress!</p>'}
+            ${percentage >= 100
+      ? '<p>🎊 You\'ve achieved your goal! Time to celebrate and set a new target!</p>'
+      : '<p>Keep up the great work! You\'re making excellent progress!</p>'}
 
             <center>
               <a href="${process.env.NEXTAUTH_URL}/goals" class="button">View Goals</a>
@@ -325,9 +325,9 @@ Progress: ${percentage.toFixed(0)}%
 Current: ${formatCurrency(currentAmount)}
 Target: ${formatCurrency(targetAmount)}
 
-${percentage >= 100 
-  ? 'You\'ve achieved your goal! Time to celebrate!' 
-  : 'Keep up the great work!'}
+${percentage >= 100
+      ? 'You\'ve achieved your goal! Time to celebrate!'
+      : 'Keep up the great work!'}
 
 View your goals: ${process.env.NEXTAUTH_URL}/goals
   `;

@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 const updateSharedBudgetSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   category: z.string().optional(),
-  limit: z.number().positive().optional(),
-  period: z.enum(['MONTHLY', 'YEARLY']).optional(),
+  amount: z.number().positive().optional(),
 });
 
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -87,7 +87,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -120,7 +120,7 @@ export async function PATCH(
 
     const body = await request.json();
     const validation = updateSharedBudgetSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid request', details: validation.error.issues },
@@ -129,11 +129,10 @@ export async function PATCH(
     }
 
     // Filter out undefined values for exactOptionalPropertyTypes
-    const updateData: Record<string, any> = {};
+    const updateData: Prisma.SharedBudgetUpdateInput = {};
     if (validation.data.name !== undefined) updateData.name = validation.data.name;
     if (validation.data.category !== undefined) updateData.category = validation.data.category;
-    if (validation.data.limit !== undefined) updateData.limit = validation.data.limit;
-    if (validation.data.period !== undefined) updateData.period = validation.data.period;
+    if (validation.data.amount !== undefined) updateData.amount = new Prisma.Decimal(validation.data.amount);
 
     const sharedBudget = await prisma.sharedBudget.update({
       where: { id },
@@ -176,7 +175,7 @@ export async function DELETE(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },

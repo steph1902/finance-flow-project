@@ -5,6 +5,7 @@
  * Part of production deployment fix - removes console statements
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 
@@ -42,18 +43,18 @@ let filesModified = 0;
 
 files.forEach(filePath => {
   const fullPath = path.join(process.cwd(), filePath);
-  
+
   if (!fs.existsSync(fullPath)) {
     console.log(`⚠️  Skipped (not found): ${filePath}`);
     return;
   }
-  
+
   let content = fs.readFileSync(fullPath, 'utf8');
   const originalContent = content;
-  
+
   // Check if logger is already imported
   const hasLoggerImport = /import\s+{[^}]*logger[^}]*}\s+from\s+['"]@\/lib\/logger['"]/.test(content);
-  
+
   // Add logger import if not present
   if (!hasLoggerImport && /console\.(error|warn|log|info)/.test(content)) {
     // Find the last import statement
@@ -63,7 +64,7 @@ files.forEach(filePath => {
       content = content.replace(lastImport, `${lastImport}\nimport { logger } from '@/lib/logger';`);
     }
   }
-  
+
   // Replace console.error with logger.error
   // Pattern: console.error('message:', error) → logger.error('message', error)
   content = content.replace(
@@ -72,7 +73,7 @@ files.forEach(filePath => {
       return `logger.error('${message}', ${errorVar.trim()})`;
     }
   );
-  
+
   // Pattern: console.error('message', error) → logger.error('message', error)
   content = content.replace(
     /console\.error\(\s*['"]([^'"]+)['"],\s*([^)]+)\)/g,
@@ -80,7 +81,7 @@ files.forEach(filePath => {
       return `logger.error('${message}', ${errorVar.trim()})`;
     }
   );
-  
+
   // Pattern: console.error('message') → logger.error('message')
   content = content.replace(
     /console\.error\(\s*['"]([^'"]+)['"]\s*\)/g,
@@ -88,16 +89,16 @@ files.forEach(filePath => {
       return `logger.error('${message}')`;
     }
   );
-  
+
   // Replace console.log with logger.info
   content = content.replace(/console\.log\(/g, 'logger.info(');
-  
+
   // Replace console.warn with logger.warn
   content = content.replace(/console\.warn\(/g, 'logger.warn(');
-  
+
   // Replace console.info with logger.info
   content = content.replace(/console\.info\(/g, 'logger.info(');
-  
+
   if (content !== originalContent) {
     fs.writeFileSync(fullPath, content, 'utf8');
     filesModified++;

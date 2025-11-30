@@ -19,7 +19,7 @@ export interface Goal {
   createdAt: Date;
 }
 
-interface CreateGoalData {
+export interface CreateGoalData {
   name: string;
   description?: string;
   targetAmount: number;
@@ -61,10 +61,10 @@ export function useGoals(status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'PAUSED
       }
 
       const { goal } = await response.json();
-      
+
       // Optimistically update the UI
       mutate();
-      
+
       return goal;
     } catch (error) {
       console.error('Failed to create goal:', error);
@@ -140,10 +140,10 @@ export function useGoals(status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'PAUSED
       }
 
       const { contribution } = await response.json();
-      
+
       // Revalidate data
       mutate();
-      
+
       return contribution;
     } catch (error) {
       console.error('Failed to add contribution:', error);

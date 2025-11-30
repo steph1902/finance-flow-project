@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export interface CreateGoalInput {
@@ -58,8 +59,8 @@ export interface GoalProgress {
  */
 export async function createGoal(input: CreateGoalInput) {
   try {
-    const goalData: any = {
-      userId: input.userId,
+    const goalData: Prisma.GoalCreateInput = {
+      user: { connect: { id: input.userId } },
       name: input.name,
       targetAmount: new Decimal(input.targetAmount),
       category: input.category || 'General',
@@ -104,8 +105,8 @@ export async function createGoal(input: CreateGoalInput) {
  */
 export async function updateGoal(goalId: string, userId: string, input: UpdateGoalInput) {
   try {
-    const updateData: any = {}
-    
+    const updateData: Prisma.GoalUpdateInput = {}
+
     if (input.name !== undefined) updateData.name = input.name
     if (input.description !== undefined) updateData.description = input.description
     if (input.targetDate !== undefined) updateData.targetDate = input.targetDate
@@ -146,11 +147,12 @@ export async function addContribution(input: AddContributionInput, userId: strin
     }
 
     // Create contribution
-    const contributionData: any = {
-      goalId: input.goalId,
+    // Create contribution
+    const contributionData: Prisma.GoalContributionCreateInput = {
+      goal: { connect: { id: input.goalId } },
       amount: new Decimal(input.amount),
     }
-    
+
     if (input.notes) contributionData.notes = input.notes
 
     const contribution = await prisma.goalContribution.create({

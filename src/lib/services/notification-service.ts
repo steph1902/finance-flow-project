@@ -10,6 +10,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma, Notification } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import { ENV } from '@/lib/env';
 
@@ -19,7 +20,7 @@ export interface CreateNotificationInput {
   title: string;
   message: string;
   priority?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   actionUrl?: string;
 }
 
@@ -28,13 +29,13 @@ export interface CreateNotificationInput {
  */
 export async function createNotification(input: CreateNotificationInput) {
   try {
-    const notificationData: any = {
-      userId: input.userId,
+    const notificationData: Prisma.NotificationCreateInput = {
+      user: { connect: { id: input.userId } },
       type: input.type,
       title: input.title,
       message: input.message,
       priority: input.priority || 0,
-      metadata: input.metadata || {},
+      metadata: (input.metadata || {}) as Prisma.InputJsonValue,
       status: 'UNREAD',
     }
 
@@ -61,7 +62,7 @@ export async function createNotification(input: CreateNotificationInput) {
 /**
  * Send email notification using Resend
  */
-async function sendEmailNotification(notification: any) {
+async function sendEmailNotification(notification: Notification) {
   if (!ENV.RESEND_API_KEY) {
     logger.warn('Resend API key not configured, skipping email');
     return;

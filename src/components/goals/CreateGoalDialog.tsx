@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useGoals } from "@/hooks/useGoals"
+import { useGoals, CreateGoalData } from "@/hooks/useGoals"
 
 export function CreateGoalDialog() {
   const [open, setOpen] = useState(false)
@@ -33,7 +33,7 @@ export function CreateGoalDialog() {
     e.preventDefault()
 
     try {
-      const goalData: any = {
+      const goalData: CreateGoalData = {
         name: formData.name,
         targetAmount: parseFloat(formData.targetAmount),
         priority: parseInt(formData.priority),
@@ -59,6 +59,7 @@ export function CreateGoalDialog() {
       console.error("Failed to create goal:", error)
     }
   }
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

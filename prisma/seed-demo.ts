@@ -4,32 +4,9 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 // Helper function to calculate next date for recurring transactions
-function calculateNextDate(startDate: Date, frequency: string): Date {
-  const next = new Date(startDate);
+// function calculateNextDate(startDate: Date, frequency: string): Date {
 
-  switch (frequency) {
-    case 'DAILY':
-      next.setDate(next.getDate() + 1);
-      break;
-    case 'WEEKLY':
-      next.setDate(next.getDate() + 7);
-      break;
-    case 'BIWEEKLY':
-      next.setDate(next.getDate() + 14);
-      break;
-    case 'MONTHLY':
-      next.setMonth(next.getMonth() + 1);
-      break;
-    case 'QUARTERLY':
-      next.setMonth(next.getMonth() + 3);
-      break;
-    case 'YEARLY':
-      next.setFullYear(next.getFullYear() + 1);
-      break;
-  }
 
-  return next;
-}
 
 async function main() {
   console.log('🌱 Seeding comprehensive demo data...');
@@ -55,7 +32,6 @@ async function main() {
   // Generate 1000 transactions
   console.log('🔄 Generating 1000 demo transactions...');
   const categories = ['Food', 'Transport', 'Utilities', 'Entertainment', 'Shopping', 'Health', 'Education', 'Salary', 'Investment', 'Freelance'];
-  const types = ['INCOME', 'EXPENSE'];
   const transactions = [];
 
   for (let i = 0; i < 1000; i++) {
@@ -73,7 +49,7 @@ async function main() {
     transactions.push({
       userId: demoUser.id,
       amount: amount,
-      type: type,
+      type: type as 'INCOME' | 'EXPENSE',
       category: category,
       description: `${type === 'INCOME' ? 'Received' : 'Paid for'} ${category} #${i + 1}`,
       date: date,

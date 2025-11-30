@@ -12,6 +12,7 @@
 import { prisma } from '@/lib/prisma';
 import { logInfo, logError } from '@/lib/logger';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma, Transaction } from '@prisma/client';
 
 export type ReportType = 'MONTHLY' | 'YEARLY' | 'CATEGORY' | 'TAX' | 'CUSTOM';
 export type ReportFormat = 'JSON' | 'CSV' | 'PDF';
@@ -127,7 +128,7 @@ export async function generateReport(input: GenerateReportInput) {
         startDate,
         endDate,
         filters: filters || {},
-        data: reportData as any,
+        data: reportData as unknown as Prisma.InputJsonValue,
       },
     });
 
@@ -144,7 +145,7 @@ export async function generateReport(input: GenerateReportInput) {
  * Calculate summary statistics
  */
 function calculateSummary(
-  transactions: any[],
+  transactions: Transaction[],
   startDate: Date,
   endDate: Date
 ): ReportSummary {
@@ -203,7 +204,7 @@ function calculateSummary(
 /**
  * Calculate category breakdown
  */
-function calculateCategoryBreakdown(transactions: any[]): CategoryBreakdown[] {
+function calculateCategoryBreakdown(transactions: Transaction[]): CategoryBreakdown[] {
   const categoryData = new Map<string, {
     type: 'INCOME' | 'EXPENSE';
     amounts: number[];

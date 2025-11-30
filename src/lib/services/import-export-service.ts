@@ -53,15 +53,15 @@ function parseCSV(csvContent: string): TransactionCSVRow[] {
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i]
     if (!line) continue
-    
+
     const values = line.split(',').map(v => v.trim());
-    const row: any = {};
+    const row: Record<string, string> = {};
 
     headers.forEach((header, index) => {
       row[header] = values[index] || '';
     });
 
-    rows.push(row as TransactionCSVRow);
+    rows.push(row as unknown as TransactionCSVRow);
   }
 
   return rows;
@@ -128,7 +128,7 @@ export async function importTransactionsFromCSV(
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       if (!row) continue
-      
+
       const validation = validateRow(row);
 
       if (!validation.valid) {
@@ -155,7 +155,7 @@ export async function importTransactionsFromCSV(
         });
 
         result.successful++;
-      } catch (error) {
+      } catch (error: unknown) {
         result.failed++;
         result.errors.push({
           row: i + 2,
@@ -173,7 +173,7 @@ export async function importTransactionsFromCSV(
     });
 
     return result;
-  } catch (error) {
+  } catch (error: unknown) {
     logError('CSV import failed', error);
     throw new Error('Failed to import CSV');
   }
@@ -217,7 +217,7 @@ export async function exportTransactionsToCSV(options: ExportOptions): Promise<s
     ].join('\n');
 
     return csv;
-  } catch (error) {
+  } catch (error: unknown) {
     logError('CSV export failed', error);
     throw new Error('Failed to export CSV');
   }
@@ -226,7 +226,7 @@ export async function exportTransactionsToCSV(options: ExportOptions): Promise<s
 /**
  * Export all user data to JSON
  */
-export async function exportAllUserData(userId: string): Promise<any> {
+export async function exportAllUserData(userId: string): Promise<Record<string, unknown>> {
   try {
     logInfo('Exporting all user data', { userId });
 
@@ -279,7 +279,7 @@ export async function exportAllUserData(userId: string): Promise<any> {
       aiChatHistory,
       exportedAt: new Date().toISOString(),
     };
-  } catch (error) {
+  } catch (error: unknown) {
     logError('Data export failed', error);
     throw new Error('Failed to export user data');
   }

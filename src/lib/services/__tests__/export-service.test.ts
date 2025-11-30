@@ -3,55 +3,55 @@
  * Covers JSON, CSV, PDF, and Excel export generation
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import * as exportService from '../export-service';
 import { prisma } from '@/lib/prisma';
 
 // Mock dependencies
-vi.mock('@/lib/prisma', () => ({
+jest.mock('@/lib/prisma', () => ({
   prisma: {
     transaction: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
     budget: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
     goal: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
     recurringTransaction: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
     investment: {
-      findMany: vi.fn(),
+      findMany: jest.fn(),
     },
   },
 }));
 
-vi.mock('jspdf', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    text: vi.fn(),
-    setFontSize: vi.fn(),
-    output: vi.fn().mockReturnValue(new ArrayBuffer(100)),
+jest.mock('jspdf', () => ({
+  default: jest.fn().mockImplementation(() => ({
+    text: jest.fn(),
+    setFontSize: jest.fn(),
+    output: jest.fn().mockReturnValue(new ArrayBuffer(100)),
   })),
 }));
 
-vi.mock('jspdf-autotable', () => ({
-  default: vi.fn(),
+jest.mock('jspdf-autotable', () => ({
+  default: jest.fn(),
 }));
 
-vi.mock('xlsx', () => ({
+jest.mock('xlsx', () => ({
   utils: {
-    book_new: vi.fn(() => ({})),
-    json_to_sheet: vi.fn(() => ({})),
-    book_append_sheet: vi.fn(),
+    book_new: jest.fn(() => ({})),
+    json_to_sheet: jest.fn(() => ({})),
+    book_append_sheet: jest.fn(),
   },
-  write: vi.fn(() => Buffer.from('mock-excel-data')),
+  write: jest.fn(() => Buffer.from('mock-excel-data')),
 }));
 
 describe('Export Service', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('exportUserData', () => {
@@ -66,13 +66,11 @@ describe('Export Service', () => {
         },
       ];
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue(mockTransactions);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue(mockTransactions);
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await exportService.exportUserData({
         userId: 'user-123',
@@ -86,8 +84,7 @@ describe('Export Service', () => {
     });
 
     it('should export data as CSV', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([
         {
           id: 'tx-1',
           amount: 100,
@@ -97,11 +94,10 @@ describe('Export Service', () => {
           description: 'Lunch',
         },
       ]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await exportService.exportUserData({
         userId: 'user-123',
@@ -114,8 +110,7 @@ describe('Export Service', () => {
     });
 
     it('should export data as PDF', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([
         {
           id: 'tx-1',
           amount: 100,
@@ -125,11 +120,10 @@ describe('Export Service', () => {
           description: 'Lunch',
         },
       ]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await exportService.exportUserData({
         userId: 'user-123',
@@ -140,8 +134,7 @@ describe('Export Service', () => {
     });
 
     it('should export data as Excel', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([
         {
           id: 'tx-1',
           amount: 100,
@@ -151,11 +144,10 @@ describe('Export Service', () => {
           description: 'Lunch',
         },
       ]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await exportService.exportUserData({
         userId: 'user-123',
@@ -169,13 +161,11 @@ describe('Export Service', () => {
       const startDate = new Date('2024-11-01');
       const endDate = new Date('2024-11-30');
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       await exportService.exportUserData({
         userId: 'user-123',
@@ -197,10 +187,8 @@ describe('Export Service', () => {
     });
 
     it('should handle selective data export', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
 
       await exportService.exportUserData({
         userId: 'user-123',
@@ -220,8 +208,7 @@ describe('Export Service', () => {
 
   describe('CSV generation', () => {
     it('should properly escape CSV special characters', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.transaction.findMany as any).mockResolvedValue([
+      (prisma.transaction.findMany as jest.Mock).mockResolvedValue([
         {
           id: 'tx-1',
           amount: 100,
@@ -231,11 +218,10 @@ describe('Export Service', () => {
           description: 'Lunch, with "quotes"',
         },
       ]);
-      (prisma.budget.findMany as any).mockResolvedValue([]);
-      (prisma.goal.findMany as any).mockResolvedValue([]);
-      (prisma.recurringTransaction.findMany as any).mockResolvedValue([]);
-      (prisma.investment.findMany as any).mockResolvedValue([]);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.budget.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.goal.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.recurringTransaction.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await exportService.exportUserData({
         userId: 'user-123',
@@ -252,7 +238,7 @@ describe('Export Service', () => {
       await expect(
         exportService.exportUserData({
           userId: 'user-123',
-          format: 'invalid' as any,
+          format: 'invalid' as unknown as exportService.ExportFormat,
         })
       ).rejects.toThrow();
     });

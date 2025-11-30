@@ -5,7 +5,7 @@
 declare module 'jspdf-autotable' {
   import { jsPDF } from 'jspdf';
 
-  export type RowInput = string | number | boolean | null | undefined | { content?: string; [key: string]: any };
+  export type RowInput = string | number | boolean | null | undefined | { content?: string;[key: string]: unknown };
 
   export interface UserOptions {
     head?: RowInput[][];
@@ -14,12 +14,13 @@ declare module 'jspdf-autotable' {
     startY?: number;
     margin?: number | { top?: number; right?: number; bottom?: number; left?: number };
     theme?: 'striped' | 'grid' | 'plain';
-    styles?: any;
-    headStyles?: any;
-    bodyStyles?: any;
-    footStyles?: any;
-    alternateRowStyles?: any;
-    columnStyles?: any;
+    styles?: Record<string, unknown>;
+    headStyles?: Record<string, unknown>;
+    bodyStyles?: Record<string, unknown>;
+    footStyles?: Record<string, unknown>;
+    alternateRowStyles?: Record<string, unknown>;
+    columnStyles?: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   }
 
