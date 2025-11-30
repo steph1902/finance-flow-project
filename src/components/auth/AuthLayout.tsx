@@ -9,21 +9,21 @@ interface AuthLayoutProps {
   showFeatures?: boolean;
 }
 
-export default function AuthLayout({ 
-  children, 
-  title, 
+export default function AuthLayout({
+  children,
+  title,
   description,
-  showFeatures = true 
+  showFeatures = true
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 pt-16">
       {/* Hero Section - Left Side */}
-      <div className="hidden lg:flex relative overflow-hidden bg-linear-to-br from-[hsl(220,45%,62%)] via-[hsl(220,50%,55%)] to-[hsl(220,55%,48%)] dark:from-[hsl(220,40%,45%)] dark:via-[hsl(220,45%,38%)] dark:to-[hsl(220,50%,32%)]">
+      <div className="hidden lg:flex relative overflow-hidden bg-linear-to-br from-[hsl(220,45%,62%)] via-[hsl(220,50%,55%)] to-[hsl(220,55%,48%)]">
         {/* Gradient Overlay - Enhanced for depth */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent dark:from-black/40" />
-        
+        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
+
         {/* Dot Pattern Background */}
-        <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.05]" style={{
+        <div className="absolute inset-0 opacity-[0.08]" style={{
           backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
           backgroundSize: '24px 24px',
           color: 'white'
@@ -55,15 +55,15 @@ export default function AuthLayout({
             {/* Feature Highlights */}
             {showFeatures && (
               <div className="space-y-4 pt-4">
-                <FeatureItem 
+                <FeatureItem
                   icon={<Shield className="w-5 h-5" />}
                   text="Bank-level security & encryption"
                 />
-                <FeatureItem 
+                <FeatureItem
                   icon={<Zap className="w-5 h-5" />}
                   text="AI-powered financial insights"
                 />
-                <FeatureItem 
+                <FeatureItem
                   icon={<CheckCircle2 className="w-5 h-5" />}
                   text="Real-time budget tracking"
                 />
@@ -86,8 +86,8 @@ export default function AuthLayout({
 
           {/* Footer Link */}
           <div>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center space-x-2 text-white/85 hover:text-white transition-colors duration-fast group"
             >
               <span className="text-sm font-medium">Learn more about FinanceFlow</span>
@@ -109,7 +109,7 @@ export default function AuthLayout({
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8">
             <Link href="/" className="inline-flex items-center space-x-2 group">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-primary/30 flex items-center justify-center transition-all duration-medium group-hover:bg-primary/15 dark:group-hover:bg-primary/25 group-hover:scale-105">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center transition-all duration-medium group-hover:bg-primary/15 group-hover:scale-105">
                 <TrendingUp className="w-6 h-6 text-primary" strokeWidth={2.5} />
               </div>
               <span className="text-2xl font-bold text-foreground">FinanceFlow</span>

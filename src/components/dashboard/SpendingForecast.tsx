@@ -49,35 +49,35 @@ export function SpendingForecast() {
 
     try {
       const res = await fetch(`/api/ai/forecast?months=${months}`);
-      
+
       if (!res.ok) {
         if (res.status === 429) {
           toast.error("Rate limit exceeded. Please try again later.");
           return;
         }
-        
+
         // Try to get detailed error message from response
         const errorData = await res.json().catch(() => ({}));
         const errorMessage = errorData.error || `Failed to load forecast (${res.status})`;
-        
+
         console.error("Forecast API error:", {
           status: res.status,
           statusText: res.statusText,
           error: errorData
         });
-        
+
         toast.error(errorMessage);
         return;
       }
 
       const data = await res.json();
-      
+
       if (!data.data) {
         console.error("Invalid forecast response:", data);
         toast.error("Invalid forecast data received");
         return;
       }
-      
+
       setForecast(data.data);
       toast.success(`${months}-month forecast generated!`);
     } catch (error) {
@@ -91,9 +91,9 @@ export function SpendingForecast() {
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "increasing": return <TrendingUp className="h-4 w-4 text-red-500" />;
-      case "decreasing": return <TrendingDown className="h-4 w-4 text-green-500" />;
-      default: return <Minus className="h-4 w-4 text-gray-500" />;
+      case "increasing": return <TrendingUp className="h-4 w-4 text-destructive" />;
+      case "decreasing": return <TrendingDown className="h-4 w-4 text-success" />;
+      default: return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -114,7 +114,7 @@ export function SpendingForecast() {
               Predict your future spending based on historical patterns
             </CardDescription>
           </div>
-          
+
           <div className="flex gap-2">
             <Button
               variant={selectedMonths === 1 ? "default" : "outline"}
@@ -181,134 +181,134 @@ export function SpendingForecast() {
               </div>
             ) : (
               <>
-            {/* Summary */}
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-red-600">
-                    {formatCurrency(forecast.totalExpense)}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Total Projected Expenses</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(forecast.totalIncome)}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Total Projected Income</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {Math.round(forecast.confidence * 100)}%
-                  </div>
-                  <p className="text-xs text-muted-foreground">Forecast Confidence</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Monthly Breakdown */}
-            <div>
-              <h3 className="font-semibold mb-3">Monthly Breakdown</h3>
-              <Tabs defaultValue="month-1">
-                <TabsList>
-                  {forecast.months.map((month, idx) => (
-                    <TabsTrigger key={idx} value={`month-${idx + 1}`}>
-                      {getMonthName(month.month)} {month.year}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {forecast.months.map((month, idx) => (
-                  <TabsContent key={idx} value={`month-${idx + 1}`} className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <div className="bg-muted rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <DollarSign className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium">Income</span>
-                        </div>
-                        <div className="text-2xl font-bold text-green-600">
-                          {formatCurrency(month.totalIncome)}
-                        </div>
+                {/* Summary */}
+                <div className="grid gap-4 md:grid-cols-3">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold text-destructive">
+                        {formatCurrency(forecast.totalExpense)}
                       </div>
-                      <div className="bg-muted rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <DollarSign className="h-4 w-4 text-red-600" />
-                          <span className="text-sm font-medium">Expenses</span>
-                        </div>
-                        <div className="text-2xl font-bold text-red-600">
-                          {formatCurrency(month.totalExpense)}
-                        </div>
+                      <p className="text-xs text-muted-foreground">Total Projected Expenses</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold text-success">
+                        {formatCurrency(forecast.totalIncome)}
                       </div>
-                      <div className="bg-muted rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <DollarSign className="h-4 w-4" />
-                          <span className="text-sm font-medium">Net Balance</span>
-                        </div>
-                        <div className={`text-2xl font-bold ${month.netBalance >= 0 ? "text-green-600" : "text-red-600"}`}>
-                          {formatCurrency(month.netBalance)}
-                        </div>
+                      <p className="text-xs text-muted-foreground">Total Projected Income</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold">
+                        {Math.round(forecast.confidence * 100)}%
                       </div>
-                    </div>
+                      <p className="text-xs text-muted-foreground">Forecast Confidence</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                    {/* Category Forecasts */}
-                    <div>
-                      <h4 className="font-medium mb-3">Category Breakdown</h4>
-                      <div className="space-y-2">
-                        {month.categories
-                          .filter(c => c.type === "EXPENSE")
-                          .sort((a, b) => b.projected - a.projected)
-                          .slice(0, 8) // Show top 8 categories
-                          .map((category, catIdx) => (
-                            <div key={catIdx} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                              <div className="flex items-center gap-3">
-                                {getTrendIcon(category.trend)}
-                                <div>
-                                  <div className="font-medium">{category.category}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {category.explanation}
+                {/* Monthly Breakdown */}
+                <div>
+                  <h3 className="font-semibold mb-3">Monthly Breakdown</h3>
+                  <Tabs defaultValue="month-1">
+                    <TabsList>
+                      {forecast.months.map((month, idx) => (
+                        <TabsTrigger key={idx} value={`month-${idx + 1}`}>
+                          {getMonthName(month.month)} {month.year}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {forecast.months.map((month, idx) => (
+                      <TabsContent key={idx} value={`month-${idx + 1}`} className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-3">
+                          <div className="bg-muted rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-1">
+                              <DollarSign className="h-4 w-4 text-success" />
+                              <span className="text-sm font-medium">Income</span>
+                            </div>
+                            <div className="text-2xl font-bold text-success">
+                              {formatCurrency(month.totalIncome)}
+                            </div>
+                          </div>
+                          <div className="bg-muted rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-1">
+                              <DollarSign className="h-4 w-4 text-destructive" />
+                              <span className="text-sm font-medium">Expenses</span>
+                            </div>
+                            <div className="text-2xl font-bold text-destructive">
+                              {formatCurrency(month.totalExpense)}
+                            </div>
+                          </div>
+                          <div className="bg-muted rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-1">
+                              <DollarSign className="h-4 w-4" />
+                              <span className="text-sm font-medium">Net Balance</span>
+                            </div>
+                            <div className={`text-2xl font-bold ${month.netBalance >= 0 ? "text-success" : "text-destructive"}`}>
+                              {formatCurrency(month.netBalance)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Category Forecasts */}
+                        <div>
+                          <h4 className="font-medium mb-3">Category Breakdown</h4>
+                          <div className="space-y-2">
+                            {month.categories
+                              .filter(c => c.type === "EXPENSE")
+                              .sort((a, b) => b.projected - a.projected)
+                              .slice(0, 8) // Show top 8 categories
+                              .map((category, catIdx) => (
+                                <div key={catIdx} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                                  <div className="flex items-center gap-3">
+                                    {getTrendIcon(category.trend)}
+                                    <div>
+                                      <div className="font-medium">{category.category}</div>
+                                      <div className="text-xs text-muted-foreground">
+                                        {category.explanation}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-semibold">{formatCurrency(category.projected)}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {Math.round(category.confidence * 100)}% confidence
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-semibold">{formatCurrency(category.projected)}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  {Math.round(category.confidence * 100)}% confidence
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </div>
-
-            {/* Insights */}
-            {forecast.insights.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  AI Insights
-                </h3>
-                <div className="space-y-2">
-                  {forecast.insights.map((insight, idx) => (
-                    <div key={idx} className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
-                      {insight}
-                    </div>
-                  ))}
+                              ))}
+                          </div>
+                        </div>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
                 </div>
-              </div>
-            )}
 
-            {/* Methodology */}
-            <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-              <strong>Methodology:</strong> {forecast.methodology}
-            </div>
-            </>
+                {/* Insights */}
+                {forecast.insights.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <Info className="h-4 w-4" />
+                      AI Insights
+                    </h3>
+                    <div className="space-y-2">
+                      {forecast.insights.map((insight, idx) => (
+                        <div key={idx} className="p-3 bg-accent/50 border border-border rounded-lg text-sm">
+                          {insight}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Methodology */}
+                <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
+                  <strong>Methodology:</strong> {forecast.methodology}
+                </div>
+              </>
             )}
           </div>
         )}

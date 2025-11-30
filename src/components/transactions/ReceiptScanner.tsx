@@ -39,7 +39,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
   const [scannedData, setScannedData] = useState<ScannedReceipt | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  
+
   // Editable fields
   const [merchant, setMerchant] = useState("");
   const [amount, setAmount] = useState("");
@@ -292,7 +292,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
         {/* Scanned Data */}
         {scannedData && !scanning && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center gap-2">
                 <Check className="h-5 w-5 text-green-600" />
                 <span className="font-medium text-sm">Receipt Scanned</span>

@@ -13,7 +13,7 @@ export default function LoginPage() {
         description="Sign in to your account to access your financial dashboard and continue managing your money with confidence."
         showFeatures={true}
       >
-        <Card className="bg-card/95 dark:bg-card border-border/50 shadow-card hover:shadow-mist transition-shadow duration-medium">
+        <Card className="bg-card/95 border-border/50 shadow-card hover:shadow-mist transition-shadow duration-medium">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-3xl font-bold tracking-tight text-foreground">Login</CardTitle>
             <CardDescription className="text-base text-muted-foreground">
@@ -24,8 +24,8 @@ export default function LoginPage() {
             <LoginForm />
             <div className="mt-6 text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link 
-                href="/signup" 
+              <Link
+                href="/signup"
                 className="font-medium text-primary underline-offset-4 hover:underline transition-colors duration-fast"
               >
                 Sign up

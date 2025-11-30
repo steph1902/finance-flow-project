@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 
 interface AuthNavbarProps {
   currentPage: "login" | "signup";
@@ -22,9 +22,9 @@ export default function AuthNavbar({ currentPage }: AuthNavbarProps) {
               FinanceFlow
             </span>
           </Link>
-          
+
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+
             {currentPage === "login" ? (
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Don&apos;t have an account?</span>

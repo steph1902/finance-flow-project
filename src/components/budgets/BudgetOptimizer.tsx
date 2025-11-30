@@ -48,7 +48,7 @@ export function BudgetOptimizer() {
 
     try {
       const res = await fetch("/api/ai/optimize-budgets?months=3");
-      
+
       if (!res.ok) {
         if (res.status === 429) {
           toast.error("Rate limit exceeded. Please try again later.");
@@ -59,11 +59,11 @@ export function BudgetOptimizer() {
 
       const data = await res.json();
       setOptimization(data.data);
-      
+
       // Select all suggestions by default
       const allIndices = new Set<number>(data.data.suggestions.map((_: unknown, idx: number) => idx));
       setSelectedSuggestions(allIndices);
-      
+
       toast.success("Budget optimization analysis complete!");
     } catch (error) {
       console.error("Optimization error:", error);
@@ -79,7 +79,7 @@ export function BudgetOptimizer() {
     setApplying(true);
 
     try {
-      const suggestionsToApply = optimization.suggestions.filter((_, idx) => 
+      const suggestionsToApply = optimization.suggestions.filter((_, idx) =>
         selectedSuggestions.has(idx)
       );
 
@@ -94,7 +94,7 @@ export function BudgetOptimizer() {
       }
 
       toast.success(`Applied ${suggestionsToApply.length} budget optimizations!`);
-      
+
       // Refresh page to show updated budgets
       setTimeout(() => {
         window.location.reload();
@@ -138,7 +138,7 @@ export function BudgetOptimizer() {
               Optimize your budgets based on actual spending patterns
             </CardDescription>
           </div>
-          
+
           <Button
             onClick={loadOptimization}
             disabled={loading}
@@ -202,7 +202,7 @@ export function BudgetOptimizer() {
             <div className="grid gap-4 md:grid-cols-3">
               {/* Over Budget */}
               {optimization.analysis.overBudget.length > 0 && (
-                <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp className="h-4 w-4 text-red-600" />
                     <h3 className="font-semibold text-sm">Over Budget</h3>
@@ -222,7 +222,7 @@ export function BudgetOptimizer() {
 
               {/* Under Budget */}
               {optimization.analysis.underBudget.length > 0 && (
-                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingDown className="h-4 w-4 text-green-600" />
                     <h3 className="font-semibold text-sm">Under Budget</h3>
@@ -242,7 +242,7 @@ export function BudgetOptimizer() {
 
               {/* Balanced */}
               {optimization.analysis.balanced.length > 0 && (
-                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Check className="h-4 w-4 text-blue-600" />
                     <h3 className="font-semibold text-sm">Well Balanced</h3>
@@ -274,16 +274,15 @@ export function BudgetOptimizer() {
                     {applying ? "Applying..." : `Apply ${selectedSuggestions.size} Selected`}
                   </Button>
                 </div>
-                
+
                 <div className="space-y-3">
                   {optimization.suggestions.map((suggestion, idx) => (
                     <div
                       key={idx}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedSuggestions.has(idx)
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${selectedSuggestions.has(idx)
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
-                      }`}
+                        }`}
                       onClick={() => toggleSuggestion(idx)}
                     >
                       <div className="flex items-start justify-between mb-3">
@@ -300,7 +299,7 @@ export function BudgetOptimizer() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <Badge variant={selectedSuggestions.has(idx) ? "default" : "outline"}>
                             {suggestion.priority}
@@ -328,9 +327,9 @@ export function BudgetOptimizer() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <div className="text-center py-8 bg-green-50 border border-green-200 rounded-lg">
                 <Check className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                <p className="font-semibold text-green-900 dark:text-green-100">
+                <p className="font-semibold text-green-900">
                   Your budgets are well-optimized!
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -345,7 +344,7 @@ export function BudgetOptimizer() {
                 <h3 className="font-semibold mb-3">AI Insights</h3>
                 <div className="space-y-2">
                   {optimization.insights.map((insight, idx) => (
-                    <div key={idx} className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
+                    <div key={idx} className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
                       {insight}
                     </div>
                   ))}

@@ -72,11 +72,11 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                   onMouseLeave={() => setActiveIndex(null)}
                 >
                   {data.map((entry, index) => (
-                    <Cell 
-                      key={entry.category} 
+                    <Cell
+                      key={entry.category}
                       fill={getChartColor(index)}
                       opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
-                      style={{ 
+                      style={{
                         cursor: 'pointer',
                         transition: 'opacity 0.2s ease',
                         filter: activeIndex === index ? 'brightness(1.1)' : 'none'
@@ -93,8 +93,8 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                   }}
                 />
-                <Legend 
-                  verticalAlign="bottom" 
+                <Legend
+                  verticalAlign="bottom"
                   height={36}
                   iconType="circle"
                 />
@@ -104,16 +104,15 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
               {data.map((item, index) => {
                 const percentage = total === 0 ? 0 : Math.round((item.amount / total) * 100);
                 const isActive = activeIndex === index;
-                
+
                 return (
                   <motion.div
                     key={item.category}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * STAGGER_DELAY.medium }}
-                    className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
-                      isActive ? 'bg-primary-50 dark:bg-primary-950/20' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
-                    }`}
+                    className={`flex items-center gap-3 p-2 rounded-lg transition-all ${isActive ? 'bg-primary-50' : 'hover:bg-neutral-50'
+                      }`}
                     onMouseEnter={() => setActiveIndex(index)}
                     onMouseLeave={() => setActiveIndex(null)}
                   >
@@ -122,13 +121,13 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
                       style={{ backgroundColor: getChartColor(index) }}
                       aria-hidden
                     />
-                    <span className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-medium">
+                    <span className="flex-1 text-sm text-neutral-700 font-medium">
                       {item.category}
                     </span>
-                    <span className="text-sm font-semibold text-neutral-900 dark:text-white">
+                    <span className="text-sm font-semibold text-neutral-900">
                       ${item.amount.toLocaleString()}
                     </span>
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400 min-w-12 text-right">
+                    <span className="text-xs text-neutral-500 min-w-12 text-right">
                       {percentage}%
                     </span>
                   </motion.div>

@@ -134,9 +134,8 @@ export function BudgetSimulator() {
             </div>
             <div className="h-2 bg-background rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all ${
-                  savingsRate >= 20 ? 'bg-green-500' : 'bg-destructive'
-                }`}
+                className={`h-full transition-all ${savingsRate >= 20 ? 'bg-green-500' : 'bg-destructive'
+                  }`}
                 style={{ width: `${Math.min(savingsRate, 100)}%` }}
               />
             </div>
@@ -201,11 +200,10 @@ export function BudgetSimulator() {
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              className={`p-3 rounded-lg border ${
-                rec.type === 'success'
-                  ? 'border-green-500 bg-green-50 dark:bg-green-950'
-                  : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950'
-              }`}
+              className={`p-3 rounded-lg border ${rec.type === 'success'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-yellow-500 bg-yellow-50'
+                }`}
             >
               <div className="font-medium text-sm">{rec.category}</div>
               <div className="text-sm text-muted-foreground mt-1">

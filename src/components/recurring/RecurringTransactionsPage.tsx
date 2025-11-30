@@ -167,8 +167,8 @@ export function RecurringTransactionsPage() {
             Manage your recurring income and expenses with automated tracking
           </p>
         </div>
-        <Button 
-          onClick={() => setIsFormOpen(true)} 
+        <Button
+          onClick={() => setIsFormOpen(true)}
           size="lg"
           className="shadow-sm hover:shadow-md transition-shadow"
         >
@@ -208,7 +208,7 @@ export function RecurringTransactionsPage() {
           <div className="flex items-center gap-2 type-body text-destructive mb-3">
             <span>Monthly Expenses</span>
           </div>
-          <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+          <div className="text-2xl font-bold text-destructive">
             {formatCurrency(totalMonthlyExpenses)}
           </div>
         </div>

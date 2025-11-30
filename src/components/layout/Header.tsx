@@ -29,7 +29,7 @@ export default function Header() {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col w-64 bg-linear-to-br from-background via-muted/30 to-primary/5 dark:from-background dark:via-muted/20 dark:to-primary/10">
+        <SheetContent side="left" className="flex flex-col w-64 bg-linear-to-br from-background via-muted/30 to-primary/5">
           <nav className="grid gap-2 text-base font-medium mt-8">
             <Link
               href="/dashboard"
@@ -86,9 +86,9 @@ export default function Header() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="rounded-full hover:bg-accent transition-colors duration-200"
               aria-label="Open user menu"
             >
@@ -115,7 +115,7 @@ export default function Header() {
               <span>Support</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={handleSignOut}
               className="hover:bg-destructive/10 text-destructive cursor-pointer transition-colors"
             >

@@ -159,7 +159,7 @@ export function NotificationCenter() {
             </CardTitle>
             <CardDescription>Stay updated with important alerts</CardDescription>
           </div>
-          
+
           {unreadCount > 0 && (
             <Button variant="outline" size="sm" onClick={markAllAsRead}>
               <Check className="mr-2 h-4 w-4" />
@@ -200,19 +200,18 @@ export function NotificationCenter() {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`group relative rounded-lg border p-4 transition-colors ${
-                    notification.status === 'UNREAD'
-                      ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
+                  className={`group relative rounded-lg border p-4 transition-colors ${notification.status === 'UNREAD'
+                      ? 'bg-blue-50/50 border-blue-200'
                       : 'hover:bg-muted/50'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">{getIcon(notification.type)}</div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="font-semibold text-sm">{notification.title}</h4>
-                        
+
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {notification.status === 'UNREAD' && (
                             <Button
@@ -225,7 +224,7 @@ export function NotificationCenter() {
                               <Check className="h-4 w-4" />
                             </Button>
                           )}
-                          
+
                           <Button
                             variant="ghost"
                             size="icon"
@@ -237,16 +236,16 @@ export function NotificationCenter() {
                           </Button>
                         </div>
                       </div>
-                      
+
                       <p className="text-sm text-muted-foreground mt-1">
                         {notification.message}
                       </p>
-                      
+
                       <div className="flex items-center gap-2 mt-2">
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(notification.sentAt), 'MMM d, h:mm a')}
                         </span>
-                        
+
                         {notification.actionUrl && (
                           <>
                             <span className="text-xs text-muted-foreground">•</span>

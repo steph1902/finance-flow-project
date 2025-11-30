@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { 
-  User, 
-  Bell, 
-  Lock, 
-  Palette, 
+import {
+  User,
+  Bell,
+  Lock,
+  Palette,
   Globe,
   Smartphone,
   Mail,
@@ -16,9 +15,6 @@ import {
   Database,
   Download,
   Trash2,
-  Sun,
-  Moon,
-  Monitor,
   Check
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +26,6 @@ import { toast } from "sonner";
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -52,13 +47,13 @@ export default function SettingsPage() {
   const handleExportData = async () => {
     try {
       toast.info("Preparing your data export...");
-      
+
       const response = await fetch("/api/export/data");
-      
+
       if (!response.ok) {
         throw new Error("Export failed");
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -68,7 +63,7 @@ export default function SettingsPage() {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      
+
       toast.success("Data exported successfully!");
     } catch {
       toast.error("Failed to export data. Please try again later.");
@@ -79,36 +74,36 @@ export default function SettingsPage() {
     const confirmed = confirm(
       "Are you absolutely sure? This action cannot be undone. All your data will be permanently deleted."
     );
-    
+
     if (!confirmed) return;
-    
+
     // Second confirmation for extra safety
     const doubleConfirmed = confirm(
       "This is your last chance. Type 'DELETE' in the next prompt to confirm."
     );
-    
+
     if (!doubleConfirmed) return;
-    
+
     const userInput = prompt('Please type "DELETE" to confirm account deletion:');
-    
+
     if (userInput !== "DELETE") {
       toast.error("Account deletion cancelled - confirmation text did not match");
       return;
     }
-    
+
     try {
       toast.loading("Deleting account...");
-      
+
       const response = await fetch("/api/account/delete", {
         method: "DELETE",
       });
-      
+
       if (!response.ok) {
         throw new Error("Deletion failed");
       }
-      
+
       toast.success("Account deleted successfully");
-      
+
       // Redirect to home page after brief delay
       setTimeout(() => {
         router.push("/");
@@ -162,72 +157,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Appearance Section */}
-      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
-        <CardHeader className="space-y-2">
-          <CardTitle className="flex items-center gap-2 type-h3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Palette className="h-5 w-5 text-primary" />
-            </div>
-            Appearance
-          </CardTitle>
-          <CardDescription className="type-body">
-            Customize how FinanceFlow looks and feels
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-4">
-            <Label className="font-medium">Theme</Label>
-            <div className="grid grid-cols-3 gap-4">
-              <button
-                onClick={() => setTheme("light")}
-                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
-                  theme === "light"
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
-                }`}
-              >
-                <Sun className="h-7 w-7" />
-                <span className="text-sm font-semibold">Light</span>
-                {theme === "light" && <Check className="h-4 w-4 text-primary" />}
-              </button>
-              
-              <button
-                onClick={() => setTheme("dark")}
-                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
-                  theme === "dark"
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
-                }`}
-              >
-                <Moon className="h-7 w-7" />
-                <span className="text-sm font-semibold">Dark</span>
-                {theme === "dark" && <Check className="h-4 w-4 text-primary" />}
-              </button>
-              
-              <button
-                onClick={() => setTheme("system")}
-                className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all shadow-soft ${
-                  theme === "system"
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border/30 hover:border-primary/50 hover:shadow-mist"
-                }`}
-              >
-                <Monitor className="h-7 w-7" />
-                <span className="text-sm font-semibold">System</span>
-                {theme === "system" && <Check className="h-4 w-4 text-primary" />}
-              </button>
-            </div>
-            <p className="type-small text-muted-foreground">
-              {theme === "system" 
-                ? "Automatically switches between light and dark mode based on your system preferences" 
-                : theme === "dark"
-                ? "Dark mode reduces eye strain in low-light environments"
-                : "Light mode provides better readability in bright environments"}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Notifications Section */}
       <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
@@ -259,9 +189,9 @@ export default function SettingsPage() {
               {notifications.email ? "Enabled" : "Disabled"}
             </Button>
           </div>
-          
+
           <Separator className="opacity-50" />
-          
+
           <div className="flex items-center justify-between py-2">
             <div className="space-y-1">
               <Label className="flex items-center gap-2 font-medium">
@@ -281,9 +211,9 @@ export default function SettingsPage() {
               {notifications.push ? "Enabled" : "Disabled"}
             </Button>
           </div>
-          
+
           <Separator className="opacity-50" />
-          
+
           <div className="flex items-center justify-between py-2">
             <div className="space-y-1">
               <Label className="font-medium">Budget Alerts</Label>
@@ -300,9 +230,9 @@ export default function SettingsPage() {
               {notifications.budgetAlerts ? "Enabled" : "Disabled"}
             </Button>
           </div>
-          
+
           <Separator className="opacity-50" />
-          
+
           <div className="flex items-center justify-between py-2">
             <div className="space-y-1">
               <Label className="font-medium">Recurring Transaction Reminders</Label>
@@ -375,9 +305,9 @@ export default function SettingsPage() {
               Export Data
             </Button>
           </div>
-          
+
           <Separator className="opacity-50" />
-          
+
           <div className="space-y-3">
             <Label className="flex items-center gap-2 font-medium text-destructive">
               <Trash2 className="h-4 w-4" />

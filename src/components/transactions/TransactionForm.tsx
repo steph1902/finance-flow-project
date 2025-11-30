@@ -101,7 +101,7 @@ export function TransactionForm({
               type: selectedType,
             }),
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             setAiSuggestion(data);
@@ -170,13 +170,13 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01" 
-                    min="0" 
-                    placeholder="0.00" 
-                    className="transition-all focus:shadow-md" 
-                    {...field} 
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    className="transition-all focus:shadow-md"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -191,10 +191,10 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel>Date</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="date" 
-                    className="transition-all focus:shadow-md" 
-                    {...field} 
+                  <Input
+                    type="date"
+                    className="transition-all focus:shadow-md"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -291,7 +291,7 @@ export function TransactionForm({
 
         {/* AI Category Suggestion - Error State */}
         {aiError && !isLoadingAI && !aiSuggestion && (
-          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
             <p className="font-medium">AI Suggestion Unavailable</p>
             <p className="mt-1 text-xs">{aiError}</p>
           </div>
@@ -300,14 +300,14 @@ export function TransactionForm({
         <FormField
           control={form.control}
           name="notes"
-          render={({ field}) => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Notes</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Optional notes" 
-                  className="transition-all focus:shadow-md" 
-                  {...field} 
+                <Textarea
+                  placeholder="Optional notes"
+                  className="transition-all focus:shadow-md"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -318,10 +318,10 @@ export function TransactionForm({
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
           <div>
             {onDelete ? (
-              <Button 
-                type="button" 
-                variant="destructive" 
-                onClick={() => onDelete()} 
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => onDelete()}
                 disabled={isSubmitting}
                 className="transition-all hover:shadow-md"
               >
@@ -334,18 +334,18 @@ export function TransactionForm({
 
           <div className="flex flex-col gap-2 sm:flex-row">
             {onCancel ? (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={onCancel} 
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
                 disabled={isSubmitting}
                 className="transition-all hover:shadow-sm"
               >
                 Cancel
               </Button>
             ) : null}
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isSubmitting}
               className="transition-all hover:shadow-md disabled:opacity-50"
             >
