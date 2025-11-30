@@ -5,7 +5,7 @@ let prisma: PrismaClient;
 export async function setupTestDatabase(): Promise<PrismaClient> {
   if (!prisma) {
     const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
-    
+
     if (!databaseUrl) {
       throw new Error('TEST_DATABASE_URL or DATABASE_URL must be set');
     }
@@ -78,3 +78,11 @@ export async function createAdminUser(data = {}) {
     },
   });
 }
+
+export const TestDatabase = {
+  setup: setupTestDatabase,
+  cleanup: cleanupTestDatabase,
+  teardown: teardownTestDatabase,
+  createUser: createTestUser,
+  createAdmin: createAdminUser,
+};

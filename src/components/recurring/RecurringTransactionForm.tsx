@@ -60,7 +60,7 @@ export function RecurringTransactionForm({
   const [nextOccurrence, setNextOccurrence] = useState<Date | null>(null);
 
   const defaultStartDate = (initialData?.startDate || new Date().toISOString().split("T")[0]) as string;
-  
+
   const {
     register,
     handleSubmit,
@@ -89,7 +89,7 @@ export function RecurringTransactionForm({
   // Calculate next occurrence preview
   const calculateNextOccurrence = (startDate: string, frequency: string) => {
     if (!startDate) return null;
-    
+
     const start = new Date(startDate);
     const next = new Date(start);
 
@@ -331,13 +331,13 @@ export function RecurringTransactionForm({
           </div>
 
           {nextOccurrence && (
-            <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-md border border-green-200 dark:border-green-900">
-              <p className="text-sm text-green-700 dark:text-green-400">
-                <strong>Next occurrence:</strong> {nextOccurrence.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
+            <div className="p-3 bg-green-50 rounded-md border border-green-200">
+              <p className="text-sm text-green-700">
+                <strong>Next occurrence:</strong> {nextOccurrence.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
                 })}
               </p>
             </div>

@@ -20,9 +20,11 @@ describe('BudgetsService', () => {
     startDate: new Date('2025-11-01'),
     endDate: new Date('2025-11-30'),
     rollover: false,
-    alertThreshold: 80,
+    alertThreshold: new Decimal(80),
     createdAt: new Date(),
     updatedAt: new Date(),
+    month: 1,
+    year: 2024,
   };
 
   const mockBudgetRepository = {
@@ -194,7 +196,7 @@ describe('BudgetsService', () => {
       const updatedBudget = {
         ...mockBudget,
         amount: new Decimal(600),
-        alertThreshold: 75,
+        alertThreshold: new Decimal(75),
       };
 
       repository.findById.mockResolvedValue(mockBudget);
@@ -220,7 +222,7 @@ describe('BudgetsService', () => {
   describe('remove', () => {
     it('should delete a budget successfully', async () => {
       repository.findById.mockResolvedValue(mockBudget);
-      repository.delete.mockResolvedValue(undefined);
+      repository.delete.mockResolvedValue(mockBudget);
 
       await service.remove(mockUserId, mockBudgetId);
 
@@ -299,8 +301,8 @@ describe('BudgetsService', () => {
 
       const result = await service.getBudgetSummary(mockUserId);
 
-      expect(result.categoryBreakdown[0].isOverBudget).toBe(true);
-      expect(result.categoryBreakdown[0].percentUsed).toBe(120);
+      expect(result.categoryBreakdown[0]?.isOverBudget).toBe(true);
+      expect(result.categoryBreakdown[0]?.percentUsed).toBe(120);
     });
 
     it('should handle zero budgets', async () => {
@@ -373,7 +375,7 @@ describe('BudgetsService', () => {
   describe('optimizeBudgets', () => {
     it('should throw error for unimplemented feature', async () => {
       await expect(
-        service.optimizeBudgets(mockUserId, { targetSavings: 1000 }),
+        service.optimizeBudgets(mockUserId, { totalIncome: 5000 }),
       ).rejects.toThrow('Budget optimization not yet implemented');
     });
   });
@@ -382,6 +384,7 @@ describe('BudgetsService', () => {
     it('should throw error for unimplemented feature', async () => {
       await expect(
         service.createSharedBudget(mockUserId, {
+          name: 'Shared Budget',
           category: 'GROCERIES',
           amount: 500,
           startDate: new Date(),

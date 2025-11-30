@@ -40,21 +40,19 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
           <div className="flex gap-1 bg-muted p-1 rounded-lg">
             <button
               onClick={() => setActiveChart('area')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
-                activeChart === 'area'
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${activeChart === 'area'
                   ? 'bg-background text-primary shadow-sm scale-105'
                   : 'text-muted-foreground hover:text-foreground active:scale-95'
-              }`}
+                }`}
             >
               Area
             </button>
             <button
               onClick={() => setActiveChart('line')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
-                activeChart === 'line'
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${activeChart === 'line'
                   ? 'bg-background text-primary shadow-sm scale-105'
                   : 'text-muted-foreground hover:text-foreground active:scale-95'
-              }`}
+                }`}
             >
               Line
             </button>
@@ -69,9 +67,9 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
               {/* Bar chart skeleton representation */}
               <div className="flex items-end justify-between gap-2 h-48">
                 {[40, 65, 45, 80, 55, 70, 50, 75, 60, 85].map((height, i) => (
-                  <Skeleton 
-                    key={i} 
-                    className="flex-1 rounded-t" 
+                  <Skeleton
+                    key={i}
+                    className="flex-1 rounded-t"
                     style={{ height: `${height}%` }}
                   />
                 ))}
@@ -150,26 +148,26 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                     }}
                   />
-                  <Legend 
+                  <Legend
                     iconType="circle"
                     wrapperStyle={{ fontSize: '14px' }}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="income" 
-                    stroke={CHART_COLORS[1]} 
-                    strokeWidth={2.5} 
-                    fill="url(#incomeGradient)" 
+                  <Area
+                    type="monotone"
+                    dataKey="income"
+                    stroke={CHART_COLORS[1]}
+                    strokeWidth={2.5}
+                    fill="url(#incomeGradient)"
                     name="Income"
                     dot={{ fill: CHART_COLORS[1], r: 3 }}
                     activeDot={{ r: 5 }}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="expenses" 
-                    stroke={CHART_COLORS[3]} 
-                    strokeWidth={2.5} 
-                    fill="url(#expensesGradient)" 
+                  <Area
+                    type="monotone"
+                    dataKey="expenses"
+                    stroke={CHART_COLORS[3]}
+                    strokeWidth={2.5}
+                    fill="url(#expensesGradient)"
                     name="Expenses"
                     dot={{ fill: CHART_COLORS[3], r: 3 }}
                     activeDot={{ r: 5 }}
@@ -203,27 +201,27 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                     }}
                   />
-                  <Legend 
+                  <Legend
                     iconType="circle"
                     wrapperStyle={{ fontSize: '14px' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="income" 
-                    stroke="#10B981" 
-                    strokeWidth={2.5} 
-                    dot={{ fill: '#10B981', r: 4 }} 
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#10B981"
+                    strokeWidth={2.5}
+                    dot={{ fill: '#10B981', r: 4 }}
                     activeDot={{ r: 6 }}
-                    name="Income" 
+                    name="Income"
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="expenses" 
-                    stroke="#EF4444" 
-                    strokeWidth={2.5} 
-                    dot={{ fill: '#EF4444', r: 4 }} 
+                  <Line
+                    type="monotone"
+                    dataKey="expenses"
+                    stroke="#EF4444"
+                    strokeWidth={2.5}
+                    dot={{ fill: '#EF4444', r: 4 }}
                     activeDot={{ r: 6 }}
-                    name="Expenses" 
+                    name="Expenses"
                   />
                 </LineChart>
               )}

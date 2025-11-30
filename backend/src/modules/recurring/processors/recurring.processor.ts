@@ -15,7 +15,7 @@ export class RecurringProcessor {
   constructor(
     private readonly recurringRepository: RecurringRepository,
     private readonly transactionsService: TransactionsService,
-  ) {}
+  ) { }
 
   /**
    * Process recurring transactions daily at 1 AM
@@ -46,14 +46,14 @@ export class RecurringProcessor {
           this.logger.log(`Processed recurring transaction: ${recurring.id}`);
         } catch (error) {
           this.logger.error(
-            `Failed to process recurring transaction ${recurring.id}: ${error.message}`,
+            `Failed to process recurring transaction ${recurring.id}: ${(error as Error).message}`,
           );
         }
       }
 
       this.logger.log('Recurring transaction processing completed');
     } catch (error) {
-      this.logger.error(`Recurring transaction processing failed: ${error.message}`);
+      this.logger.error(`Recurring transaction processing failed: ${(error as Error).message}`);
     }
   }
 

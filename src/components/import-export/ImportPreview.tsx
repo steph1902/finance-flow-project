@@ -38,7 +38,7 @@ export function ImportPreview({
         <div className="flex items-center gap-2">
           <CheckCircle2Icon className="size-5 text-green-500" />
           <div>
-            <CardTitle className="text-green-700 dark:text-green-400">
+            <CardTitle className="text-green-700">
               Valid Transactions ({transactions.length})
             </CardTitle>
             <CardDescription>

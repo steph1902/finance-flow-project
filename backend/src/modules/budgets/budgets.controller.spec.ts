@@ -148,8 +148,8 @@ describe('BudgetsController', () => {
 
   describe('optimize', () => {
     it('should call optimize budgets', async () => {
-      const optimizeDto = { targetSavings: 1000 };
-      service.optimizeBudgets.mockResolvedValue({ recommendations: [] });
+      const optimizeDto = { targetSavings: 1000, totalIncome: 5000 };
+      service.optimizeBudgets.mockResolvedValue({ recommendations: [] } as any);
 
       const result = await controller.optimize(mockUserId, optimizeDto);
 
@@ -166,9 +166,10 @@ describe('BudgetsController', () => {
         startDate: new Date(),
         endDate: new Date(),
         sharedWith: ['user-456'],
+        name: 'Shared Groceries',
       };
 
-      service.createSharedBudget.mockResolvedValue({ id: 'shared-123' });
+      service.createSharedBudget.mockResolvedValue({ id: 'shared-123' } as any);
 
       const result = await controller.createShared(mockUserId, createSharedDto);
 

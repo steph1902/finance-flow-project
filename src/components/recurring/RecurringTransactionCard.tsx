@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import { 
-  Repeat, 
-  Calendar, 
-  Pause, 
-  Play, 
-  Trash2, 
+import {
+  Repeat,
+  Calendar,
+  Pause,
+  Play,
+  Trash2,
   Edit,
   Clock,
   TrendingUp,
@@ -161,7 +161,7 @@ export function RecurringTransactionCard({
           )}
 
           {isOverdue && (
-            <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/30 font-medium dark:text-orange-400">
+            <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/30 font-medium">
               <Clock className="h-3 w-3 mr-1.5" />
               Due
             </Badge>
@@ -180,7 +180,7 @@ export function RecurringTransactionCard({
             <Calendar className="h-4 w-4" />
             <span className="font-medium">Next occurrence:</span>
           </div>
-          <div className={`font-semibold ${isOverdue ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>
+          <div className={`font-semibold ${isOverdue ? "text-orange-600" : "text-foreground"}`}>
             {formatRelativeDate(nextDate)}
           </div>
         </div>

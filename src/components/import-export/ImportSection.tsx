@@ -123,14 +123,14 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
       {result && (
         <div className="space-y-4">
           {/* Success Summary */}
-          <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
             <div className="flex items-center gap-3">
               <CheckCircle2Icon className="size-8 text-green-600" />
               <div>
-                <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
+                <h3 className="text-lg font-semibold text-green-900">
                   Import Complete
                 </h3>
-                <p className="text-sm text-green-700 dark:text-green-300">
+                <p className="text-sm text-green-700">
                   {result.successful} of {result.total} transactions imported successfully
                   {result.failed > 0 && ` (${result.failed} failed)`}
                 </p>

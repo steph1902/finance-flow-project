@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -22,7 +22,7 @@ export default function Sidebar() {
           <span className="text-foreground">FinanceFlow</span>
         </Link>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+
           <Button
             variant="ghost"
             size="icon"
@@ -114,12 +114,7 @@ export default function Sidebar() {
             })}
           </nav>
         </div>
-        <div className="border-t border-border/50 p-4 bg-muted/30">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground font-medium">Theme</span>
-            <ThemeToggle />
-          </div>
-        </div>
+
       </div>
     </>
   );

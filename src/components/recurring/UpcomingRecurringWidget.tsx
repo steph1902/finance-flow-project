@@ -50,7 +50,7 @@ export function UpcomingRecurringWidget() {
       }
 
       const data = await response.json();
-      
+
       // Filter for active transactions coming up in the next 7 days
       const now = new Date();
       const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -176,9 +176,8 @@ export function UpcomingRecurringWidget() {
                   </div>
                 </div>
                 <div
-                  className={`text-sm font-semibold shrink-0 ml-3 ${
-                    transaction.type === "INCOME" ? "text-green-600" : "text-red-600"
-                  }`}
+                  className={`text-sm font-semibold shrink-0 ml-3 ${transaction.type === "INCOME" ? "text-success" : "text-destructive"
+                    }`}
                 >
                   {transaction.type === "INCOME" ? "+" : "-"}
                   {formatCurrency(transaction.amount)}

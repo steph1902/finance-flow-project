@@ -3,14 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  
+
   // Turbopack configuration
   turbopack: {
     root: __dirname, // Explicitly set workspace root
   },
-  
+
   // Image optimization
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -26,11 +27,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
+
   // NOTE: i18n is not supported in App Router (Next.js 16+)
   // For internationalization, use next-intl or App Router i18n patterns
   // See: https://nextjs.org/docs/app/building-your-application/routing/internationalization
-  
+
   // Security headers
   async headers() {
     return [

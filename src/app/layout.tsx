@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import AuthProvider from "@/components/auth/AuthProvider";
-import ThemeProvider from "@/components/layout/ThemeProvider";
-import ToasterProvider from "@/components/ui/ToasterProvider";
+import AuthProvider from "@/providers/AuthProvider";
+import ToasterProvider from "@/providers/ToasterProvider";
 import { ErrorBoundary, FullPageErrorFallback } from "@/components/errors/ErrorBoundary";
 import { fontInter, fontShippori } from "@/lib/fonts";
 
@@ -20,12 +19,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontInter.variable} ${fontShippori.variable} font-sans antialiased`}>
         <ErrorBoundary fallback={<FullPageErrorFallback />}>
-          <ThemeProvider>
-            <AuthProvider>
-              {children}
-              <ToasterProvider />
-            </AuthProvider>
-          </ThemeProvider>
+          <AuthProvider>
+            {children}
+            <ToasterProvider />
+          </AuthProvider>
         </ErrorBoundary>
       </body>
     </html>

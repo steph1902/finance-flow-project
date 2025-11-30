@@ -5,7 +5,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Get financial overview
@@ -223,7 +223,7 @@ export class AnalyticsService {
       } else if (groupBy === 'week') {
         const weekStart = new Date(date);
         weekStart.setDate(date.getDate() - date.getDay());
-        key = weekStart.toISOString().split('T')[0];
+        key = weekStart.toISOString().split('T')[0] || '';
       } else {
         key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       }

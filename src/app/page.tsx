@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 import { TrendingUp, Repeat, Sparkles, Shield, Zap, ArrowRight, Check, BarChart3, Target, FileDown, Brain, Moon, Smartphone } from "lucide-react";
 
 export default function LandingPage() {
@@ -21,7 +21,7 @@ export default function LandingPage() {
               <span className="text-xl font-semibold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">FinanceFlow</span>
             </Link>
             <div className="flex items-center gap-4">
-              <ThemeToggle />
+
               <div className="hidden md:flex items-center gap-2">
                 <Button variant="ghost" asChild className="hover:bg-accent">
                   <Link href="/login">Login</Link>
@@ -43,7 +43,7 @@ export default function LandingPage() {
             <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-primary/20 blur-3xl opacity-50" />
             <div className="absolute bottom-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/10 blur-3xl opacity-40" />
           </div>
-          
+
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-8 animate-fade-in">
@@ -52,7 +52,7 @@ export default function LandingPage() {
                   <Sparkles className="w-4 h-4" />
                   <span>AI-Powered Financial Intelligence</span>
                 </div>
-                
+
                 {/* Headline */}
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   Master Your Finances with{" "}
@@ -61,13 +61,13 @@ export default function LandingPage() {
                   </span>{" "}
                   Intelligence
                 </h1>
-                
+
                 {/* Subheadline */}
                 <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
-                  Track expenses, manage budgets, and achieve financial goals with intelligent insights. 
+                  Track expenses, manage budgets, and achieve financial goals with intelligent insights.
                   Your complete personal finance platform.
                 </p>
-                
+
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button size="lg" asChild className="group shadow-lg hover:shadow-xl transition-all">
@@ -80,7 +80,7 @@ export default function LandingPage() {
                     <Link href="/login">Sign In</Link>
                   </Button>
                 </div>
-                
+
                 {/* Trust signals */}
                 <div className="flex flex-col gap-4 pt-4">
                   <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
@@ -99,7 +99,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Product preview */}
               <div className="relative animate-fade-in">
                 <div className="absolute inset-0 bg-linear-to-tr from-primary/30 via-primary/10 to-transparent rounded-2xl blur-2xl opacity-40" />
@@ -142,7 +142,7 @@ export default function LandingPage() {
                 Powerful features designed to help you take control of your financial future
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-primary/50">
@@ -154,7 +154,7 @@ export default function LandingPage() {
                   Automatically categorize and track all your transactions with AI-powered intelligence.
                 </p>
               </div>
-              
+
               {/* Feature 2 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-success/50">
                 <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center mb-4">
@@ -165,7 +165,7 @@ export default function LandingPage() {
                   Create and manage budgets with real-time tracking and smart alerts to stay on target.
                 </p>
               </div>
-              
+
               {/* Feature 3 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-warning/50">
                 <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center mb-4">
@@ -176,7 +176,7 @@ export default function LandingPage() {
                   Get personalized recommendations and insights powered by advanced AI analysis.
                 </p>
               </div>
-              
+
               {/* Feature 4 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-info/50">
                 <div className="w-12 h-12 rounded-lg bg-info/10 flex items-center justify-center mb-4">
@@ -187,7 +187,7 @@ export default function LandingPage() {
                   Visualize your financial data with beautiful, interactive charts and reports.
                 </p>
               </div>
-              
+
               {/* Feature 5 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-primary/50">
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
@@ -198,7 +198,7 @@ export default function LandingPage() {
                   Automate recurring expenses and income tracking for effortless money management.
                 </p>
               </div>
-              
+
               {/* Feature 6 */}
               <div className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-all duration-200 hover:border-success/50">
                 <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center mb-4">
@@ -222,7 +222,7 @@ export default function LandingPage() {
                 Access your finances anywhere, anytime, on any device
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
@@ -233,7 +233,7 @@ export default function LandingPage() {
                   Beautiful dark mode for comfortable viewing day or night
                 </p>
               </div>
-              
+
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto">
                   <Smartphone className="w-8 h-8 text-success" />
@@ -243,7 +243,7 @@ export default function LandingPage() {
                   Responsive design works perfectly on all devices
                 </p>
               </div>
-              
+
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center mx-auto">
                   <Zap className="w-8 h-8 text-warning" />
@@ -264,7 +264,7 @@ export default function LandingPage() {
               <div className="p-12 rounded-2xl border border-border bg-card shadow-xl text-center space-y-8">
                 <h2 className="text-3xl md:text-4xl font-bold">Ready to Take Control?</h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Join thousands who have transformed their financial lives with FinanceFlow. 
+                  Join thousands who have transformed their financial lives with FinanceFlow.
                   Start your free trial today—no credit card required.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

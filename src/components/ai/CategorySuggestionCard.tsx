@@ -20,12 +20,12 @@ export function CategorySuggestionCard({
   isLoading = false,
 }: CategorySuggestionCardProps) {
   const confidencePercent = Math.round(suggestion.confidence * 100);
-  
+
   // Determine confidence level color
   const getConfidenceColor = () => {
-    if (suggestion.confidence >= 0.8) return "text-green-600 dark:text-green-400";
-    if (suggestion.confidence >= 0.6) return "text-yellow-600 dark:text-yellow-400";
-    return "text-orange-600 dark:text-orange-400";
+    if (suggestion.confidence >= 0.8) return "text-green-600";
+    if (suggestion.confidence >= 0.6) return "text-yellow-600";
+    return "text-orange-600";
   };
 
   const getConfidenceVariant = (): "default" | "secondary" | "destructive" | "outline" => {
@@ -50,26 +50,26 @@ export function CategorySuggestionCard({
           Based on the transaction details
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <div>
           <p className="text-sm font-medium text-muted-foreground">Category</p>
           <p className="text-xl font-semibold">{suggestion.category}</p>
         </div>
-        
+
         {suggestion.subcategory && (
           <div>
             <p className="text-sm font-medium text-muted-foreground">Subcategory</p>
             <p className="text-lg">{suggestion.subcategory}</p>
           </div>
         )}
-        
+
         <div className="rounded-lg bg-muted/50 p-3">
           <p className="text-sm font-medium text-muted-foreground mb-1">Why this category?</p>
           <p className="text-sm">{suggestion.reasoning}</p>
         </div>
       </CardContent>
-      
+
       <CardFooter className="flex gap-2">
         <Button
           onClick={onAccept}

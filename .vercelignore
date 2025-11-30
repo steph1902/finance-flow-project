@@ -1,6 +1,12 @@
-.env.local
+/backend
+/docker
+Dockerfile
+docker-compose.yml
+prisma/*.md
+**/*.log
 .env
-node_modules
-.next
+.env.local
 .DS_Store
-*.log
+coverage
+tsc_errors*.txt
+uninitialized_errors.txt

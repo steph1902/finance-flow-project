@@ -61,7 +61,7 @@ describe('UsersService', () => {
 
   describe('findById', () => {
     it('should return user when found', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
       const result = await service.findById('user-123');
 
@@ -77,7 +77,7 @@ describe('UsersService', () => {
     });
 
     it('should throw NotFoundException when user not found', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.findById('nonexistent')).rejects.toThrow(
         NotFoundException,
@@ -90,7 +90,7 @@ describe('UsersService', () => {
 
   describe('findByEmail', () => {
     it('should return user when found', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
       const result = await service.findByEmail('test@example.com');
 
@@ -101,7 +101,7 @@ describe('UsersService', () => {
     });
 
     it('should return null when user not found', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await service.findByEmail('nonexistent@example.com');
 
@@ -118,7 +118,7 @@ describe('UsersService', () => {
 
     it('should update user profile successfully', async () => {
       const updatedUser = { ...mockUser, ...updateDto };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.updateProfile('user-123', updateDto);
 
@@ -137,7 +137,7 @@ describe('UsersService', () => {
     it('should handle partial updates', async () => {
       const partialUpdate = { name: 'New Name' };
       const updatedUser = { ...mockUser, ...partialUpdate };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.updateProfile('user-123', partialUpdate);
 
@@ -157,7 +157,7 @@ describe('UsersService', () => {
         onboardingCompleted: true,
         onboardingStep: 5,
       };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.updateOnboarding('user-123', true, 5);
 
@@ -173,7 +173,7 @@ describe('UsersService', () => {
 
     it('should update onboarding status without step', async () => {
       const updatedUser = { ...mockUser, onboardingCompleted: true };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.updateOnboarding('user-123', true);
 
@@ -192,7 +192,7 @@ describe('UsersService', () => {
         onboardingCompleted: false,
         onboardingStep: 2,
       };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as jest.Mock).mockResolvedValue(updatedUser);
 
       const result = await service.updateOnboarding('user-123', false, 2);
 
@@ -203,7 +203,7 @@ describe('UsersService', () => {
 
   describe('deleteAccount', () => {
     it('should delete user account successfully', async () => {
-      prisma.user.delete.mockResolvedValue(mockUser);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.deleteAccount('user-123');
 
@@ -214,7 +214,7 @@ describe('UsersService', () => {
     });
 
     it('should handle deletion errors', async () => {
-      prisma.user.delete.mockRejectedValue(new Error('Database error'));
+      (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
       await expect(service.deleteAccount('user-123')).rejects.toThrow(
         'Database error',

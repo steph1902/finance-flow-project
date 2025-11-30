@@ -17,6 +17,7 @@ WORKDIR /app
 
 # Copy package files and install all dependencies (including devDependencies)
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 RUN npm ci
 
 # Copy application code

@@ -133,7 +133,7 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
         </div>
 
         <div className="space-y-2">
-          <Label className="text-neutral-700 dark:text-neutral-300 font-medium flex items-center gap-1">
+          <Label className="text-neutral-700 font-medium flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             Date Range
           </Label>
@@ -142,14 +142,14 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
               type="date"
               value={value.startDate ?? ""}
               onChange={(event) => handleChange("startDate", event.target.value)}
-              className="border-neutral-300 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 text-sm"
+              className="border-neutral-300 focus:ring-2 focus:ring-primary-500 text-sm"
               placeholder="Start"
             />
             <Input
               type="date"
               value={value.endDate ?? ""}
               onChange={(event) => handleChange("endDate", event.target.value)}
-              className="border-neutral-300 dark:border-neutral-700 focus:ring-2 focus:ring-primary-500 text-sm"
+              className="border-neutral-300 focus:ring-2 focus:ring-primary-500 text-sm"
               placeholder="End"
             />
           </div>

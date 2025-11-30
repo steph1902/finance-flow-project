@@ -4,7 +4,7 @@ import {
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 /**
  * Prisma service - manages database connections
@@ -13,8 +13,7 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService
   extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+  implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
@@ -85,14 +84,14 @@ export class PrismaService
    * Execute a transaction with automatic retry logic
    */
   async executeTransaction<T>(
-    callback: (tx: PrismaClient) => Promise<T>,
+    callback: (tx: Prisma.TransactionClient) => Promise<T>,
     maxRetries = 3,
   ): Promise<T> {
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        return await this.$transaction(callback);
+        return (await this.$transaction(callback as any)) as unknown as T;
       } catch (error) {
         lastError = error as Error;
         this.logger.warn(

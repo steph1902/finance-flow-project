@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GoalsController } from './goals.controller';
 import { GoalsService } from './goals.service';
+import { Decimal } from '@prisma/client/runtime/library';
 
 describe('GoalsController', () => {
   let controller: GoalsController;
@@ -14,17 +15,20 @@ describe('GoalsController', () => {
     userId: mockUserId,
     name: 'Emergency Fund',
     description: 'Save for emergencies',
-    targetAmount: 10000,
-    currentAmount: 5000,
+    targetAmount: new Decimal(10000),
+    currentAmount: new Decimal(5000),
     progress: 50,
     remaining: 5000,
     targetDate: new Date('2026-12-31'),
     category: 'SAVINGS',
-    priority: 'HIGH',
+    priority: 1, // High priority
     isCompleted: false,
     projectedCompletion: new Date('2026-11-15'),
     createdAt: new Date(),
     updatedAt: new Date(),
+    status: 'ACTIVE' as any, // GoalStatus.ACTIVE
+    reminderEnabled: true,
+    completedAt: null,
   };
 
   const mockGoalsService = {
@@ -60,7 +64,7 @@ describe('GoalsController', () => {
         targetAmount: 10000,
         targetDate: new Date('2026-12-31'),
         category: 'SAVINGS',
-        priority: 'HIGH',
+        priority: 1,
       };
 
       service.create.mockResolvedValue(mockGoalResponse);

@@ -19,9 +19,9 @@ interface InsightsCardProps {
 }
 
 const severityColors = {
-  info: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  warning: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  critical: "bg-red-500/10 text-red-700 dark:text-red-400",
+  info: "bg-accent/50 text-foreground",
+  warning: "bg-orange-500/10 text-orange-700",
+  critical: "bg-destructive/10 text-destructive",
 };
 
 const typeIcons = {

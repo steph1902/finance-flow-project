@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: finance-flow-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://step:password@db:5432/finance-flow?schema=public
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=super-secret-secret
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  backend:
+    container_name: finance-flow-backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://step:password@db:5432/finance-flow?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_ACCESS_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+
+  db:
+    container_name: finance-flow-db
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=step
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=finance-flow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    container_name: finance-flow-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
