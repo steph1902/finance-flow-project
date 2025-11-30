@@ -15,9 +15,11 @@ const zenButtonVariants = cva(
       variant: {
         default:
           "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-card",
+        // Mapping legacy variants to standard palette
         indigo:
-          "bg-accent-indigo text-white shadow-soft hover:bg-accent-indigo/90 hover:shadow-card",
-        gold: "bg-accent-gold text-accent-gold-foreground shadow-soft hover:bg-accent-gold/90 hover:shadow-card",
+          "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-card", // Mapped to primary (Desert Clay)
+        gold:
+          "bg-secondary text-secondary-foreground shadow-soft hover:bg-secondary/90 hover:shadow-card", // Mapped to secondary (Light Stone)
         outline:
           "border-2 border-border bg-transparent hover:bg-accent hover:border-primary/50",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -26,7 +28,7 @@ const zenButtonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground shadow-soft hover:bg-destructive/90",
         success:
-          "bg-success text-success-foreground shadow-soft hover:bg-success/90",
+          "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90", // Mapped to primary
       },
       size: {
         sm: "h-9 px-3 text-xs",
@@ -45,7 +47,7 @@ const zenButtonVariants = cva(
 
 export interface ZenButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof zenButtonVariants> {
+  VariantProps<typeof zenButtonVariants> {
   asChild?: boolean;
 }
 

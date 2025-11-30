@@ -3,7 +3,7 @@
  * Handles OAuth flow, transaction syncing, and account management
  */
 
-import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
+import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode, LinkTokenCreateResponse, ItemPublicTokenExchangeResponse, TransactionsGetResponse, InstitutionsGetByIdResponse, ItemGetResponse } from 'plaid';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
@@ -13,10 +13,10 @@ const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
 
 // Environment mapping
-const plaidEnvMap: Record<string, any> = {
-  sandbox: PlaidEnvironments.sandbox,
-  development: PlaidEnvironments.development,
-  production: PlaidEnvironments.production,
+const plaidEnvMap: Record<string, string> = {
+  sandbox: PlaidEnvironments.sandbox as string,
+  development: PlaidEnvironments.development as string,
+  production: PlaidEnvironments.production as string,
 };
 
 let plaidClient: PlaidApi | null = null;
@@ -24,7 +24,7 @@ let plaidClient: PlaidApi | null = null;
 /**
  * Initialize Plaid client
  */
-function getPlaidClient(): PlaidApi {
+export function getPlaidClient(): PlaidApi {
   if (!PLAID_CLIENT_ID || !PLAID_SECRET) {
     throw new Error('Plaid credentials not configured. Set PLAID_CLIENT_ID and PLAID_SECRET in environment variables.');
   }
@@ -54,12 +54,12 @@ function encryptToken(token: string): string {
   const key = crypto.scryptSync(process.env.NEXTAUTH_SECRET || 'default-key', 'salt', 32);
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
-  
+
   let encrypted = cipher.update(token, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  
+
   const authTag = cipher.getAuthTag();
-  
+
   return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
 
@@ -69,21 +69,21 @@ function encryptToken(token: string): string {
 function decryptToken(encryptedToken: string): string {
   const algorithm = 'aes-256-gcm';
   const key = crypto.scryptSync(process.env.NEXTAUTH_SECRET || 'default-key', 'salt', 32);
-  
+
   const parts = encryptedToken.split(':');
   if (parts.length !== 3) {
     throw new Error('Invalid encrypted token format');
   }
-  
+
   const [ivHex, authTagHex, encrypted] = parts as [string, string, string];
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(authTagHex, 'hex');
-  
+
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
   decipher.setAuthTag(authTag);
-  
+
   const decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-  
+
   return decrypted;
 }
 
@@ -93,7 +93,7 @@ function decryptToken(encryptedToken: string): string {
 export async function createLinkToken(userId: string): Promise<string> {
   try {
     const client = getPlaidClient();
-    
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -112,9 +112,10 @@ export async function createLinkToken(userId: string): Promise<string> {
       language: 'en',
     });
 
+    const data: LinkTokenCreateResponse = response.data;
     logger.info('Link token created', { userId });
-    return response.data.link_token;
-  } catch (error) {
+    return data.link_token;
+  } catch (error: unknown) {
     logger.error('Failed to create link token', error);
     throw new Error('Failed to initialize bank connection');
   }
@@ -135,22 +136,28 @@ export async function exchangePublicToken(
       public_token: publicToken,
     });
 
-    const accessToken = tokenResponse.data.access_token;
-    const itemId = tokenResponse.data.item_id;
+    const tokenData: ItemPublicTokenExchangeResponse = tokenResponse.data;
+    const accessToken = tokenData.access_token;
+    const itemId = tokenData.item_id;
 
     // Get institution info
     const itemResponse = await client.itemGet({
       access_token: accessToken,
     });
 
-    const institutionId = itemResponse.data.item.institution_id!;
+    const itemData: ItemGetResponse = itemResponse.data;
+    const institutionId = itemData.item.institution_id;
+    if (!institutionId) {
+      throw new Error('Institution ID not found in Plaid item');
+    }
 
     const institutionResponse = await client.institutionsGetById({
       institution_id: institutionId,
       country_codes: [CountryCode.Us],
     });
 
-    const institutionName = institutionResponse.data.institution.name;
+    const institutionData: InstitutionsGetByIdResponse = institutionResponse.data;
+    const institutionName = institutionData.institution.name;
 
     // Encrypt and store
     const encryptedToken = encryptToken(accessToken);
@@ -169,7 +176,7 @@ export async function exchangePublicToken(
     logger.info('Plaid item connected', { userId, institutionName });
 
     return { itemId, institutionName };
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to exchange public token', error);
     throw new Error('Failed to connect bank account');
   }
@@ -204,9 +211,9 @@ export async function syncTransactions(userId: string): Promise<number> {
         const startDate = item.lastSync
           ? new Date(item.lastSync)
           : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        
+
         const endDate = new Date();
-        
+
         const startDateStr = startDate.toISOString().split('T')[0]!;
         const endDateStr = endDate.toISOString().split('T')[0]!;
 
@@ -216,7 +223,8 @@ export async function syncTransactions(userId: string): Promise<number> {
           end_date: endDateStr,
         });
 
-        const transactions = response.data.transactions;
+        const data: TransactionsGetResponse = response.data;
+        const transactions = data.transactions;
 
         // Import transactions
         for (const txn of transactions) {
@@ -257,7 +265,7 @@ export async function syncTransactions(userId: string): Promise<number> {
           itemId: item.id,
           count: transactions.length,
         });
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to sync transactions for item', {
           itemId: item.id,
           error,
@@ -267,7 +275,7 @@ export async function syncTransactions(userId: string): Promise<number> {
     }
 
     return totalSynced;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to sync transactions', error);
     throw new Error('Failed to sync bank transactions');
   }
@@ -328,7 +336,7 @@ export async function removePlaidItem(userId: string, itemId: string): Promise<v
     });
 
     logger.info('Plaid item removed', { userId, itemId });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to remove Plaid item', error);
     throw new Error('Failed to disconnect bank account');
   }

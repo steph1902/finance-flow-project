@@ -3,8 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { withApiAuth } from '@/lib/auth-helpers';
 import { importTransactionsFromCSV } from '@/lib/services/import-export-service';
 import { logger } from '@/lib/logger';
 
@@ -12,17 +11,8 @@ import { logger } from '@/lib/logger';
  * POST /api/import-export/import
  * Import transactions from CSV file
  */
-export async function POST(request: NextRequest) {
+export const POST = withApiAuth(async (request: NextRequest, userId: string) => {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -36,7 +26,8 @@ export async function POST(request: NextRequest) {
     // Read file content
     const csvContent = await file.text();
 
-    const result = await importTransactionsFromCSV(csvContent, session.user.id);
+    // Fix: userId is the first argument
+    const result = await importTransactionsFromCSV(userId, csvContent);
 
     return NextResponse.json(result);
   } catch (error) {
@@ -46,4 +37,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

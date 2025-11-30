@@ -83,7 +83,7 @@ export async function createInvestment(
 
     logger.info('Investment created', { userId, investmentId: investment.id });
     return investment;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create investment', error);
     throw new Error('Failed to create investment');
   }
@@ -107,7 +107,7 @@ export async function updateInvestmentValue(
 
     logger.info('Investment value updated', { investmentId, currentValue });
     return investment;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to update investment value', error);
     throw new Error('Failed to update investment value');
   }
@@ -183,7 +183,7 @@ export async function recordInvestmentTransaction(
     });
 
     return transaction;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to record investment transaction', error);
     throw new Error('Failed to record transaction');
   }
@@ -223,7 +223,7 @@ export async function getUserInvestments(
         lastUpdated: inv.lastUpdated,
       };
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get user investments', error);
     throw new Error('Failed to fetch investments');
   }
@@ -244,7 +244,12 @@ export async function getPortfolioSummary(
       totalGainLoss: 0,
       totalGainLossPercentage: 0,
       investmentCount: investments.length,
-      byType: {} as any,
+      byType: {} as Record<InvestmentType, {
+        count: number;
+        value: number;
+        costBasis: number;
+        gainLoss: number;
+      }>,
     };
 
     // Initialize byType for all investment types
@@ -277,7 +282,7 @@ export async function getPortfolioSummary(
         : 0;
 
     return summary;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get portfolio summary', error);
     throw new Error('Failed to calculate portfolio summary');
   }
@@ -292,7 +297,7 @@ export async function getInvestmentTransactions(investmentId: string) {
       where: { investmentId },
       orderBy: { date: 'desc' },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get investment transactions', error);
     throw new Error('Failed to fetch transactions');
   }
@@ -320,7 +325,7 @@ export async function deleteInvestment(userId: string, investmentId: string) {
     });
 
     logger.info('Investment deleted', { userId, investmentId });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to delete investment', error);
     throw new Error('Failed to delete investment');
   }
@@ -335,19 +340,19 @@ export async function getPortfolioPerformance(
 ) {
   try {
     const investments = await getUserInvestments(userId);
-    
+
     // For now, return current snapshot
     // In a real app, you'd track historical values
     const dataPoints = [];
     const endDate = new Date();
-    
+
     for (let i = days; i >= 0; i--) {
       const date = new Date(endDate);
       date.setDate(date.getDate() - i);
-      
+
       // Simplified: use current values (in production, fetch historical data)
       const totalValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
-      
+
       dataPoints.push({
         date: date.toISOString().split('T')[0],
         value: totalValue,
@@ -355,7 +360,7 @@ export async function getPortfolioPerformance(
     }
 
     return dataPoints;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get portfolio performance', error);
     throw new Error('Failed to calculate performance');
   }

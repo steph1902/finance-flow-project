@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
@@ -42,6 +43,7 @@ const customJestConfig = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/.next/',
+    '/backend/',
   ],
   transformIgnorePatterns: [
     '/node_modules/',

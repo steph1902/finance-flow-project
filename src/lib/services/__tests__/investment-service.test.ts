@@ -3,32 +3,32 @@
  * Covers portfolio management, transactions, and performance calculations
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import * as investmentService from '../investment-service';
 import { prisma } from '@/lib/prisma';
 import { InvestmentType, InvestmentTransactionType } from '@prisma/client';
 
 // Mock Prisma
-vi.mock('@/lib/prisma', () => ({
+jest.mock('@/lib/prisma', () => ({
   prisma: {
     investment: {
-      create: vi.fn(),
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      findFirst: vi.fn(),
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findFirst: jest.fn(),
     },
     investmentTransaction: {
-      create: vi.fn(),
-      findMany: vi.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
     },
   },
 }));
 
 describe('Investment Service', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('createInvestment', () => {
@@ -48,12 +48,10 @@ describe('Investment Service', () => {
         updatedAt: new Date(),
       };
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.create as any).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as any).mockResolvedValue({
+      (prisma.investment.create as jest.Mock).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
         id: 'tx-123',
       });
-      /* eslint-enable @typescript-eslint/no-explicit-any */
 
       const result = await investmentService.createInvestment('user-123', {
         symbol: 'AAPL',
@@ -86,13 +84,11 @@ describe('Investment Service', () => {
         costBasis: 1500,
       };
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findUnique as any).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as any).mockResolvedValue({
+      (prisma.investment.findUnique as jest.Mock).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
         id: 'tx-123',
       });
-      (prisma.investment.update as any).mockResolvedValue({});
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.update as jest.Mock).mockResolvedValue({});
 
       const result = await investmentService.recordInvestmentTransaction('inv-123', {
         type: 'BUY' as InvestmentTransactionType,
@@ -120,13 +116,11 @@ describe('Investment Service', () => {
         costBasis: 1500,
       };
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findUnique as any).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as any).mockResolvedValue({
+      (prisma.investment.findUnique as jest.Mock).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
         id: 'tx-123',
       });
-      (prisma.investment.update as any).mockResolvedValue({});
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.update as jest.Mock).mockResolvedValue({});
 
       await investmentService.recordInvestmentTransaction('inv-123', {
         type: 'SELL' as InvestmentTransactionType,
@@ -162,9 +156,7 @@ describe('Investment Service', () => {
         },
       ];
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findMany as any).mockResolvedValue(mockInvestments);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue(mockInvestments);
 
       const result = await investmentService.getUserInvestments('user-123');
 
@@ -195,9 +187,7 @@ describe('Investment Service', () => {
         },
       ];
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findMany as any).mockResolvedValue(mockInvestments);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.findMany as jest.Mock).mockResolvedValue(mockInvestments);
 
       const result = await investmentService.getPortfolioSummary('user-123');
 
@@ -216,10 +206,8 @@ describe('Investment Service', () => {
         userId: 'user-123',
       };
 
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findFirst as any).mockResolvedValue(mockInvestment);
-      (prisma.investment.delete as any).mockResolvedValue({});
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.findFirst as jest.Mock).mockResolvedValue(mockInvestment);
+      (prisma.investment.delete as jest.Mock).mockResolvedValue({});
 
       await investmentService.deleteInvestment('inv-123', 'user-123');
 
@@ -229,9 +217,7 @@ describe('Investment Service', () => {
     });
 
     it('should throw error if user does not own investment', async () => {
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      (prisma.investment.findFirst as any).mockResolvedValue(null);
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      (prisma.investment.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
         investmentService.deleteInvestment('inv-123', 'user-999')
@@ -241,11 +227,6 @@ describe('Investment Service', () => {
 
   describe('Performance calculations', () => {
     it('should correctly calculate gain/loss percentage', async () => {
-      const investment = {
-        costBasis: 1000,
-        currentValue: 1200,
-      };
-
       const gainLoss = 1200 - 1000; // 200
       const percentage = (gainLoss / 1000) * 100; // 20%
 
@@ -259,8 +240,8 @@ describe('Investment Service', () => {
       };
 
       // Should not divide by zero
-      const percentage = investment.costBasis > 0 
-        ? ((investment.currentValue - investment.costBasis) / investment.costBasis) * 100 
+      const percentage = investment.costBasis > 0
+        ? ((investment.currentValue - investment.costBasis) / investment.costBasis) * 100
         : 0;
 
       expect(percentage).toBe(0);

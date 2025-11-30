@@ -6,10 +6,39 @@ import { MicIcon, MicOffIcon } from "lucide-react"
 import { toast } from "sonner"
 
 // Extend Window interface for Speech Recognition
+interface SpeechRecognitionEvent {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionError {
+  error: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionError) => void;
+  onend: () => void;
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: {
+      new(): SpeechRecognition;
+    };
+    webkitSpeechRecognition: {
+      new(): SpeechRecognition;
+    };
   }
 }
 
@@ -29,29 +58,31 @@ interface VoiceCommand {
 
 export function VoiceInput({ onTranscript, onCommand }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       const recognitionInstance = new SpeechRecognition()
-      
+
       recognitionInstance.continuous = false
       recognitionInstance.interimResults = false
       recognitionInstance.lang = 'en-US'
 
-      recognitionInstance.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
-        onTranscript?.(transcript)
-        
-        // Parse command
-        const command = parseVoiceCommand(transcript)
-        onCommand?.(command)
-        
-        toast.success(`Heard: "${transcript}"`)
+      recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = event.results?.[0]?.[0]?.transcript
+        if (transcript) {
+          onTranscript?.(transcript)
+
+          // Parse command
+          const command = parseVoiceCommand(transcript)
+          onCommand?.(command)
+
+          toast.success(`Heard: "${transcript}"`)
+        }
       }
 
-      recognitionInstance.onerror = (event: any) => {
+      recognitionInstance.onerror = (event: SpeechRecognitionError) => {
         console.error('Speech recognition error:', event.error)
         toast.error('Voice recognition failed. Please try again.')
         setIsListening(false)
@@ -72,7 +103,7 @@ export function VoiceInput({ onTranscript, onCommand }: VoiceInputProps) {
     }
 
     try {
-      recognitionRef.current.start()
+      recognitionRef.current?.start()
       setIsListening(true)
       toast.info('Listening...')
     } catch (error) {
@@ -113,7 +144,7 @@ function parseVoiceCommand(transcript: string): VoiceCommand {
     const amount = parseFloat(addMatch[1])
     const description = addMatch[2].trim()
     const category = inferCategory(description)
-    
+
     return {
       action: 'add-transaction',
       amount,
@@ -147,13 +178,13 @@ function parseVoiceCommand(transcript: string): VoiceCommand {
 
 function inferCategory(description: string): string {
   const lower = description.toLowerCase()
-  
+
   if (lower.match(/coffee|restaurant|lunch|dinner|food|eating/)) return 'Food & Dining'
   if (lower.match(/uber|lyft|gas|fuel|parking|transit/)) return 'Transportation'
   if (lower.match(/amazon|walmart|target|shopping|store/)) return 'Shopping'
   if (lower.match(/movie|concert|game|entertainment/)) return 'Entertainment'
   if (lower.match(/electric|water|internet|phone|bill/)) return 'Bills & Utilities'
   if (lower.match(/doctor|pharmacy|medicine|health/)) return 'Health'
-  
+
   return 'Other'
 }

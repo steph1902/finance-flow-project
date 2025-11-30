@@ -3,46 +3,54 @@
  * Covers bank integration, token encryption, and transaction syncing
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { PlaidApi } from 'plaid';
 import * as plaidService from '../plaid-service';
 import { prisma } from '@/lib/prisma';
 
 // Mock dependencies
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: vi.fn(),
+jest.mock('@/lib/prisma', () => {
+  const { jest } = require('@jest/globals');
+  return {
+    prisma: {
+      user: {
+        findUnique: jest.fn(),
+      },
+      plaidItem: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        update: jest.fn(),
+      },
+      transaction: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+      },
     },
-    plaidItem: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
-    },
-    transaction: {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-    },
-  },
-}));
+  };
+});
 
-vi.mock('plaid', () => ({
-  PlaidApi: vi.fn(),
-  Configuration: vi.fn(),
-  PlaidEnvironments: {
-    sandbox: 'sandbox',
-  },
-  Products: {
-    Transactions: 'transactions',
-  },
-  CountryCode: {
-    Us: 'US',
-  },
-}));
+jest.mock('plaid', () => {
+  const { jest } = require('@jest/globals');
+  return {
+    PlaidApi: jest.fn(),
+    Configuration: jest.fn(),
+    PlaidEnvironments: {
+      sandbox: 'sandbox',
+    },
+    Products: {
+      Transactions: 'transactions',
+    },
+    CountryCode: {
+      Us: 'US',
+    },
+  };
+});
 
 describe('Plaid Service', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
+    // Reset the singleton if possible, or just rely on PlaidApi mock
+    // Since we can't reset the module-level variable easily, we rely on PlaidApi mock returning our mock client
   });
 
   describe('createLinkToken', () => {
@@ -55,16 +63,16 @@ describe('Plaid Service', () => {
 
       const mockLinkToken = 'link-token-12345';
 
-      (prisma.user.findUnique as any).mockResolvedValue(mockUser);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       const mockPlaidClient = {
-        linkTokenCreate: vi.fn().mockResolvedValue({
+        linkTokenCreate: jest.fn().mockResolvedValue({
           data: { link_token: mockLinkToken },
         }),
       };
 
-      // Mock getPlaidClient to return our mock client
-      vi.spyOn(plaidService as any, 'getPlaidClient').mockReturnValue(mockPlaidClient);
+      // Mock PlaidApi constructor to return our mock client
+      (PlaidApi as jest.Mock).mockImplementation(() => mockPlaidClient);
 
       const result = await plaidService.createLinkToken('user-123');
 
@@ -76,7 +84,7 @@ describe('Plaid Service', () => {
     });
 
     it('should throw error if user not found', async () => {
-      (prisma.user.findUnique as any).mockResolvedValue(null);
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(plaidService.createLinkToken('invalid-user')).rejects.toThrow(
         'Failed to initialize bank connection'
@@ -91,20 +99,20 @@ describe('Plaid Service', () => {
       const mockInstitutionName = 'Test Bank';
 
       const mockPlaidClient = {
-        itemPublicTokenExchange: vi.fn().mockResolvedValue({
+        itemPublicTokenExchange: jest.fn().mockResolvedValue({
           data: {
             access_token: mockAccessToken,
             item_id: mockItemId,
           },
         }),
-        itemGet: vi.fn().mockResolvedValue({
+        itemGet: jest.fn().mockResolvedValue({
           data: {
             item: {
               institution_id: 'ins_123',
             },
           },
         }),
-        institutionsGetById: vi.fn().mockResolvedValue({
+        institutionsGetById: jest.fn().mockResolvedValue({
           data: {
             institution: {
               name: mockInstitutionName,
@@ -113,9 +121,9 @@ describe('Plaid Service', () => {
         }),
       };
 
-      vi.spyOn(plaidService as any, 'getPlaidClient').mockReturnValue(mockPlaidClient);
-      
-      (prisma.plaidItem.create as any).mockResolvedValue({
+      (PlaidApi as jest.Mock).mockImplementation(() => mockPlaidClient);
+
+      (prisma.plaidItem.create as jest.Mock).mockResolvedValue({
         id: 'plaid-item-123',
       });
 
@@ -124,9 +132,9 @@ describe('Plaid Service', () => {
       expect(result.itemId).toBe(mockItemId);
       expect(result.institutionName).toBe(mockInstitutionName);
       expect(prisma.plaidItem.create).toHaveBeenCalled();
-      
+
       // Verify access token is encrypted (should not match original)
-      const createCall = (prisma.plaidItem.create as any).mock.calls[0][0];
+      const createCall = (prisma.plaidItem.create as jest.Mock).mock.calls[0][0];
       expect(createCall.data.accessToken).not.toBe(mockAccessToken);
       expect(createCall.data.accessToken).toContain(':'); // Contains IV:authTag:encrypted format
     });
@@ -153,20 +161,20 @@ describe('Plaid Service', () => {
         },
       ];
 
-      (prisma.plaidItem.findMany as any).mockResolvedValue(mockPlaidItems);
-      (prisma.transaction.findFirst as any).mockResolvedValue(null);
-      (prisma.transaction.create as any).mockResolvedValue({ id: 'new-tx-1' });
-      (prisma.plaidItem.update as any).mockResolvedValue({});
+      (prisma.plaidItem.findMany as jest.Mock).mockResolvedValue(mockPlaidItems);
+      (prisma.transaction.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.transaction.create as jest.Mock).mockResolvedValue({ id: 'new-tx-1' });
+      (prisma.plaidItem.update as jest.Mock).mockResolvedValue({});
 
       const mockPlaidClient = {
-        transactionsGet: vi.fn().mockResolvedValue({
+        transactionsGet: jest.fn().mockResolvedValue({
           data: {
             transactions: mockTransactions,
           },
         }),
       };
 
-      vi.spyOn(plaidService as any, 'getPlaidClient').mockReturnValue(mockPlaidClient);
+      (PlaidApi as jest.Mock).mockImplementation(() => mockPlaidClient);
 
       const result = await plaidService.syncTransactions('user-123');
 
@@ -201,16 +209,16 @@ describe('Plaid Service', () => {
         },
       ];
 
-      (prisma.plaidItem.findMany as any).mockResolvedValue(mockPlaidItems);
-      (prisma.transaction.findFirst as any).mockResolvedValue({ id: 'existing-tx' });
+      (prisma.plaidItem.findMany as jest.Mock).mockResolvedValue(mockPlaidItems);
+      (prisma.transaction.findFirst as jest.Mock).mockResolvedValue({ id: 'existing-tx' });
 
       const mockPlaidClient = {
-        transactionsGet: vi.fn().mockResolvedValue({
+        transactionsGet: jest.fn().mockResolvedValue({
           data: { transactions: mockTransactions },
         }),
       };
 
-      vi.spyOn(plaidService as any, 'getPlaidClient').mockReturnValue(mockPlaidClient);
+      (PlaidApi as jest.Mock).mockImplementation(() => mockPlaidClient);
 
       const result = await plaidService.syncTransactions('user-123');
 
@@ -238,7 +246,7 @@ describe('Plaid Service', () => {
         },
       ];
 
-      (prisma.plaidItem.findMany as any).mockResolvedValue(mockPlaidItems);
+      (prisma.plaidItem.findMany as jest.Mock).mockResolvedValue(mockPlaidItems);
 
       const result = await plaidService.getConnectedBanks('user-123');
 
@@ -252,30 +260,30 @@ describe('Plaid Service', () => {
     it('should encrypt and decrypt tokens correctly', () => {
       // Access private functions via module exports for testing
       const originalToken = 'test-access-token-12345';
-      
+
       // Use a simple encryption test by calling the service functions
       // that use encryption internally
       const mockPlaidClient = {
-        itemPublicTokenExchange: vi.fn().mockResolvedValue({
+        itemPublicTokenExchange: jest.fn().mockResolvedValue({
           data: {
             access_token: originalToken,
             item_id: 'item-id',
           },
         }),
-        itemGet: vi.fn().mockResolvedValue({
+        itemGet: jest.fn().mockResolvedValue({
           data: {
             item: { institution_id: 'ins_1' },
           },
         }),
-        institutionsGetById: vi.fn().mockResolvedValue({
+        institutionsGetById: jest.fn().mockResolvedValue({
           data: {
             institution: { name: 'Test Bank' },
           },
         }),
       };
 
-      vi.spyOn(plaidService as any, 'getPlaidClient').mockReturnValue(mockPlaidClient);
-      (prisma.plaidItem.create as any).mockResolvedValue({ id: 'item-1' });
+      (PlaidApi as jest.Mock).mockImplementation(() => mockPlaidClient);
+      (prisma.plaidItem.create as jest.Mock).mockResolvedValue({ id: 'item-1' });
 
       // The exchange function will encrypt the token
       expect(async () => {

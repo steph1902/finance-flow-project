@@ -25,6 +25,56 @@ export interface ExportOptions {
   includeInvestments?: boolean;
 }
 
+export interface ExportData {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    preferredCurrency: string;
+    createdAt: Date;
+  } | null;
+  transactions?: Array<{
+    date: Date;
+    description: string | null;
+    category: string;
+    type: string;
+    amount: number | import('@prisma/client/runtime/library').Decimal;
+    notes: string | null;
+  }>;
+  budgets?: Array<{
+    category: string;
+    amount: number | import('@prisma/client/runtime/library').Decimal;
+    month: number;
+    year: number;
+  }>;
+  goals?: Array<{
+    name: string;
+    targetAmount: number | import('@prisma/client/runtime/library').Decimal;
+    currentAmount: number | import('@prisma/client/runtime/library').Decimal;
+    targetDate: Date | null;
+    status: string;
+  }>;
+  recurringTransactions?: Array<{
+    description: string | null;
+    category: string;
+    type: string;
+    amount: number | import('@prisma/client/runtime/library').Decimal;
+    frequency: string;
+    nextDate: Date;
+    isActive: boolean;
+  }>;
+  investments?: Array<{
+    symbol: string;
+    name: string;
+    type: string;
+    quantity: number | import('@prisma/client/runtime/library').Decimal;
+    costBasis: number | import('@prisma/client/runtime/library').Decimal;
+    currentValue: number | import('@prisma/client/runtime/library').Decimal;
+    currency: string;
+    purchaseDate: Date;
+  }>;
+}
+
 /**
  * Export user data in specified format
  */
@@ -37,18 +87,18 @@ export async function exportUserData(options: ExportOptions): Promise<Buffer | s
     switch (options.format) {
       case 'json':
         return JSON.stringify(data, null, 2);
-      
+
       case 'csv':
         return generateCSV(data);
-      
-    case 'pdf':
-      return await generatePDF(data);      case 'excel':
+
+      case 'pdf':
+        return await generatePDF(data); case 'excel':
         return generateExcel(data);
-      
+
       default:
         throw new Error(`Unsupported export format: ${options.format}`);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Data export failed', error);
     throw new Error('Failed to export data');
   }
@@ -57,9 +107,9 @@ export async function exportUserData(options: ExportOptions): Promise<Buffer | s
 /**
  * Gather all data for export
  */
-async function gatherExportData(options: ExportOptions) {
+async function gatherExportData(options: ExportOptions): Promise<ExportData> {
   const { userId, startDate, endDate } = options;
-  const data: any = {};
+  const data: Partial<ExportData> = {};
 
   // User info
   const user = await prisma.user.findUnique({
@@ -75,7 +125,8 @@ async function gatherExportData(options: ExportOptions) {
   data.user = user;
 
   // Date filter
-  const dateFilter: any = {};
+
+  const dateFilter: Record<string, Date> = {};
   if (startDate) dateFilter.gte = startDate;
   if (endDate) dateFilter.lte = endDate;
 
@@ -130,27 +181,27 @@ async function gatherExportData(options: ExportOptions) {
         orderBy: { createdAt: 'desc' },
       });
       data.investments = investments;
-    } catch (error) {
+    } catch {
       // Investment table might not exist yet
       logger.warn('Skipping investments (table not found)');
     }
   }
 
-  return data;
+  return data as ExportData;
 }
 
 /**
  * Generate CSV export
  */
-function generateCSV(data: any): string {
+function generateCSV(data: ExportData): string {
   let csv = '';
 
   // Transactions CSV
   if (data.transactions && data.transactions.length > 0) {
     csv += 'TRANSACTIONS\n';
     csv += 'Date,Description,Category,Type,Amount,Notes\n';
-    
-    data.transactions.forEach((txn: any) => {
+
+    data.transactions.forEach((txn) => {
       const row = [
         format(new Date(txn.date), 'yyyy-MM-dd'),
         escapeCSV(txn.description || ''),
@@ -168,8 +219,8 @@ function generateCSV(data: any): string {
   if (data.budgets && data.budgets.length > 0) {
     csv += 'BUDGETS\n';
     csv += 'Category,Amount,Month,Year\n';
-    
-    data.budgets.forEach((budget: any) => {
+
+    data.budgets.forEach((budget) => {
       const row = [
         escapeCSV(budget.category),
         budget.amount,
@@ -185,8 +236,8 @@ function generateCSV(data: any): string {
   if (data.goals && data.goals.length > 0) {
     csv += 'GOALS\n';
     csv += 'Name,Target Amount,Current Amount,Target Date,Status\n';
-    
-    data.goals.forEach((goal: any) => {
+
+    data.goals.forEach((goal) => {
       const row = [
         escapeCSV(goal.name),
         goal.targetAmount,
@@ -214,7 +265,7 @@ function escapeCSV(str: string): string {
 /**
  * Generate PDF export
  */
-async function generatePDF(data: any): Promise<Buffer> {
+async function generatePDF(data: ExportData): Promise<Buffer> {
   const doc = new jsPDF();
   let yPos = 20;
 
@@ -226,7 +277,7 @@ async function generatePDF(data: any): Promise<Buffer> {
   doc.setFontSize(10);
   doc.text(`Generated: ${format(new Date(), 'PPP')}`, 20, yPos);
   yPos += 5;
-  doc.text(`User: ${data.user.email}`, 20, yPos);
+  doc.text(`User: ${data.user?.email || 'Unknown'}`, 20, yPos);
   yPos += 15;
 
   // Transactions Table
@@ -235,7 +286,7 @@ async function generatePDF(data: any): Promise<Buffer> {
     doc.text('Transactions', 20, yPos);
     yPos += 5;
 
-    const transactionRows = data.transactions.map((txn: any) => [
+    const transactionRows = data.transactions.map((txn) => [
       format(new Date(txn.date), 'MMM dd, yyyy'),
       txn.description || '',
       txn.category,
@@ -252,7 +303,10 @@ async function generatePDF(data: any): Promise<Buffer> {
       styles: { fontSize: 8 },
     });
 
-    yPos = (doc as any).lastAutoTable.finalY + 10;
+    interface JsPDFWithAutoTable extends jsPDF {
+      lastAutoTable: { finalY: number };
+    }
+    yPos = (doc as unknown as JsPDFWithAutoTable).lastAutoTable.finalY + 10;
   }
 
   // Summary Statistics
@@ -262,14 +316,14 @@ async function generatePDF(data: any): Promise<Buffer> {
     yPos += 7;
 
     doc.setFontSize(10);
-    
+
     const income = data.transactions
-      ?.filter((t: any) => t.type === 'INCOME')
-      .reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0;
-    
+      ?.filter((t) => t.type === 'INCOME')
+      .reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+
     const expenses = data.transactions
-      ?.filter((t: any) => t.type === 'EXPENSE')
-      .reduce((sum: number, t: any) => sum + Number(t.amount), 0) || 0;
+      ?.filter((t) => t.type === 'EXPENSE')
+      .reduce((sum, t) => sum + Number(t.amount), 0) || 0;
 
     doc.text(`Total Income: ${formatCurrency(income)}`, 20, yPos);
     yPos += 6;
@@ -284,12 +338,12 @@ async function generatePDF(data: any): Promise<Buffer> {
 /**
  * Generate Excel export
  */
-function generateExcel(data: any): Buffer {
+function generateExcel(data: ExportData): Buffer {
   const workbook = utils.book_new();
 
   // Transactions sheet
   if (data.transactions && data.transactions.length > 0) {
-    const transactionData = data.transactions.map((txn: any) => ({
+    const transactionData = data.transactions.map((txn) => ({
       Date: format(new Date(txn.date), 'yyyy-MM-dd'),
       Description: txn.description || '',
       Category: txn.category,
@@ -304,7 +358,7 @@ function generateExcel(data: any): Buffer {
 
   // Budgets sheet
   if (data.budgets && data.budgets.length > 0) {
-    const budgetData = data.budgets.map((budget: any) => ({
+    const budgetData = data.budgets.map((budget) => ({
       Category: budget.category,
       Amount: Number(budget.amount),
       Month: budget.month,
@@ -317,7 +371,7 @@ function generateExcel(data: any): Buffer {
 
   // Goals sheet
   if (data.goals && data.goals.length > 0) {
-    const goalData = data.goals.map((goal: any) => ({
+    const goalData = data.goals.map((goal) => ({
       Name: goal.name,
       'Target Amount': Number(goal.targetAmount),
       'Current Amount': Number(goal.currentAmount),
@@ -331,7 +385,7 @@ function generateExcel(data: any): Buffer {
 
   // Recurring Transactions sheet
   if (data.recurringTransactions && data.recurringTransactions.length > 0) {
-    const recurringData = data.recurringTransactions.map((rec: any) => ({
+    const recurringData = data.recurringTransactions.map((rec) => ({
       Description: rec.description || '',
       Category: rec.category,
       Type: rec.type,
@@ -347,7 +401,7 @@ function generateExcel(data: any): Buffer {
 
   // Investments sheet
   if (data.investments && data.investments.length > 0) {
-    const investmentData = data.investments.map((inv: any) => ({
+    const investmentData = data.investments.map((inv) => ({
       Symbol: inv.symbol,
       Name: inv.name,
       Type: inv.type,
@@ -381,7 +435,7 @@ export async function createExportReport(
       data: {
         userId,
         type: 'CUSTOM',
-        format: options.format.toUpperCase() as any,
+        format: options.format.toUpperCase() as import('@prisma/client').ReportFormat,
         name: `Export ${format(new Date(), 'yyyy-MM-dd HH:mm')}`,
         startDate: options.startDate || new Date(0),
         endDate: options.endDate || new Date(),
@@ -400,7 +454,7 @@ export async function createExportReport(
 
     logger.info('Export report created', { userId, reportId: report.id });
     return report;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to create export report', error);
     throw new Error('Failed to create export report');
   }
