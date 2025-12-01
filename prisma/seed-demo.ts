@@ -37,7 +37,7 @@ async function main() {
   for (let i = 0; i < 1000; i++) {
     const isIncome = Math.random() > 0.7; // 30% chance of income
     const type = isIncome ? 'INCOME' : 'EXPENSE';
-    const category = categories[Math.floor(Math.random() * categories.length)];
+    const category = categories[Math.floor(Math.random() * categories.length)]!;
     const amount = isIncome
       ? Math.floor(Math.random() * 5000) + 1000 // Income: 1000-6000
       : Math.floor(Math.random() * 200) + 10;   // Expense: 10-210

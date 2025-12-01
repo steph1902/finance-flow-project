@@ -1,4 +1,20 @@
-import { Home, DollarSign, Wallet, Settings, MessageSquare, Repeat, Target, ArrowLeftRightIcon, Coins, FileText, CreditCard, type LucideIcon } from "lucide-react";
+import {
+  Home,
+  DollarSign,
+  Wallet,
+  Settings,
+  MessageSquare,
+  Repeat,
+  Target,
+  ArrowLeftRightIcon,
+  Coins,
+  FileText,
+  Activity,
+  GitBranch,
+  ScrollText,
+  MessageCircle,
+  type LucideIcon
+} from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -15,7 +31,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/reports", label: "Reports", icon: FileText },
   { href: "/import-export", label: "Import/Export", icon: ArrowLeftRightIcon },
   { href: "/currency", label: "Currency", icon: Coins },
-  { href: "/subscription", label: "Subscription", icon: CreditCard },
   { href: "/ai-assistant", label: "AI Assistant", icon: MessageSquare },
+
+  // New Admin Modules
+  { href: "/dashboard/logs", label: "System Logs", icon: ScrollText },
+  { href: "/dashboard/system-health", label: "System Health", icon: Activity },
+  { href: "/dashboard/versioning", label: "Versioning", icon: GitBranch },
+  { href: "/dashboard/feedback", label: "Feedback", icon: MessageCircle },
+
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;

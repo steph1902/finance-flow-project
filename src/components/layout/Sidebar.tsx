@@ -16,10 +16,10 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Header with Menu Button */}
-      <div className="fixed top-0 left-0 right-0 z-20 flex h-[60px] items-center justify-between border-b border-border/50 bg-background/95 backdrop-blur-sm px-4 lg:hidden shadow-sm transition-colors duration-300">
+      <div className="fixed top-0 left-0 right-0 z-20 flex h-[60px] items-center justify-between border-b border-border bg-card px-4 lg:hidden shadow-sm transition-colors duration-300">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
           <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
-          <span className="text-foreground">FinanceFlow</span>
+          <span className="text-foreground font-serif">FinanceFlow</span>
         </Link>
         <div className="flex items-center gap-2">
 
@@ -38,7 +38,7 @@ export default function Sidebar() {
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-10 bg-background/80 backdrop-blur-sm lg:hidden animate-fade-in"
+          className="fixed inset-0 z-10 bg-black/20 backdrop-blur-sm lg:hidden animate-fade-in"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -47,14 +47,14 @@ export default function Sidebar() {
       {/* Mobile Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-20 w-64 flex-col border-r border-border/50 bg-background shadow-xl transition-transform duration-300 ease-out lg:hidden",
+          "fixed inset-y-0 left-0 z-20 w-64 flex-col border-r border-border bg-card shadow-xl transition-transform duration-300 ease-out lg:hidden",
           isMobileMenuOpen ? "translate-x-0 flex" : "-translate-x-full"
         )}
       >
-        <div className="flex h-[60px] items-center border-b border-border/50 px-6">
+        <div className="flex h-[60px] items-center border-b border-border px-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
             <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
-            <span className="text-foreground">FinanceFlow</span>
+            <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
@@ -69,8 +69,8 @@ export default function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -84,11 +84,11 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r border-border/50 bg-background lg:flex shadow-sm transition-colors duration-300">
-        <div className="flex h-[60px] items-center border-b border-border/50 px-6">
+      <div className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r border-border bg-card lg:flex shadow-sm transition-colors duration-300">
+        <div className="flex h-[60px] items-center border-b border-border px-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
             <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
-            <span className="text-foreground">FinanceFlow</span>
+            <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
@@ -102,8 +102,8 @@ export default function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
