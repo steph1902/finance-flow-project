@@ -47,26 +47,39 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6">
-      <DashboardDateFilter
-        startDate={selectedRange.startDate}
-        endDate={selectedRange.endDate}
-        onChange={setDateRange}
-      />
-
-      <DashboardSummary summary={data?.summary} isLoading={isLoading} />
-
-      <AIInsights />
-
-      <SpendingForecast />
-
-      <UpcomingRecurringWidget />
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SpendingPieChart data={data?.spendingByCategory ?? []} isLoading={isLoading} />
-        <SpendingLineChart data={data?.dailyTrend ?? []} isLoading={isLoading} />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-serif text-foreground">Overview</h2>
+          <p className="text-muted-foreground">Your financial health at a glance.</p>
+        </div>
+        <DashboardDateFilter
+          startDate={selectedRange.startDate}
+          endDate={selectedRange.endDate}
+          onChange={setDateRange}
+        />
       </div>
 
-      <RecentTransactions transactions={data?.recentTransactions ?? []} isLoading={isLoading} />
+      <div className="space-y-6">
+        {/* Top Stats Row */}
+        <DashboardSummary summary={data?.summary} isLoading={isLoading} />
+
+        {/* Main Grid: 2/3 + 1/3 Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column (Wide) - Spans 2 cols */}
+          <div className="lg:col-span-2 space-y-6">
+            <SpendingLineChart data={data?.dailyTrend ?? []} isLoading={isLoading} />
+            <RecentTransactions transactions={data?.recentTransactions ?? []} isLoading={isLoading} />
+          </div>
+
+          {/* Right Column (Narrow) - Spans 1 col */}
+          <div className="space-y-6">
+            <AIInsights />
+            <SpendingPieChart data={data?.spendingByCategory ?? []} isLoading={isLoading} />
+            <SpendingForecast />
+            <UpcomingRecurringWidget />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -64,11 +64,16 @@ const config: Config = {
           '4': 'var(--chart-4)',
           '5': 'var(--chart-5)',
         },
-        // Fixed Palette
-        milk: '#F9F7F0',
-        'light-stone': '#D8D2C2',
-        'desert-clay': '#B17457',
-        graphite: '#4A4947',
+        // Warm Minimalist Palette Extension
+        cream: {
+          50: '#FDFCF8',
+          100: '#F5F2EB',
+          200: '#EBE5DA',
+        },
+        brown: {
+          500: '#8C705F',
+          800: '#2D2420',
+        },
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
@@ -88,8 +93,12 @@ const config: Config = {
       },
       boxShadow: {
         sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-        lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        md: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        lg: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.05)',
+      },
+      backgroundImage: {
+        'subtle-gradient': 'linear-gradient(180deg, #FDFCF8 0%, #F5F2EB 100%)',
       },
       transitionDuration: {
         '150': '150ms',

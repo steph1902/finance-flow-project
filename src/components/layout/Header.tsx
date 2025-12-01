@@ -20,7 +20,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 md:px-6 lg:ml-64 z-50 shadow-sm transition-colors duration-300">
+    <header className="sticky top-0 flex h-16 items-center gap-4 bg-background border-b border-border px-4 md:px-6 lg:ml-64 z-50 shadow-sm transition-colors duration-300">
       {/* Mobile Menu */}
       <Sheet>
         <SheetTrigger asChild>
@@ -29,17 +29,16 @@ export default function Header() {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col w-64 bg-linear-to-br from-background via-muted/30 to-primary/5">
+        <SheetContent side="left" className="flex flex-col w-64 bg-card">
           <nav className="grid gap-2 text-base font-medium mt-8">
             <Link
               href="/dashboard"
               className="flex items-center gap-3 text-lg font-semibold mb-6 group"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-primary rounded-lg blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
                 <TrendingUp className="h-7 w-7 text-primary relative z-10" />
               </div>
-              <span className="bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <span className="text-foreground font-serif">
                 FinanceFlow
               </span>
             </Link>
@@ -52,8 +51,8 @@ export default function Header() {
                   className={cn(
                     "flex items-center gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-linear-to-r from-primary to-primary/90 text-primary-foreground shadow-md scale-[1.02]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -73,7 +72,7 @@ export default function Header() {
           <input
             type="search"
             placeholder="Search transactions..."
-            className="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-lg bg-muted/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+            className="w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-input transition-all duration-200"
           />
         </div>
       </div>
@@ -92,7 +91,7 @@ export default function Header() {
               className="rounded-full hover:bg-accent transition-colors duration-200"
               aria-label="Open user menu"
             >
-              <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-medium text-sm shadow-sm transition-shadow hover:shadow-md">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium text-sm shadow-sm transition-shadow hover:shadow-md">
                 D
               </div>
               <span className="sr-only">Toggle user menu</span>
