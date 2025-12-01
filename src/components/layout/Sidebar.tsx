@@ -4,10 +4,71 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Package2, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "@/config/navigation";
+import { NAV_SECTIONS, NAV_FOOTER, type NavItem } from "@/config/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
+function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
+  return (
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
+        isActive
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+      )}
+      aria-current={isActive ? "page" : undefined}
+    >
+      <item.icon className="h-4 w-4" />
+      {item.label}
+    </Link>
+  );
+}
+
+function NavigationSections({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
+  return (
+    <>
+      {NAV_SECTIONS.map((section, sectionIndex) => (
+        <div key={sectionIndex} className={section.title ? "mt-6" : ""}>
+          {section.title && (
+            <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground/70">
+              {section.title}
+            </h3>
+          )}
+          <div className="space-y-1">
+            {section.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
+                onClick={onItemClick}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function NavigationFooter({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
+  return (
+    <div className="border-t border-border bg-card pt-4">
+      <div className="space-y-1 px-4">
+        {NAV_FOOTER.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            isActive={pathname === item.href}
+            onClick={onItemClick}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -22,7 +83,6 @@ export default function Sidebar() {
           <span className="text-foreground font-serif">FinanceFlow</span>
         </Link>
         <div className="flex items-center gap-2">
-
           <Button
             variant="ghost"
             size="icon"
@@ -57,30 +117,16 @@ export default function Sidebar() {
             <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
         </div>
+
+        {/* Scrollable Navigation */}
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-          <nav className="grid items-start px-4 text-sm font-medium" aria-label="Main navigation">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  )}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="px-4 text-sm font-medium" aria-label="Main navigation">
+            <NavigationSections pathname={pathname} onItemClick={() => setIsMobileMenuOpen(false)} />
           </nav>
         </div>
+
+        {/* Sticky Footer */}
+        <NavigationFooter pathname={pathname} onItemClick={() => setIsMobileMenuOpen(false)} />
       </div>
 
       {/* Desktop Sidebar */}
@@ -91,30 +137,16 @@ export default function Sidebar() {
             <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
         </div>
+
+        {/* Scrollable Navigation */}
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-          <nav className="grid items-start px-4 text-sm font-medium" aria-label="Main navigation">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  )}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="px-4 text-sm font-medium" aria-label="Main navigation">
+            <NavigationSections pathname={pathname} />
           </nav>
         </div>
 
+        {/* Sticky Footer */}
+        <NavigationFooter pathname={pathname} />
       </div>
     </>
   );
