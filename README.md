@@ -105,12 +105,18 @@ Manual expense tracking is tedious and lacks actionable intelligence. FinanceFlo
 
 ### User Experience
 
+- **Premium Interface** – "Neo-Fintech" aesthetic with glassmorphism and dynamic gradients
 - **Responsive Design** – Mobile-first layout with tablet/desktop breakpoints
-- **Dark/Light Mode** – System preference detection + manual toggle (next-themes)
 - **Smooth Animations** – Framer Motion with `prefers-reduced-motion` support
 - **Optimistic Updates** – Instant UI feedback using SWR with rollback on error
 - **Toast Notifications** – Contextual feedback for all user actions (Sonner)
 - **Accessible** – WCAG 2.1 AA compliant with keyboard navigation
+
+### DevOps & Quality Assurance
+
+- **Automated Versioning** – GitHub webhook automatically increments versions on push
+- **Pre-Commit Validation** – Husky + lint-staged ensure code quality (Lint, Type-Check, Test)
+- **Auto-Deployment** – Vercel integration with automatic DB schema sync and seeding
 
 ---
 
@@ -151,6 +157,8 @@ Manual expense tracking is tedious and lacks actionable intelligence. FinanceFlo
 | TypeScript | Strict type checking with 7+ strict flags |
 | Prisma Studio | Database GUI for development |
 | Jest | Unit testing framework (configured) |
+| Husky | Git hooks for pre-commit validation |
+| Lint-Staged | Run linters on staged files only |
 
 ---
 
@@ -635,12 +643,13 @@ This will:
 npm run db:seed
 ```
 
-Creates demo data:
-- Demo user account: `demo@financeflow.com` / `demo123`
-- 50+ sample transactions across categories
-- Sample budgets for current month
-- Sample recurring transactions (Netflix, Spotify, Rent)
-- AI chat conversation examples
+Creates extensive demo data:
+- Demo user account: `demo@financeflow.com` / `Demo1234`
+- **500+ Transactions** covering 12 months of history
+- **108 Budgets** (9 categories × 12 months)
+- **5 Financial Goals** with progress tracking
+- **15 Recurring Transactions** (subscriptions, bills, salary)
+- Varied spending patterns for realistic analytics
 
 **Skip this if you want to start fresh!**
 
@@ -803,25 +812,15 @@ GOOGLE_CLIENT_SECRET=<for-google-oauth>
 4. Add `?sslmode=require` to end
 5. Paste as `DATABASE_URL` in Vercel
 
-**5. Run Database Migrations**
+**5. Automated Database Sync & Seeding**
 
-After first deployment:
+This project includes a `postbuild` script that automatically:
+1. Syncs the database schema (`prisma db push`)
+2. Seeds the database with demo data (`prisma/seed.ts`)
 
-```bash
-# Install Vercel CLI
-npm install -g vercel
+No manual migration steps are required! Vercel will handle this automatically during deployment.
 
-# Link to your project
-vercel link
-
-# Run migrations in production
-vercel env pull .env.production.local
-DATABASE_URL="<your-production-db-url>" npx prisma migrate deploy
-```
-
-**Alternative:** Use Vercel dashboard terminal (recommended for beginners):
-1. Go to Vercel project → **Settings** → **Functions**
-2. Enable **Build Command Override**: `prisma migrate deploy && npm run build`
+**Note:** The `postbuild` script uses `--accept-data-loss` to ensure schema changes are applied even if they require dropping columns. This is ideal for development/demo environments.
 
 **6. Deploy**
 
