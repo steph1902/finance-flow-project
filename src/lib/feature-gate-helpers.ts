@@ -11,24 +11,11 @@ export async function checkFeatureAccess(
   feature: 'transactions' | 'aiRequests' | 'goals' | 'budgets' | 'sharedBudgets' | 'reports',
   currentUsage: number
 ): Promise<FeatureGateResult> {
-  // Get user's subscription tier
-  const { prisma } = await import('@/lib/prisma')
-  
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId },
-  })
-
-  const tier: SubscriptionTier = subscription?.tier || 'FREE'
-
-  const canUse = canUseFeature(tier, feature, currentUsage)
-
+  // Since subscriptions have been removed, all features are now available to all users.
+  // Always allow access.
   const result: FeatureGateResult = {
-    canUse,
-    showUpgrade: !canUse,
-  }
-
-  if (!canUse) {
-    result.message = `You've reached your ${tier} plan limit for ${feature}. Upgrade to continue.`
+    canUse: true,
+    showUpgrade: false,
   }
 
   return result
