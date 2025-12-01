@@ -12,8 +12,7 @@ import {
   Mail,
   Shield,
   Database,
-  Download,
-  Trash2
+  Download
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -65,49 +64,6 @@ export default function SettingsPage() {
       toast.success("Data exported successfully!");
     } catch {
       toast.error("Failed to export data. Please try again later.");
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    const confirmed = confirm(
-      "Are you absolutely sure? This action cannot be undone. All your data will be permanently deleted."
-    );
-
-    if (!confirmed) return;
-
-    // Second confirmation for extra safety
-    const doubleConfirmed = confirm(
-      "This is your last chance. Type 'DELETE' in the next prompt to confirm."
-    );
-
-    if (!doubleConfirmed) return;
-
-    const userInput = prompt('Please type "DELETE" to confirm account deletion:');
-
-    if (userInput !== "DELETE") {
-      toast.error("Account deletion cancelled - confirmation text did not match");
-      return;
-    }
-
-    try {
-      toast.loading("Deleting account...");
-
-      const response = await fetch("/api/account/delete", {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Deletion failed");
-      }
-
-      toast.success("Account deleted successfully");
-
-      // Redirect to home page after brief delay
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
-    } catch {
-      toast.error("Failed to delete account. Please contact support.");
     }
   };
 
@@ -301,21 +257,6 @@ export default function SettingsPage() {
             </p>
             <Button variant="outline" onClick={handleExportData} className="font-medium shadow-soft">
               Export Data
-            </Button>
-          </div>
-
-          <Separator className="opacity-50" />
-
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2 font-medium text-destructive">
-              <Trash2 className="h-4 w-4" />
-              Delete Account
-            </Label>
-            <p className="type-small text-muted-foreground">
-              Permanently delete your account and all associated data
-            </p>
-            <Button variant="destructive" onClick={handleDeleteAccount} className="font-medium shadow-sm">
-              Delete Account
             </Button>
           </div>
         </CardContent>

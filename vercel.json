@@ -1,11 +1,5 @@
 {
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "env": {},
   "regions": [
-    "sin1"
+    "iad1"
   ]
 }
