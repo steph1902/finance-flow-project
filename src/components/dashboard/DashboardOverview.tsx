@@ -245,7 +245,7 @@ export function DashboardOverview() {
                                             </div>
                                         </div>
                                         <div>
-                                            <div className="text-3xl font-medium tracking-tight">{formatCurrency(data?.summary.totalIncome || 0)}</div>
+                                            <div className="text-3xl font-medium tracking-tight text-neutral-900">{formatCurrency(data?.summary.totalIncome || 0)}</div>
                                             <Progress value={65} className="h-2 mt-4 bg-neutral-100" indicatorClassName="bg-yellow-400" />
                                         </div>
                                     </>
@@ -274,7 +274,7 @@ export function DashboardOverview() {
                                             </div>
                                         </div>
                                         <div>
-                                            <div className="text-3xl font-medium tracking-tight">{formatCurrency(data?.summary.totalExpenses || 0)}</div>
+                                            <div className="text-3xl font-medium tracking-tight text-neutral-900">{formatCurrency(data?.summary.totalExpenses || 0)}</div>
                                             <Progress value={42} className="h-2 mt-4 bg-neutral-100" indicatorClassName="bg-neutral-800" />
                                         </div>
                                     </>
