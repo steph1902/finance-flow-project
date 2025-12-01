@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NextImage from "next/image";
 import { Button } from "@/components/ui/button";
 
 import { TrendingUp, Repeat, Sparkles, Shield, Zap, ArrowRight, Check, BarChart3, Target, FileDown, Brain, Moon, Smartphone } from "lucide-react";
@@ -69,10 +70,15 @@ export default function LandingPage() {
 
             {/* Hero Image / Dashboard Preview */}
             <div className="mt-20 relative max-w-6xl mx-auto animate-fade-in delay-200">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border bg-card aspect-[16/9]">
-                <div className="absolute inset-0 bg-muted/20 flex items-center justify-center">
-                  <p className="text-muted-foreground font-serif text-xl">Dashboard Preview</p>
-                </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border bg-card">
+                <NextImage
+                  src="/assets/dashboard-preview.png"
+                  alt="FinanceFlow Dashboard Preview"
+                  width={1200}
+                  height={675}
+                  className="w-full h-auto object-cover"
+                  priority
+                />
               </div>
             </div>
           </div>

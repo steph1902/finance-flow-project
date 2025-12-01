@@ -69,11 +69,11 @@ export const tokens = {
   },
   borderRadius: {
     none: '0px',
-    sm: '4px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px',
-    '2xl': '24px',
+    sm: '8px',
+    md: '12px',
+    lg: '24px', // Large soft radius
+    xl: '32px',
+    '2xl': '40px',
     full: '9999px',
   },
 } as const;
