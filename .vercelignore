@@ -1,0 +1,12 @@
+/backend
+/docker
+Dockerfile
+docker-compose.yml
+prisma/*.md
+**/*.log
+.env
+.env.local
+.DS_Store
+coverage
+tsc_errors*.txt
+uninitialized_errors.txt
