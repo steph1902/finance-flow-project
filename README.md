@@ -1,99 +1,157 @@
 # FinanceFlow
 
-AI-powered personal finance platform with intelligent transaction categorization, budget optimization, and receipt scanning. Built for users who want automated insights without manual data entry.
-
----
-
-## Demo
-
-### Dashboard Overview
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Total Balance                    Monthly Spending          │
-│  $12,450.75                       $2,847.32                 │
-│  ↑ 12% from last month            ▓▓▓▓▓▓▓░░░ 71% of budget │
-├─────────────────────────────────────────────────────────────┤
-│  Recent Transactions                                        │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │ 🍔 Good Food Restaurant    -$42.50    Food      Today  │ │
-│  │ 🚗 City Transit            -$150.00   Transport Dec 15 │ │
-│  │ 💰 TechCorp Inc.          +$5,000.00  Salary    Dec 14 │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### AI Receipt Scanning
-```
-┌──────────────────────┐      ┌──────────────────────────────┐
-│  📷 Receipt Image    │  →   │  Extracted Data              │
-│  ┌────────────────┐  │      │  ─────────────────────       │
-│  │ STORE #1234    │  │      │  Merchant: Target            │
-│  │ BANANAS  $2.99 │  │      │  Amount: $47.32              │
-│  │ MILK     $4.50 │  │      │  Category: Shopping (94%)    │
-│  │ TOTAL   $47.32 │  │      │  Date: Dec 17, 2025          │
-│  └────────────────┘  │      │  ✓ Auto-categorized          │
-└──────────────────────┘      └──────────────────────────────┘
-```
-
----
-
-## Example Usage
-
-### Web Application
-```typescript
-// Transactions are auto-categorized by AI
-const transaction = await createTransaction({
-  amount: 42.50,
-  description: "Coffee with client",
-});
-// → { category: "food", confidence: 0.94, merchant: "Starbucks" }
-
-// Budget alerts trigger automatically
-const budget = await getBudget("food");
-// → { spent: 285, limit: 400, alert: false, remaining: 115 }
-```
-
-### Mobile Application
-```typescript
-// Scan receipt with camera
-const receipt = await scanReceipt(imageUri);
-// → { amount: 127.43, merchant: "Whole Foods", items: [...] }
-
-// Track spending on the go
-const summary = await getMonthSummary();
-// → { income: 5500, expenses: 2847, savingsRate: 48 }
-```
-
----
+Personal finance automation platform with AI-powered transaction categorization, receipt scanning, and budget optimization. Targets users who need expense tracking without manual data entry. Built as a hybrid full-stack application with web, mobile, and background processing components.
 
 ## Key Capabilities
 
-| Capability | Implementation |
-|------------|----------------|
-| AI Categorization | Gemini 1.5 Flash with learning feedback loop |
-| Receipt OCR | Google Cloud Vision with merchant normalization |
-| Budget Tracking | Category-specific limits with rollover support |
-| Bank Sync | Plaid integration for automatic imports |
-| Multi-platform | Next.js web + React Native mobile |
-| Background Jobs | BullMQ with Redis for async processing |
-
----
+- Categorize transactions automatically using Gemini 1.5 Flash with confidence scoring
+- Extract receipt data via Google Cloud Vision and normalize merchant names
+- Track budgets per category with rollover support and threshold alerts
+- Sync bank accounts through Plaid for automatic transaction imports
+- Process recurring transactions (subscriptions, bills) on configurable schedules
+- Generate financial reports in PDF, CSV, and JSON formats
+- Run on web (Next.js), mobile (React Native), and API (NestJS) simultaneously
 
 ## Architecture
 
-**Hybrid full-stack design** separating UI rendering from heavy computation:
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Next.js 16    │     │    NestJS 10    │     │  React Native   │
+│   (Frontend)    │────▶│    (Backend)    │◀────│    (Mobile)     │
+│   Port 3000     │     │   Port 3001     │     │   Expo SDK 54   │
+└────────┬────────┘     └────────┬────────┘     └─────────────────┘
+         │                       │
+         │    ┌─────────────┐    │
+         └───▶│ PostgreSQL  │◀───┘
+              │   Prisma    │
+              └──────┬──────┘
+                     │
+              ┌──────▼──────┐
+              │    Redis    │
+              │  BullMQ     │
+              └─────────────┘
+```
 
-- **Frontend**: Next.js 16 handles auth, routing, and server components
-- **Backend**: NestJS service processes AI pipelines and queued jobs
-- **Database**: PostgreSQL via Prisma with type-safe queries
-- **Mobile**: Expo + React Native with shared type definitions
+**Frontend**: Handles authentication (NextAuth.js), routing, server components, and direct database reads for UI rendering.
 
-This separation allows the frontend to remain fast while AI-intensive operations run asynchronously.
+**Backend**: Processes AI pipelines, queued jobs, receipt scanning, and complex business logic asynchronously.
 
----
+**Database**: PostgreSQL with Prisma ORM. Schema includes users, transactions, budgets, goals, recurring transactions, notifications, and AI suggestions.
 
-## Project Status
+**Queue**: Redis with BullMQ for background job processing.
 
-**Active Development**
+## Getting Started
 
-The platform is functional with core features complete. Receipt scanning and budget optimization are stable. Investment tracking is in progress.
+Prerequisites: Node.js 20+, PostgreSQL 15+, Redis 7+
+
+```bash
+# Clone and install
+git clone https://github.com/steph1902/finance-flow-project.git
+cd finance-flow-project
+npm install
+cd backend && npm install && cd ..
+
+# Configure environment
+cp .env.example .env
+# Edit .env with database URL, Redis URL, API keys
+
+# Initialize database
+npx prisma migrate deploy
+npx prisma db seed
+
+# Start services
+npm run dev          # Frontend on localhost:3000
+cd backend && npm run start:dev  # Backend on localhost:3001
+```
+
+Docker alternative:
+
+```bash
+docker-compose up -d
+```
+
+## Configuration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DATABASE_URL` | Yes | - | PostgreSQL connection string |
+| `REDIS_URL` | Yes | - | Redis connection string |
+| `NEXTAUTH_SECRET` | Yes | - | Session encryption key |
+| `JWT_SECRET` | Yes | - | API token signing key |
+| `GOOGLE_AI_API_KEY` | No | - | Gemini API for categorization |
+| `GOOGLE_CLOUD_VISION_KEY` | No | - | Receipt scanning |
+| `PLAID_CLIENT_ID` | No | - | Bank sync |
+| `PLAID_SECRET` | No | - | Bank sync |
+
+Without AI keys, categorization falls back to rule-based matching. Without Plaid keys, bank sync is disabled.
+
+## Usage
+
+Create a transaction:
+
+```typescript
+POST /api/transactions
+{
+  "amount": 42.50,
+  "description": "Coffee meeting",
+  "type": "EXPENSE",
+  "date": "2025-12-18"
+}
+// Response includes AI-assigned category
+```
+
+Scan a receipt:
+
+```typescript
+POST /api/receipts/scan
+Content-Type: multipart/form-data
+// Upload image file
+// Returns extracted merchant, amount, date, line items
+```
+
+Check budget status:
+
+```typescript
+GET /api/budgets
+// Returns category budgets with spent/remaining/alert status
+```
+
+## Quality and Safety
+
+**Error Handling**: All API endpoints return structured errors with codes. Failed AI calls fall back to manual categorization. Queue jobs retry 3 times with exponential backoff.
+
+**Rate Limiting**: Auth endpoints limited to 5 requests/minute. General API limited to 100 requests/minute per user.
+
+**Input Validation**: All inputs validated via class-validator. SQL injection prevented by Prisma. XSS prevented by output escaping and input sanitization.
+
+**Known Limitations**:
+- Receipt scanning accuracy depends on image quality
+- AI categorization requires transaction history for optimal results
+- Bank sync refresh frequency determined by Plaid tier
+
+**Non-Goals**:
+- This is not an accounting system; no double-entry bookkeeping
+- No tax filing or compliance features
+- No cryptocurrency wallet integration (tracking only)
+
+## Testing
+
+```bash
+# Unit tests
+cd backend && npm test
+
+# E2E tests
+cd backend && npm run test:e2e
+
+# Coverage report
+cd backend && npm run test:cov
+```
+
+Test structure:
+- `*.spec.ts`: Unit tests per module (controllers, services)
+- `test/*.e2e-spec.ts`: Integration tests for API endpoints
+- `test/helpers/`: Mocks, factories, utilities
+
+Coverage targets: 80% for services, 70% for controllers. E2E tests cover auth flows, transactions, budgets, goals, analytics, recurring transactions, and notifications.
+
+CI runs tests on every push. Tests use isolated database transactions that rollback after each suite.
