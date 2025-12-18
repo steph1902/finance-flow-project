@@ -11,6 +11,7 @@ import axios, {
 import { env } from '@/config/env';
 import { authService } from './auth';
 import { normalizeError } from '@/utils/errorHandler';
+import type { Transaction, FinancialSummary, CreateTransactionPayload } from '@/types';
 
 // Create axios instance with default config
 const api: AxiosInstance = axios.create({
@@ -69,36 +70,37 @@ api.interceptors.response.use(
 );
 
 // ============================================================================
-// API Methods
-// In a real app, these would make actual API calls
-// For demo, they use mock data
+// API Methods - Real Backend Integration
 // ============================================================================
-
-import { mockTransactionData, mockFinancialData } from './mockData';
-import type { Transaction, FinancialSummary, CreateTransactionPayload } from '@/types';
-
-// Simulate network delay
-const delay = (ms: number = 500): Promise<void> =>
-    new Promise(resolve => setTimeout(resolve, ms));
 
 export const financeApi = {
     async getFinancialSummary(): Promise<FinancialSummary> {
-        await delay();
-        return mockFinancialData.getSummary();
+        const response = await api.get<{ summary: FinancialSummary }>('/dashboard/stats');
+        return response.data.summary;
     },
 
     async getTransactions(): Promise<Transaction[]> {
-        await delay();
-        return mockTransactionData.getTransactions();
+        const response = await api.get<{ transactions: Transaction[] }>('/transactions');
+        return response.data.transactions;
     },
 
     async addTransaction(payload: CreateTransactionPayload): Promise<Transaction> {
-        await delay();
-        return mockTransactionData.addTransaction({
+        const response = await api.post<{ transaction: Transaction }>('/transactions', {
             ...payload,
-            date: payload.date,
+            date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
         });
+        return response.data.transaction;
+    },
+
+    async deleteTransaction(id: string): Promise<void> {
+        await api.delete(`/transactions/${id}`);
+    },
+
+    async updateTransaction(id: string, payload: Partial<CreateTransactionPayload>): Promise<Transaction> {
+        const response = await api.patch<{ transaction: Transaction }>(`/transactions/${id}`, payload);
+        return response.data.transaction;
     },
 };
 
 export default api;
+

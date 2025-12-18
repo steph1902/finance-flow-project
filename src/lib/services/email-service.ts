@@ -341,8 +341,124 @@ View your goals: ${process.env.NEXTAUTH_URL}/goals
 }
 
 /**
+ * Send weekly summary email
+ */
+export interface WeeklySummaryData {
+  totalIncome: number;
+  totalExpenses: number;
+  netSavings: number;
+  topCategories: Array<[string, number]>;
+  transactionCount: number;
+}
+
+export async function sendWeeklySummary(
+  userEmail: string,
+  userName: string | null,
+  data: WeeklySummaryData
+) {
+  const displayName = userName || 'there';
+
+  const topCategoriesHtml = data.topCategories
+    .map(([category, amount]) => `<li>${category}: ${formatCurrency(amount)}</li>`)
+    .join('');
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; }
+          .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+          .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; }
+          .stat-value { font-size: 24px; font-weight: 700; color: #111827; }
+          .stat-label { font-size: 12px; color: #6b7280; text-transform: uppercase; }
+          .income { color: #10b981; }
+          .expense { color: #ef4444; }
+          .savings { color: ${data.netSavings >= 0 ? '#10b981' : '#ef4444'}; }
+          .categories { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+          .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📊 Weekly Financial Summary</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${displayName},</p>
+            <p>Here's your financial summary for the past week:</p>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value income">${formatCurrency(data.totalIncome)}</div>
+                <div class="stat-label">Income</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value expense">${formatCurrency(data.totalExpenses)}</div>
+                <div class="stat-label">Expenses</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value savings">${formatCurrency(data.netSavings)}</div>
+                <div class="stat-label">Net ${data.netSavings >= 0 ? 'Savings' : 'Deficit'}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">${data.transactionCount}</div>
+                <div class="stat-label">Transactions</div>
+              </div>
+            </div>
+
+            ${data.topCategories.length > 0 ? `
+            <div class="categories">
+              <h3 style="margin-top: 0;">Top Spending Categories</h3>
+              <ol>${topCategoriesHtml}</ol>
+            </div>
+            ` : ''}
+
+            <center>
+              <a href="${process.env.NEXTAUTH_URL}/dashboard" class="button">View Dashboard</a>
+            </center>
+          </div>
+          <div class="footer">
+            <p>This is your weekly summary from FinanceFlow.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  const text = `
+Weekly Financial Summary
+
+Hi ${displayName},
+
+Here's your financial summary for the past week:
+
+Income: ${formatCurrency(data.totalIncome)}
+Expenses: ${formatCurrency(data.totalExpenses)}
+Net ${data.netSavings >= 0 ? 'Savings' : 'Deficit'}: ${formatCurrency(data.netSavings)}
+Transactions: ${data.transactionCount}
+
+${data.topCategories.length > 0 ? `Top Categories:\n${data.topCategories.map(([cat, amt]) => `- ${cat}: ${formatCurrency(amt)}`).join('\n')}` : ''}
+
+View dashboard: ${process.env.NEXTAUTH_URL}/dashboard
+  `;
+
+  await sendEmail({
+    to: userEmail,
+    subject: `📊 Your Weekly Financial Summary`,
+    html,
+    text,
+  });
+}
+
+/**
  * Check if email service is configured
  */
 export function isEmailConfigured(): boolean {
   return !!RESEND_API_KEY;
 }
+

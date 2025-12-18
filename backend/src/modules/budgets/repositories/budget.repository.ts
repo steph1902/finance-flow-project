@@ -112,17 +112,43 @@ export class BudgetRepository {
   }
 
   async updateSpent(id: string, spent: Prisma.Decimal): Promise<Budget> {
-    // TODO: Implement when spent field is added to schema
-    throw new Error('updateSpent not implemented - spent field not in schema');
+    return this.prisma.budget.update({
+      where: { id },
+      data: { spent },
+    });
   }
 
   async findRolloverCandidates(userId: string): Promise<Budget[]> {
-    // TODO: Implement when rollover field is added to schema
-    return [];
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    
+    // Find budgets from previous month with rollover enabled
+    let prevMonth = currentMonth - 1;
+    let prevYear = currentYear;
+    if (prevMonth === 0) {
+      prevMonth = 12;
+      prevYear = currentYear - 1;
+    }
+
+    return this.prisma.budget.findMany({
+      where: {
+        userId,
+        rollover: true,
+        month: prevMonth,
+        year: prevYear,
+      },
+    });
   }
 
   async incrementSpent(id: string, amount: Prisma.Decimal): Promise<Budget> {
-    // TODO: Implement when spent field is added to schema
-    throw new Error('incrementSpent not implemented - spent field not in schema');
+    return this.prisma.budget.update({
+      where: { id },
+      data: {
+        spent: {
+          increment: amount,
+        },
+      },
+    });
   }
 }

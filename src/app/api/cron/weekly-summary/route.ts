@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { sendWeeklySummary, isEmailConfigured } from '@/lib/services/email-service';
 
 /**
  * Weekly Summary Cron Job
@@ -100,14 +101,21 @@ export async function GET(request: Request) {
 
       summariesCreated++;
 
-      // TODO: Send email using Resend (when email feature is implemented)
-      // await sendWeeklySummaryEmail(user.email, {
-      //   totalIncome,
-      //   totalExpenses,
-      //   netSavings,
-      //   topCategories,
-      //   transactionCount: transactions.length,
-      // });
+      // Send email summary if email service is configured
+      if (isEmailConfigured()) {
+        try {
+          await sendWeeklySummary(user.email, user.name, {
+            totalIncome,
+            totalExpenses,
+            netSavings,
+            topCategories,
+            transactionCount: transactions.length,
+          });
+        } catch (emailError) {
+          logger.warn('Failed to send weekly summary email', { userId: user.id, error: emailError });
+          // Continue processing other users even if email fails
+        }
+      }
     }
 
     return NextResponse.json({

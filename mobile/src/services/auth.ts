@@ -4,9 +4,9 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import type { User, AuthTokens, LoginCredentials } from '@/types';
-import { StorageKeys } from '@/config/env';
-import { mockAuthData } from './mockData';
+import { StorageKeys, env } from '@/config/env';
 
 interface AuthResult {
     user: User;
@@ -18,10 +18,21 @@ interface StoredAuth {
     tokens: AuthTokens;
 }
 
+interface LoginResponse {
+    user: {
+        id: string;
+        email: string;
+        name: string | null;
+    };
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: string;
+}
+
 class AuthService {
     /**
      * Login with email and password
-     * In production, this would call the actual API
+     * Calls the real backend API
      */
     async login(credentials: LoginCredentials): Promise<AuthResult> {
         // Validate credentials format
@@ -37,17 +48,66 @@ class AuthService {
             throw new Error('Password must be at least 6 characters');
         }
 
-        // Simulate API call delay
-        await this.simulateNetworkDelay();
+        try {
+            // Call real API endpoint
+            const response = await axios.post<LoginResponse>(
+                `${env.apiUrl}/auth/signin`,
+                credentials
+            );
 
-        // For demo: accept any valid-looking credentials
-        // In production, this would call the actual backend API
-        const result = mockAuthData.getLoginResponse(credentials.email);
+            const { user, accessToken, refreshToken, expiresIn } = response.data;
 
-        // Store auth data
-        await this.storeAuth(result);
+            // Parse expires in to calculate expiration timestamp
+            const expiresInMs = this.parseExpiresIn(expiresIn);
 
-        return result;
+            const result: AuthResult = {
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name ?? undefined,
+                },
+                tokens: {
+                    accessToken,
+                    refreshToken,
+                    expiresAt: Date.now() + expiresInMs,
+                },
+            };
+
+            // Store auth data
+            await this.storeAuth(result);
+
+            return result;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const message = error.response.data?.message || 'Invalid credentials';
+                throw new Error(message);
+            }
+            throw new Error('Network error. Please check your connection.');
+        }
+    }
+
+    /**
+     * Parse expires in string to milliseconds
+     */
+    private parseExpiresIn(expiresIn: string): number {
+        const match = expiresIn.match(/^(\d+)([hmd])$/);
+        if (!match) {
+            return 60 * 60 * 1000; // Default 1 hour
+        }
+
+        const value = parseInt(match[1], 10);
+        const unit = match[2];
+
+        switch (unit) {
+            case 'h':
+                return value * 60 * 60 * 1000;
+            case 'd':
+                return value * 24 * 60 * 60 * 1000;
+            case 'm':
+                return value * 60 * 1000;
+            default:
+                return 60 * 60 * 1000;
+        }
     }
 
     /**
@@ -118,14 +178,8 @@ class AuthService {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-
-    /**
-     * Simulate network delay for demo purposes
-     */
-    private simulateNetworkDelay(): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, 800));
-    }
 }
 
 export const authService = new AuthService();
 export default authService;
+
