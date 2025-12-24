@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 // Helper function to generate random amounts within a range
 function randomAmount(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+  return Math.round((Math.random() * (max - min) + min) * 100) / 100;
 }
 
 // Helper to get random item from array
@@ -13,403 +13,578 @@ function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
+// Helper to get random date within a range
+function randomDate(monthsAgo: number): Date {
+  const now = new Date();
+  const date = new Date(now);
+  date.setMonth(date.getMonth() - monthsAgo);
+  date.setDate(Math.floor(Math.random() * 28) + 1);
+  date.setHours(Math.floor(Math.random() * 14) + 8); // 8am - 10pm
+  date.setMinutes(Math.floor(Math.random() * 60));
+  return date;
+}
+
 async function main() {
-  console.log('🌱 Seeding database with EXTENSIVE demo data...');
+  console.log('🌱 Seeding database with 1000+ NATURAL demo transactions...\n');
+
+  // Clear existing data first
+  console.log('🧹 Clearing existing demo data...');
+  const existingUser = await prisma.user.findUnique({ where: { email: 'demo@financeflow.com' } });
+  if (existingUser) {
+    await prisma.transaction.deleteMany({ where: { userId: existingUser.id } });
+    await prisma.budget.deleteMany({ where: { userId: existingUser.id } });
+    await prisma.goal.deleteMany({ where: { userId: existingUser.id } });
+    await prisma.recurringTransaction.deleteMany({ where: { userId: existingUser.id } });
+    await prisma.notification.deleteMany({ where: { userId: existingUser.id } });
+  }
 
   // Create demo user
   const hashedPassword = await bcrypt.hash('Demo1234', 10);
-
   const demoUser = await prisma.user.upsert({
     where: { email: 'demo@financeflow.com' },
-    update: {},
+    update: { name: 'Alex Johnson' },
     create: {
       email: 'demo@financeflow.com',
-      name: 'Demo User',
+      name: 'Alex Johnson',
       password: hashedPassword,
     },
   });
-
   console.log('✅ Created demo user:', demoUser.email);
 
-  const now = new Date();
-  const transactions = [];
+  const transactions: Array<{
+    userId: string;
+    amount: number;
+    type: 'INCOME' | 'EXPENSE';
+    category: string;
+    description: string;
+    date: Date;
+    merchantName?: string;
+  }> = [];
 
-  // ============== INCOME TRANSACTIONS (100+ entries) ==============
+  // ================ REALISTIC INCOME SOURCES ================
 
-  // Monthly salary for 12 months
-  for (let month = 0; month < 12; month++) {
-    const salary = month < 6 ? 5500 : 5300; // Raise after 6 months
-    transactions.push({
-      userId: demoUser.id,
-      amount: salary,
-      type: 'INCOME' as const,
-      category: 'Salary',
-      description: 'Full-time salary - Tech Company',
-      monthsAgo: month,
-      day: 28,
-    });
+  // Primary job salary (24 months - bi-weekly pay)
+  const employers = ['Acme Technologies', 'Innovate Corp', 'TechStart Inc'];
+  const employer = randomItem(employers);
+  const baseSalary = 3250; // ~$6500/month
+
+  for (let month = 0; month < 24; month++) {
+    // Two paychecks per month
+    for (let paycheck of [1, 15]) {
+      const variance = randomAmount(-50, 50);
+      transactions.push({
+        userId: demoUser.id,
+        amount: baseSalary + variance,
+        type: 'INCOME',
+        category: 'Salary',
+        description: `Direct Deposit - ${employer}`,
+        date: new Date(new Date().getFullYear(), new Date().getMonth() - month, paycheck),
+        merchantName: employer,
+      });
+    }
   }
 
-  // Quarterly bonuses
-  [2, 5, 8, 11].forEach(month => {
-    transactions.push({
-      userId: demoUser.id,
-      amount: randomAmount(1500, 3000),
-      type: 'INCOME' as const,
-      category: 'Salary',
-      description: 'Quarterly Performance Bonus',
-      monthsAgo: month,
-      day: 15,
-    });
+  // Annual bonus (December)
+  transactions.push({
+    userId: demoUser.id,
+    amount: randomAmount(8000, 12000),
+    type: 'INCOME',
+    category: 'Salary',
+    description: 'Annual Performance Bonus',
+    date: new Date(new Date().getFullYear(), 11, 20),
+    merchantName: employer,
   });
 
-  // Freelance projects (2-4 per month)
-  const freelanceDescriptions = [
-    'Website redesign', 'Logo design', 'E-commerce development',
-    'Mobile app consultation', 'UI/UX design', 'WordPress customization',
-    'React consulting', 'Database optimization', 'API development',
-    'SEO optimization', 'Content management system', 'Landing page design'
+  // Freelance income (irregular)
+  const freelanceClients = [
+    'Startup XYZ', 'Local Restaurant', 'Boutique Agency', 'E-commerce Store',
+    'Real Estate Office', 'Dental Practice', 'Law Firm', 'Marketing Agency'
+  ];
+  const freelanceServices = [
+    'Website Development', 'Logo Design', 'SEO Consulting', 'Content Writing',
+    'Social Media Setup', 'Email Marketing', 'WordPress Maintenance', 'App Prototype'
   ];
 
   for (let month = 0; month < 12; month++) {
-    const projectCount = randomAmount(2, 4);
+    const projectCount = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < projectCount; i++) {
+      const client = randomItem(freelanceClients);
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(300, 2500),
-        type: 'INCOME' as const,
+        amount: randomAmount(350, 2800),
+        type: 'INCOME',
         category: 'Freelance',
-        description: randomItem(freelanceDescriptions),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: `${randomItem(freelanceServices)} - ${client}`,
+        date: randomDate(month),
+        merchantName: client,
       });
     }
   }
 
-  // Investment income (monthly)
-  const investmentTypes = [
-    'Stock dividends', 'Index fund dividends', 'Bond interest',
-    'Savings account interest', 'Cryptocurrency gains', 'REIT dividends'
-  ];
-
-  for (let month = 0; month < 12; month++) {
-    const investmentCount = randomAmount(2, 4);
-    for (let i = 0; i < investmentCount; i++) {
+  // Dividend income
+  const stocks = ['AAPL', 'MSFT', 'VTI', 'VXUS', 'BND', 'VNQ'];
+  for (let quarter = 0; quarter < 8; quarter++) {
+    for (const stock of stocks.slice(0, Math.floor(Math.random() * 4) + 2)) {
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(50, 300),
-        type: 'INCOME' as const,
+        amount: randomAmount(15, 180),
+        type: 'INCOME',
         category: 'Investment',
-        description: randomItem(investmentTypes),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: `${stock} Quarterly Dividend`,
+        date: new Date(new Date().getFullYear(), (quarter * 3) % 12, randomItem([15, 20, 25])),
+        merchantName: 'Fidelity Investments',
       });
     }
   }
 
-  // Side business / Other income
-  const otherIncomeTypes = [
-    'Online course sales', 'Affiliate marketing', 'Digital product sales',
-    'Consulting fees', 'Credit card cashback', 'Tax refund',
-    'Rebate', 'Product return refund', 'Insurance reimbursement'
+  // Side income
+  const sideIncomeTypes = [
+    { desc: 'eBay Sales', range: [25, 200] },
+    { desc: 'Facebook Marketplace', range: [50, 300] },
+    { desc: 'Cashback Rewards', range: [15, 75] },
+    { desc: 'Survey Rewards', range: [5, 25] },
+    { desc: 'Referral Bonus', range: [50, 100] },
+    { desc: 'Credit Card Points Redemption', range: [25, 150] },
   ];
 
   for (let month = 0; month < 12; month++) {
-    const otherCount = randomAmount(1, 3);
-    for (let i = 0; i < otherCount; i++) {
+    const count = Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      const income = randomItem(sideIncomeTypes);
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(25, 800),
-        type: 'INCOME' as const,
+        amount: randomAmount(income.range[0], income.range[1]),
+        type: 'INCOME',
         category: 'Other',
-        description: randomItem(otherIncomeTypes),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: income.desc,
+        date: randomDate(month),
       });
     }
   }
 
-  // ============== EXPENSE TRANSACTIONS (400+ entries) ==============
+  // ================ REALISTIC EXPENSE CATEGORIES ================
 
-  // Monthly recurring expenses
-  const recurringExpenses = [
-    { category: 'Housing', amount: 1850, description: 'Monthly rent - Downtown apartment' },
-    { category: 'Utilities', amount: 85, description: 'Internet - Fiber 1Gbps' },
-    { category: 'Utilities', amount: 55, description: 'Mobile phone plan' },
-    { category: 'Transportation', amount: 125, description: 'Car insurance' },
-    { category: 'Healthcare', amount: 89, description: 'Gym membership' },
-    { category: 'Entertainment', amount: 16.99, description: 'Netflix Premium' },
-    { category: 'Entertainment', amount: 14.99, description: 'Spotify Premium' },
-    { category: 'Entertainment', amount: 19.99, description: 'YouTube Premium' },
-    { category: 'Other', amount: 85, description: 'Storage unit rental' },
-  ];
-
-  for (let month = 0; month < 12; month++) {
-    recurringExpenses.forEach(expense => {
-      transactions.push({
-        userId: demoUser.id,
-        amount: expense.amount,
-        type: 'EXPENSE' as const,
-        category: expense.category,
-        description: expense.description,
-        monthsAgo: month,
-        day: randomAmount(1, 5),
-      });
+  // Housing (fixed monthly)
+  for (let month = 0; month < 24; month++) {
+    transactions.push({
+      userId: demoUser.id,
+      amount: 2150,
+      type: 'EXPENSE',
+      category: 'Housing',
+      description: 'Monthly Rent - Apartment 4B',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 1),
+      merchantName: 'Oakwood Properties LLC',
     });
   }
 
-  // Variable utility bills (monthly)
+  // Utilities (variable monthly)
+  const utilityProviders = {
+    electricity: { name: 'Pacific Gas & Electric', range: [85, 180] },
+    gas: { name: 'SoCal Gas', range: [35, 95] },
+    water: { name: 'City Water Services', range: [45, 75] },
+    internet: { name: 'Comcast Xfinity', amount: 79.99 },
+    phone: { name: 'Verizon Wireless', amount: 85 },
+  };
+
   for (let month = 0; month < 12; month++) {
+    // Variable utilities
     transactions.push({
       userId: demoUser.id,
-      amount: randomAmount(90, 150),
-      type: 'EXPENSE' as const,
+      amount: randomAmount(utilityProviders.electricity.range[0], utilityProviders.electricity.range[1]),
+      type: 'EXPENSE',
       category: 'Utilities',
-      description: 'Electricity bill',
-      monthsAgo: month,
-      day: 8,
+      description: 'Electric Bill',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 8),
+      merchantName: utilityProviders.electricity.name,
     });
     transactions.push({
       userId: demoUser.id,
-      amount: randomAmount(55, 75),
-      type: 'EXPENSE' as const,
+      amount: randomAmount(utilityProviders.gas.range[0], utilityProviders.gas.range[1]),
+      type: 'EXPENSE',
       category: 'Utilities',
-      description: 'Water & sewage',
-      monthsAgo: month,
-      day: 12,
+      description: 'Natural Gas',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 12),
+      merchantName: utilityProviders.gas.name,
+    });
+    transactions.push({
+      userId: demoUser.id,
+      amount: randomAmount(utilityProviders.water.range[0], utilityProviders.water.range[1]),
+      type: 'EXPENSE',
+      category: 'Utilities',
+      description: 'Water & Sewer',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 15),
+      merchantName: utilityProviders.water.name,
+    });
+    // Fixed utilities
+    transactions.push({
+      userId: demoUser.id,
+      amount: utilityProviders.internet.amount,
+      type: 'EXPENSE',
+      category: 'Utilities',
+      description: 'Internet - 500 Mbps',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 5),
+      merchantName: utilityProviders.internet.name,
+    });
+    transactions.push({
+      userId: demoUser.id,
+      amount: utilityProviders.phone.amount,
+      type: 'EXPENSE',
+      category: 'Utilities',
+      description: 'Mobile Phone - Unlimited Plan',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 18),
+      merchantName: utilityProviders.phone.name,
     });
   }
 
-  // Groceries (weekly - 4 per month)
+  // Groceries (multiple times per week)
   const groceryStores = [
-    'Whole Foods', 'Trader Joes', 'Costco', 'Safeway',
-    'Local farmers market', 'Asian supermarket', 'Organic market'
+    { name: 'Whole Foods Market', range: [45, 120] },
+    { name: 'Trader Joes', range: [35, 85] },
+    { name: 'Costco', range: [150, 350] },
+    { name: 'Safeway', range: [40, 95] },
+    { name: 'Sprouts Farmers Market', range: [30, 75] },
+    { name: 'Target', range: [25, 65] },
+    { name: '99 Ranch Market', range: [40, 90] },
   ];
 
   for (let month = 0; month < 12; month++) {
-    for (let week = 0; week < 4; week++) {
+    const tripsPerMonth = Math.floor(Math.random() * 4) + 6; // 6-10 trips
+    for (let i = 0; i < tripsPerMonth; i++) {
+      const store = randomItem(groceryStores);
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(100, 200),
-        type: 'EXPENSE' as const,
+        amount: randomAmount(store.range[0], store.range[1]),
+        type: 'EXPENSE',
         category: 'Groceries',
-        description: `${randomItem(groceryStores)} - Weekly shopping`,
-        monthsAgo: month,
-        day: week * 7 + randomAmount(1, 6),
+        description: store.name,
+        date: randomDate(month),
+        merchantName: store.name,
       });
     }
   }
 
-  // Dining out (5-10 times per month)
+  // Dining out (frequent)
   const restaurants = [
-    'Italian restaurant', 'Sushi place', 'Mexican restaurant',
-    'Thai restaurant', 'Steakhouse', 'Coffee shop', 'Fast food',
-    'Chinese restaurant', 'Vietnamese restaurant', 'Indian cuisine',
-    'Brunch cafe', 'Pizza place', 'Food truck'
+    { name: 'Chipotle', range: [12, 18] },
+    { name: 'Panera Bread', range: [14, 22] },
+    { name: 'The Cheesecake Factory', range: [35, 75] },
+    { name: 'Olive Garden', range: [25, 55] },
+    { name: 'Local Coffee Shop', range: [5, 12] },
+    { name: 'Starbucks', range: [6, 15] },
+    { name: 'Sushi Roku', range: [45, 95] },
+    { name: 'In-N-Out Burger', range: [8, 16] },
+    { name: 'Sweetgreen', range: [14, 20] },
+    { name: 'Thai Kitchen', range: [18, 32] },
+    { name: 'Pho 88', range: [12, 22] },
+    { name: 'Pizzeria Locale', range: [18, 35] },
+    { name: 'DoorDash Order', range: [25, 55] },
+    { name: 'Uber Eats Order', range: [22, 48] },
+    { name: 'Grubhub Order', range: [20, 45] },
   ];
 
   for (let month = 0; month < 12; month++) {
-    const diningCount = randomAmount(5, 10);
-    for (let i = 0; i < diningCount; i++) {
+    const mealsOut = Math.floor(Math.random() * 8) + 10; // 10-18 per month
+    for (let i = 0; i < mealsOut; i++) {
+      const restaurant = randomItem(restaurants);
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(15, 150),
-        type: 'EXPENSE' as const,
+        amount: randomAmount(restaurant.range[0], restaurant.range[1]),
+        type: 'EXPENSE',
         category: 'Dining',
-        description: randomItem(restaurants),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: restaurant.name,
+        date: randomDate(month),
+        merchantName: restaurant.name,
       });
     }
   }
 
-  // Transportation (gas, maintenance, parking)
+  // Transportation
+  const gasStations = ['Shell', 'Chevron', '76 Station', 'Costco Gas', 'Arco'];
   for (let month = 0; month < 12; month++) {
-    // Gas (2-3 times per month)
-    const gasCount = randomAmount(2, 3);
-    for (let i = 0; i < gasCount; i++) {
+    // Gas (2-4 times per month)
+    const fillUps = Math.floor(Math.random() * 3) + 2;
+    for (let i = 0; i < fillUps; i++) {
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(50, 80),
-        type: 'EXPENSE' as const,
+        amount: randomAmount(45, 75),
+        type: 'EXPENSE',
         category: 'Transportation',
-        description: 'Gasoline',
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: `Gas - ${randomItem(gasStations)}`,
+        date: randomDate(month),
+        merchantName: randomItem(gasStations),
       });
     }
-
-    // Occasional maintenance, parking, tolls
-    if (Math.random() > 0.5) {
-      const transportTypes = [
-        { desc: 'Car wash', amount: [25, 45] as const },
-        { desc: 'Oil change', amount: [60, 90] as const },
-        { desc: 'Parking fee', amount: [15, 40] as const },
-        { desc: 'Bridge toll', amount: [5, 25] as const },
-        { desc: 'Uber ride', amount: [20, 60] as const },
-      ];
-      const transport = randomItem(transportTypes);
+    // Car insurance (monthly)
+    transactions.push({
+      userId: demoUser.id,
+      amount: 142,
+      type: 'EXPENSE',
+      category: 'Transportation',
+      description: 'Auto Insurance Premium',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 22),
+      merchantName: 'Geico',
+    });
+    // Occasional Uber/Lyft
+    const ridesPerMonth = Math.floor(Math.random() * 4);
+    for (let i = 0; i < ridesPerMonth; i++) {
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(transport.amount[0]!, transport.amount[1]!),
-        type: 'EXPENSE' as const,
+        amount: randomAmount(12, 45),
+        type: 'EXPENSE',
         category: 'Transportation',
-        description: transport.desc,
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: randomItem(['Uber', 'Lyft']) + ' ride',
+        date: randomDate(month),
+        merchantName: randomItem(['Uber', 'Lyft']),
       });
     }
   }
-
-  // Shopping (2-5 times per month)
-  const shoppingItems = [
-    { desc: 'Clothing - H&M', range: [30, 150] as const },
-    { desc: 'Electronics - Best Buy', range: [50, 800] as const },
-    { desc: 'Shoes - Nike', range: [60, 200] as const },
-    { desc: 'Home decor - Target', range: [40, 200] as const },
-    { desc: 'Books - Amazon', range: [15, 80] as const },
-    { desc: 'Kitchen items', range: [30, 150] as const },
-    { desc: 'Cosmetics - Sephora', range: [25, 120] as const },
-    { desc: 'Sports equipment', range: [40, 300] as const },
+  // Car maintenance (occasional)
+  const carMaintenance = [
+    { desc: 'Oil Change - Jiffy Lube', amount: [45, 75] },
+    { desc: 'Tire Rotation - Discount Tire', amount: [25, 40] },
+    { desc: 'Car Wash - Splash & Dash', amount: [15, 35] },
+    { desc: 'Brake Service - Midas', amount: [250, 450] },
+    { desc: 'New Tires - Americas Tire', amount: [400, 800] },
   ];
-
-  for (let month = 0; month < 12; month++) {
-    const shopCount = randomAmount(2, 5);
-    for (let i = 0; i < shopCount; i++) {
-      const item = randomItem(shoppingItems);
-      transactions.push({
-        userId: demoUser.id,
-        amount: randomAmount(item.range[0]!, item.range[1]!),
-        type: 'EXPENSE' as const,
-        category: 'Shopping',
-        description: item.desc,
-        monthsAgo: month,
-        day: randomAmount(1, 28),
-      });
-    }
+  for (let i = 0; i < 8; i++) {
+    const maintenance = randomItem(carMaintenance.slice(0, 3)); // More common ones
+    transactions.push({
+      userId: demoUser.id,
+      amount: randomAmount(maintenance.amount[0], maintenance.amount[1]),
+      type: 'EXPENSE',
+      category: 'Transportation',
+      description: maintenance.desc,
+      date: randomDate(Math.floor(Math.random() * 12)),
+    });
   }
 
-  // Healthcare (1-3 times per month)
-  const healthcareItems = [
-    'Pharmacy - Prescriptions', 'Doctor visit', 'Dentist appointment',
-    'Vitamins & supplements', 'Eye exam', 'Physical therapy',
-    'Massage therapy', 'Chiropractor', 'Medical copay'
+  // Entertainment & Subscriptions
+  const subscriptions = [
+    { name: 'Netflix', amount: 15.99 },
+    { name: 'Spotify Premium', amount: 10.99 },
+    { name: 'YouTube Premium', amount: 13.99 },
+    { name: 'Disney+', amount: 10.99 },
+    { name: 'HBO Max', amount: 15.99 },
+    { name: 'Apple iCloud', amount: 2.99 },
+    { name: 'Audible', amount: 14.95 },
+    { name: 'Amazon Prime', amount: 14.99 },
   ];
 
   for (let month = 0; month < 12; month++) {
-    const healthCount = randomAmount(1, 3);
-    for (let i = 0; i < healthCount; i++) {
+    for (const sub of subscriptions) {
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(30, 200),
-        type: 'EXPENSE' as const,
-        category: 'Healthcare',
-        description: randomItem(healthcareItems),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
-      });
-    }
-  }
-
-  // Entertainment & subscriptions
-  const entertainmentItems = [
-    'Movie theater', 'Concert tickets', 'Video games', 'Books',
-    'Streaming service', 'Sports event', 'Museum visit',
-    'Amusement park', 'Theater show', 'Bowling', 'Mini golf'
-  ];
-
-  for (let month = 0; month < 12; month++) {
-    const entertainCount = randomAmount(2, 5);
-    for (let i = 0; i < entertainCount; i++) {
-      transactions.push({
-        userId: demoUser.id,
-        amount: randomAmount(15, 250),
-        type: 'EXPENSE' as const,
+        amount: sub.amount,
+        type: 'EXPENSE',
         category: 'Entertainment',
-        description: randomItem(entertainmentItems),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        description: sub.name + ' Subscription',
+        date: new Date(new Date().getFullYear(), new Date().getMonth() - month, randomItem([1, 5, 10, 15])),
+        merchantName: sub.name,
       });
     }
   }
 
-  // Other expenses (miscellaneous)
-  const otherExpenses = [
-    'Haircut', 'Dry cleaning', 'Pet supplies', 'Gifts',
-    'Charity donation', 'Professional development', 'Online course',
-    'Subscription service', 'Home improvement', 'Laundry service'
+  // Entertainment activities
+  const entertainment = [
+    { desc: 'AMC Movie Theater', range: [15, 35] },
+    { desc: 'Concert Tickets - Ticketmaster', range: [75, 250] },
+    { desc: 'Comedy Show', range: [35, 75] },
+    { desc: 'Bowling Night', range: [25, 55] },
+    { desc: 'Escape Room', range: [30, 50] },
+    { desc: 'Museum Admission', range: [15, 35] },
+    { desc: 'Theme Park - Six Flags', range: [60, 120] },
+    { desc: 'Video Game - Steam', range: [20, 60] },
+    { desc: 'PlayStation Store', range: [15, 70] },
+    { desc: 'Book - Amazon', range: [10, 25] },
+    { desc: 'Kindle Purchase', range: [8, 18] },
   ];
 
   for (let month = 0; month < 12; month++) {
-    const otherCount = randomAmount(3, 6);
-    for (let i = 0; i < otherCount; i++) {
+    const activities = Math.floor(Math.random() * 4) + 2;
+    for (let i = 0; i < activities; i++) {
+      const activity = randomItem(entertainment);
       transactions.push({
         userId: demoUser.id,
-        amount: randomAmount(20, 300),
-        type: 'EXPENSE' as const,
-        category: 'Other',
-        description: randomItem(otherExpenses),
-        monthsAgo: month,
-        day: randomAmount(1, 28),
+        amount: randomAmount(activity.range[0], activity.range[1]),
+        type: 'EXPENSE',
+        category: 'Entertainment',
+        description: activity.desc,
+        date: randomDate(month),
       });
     }
   }
 
-  // Create all transactions
+  // Shopping
+  const shoppingStores = [
+    { name: 'Amazon', range: [15, 200] },
+    { name: 'Target', range: [25, 120] },
+    { name: 'Walmart', range: [20, 85] },
+    { name: 'Best Buy', range: [50, 500] },
+    { name: 'Apple Store', range: [100, 800] },
+    { name: 'Nike', range: [65, 180] },
+    { name: 'H&M', range: [35, 95] },
+    { name: 'Nordstrom', range: [75, 250] },
+    { name: 'REI', range: [45, 200] },
+    { name: 'IKEA', range: [30, 350] },
+    { name: 'Home Depot', range: [25, 150] },
+    { name: 'Etsy', range: [20, 75] },
+  ];
+
+  for (let month = 0; month < 12; month++) {
+    const purchases = Math.floor(Math.random() * 5) + 3;
+    for (let i = 0; i < purchases; i++) {
+      const store = randomItem(shoppingStores);
+      transactions.push({
+        userId: demoUser.id,
+        amount: randomAmount(store.range[0], store.range[1]),
+        type: 'EXPENSE',
+        category: 'Shopping',
+        description: store.name,
+        date: randomDate(month),
+        merchantName: store.name,
+      });
+    }
+  }
+
+  // Healthcare
+  const healthcareExpenses = [
+    { desc: 'CVS Pharmacy', range: [15, 75] },
+    { desc: 'Walgreens', range: [12, 65] },
+    { desc: 'Doctor Visit Copay', range: [25, 50] },
+    { desc: 'Dentist - Cleaning', range: [0, 25] },
+    { desc: 'Eye Exam - LensCrafters', range: [25, 75] },
+    { desc: 'Prescription - Express Scripts', range: [10, 45] },
+    { desc: 'Vitamins - GNC', range: [25, 60] },
+    { desc: 'Therapy Session', range: [30, 50] },
+  ];
+
+  // Gym membership
+  for (let month = 0; month < 12; month++) {
+    transactions.push({
+      userId: demoUser.id,
+      amount: 49.99,
+      type: 'EXPENSE',
+      category: 'Healthcare',
+      description: '24 Hour Fitness Membership',
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - month, 1),
+      merchantName: '24 Hour Fitness',
+    });
+    // Other healthcare
+    const healthItems = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < healthItems; i++) {
+      const item = randomItem(healthcareExpenses);
+      transactions.push({
+        userId: demoUser.id,
+        amount: randomAmount(item.range[0], item.range[1]),
+        type: 'EXPENSE',
+        category: 'Healthcare',
+        description: item.desc,
+        date: randomDate(month),
+      });
+    }
+  }
+
+  // Personal care & Other
+  const otherExpenses = [
+    { desc: 'Haircut - Great Clips', range: [25, 45] },
+    { desc: 'Dry Cleaning', range: [20, 50] },
+    { desc: 'Pet Supplies - Petco', range: [30, 80] },
+    { desc: 'Gift - Birthday', range: [25, 100] },
+    { desc: 'Gift - Wedding', range: [75, 200] },
+    { desc: 'Gift - Holiday', range: [50, 150] },
+    { desc: 'Charity Donation', range: [25, 100] },
+    { desc: 'ATM Withdrawal', range: [60, 200] },
+    { desc: 'Bank Fee', range: [10, 35] },
+    { desc: 'Parking Fee', range: [5, 25] },
+    { desc: 'Laundromat', range: [15, 30] },
+    { desc: 'Office Supplies - Staples', range: [15, 50] },
+    { desc: 'Postage - USPS', range: [5, 20] },
+  ];
+
+  for (let month = 0; month < 12; month++) {
+    const miscCount = Math.floor(Math.random() * 5) + 3;
+    for (let i = 0; i < miscCount; i++) {
+      const expense = randomItem(otherExpenses);
+      transactions.push({
+        userId: demoUser.id,
+        amount: randomAmount(expense.range[0], expense.range[1]),
+        type: 'EXPENSE',
+        category: 'Other',
+        description: expense.desc,
+        date: randomDate(month),
+      });
+    }
+  }
+
+  // Travel (occasional big expenses)
+  const travelExpenses = [
+    { desc: 'United Airlines - Flight to NYC', amount: [250, 450] },
+    { desc: 'Delta Airlines - Flight to Seattle', amount: [200, 380] },
+    { desc: 'Southwest - Flight to Denver', amount: [150, 280] },
+    { desc: 'Hotel - Marriott', amount: [150, 300] },
+    { desc: 'Hotel - Hilton', amount: [175, 350] },
+    { desc: 'Airbnb - Weekend Getaway', amount: [180, 400] },
+    { desc: 'Rental Car - Enterprise', amount: [60, 150] },
+    { desc: 'VRBO - Beach House', amount: [250, 500] },
+  ];
+
+  for (let i = 0; i < 8; i++) {
+    const travel = randomItem(travelExpenses);
+    transactions.push({
+      userId: demoUser.id,
+      amount: randomAmount(travel.amount[0], travel.amount[1]),
+      type: 'EXPENSE',
+      category: 'Other',
+      description: travel.desc,
+      date: randomDate(Math.floor(Math.random() * 12)),
+    });
+  }
+
   console.log(`📝 Creating ${transactions.length} transactions...`);
 
-  const transactionPromises = transactions.map(tx => {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - tx.monthsAgo);
-    date.setDate(tx.day);
-
-    return prisma.transaction.create({
-      data: {
+  // Batch insert transactions
+  const batchSize = 100;
+  for (let i = 0; i < transactions.length; i += batchSize) {
+    const batch = transactions.slice(i, i + batchSize);
+    await prisma.transaction.createMany({
+      data: batch.map(tx => ({
         userId: tx.userId,
         amount: tx.amount,
         type: tx.type,
         category: tx.category,
         description: tx.description,
-        date: date,
-      },
+        date: tx.date,
+      })),
     });
-  });
+    console.log(`   Inserted ${Math.min(i + batchSize, transactions.length)}/${transactions.length}`);
+  }
 
-  await Promise.all(transactionPromises);
-  console.log(`✅ Created ${transactions.length} transactions`);
+  console.log(`✅ Created ${transactions.length} transactions\n`);
 
-  // ============== BUDGETS (12 months) ==============
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
-
+  // Create budgets
   const budgetCategories = [
-    { category: 'Housing', amount: 2000 },
+    { category: 'Housing', amount: 2300 },
     { category: 'Utilities', amount: 400 },
-    { category: 'Groceries', amount: 700 },
-    { category: 'Dining', amount: 400 },
-    { category: 'Transportation', amount: 600 },
-    { category: 'Entertainment', amount: 250 },
-    { category: 'Shopping', amount: 500 },
-    { category: 'Healthcare', amount: 300 },
-    { category: 'Other', amount: 600 },
+    { category: 'Groceries', amount: 600 },
+    { category: 'Dining', amount: 350 },
+    { category: 'Transportation', amount: 500 },
+    { category: 'Entertainment', amount: 300 },
+    { category: 'Shopping', amount: 400 },
+    { category: 'Healthcare', amount: 200 },
+    { category: 'Other', amount: 500 },
   ];
 
-  console.log('📊 Creating budgets for past 12 months...');
-
   for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
-    const budgetDate = new Date(now);
+    const budgetDate = new Date();
     budgetDate.setMonth(budgetDate.getMonth() - monthOffset);
-    const month = budgetDate.getMonth() + 1;
-    const year = budgetDate.getFullYear();
-
     for (const budget of budgetCategories) {
       await prisma.budget.upsert({
         where: {
           userId_category_month_year: {
             userId: demoUser.id,
             category: budget.category,
-            month: month,
-            year: year,
+            month: budgetDate.getMonth() + 1,
+            year: budgetDate.getFullYear(),
           },
         },
         update: {},
@@ -417,232 +592,64 @@ async function main() {
           userId: demoUser.id,
           category: budget.category,
           amount: budget.amount,
-          month: month,
-          year: year,
+          month: budgetDate.getMonth() + 1,
+          year: budgetDate.getFullYear(),
         },
       });
     }
   }
+  console.log('✅ Created 12 months of budgets\n');
 
-  console.log(`✅ Created budgets for 12 months`);
-
-  // ============== FINANCIAL GOALS ==============
+  // Create goals
   const goals = [
-    {
-      name: 'Emergency Fund',
-      targetAmount: 10000,
-      currentAmount: 7500,
-      deadline: new Date(currentYear + 1, 2, 31),
-      category: 'Savings',
-    },
-    {
-      name: 'New Car Down Payment',
-      targetAmount: 15000,
-      currentAmount: 8200,
-      deadline: new Date(currentYear + 1, 5, 30),
-      category: 'Transportation',
-    },
-    {
-      name: 'Vacation to Europe',
-      targetAmount: 5000,
-      currentAmount: 2800,
-      deadline: new Date(currentYear + 1, 7, 15),
-      category: 'Entertainment',
-    },
-    {
-      name: 'Home Down Payment',
-      targetAmount: 50000,
-      currentAmount: 12500,
-      deadline: new Date(currentYear + 2, 11, 31),
-      category: 'Housing',
-    },
-    {
-      name: 'Professional Certification',
-      targetAmount: 3000,
-      currentAmount: 2100,
-      deadline: new Date(currentYear, 11, 31),
-      category: 'Other',
-    },
+    { name: 'Emergency Fund (6 months)', target: 25000, current: 18500, category: 'Savings' },
+    { name: 'New Car Down Payment', target: 12000, current: 7800, category: 'Transportation' },
+    { name: 'Japan Trip 2026', target: 8000, current: 3200, category: 'Entertainment' },
+    { name: 'Home Down Payment', target: 80000, current: 22000, category: 'Housing' },
+    { name: 'MBA Program Fund', target: 30000, current: 8500, category: 'Other' },
   ];
-
-  console.log('🎯 Creating financial goals...');
 
   for (const goal of goals) {
     await prisma.goal.create({
       data: {
         userId: demoUser.id,
         name: goal.name,
-        targetAmount: goal.targetAmount,
-        currentAmount: goal.currentAmount,
-        targetDate: goal.deadline,
+        targetAmount: goal.target,
+        currentAmount: goal.current,
+        targetDate: new Date(new Date().getFullYear() + 1, 11, 31),
         category: goal.category,
       },
     });
   }
+  console.log(`✅ Created ${goals.length} financial goals\n`);
 
-  console.log(`✅ Created ${goals.length} financial goals`);
-
-  // ============== RECURRING TRANSACTIONS ==============
-  const recurringTransactions = [
-    {
-      amount: 1850,
-      type: 'EXPENSE' as const,
-      category: 'Housing',
-      description: 'Monthly rent payment',
-      frequency: 'MONTHLY' as const,
-      day: 1,
-    },
-    {
-      amount: 5500,
-      type: 'INCOME' as const,
-      category: 'Salary',
-      description: 'Monthly salary from Tech Company',
-      frequency: 'MONTHLY' as const,
-      day: 28,
-    },
-    {
-      amount: 125,
-      type: 'EXPENSE' as const,
-      category: 'Transportation',
-      description: 'Car insurance premium',
-      frequency: 'MONTHLY' as const,
-      day: 1,
-    },
-    {
-      amount: 89,
-      type: 'EXPENSE' as const,
-      category: 'Healthcare',
-      description: '24 Hour Fitness membership',
-      frequency: 'MONTHLY' as const,
-      day: 1,
-    },
-    {
-      amount: 85,
-      type: 'EXPENSE' as const,
-      category: 'Utilities',
-      description: 'Internet service - Fiber 1Gbps',
-      frequency: 'MONTHLY' as const,
-      day: 15,
-    },
-    {
-      amount: 55,
-      type: 'EXPENSE' as const,
-      category: 'Utilities',
-      description: 'Mobile phone plan',
-      frequency: 'MONTHLY' as const,
-      day: 5,
-    },
-    {
-      amount: 16.99,
-      type: 'EXPENSE' as const,
-      category: 'Entertainment',
-      description: 'Netflix Premium subscription',
-      frequency: 'MONTHLY' as const,
-      day: 3,
-    },
-    {
-      amount: 14.99,
-      type: 'EXPENSE' as const,
-      category: 'Entertainment',
-      description: 'Spotify Premium subscription',
-      frequency: 'MONTHLY' as const,
-      day: 5,
-    },
-    {
-      amount: 19.99,
-      type: 'EXPENSE' as const,
-      category: 'Entertainment',
-      description: 'YouTube Premium subscription',
-      frequency: 'MONTHLY' as const,
-      day: 7,
-    },
-    {
-      amount: 11.99,
-      type: 'EXPENSE' as const,
-      category: 'Entertainment',
-      description: 'Audible subscription',
-      frequency: 'MONTHLY' as const,
-      day: 12,
-    },
-    {
-      amount: 49,
-      type: 'EXPENSE' as const,
-      category: 'Other',
-      description: 'LinkedIn Learning subscription',
-      frequency: 'MONTHLY' as const,
-      day: 6,
-    },
-    {
-      amount: 85,
-      type: 'EXPENSE' as const,
-      category: 'Other',
-      description: 'Storage unit rental',
-      frequency: 'MONTHLY' as const,
-      day: 1,
-    },
-    {
-      amount: 120,
-      type: 'EXPENSE' as const,
-      category: 'Other',
-      description: 'House cleaning service',
-      frequency: 'WEEKLY' as const,
-      day: 5, // Friday
-    },
-    {
-      amount: 150,
-      type: 'EXPENSE' as const,
-      category: 'Groceries',
-      description: 'Weekly grocery shopping',
-      frequency: 'WEEKLY' as const,
-      day: 0, // Sunday
-    },
-    {
-      amount: 500,
-      type: 'EXPENSE' as const,
-      category: 'Other',
-      description: 'Investment portfolio contribution',
-      frequency: 'MONTHLY' as const,
-      day: 30,
-    },
+  // Create notifications
+  const notifications = [
+    { type: 'BUDGET_ALERT', title: 'Dining Budget Warning', message: 'You\'ve used 85% of your monthly dining budget.' },
+    { type: 'GOAL_MILESTONE', title: 'Goal Progress', message: 'Great job! Emergency Fund is now 74% complete.' },
+    { type: 'BILL_REMINDER', title: 'Rent Due Tomorrow', message: 'Your rent payment of $2,150 is due tomorrow.' },
+    { type: 'SYSTEM', title: 'Welcome to FinanceFlow', message: 'Your account is set up. Start by connecting your bank accounts!' },
   ];
 
-  console.log('🔄 Creating recurring transactions...');
-
-  for (const recurring of recurringTransactions) {
-    const startDate = new Date(now.getFullYear(), now.getMonth(), recurring.day);
-    const nextDate = new Date(startDate);
-
-    if (recurring.frequency === 'MONTHLY') {
-      nextDate.setMonth(nextDate.getMonth() + 1);
-    } else if (recurring.frequency === 'WEEKLY') {
-      nextDate.setDate(nextDate.getDate() + 7);
-    }
-
-    await prisma.recurringTransaction.create({
+  for (const notif of notifications) {
+    await prisma.notification.create({
       data: {
         userId: demoUser.id,
-        amount: recurring.amount,
-        type: recurring.type,
-        category: recurring.category,
-        description: recurring.description,
-        frequency: recurring.frequency,
-        startDate: startDate,
-        nextDate: nextDate,
-        isActive: true,
+        type: notif.type,
+        title: notif.title,
+        message: notif.message,
+        isRead: false,
       },
     });
   }
+  console.log(`✅ Created ${notifications.length} notifications\n`);
 
-  console.log(`✅ Created ${recurringTransactions.length} recurring transactions`);
-
-  console.log('\n🎉 Seeding completed with EXTENSIVE demo data!');
-  console.log('📊 Demo account summary:');
-  console.log('   Email: demo@financeflow.com');
-  console.log('   Password: Demo1234');
-  console.log(`   Transactions: ${transactions.length}+ (12 months of detailed data)`);
-  console.log(`   Budgets: ${budgetCategories.length * 12} (12 months across ${budgetCategories.length} categories)`);
-  console.log(`   Goals: ${goals.length} active goals`);
-  console.log(`   Recurring: ${recurringTransactions.length} recurring transactions`);
+  console.log('🎉 Seeding completed with 1000+ transactions!');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('   📧 Email:    demo@financeflow.com');
+  console.log('   🔑 Password: Demo1234');
+  console.log(`   📊 Transactions: ${transactions.length}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
 main()
