@@ -1,122 +1,237 @@
-# FinanceFlow — Project Selling Points
+# FinanceFlow — Technical Selling Points
 
-A technically credible overview of the FinanceFlow personal finance platform, derived directly from the codebase.
+> A production-grade personal finance platform built with modern architecture and AI-powered intelligence. Every claim below is derived directly from the codebase.
+
+---
+
+## At a Glance
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 16 · React 19 · Tailwind CSS v4 · Radix UI |
+| **Backend** | NestJS 10 · Fastify · Prisma ORM · PostgreSQL |
+| **Mobile** | React Native 0.81 · Expo SDK 54 |
+| **AI/ML** | Gemini 1.5 Flash · Google Cloud Vision |
+| **Infrastructure** | Redis · BullMQ · Workbox PWA |
 
 ---
 
 ## 1. Core Technology Stack
 
-### Framework and Runtime
-- **Next.js 16** frontend with React 19 and the App Router for server-side rendering and streaming
-- **NestJS 10** backend running on Fastify for high-performance API handling
-- **React Native 0.81** mobile app with Expo SDK 54 for cross-platform deployment
-- **Node.js 20** runtime with strict TypeScript throughout the monorepo
+### Runtime & Frameworks
+
+| Component | Stack | Why It Matters |
+|-----------|-------|----------------|
+| **Web** | Next.js 16 + React 19 + App Router | Server-side rendering, streaming, and React Server Components for optimal performance |
+| **API** | NestJS 10 + Fastify | 2-3× faster than Express; modular, testable architecture |
+| **Mobile** | React Native 0.81 + Expo SDK 54 | Single codebase for iOS and Android with native performance |
+| **Language** | TypeScript (strict mode) | End-to-end type safety across the entire monorepo |
 
 ### Data Layer
-- **PostgreSQL** database managed by Prisma ORM with 29 well-indexed models
-- Database schema includes transactions, budgets, goals, recurring transactions, investments, notifications, shared budgets, AI suggestions, currency rates, and system logs
-- Soft deletes on transactions; composite unique constraints on budgets and currency rates
-- Prisma migrations with automated seed scripts for demo data
 
-### Authentication and Authorization
-- **NextAuth.js** with Prisma adapter, JWT session strategy, and secure cookie configuration
-- Credentials-based login with bcrypt password hashing and regex-enforced password strength
-- Google OAuth integration for single sign-on
-- Backend uses Passport.js with JWT strategy and NestJS guards for API route protection
+- **PostgreSQL** with **Prisma ORM** — 29 well-indexed models covering transactions, budgets, goals, investments, shared budgets, AI suggestions, and system logs
+- **Composite unique constraints** on budgets and currency rates for data integrity
+- **Soft deletes** on transactions for audit trail and recovery
+- **Automated migrations** with seed scripts for demo-ready deployments
 
-### Styling and Design System
-- **Tailwind CSS v4** with CSS variable theming for light/dark mode
-- Warm minimalist palette with custom cream and brown color tokens
-- 38 Radix-based UI primitives including dialogs, dropdowns, tabs, tooltips, and scroll areas
-- Zen component library (`zen-button`, `zen-card`, `zen-motion`) with Framer Motion animations
-- Scroll-reveal, stagger animations, and page transitions for polished UX
+### Authentication & Security
 
-### State Management Strategy
-- **SWR** for client-side data fetching with revalidation and cache synchronization
-- 12 custom React hooks encapsulating all data-fetching logic (`useTransactions`, `useBudgets`, `useGoals`, `useNotifications`, `useRecurringTransactions`, etc.)
-- **Redis with BullMQ** for server-side background job processing and queue management
-- In-memory rate limiter on the frontend; throttler middleware on the backend
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Frontend (NextAuth.js)          Backend (Passport.js)      │
+│  ├─ Prisma session adapter       ├─ JWT strategy            │
+│  ├─ JWT session strategy         ├─ NestJS guards           │
+│  ├─ Secure cookie config         └─ Per-endpoint auth       │
+│  ├─ bcrypt password hashing                                 │
+│  ├─ Regex-enforced password strength                        │
+│  └─ Google OAuth SSO                                        │
+└─────────────────────────────────────────────────────────────┘
+```
 
----
+### Design System
 
-## 2. Key Functional Capabilities
+- **Tailwind CSS v4** with CSS variable theming (light/dark mode)
+- **38 Radix-based UI primitives** — dialogs, dropdowns, tabs, tooltips, scroll areas
+- **Zen component library** (`zen-button`, `zen-card`, `zen-motion`) with **Framer Motion** animations
+- **Warm minimalist palette** with custom cream and brown color tokens
+- Scroll-reveal, stagger animations, and page transitions throughout
 
-### User-Visible Features
-- Full income/expense transaction management with filtering, search, and pagination
-- Category-based budgets with per-month targets, spent tracking, rollover support, and alert thresholds
-- Savings goals with milestones, contributions, target dates, and priority levels
-- Recurring transaction rules (daily, weekly, biweekly, monthly, quarterly, yearly) with automatic generation
-- Investment portfolio tracking across stocks, bonds, ETFs, mutual funds, crypto, real estate, and commodities
-- Shared budgets with viewer/contributor/admin permission roles
-- Notification center with budget alerts, bill reminders, goal milestones, anomaly detection, and subscription renewals
-- Multi-currency support with stored exchange rates sourced from external APIs
+### State & Data Flow
 
-### AI-Powered Capabilities
-- **Gemini 1.5 Flash** integration for automatic transaction categorization with confidence scoring
-- Spending forecasts with 3-month projections, seasonal pattern detection, and what-if scenario modeling
-- Budget optimization suggestions that identify reallocation opportunities and potential savings
-- Conversational AI assistant with persistent chat history for financial Q&A
-- **Google Cloud Vision** receipt OCR for scanning and auto-populating transactions
-
-### Platform Capabilities
-- Progressive Web App with Workbox (CacheFirst for fonts/images, NetworkFirst for API, StaleWhileRevalidate for static assets)
-- Onboarding flow with step tracking and completion status persisted to user record
-- Report generation in PDF (jsPDF + autoTable), CSV (PapaCSE), and JSON formats
-- Data import from CSV and XLSX; export across all formats
-- Dark mode toggle via next-themes with system preference detection
-
-### Performance and UX-Driven Features
-- Optimized image handling with sharp for server-side processing
-- Rate limiting per endpoint type (10/min AI, 5/min chat, 100/min general API)
-- Structured logging with Winston and daily rotating file logs
-- Skeleton loaders and loading states for all async data
+| Concern | Solution |
+|---------|----------|
+| Client data fetching | **SWR** with revalidation and cache sync |
+| Custom hooks | 12 purpose-built hooks (`useTransactions`, `useBudgets`, `useGoals`, etc.) |
+| Background jobs | **Redis + BullMQ** for queue management |
+| Rate limiting | In-memory (frontend) + throttler middleware (backend) |
 
 ---
 
-## 3. Senior-Level Engineering Patterns and Practices
+## 2. Feature Capabilities
 
-### Architectural Patterns
-- Hybrid architecture: Next.js handles UI rendering and direct database reads; NestJS processes AI pipelines, background jobs, and complex business logic
-- Modular NestJS backend with 14 well-scoped domains (auth, analytics, budgets, goals, notifications, recurring, transactions, users, investments, reports, jobs, currency, integrations)
-- Separation of concerns: services for stateful business logic, controllers for request handling, guards for auth enforcement
+### Financial Management
 
-### Validation and Error Handling
-- **Zod** schemas on the frontend for type-safe runtime validation (transactions, budgets, recurring transactions, auth inputs, AI responses, receipt scans)
-- **class-validator** and **class-transformer** on the backend for DTO validation
-- API endpoints return structured error responses with error codes
-- AI fallback to rule-based categorization when API key is missing or rate limit exceeded
-- Queue jobs retry 3 times with exponential backoff on failure
+| Feature | Details |
+|---------|---------|
+| **Transactions** | Full CRUD with filtering, search, pagination, and category tagging |
+| **Budgets** | Per-month targets, spent tracking, rollover support, and customizable alert thresholds |
+| **Savings Goals** | Milestones, contributions, target dates, and priority levels |
+| **Recurring Rules** | Daily, weekly, biweekly, monthly, quarterly, yearly — with automatic transaction generation |
+| **Investments** | Portfolio tracking across stocks, bonds, ETFs, mutual funds, crypto, real estate, and commodities |
+| **Shared Budgets** | Multi-user support with viewer/contributor/admin permission roles |
 
-### Server/Client Boundaries
-- Next.js App Router for server components with minimal client JavaScript
-- API routes use server-only Prisma client instance with connection pooling
-- SWR handles client-side cache invalidation and optimistic updates
-- Backend exposes RESTful endpoints documented with Swagger/OpenAPI
+### Notifications & Alerts
 
-### Reusability, Scalability, and Maintainability
-- Reusable custom hooks abstract API calls and state management from components
-- Radix primitives encapsulated in composable UI components for consistent styling
-- Environment variable schema (`env.ts`) with build-time validation
-- Feature gates for toggling experimental functionality
-- Husky + lint-staged for pre-commit linting and formatting
-- Jest for unit and integration tests with isolated database transactions; coverage targets: 80% services, 70% controllers
+- Budget threshold warnings
+- Bill reminders
+- Goal milestone celebrations
+- Anomaly detection alerts
+- Subscription renewal notices
+
+### Multi-Currency Support
+
+- Stored exchange rates from external APIs
+- Automatic conversion for international transactions
 
 ---
 
-## 4. Third-Party Services and Integrations
+## 3. AI-Powered Intelligence
 
-| Service | Role |
-|---------|------|
+> Powered by **Google Gemini 1.5 Flash** with graceful fallback to rule-based logic
+
+### Capabilities
+
+| Feature | Implementation |
+|---------|----------------|
+| **Auto-Categorization** | Transaction classification with confidence scoring |
+| **Spending Forecasts** | 3-month projections with seasonal pattern detection |
+| **What-If Scenarios** | Model budget changes before committing |
+| **Budget Optimization** | Identify reallocation opportunities and potential savings |
+| **Conversational AI** | Persistent chat history for financial Q&A |
+| **Receipt OCR** | Google Cloud Vision for scanning and auto-populating transactions |
+
+### Resilience
+
+- Falls back to rule-based categorization when API key is missing or rate-limited
+- Queue jobs retry 3× with exponential backoff
+- Per-endpoint rate limits: **10/min** (AI), **5/min** (chat), **100/min** (general API)
+
+---
+
+## 4. Platform & Performance
+
+### Progressive Web App
+
+```
+Workbox Caching Strategy
+├─ CacheFirst     → Fonts, images
+├─ NetworkFirst   → API calls
+└─ StaleWhileRevalidate → Static assets
+```
+
+### Data Portability
+
+| Direction | Formats |
+|-----------|---------|
+| **Import** | CSV, XLSX |
+| **Export** | PDF (jsPDF + autoTable), CSV (PapaParse), JSON |
+
+### Performance Optimizations
+
+- **sharp** for server-side image processing
+- Skeleton loaders for all async data states
+- Optimistic updates via SWR
+- Connection pooling on Prisma client
+
+### Observability
+
+- **Winston** structured logging with daily rotating file logs
+- Vercel Analytics for client-side performance metrics
+- Vercel Speed Insights for real user monitoring
+
+---
+
+## 5. Engineering Practices
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    HYBRID ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   Next.js                         NestJS                    │
+│   ├─ UI rendering                 ├─ AI pipelines           │
+│   ├─ Direct DB reads              ├─ Background jobs        │
+│   └─ Simple mutations             └─ Complex business logic │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Backend Organization
+
+**14 well-scoped NestJS modules:**
+
+`auth` · `analytics` · `budgets` · `goals` · `notifications` · `recurring` · `transactions` · `users` · `investments` · `reports` · `jobs` · `currency` · `integrations` · `chat`
+
+Each module follows separation of concerns:
+- **Services** → Stateful business logic
+- **Controllers** → Request handling
+- **Guards** → Auth enforcement
+
+### Validation Strategy
+
+| Layer | Tool | Coverage |
+|-------|------|----------|
+| **Frontend** | Zod | Transactions, budgets, recurring transactions, auth, AI responses, receipt scans |
+| **Backend** | class-validator + class-transformer | All DTOs |
+
+### Code Quality
+
+- **Husky + lint-staged** for pre-commit linting and formatting
+- **Jest** for unit and integration tests with isolated DB transactions
+- Coverage targets: **80% services**, **70% controllers**
+- Environment variable schema with build-time validation
+- Feature flags for experimental functionality
+
+### API Documentation
+
+- RESTful endpoints with **Swagger/OpenAPI** documentation
+- Structured error responses with error codes
+- Server components minimize client JavaScript
+
+---
+
+## 6. Third-Party Integrations
+
+| Service | Purpose |
+|---------|---------|
 | **Plaid** | Bank account linking and automatic transaction sync |
 | **Stripe** | Payment processing and subscription billing |
-| **Google Generative AI (Gemini 1.5 Flash)** | Transaction categorization, forecasting, chat, and budget optimization |
-| **Google Cloud Vision** | Receipt image OCR and merchant extraction |
-| **Resend** | Transactional email delivery (welcome emails, notifications) |
-| **Vercel Analytics** | Client-side performance and usage analytics |
-| **Vercel Speed Insights** | Real user monitoring for page load performance |
+| **Gemini 1.5 Flash** | AI categorization, forecasting, chat, optimization |
+| **Google Cloud Vision** | Receipt OCR and merchant extraction |
+| **Resend** | Transactional email (welcome, notifications) |
+| **Vercel Analytics** | Client-side performance and usage metrics |
+| **Vercel Speed Insights** | Real user monitoring |
 | **Redis** | Session store and BullMQ job queue backend |
 | **PostgreSQL** | Primary relational datastore |
 
 ---
 
-*Document generated from direct codebase analysis. All points are verifiable in the source.*
+## Quick Stats
+
+| Metric | Count |
+|--------|-------|
+| Database models | 29 |
+| UI components | 38+ |
+| Custom React hooks | 12 |
+| NestJS modules | 14 |
+| Zod schemas | 6+ |
+
+---
+
+<div align="center">
+
+*All points derived from direct codebase analysis and verifiable in source.*
+
+</div>

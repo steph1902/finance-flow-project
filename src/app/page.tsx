@@ -22,7 +22,10 @@ export default function LandingPage() {
               <span className="text-2xl font-serif font-bold text-foreground tracking-tight">FinanceFlow</span>
             </Link>
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-6">
+                <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Docs
+                </Link>
                 <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Login
                 </Link>
