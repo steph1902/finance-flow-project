@@ -15,7 +15,7 @@
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "validate": "tsc --noEmit && next lint && jest",
     "postinstall": "prisma generate",
-    "postbuild": "prisma db push --accept-data-loss && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "postbuild": "prisma db push --accept-data-loss",
     "prepare": "husky",
     "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts"
   },
