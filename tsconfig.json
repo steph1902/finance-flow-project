@@ -52,6 +52,7 @@
     "node_modules",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "prisma/seed.ts",
     "prisma/seed-demo.ts",
     "backend",
     "mobile"
