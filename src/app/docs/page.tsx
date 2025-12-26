@@ -83,9 +83,9 @@ export default function DocsPage() {
             <div className="bg-primary/5 border-l-4 border-primary p-6 rounded-r-xl">
               <h2 className="text-lg font-semibold mb-3">Executive Summary</h2>
               <p className="text-muted-foreground leading-relaxed">
-                FinanceFlow represents a deliberate architectural response to the challenges of modern financial data processing: 
-                high-volume transaction ingestion, probabilistic AI classification, and the non-negotiable requirement for data 
-                integrity in financial systems. This document examines the <strong className="text-foreground">why</strong> behind 
+                FinanceFlow represents a deliberate architectural response to the challenges of modern financial data processing:
+                high-volume transaction ingestion, probabilistic AI classification, and the non-negotiable requirement for data
+                integrity in financial systems. This document examines the <strong className="text-foreground">why</strong> behind
                 each architectural decision and the <strong className="text-foreground">how</strong> of its production implementation.
               </p>
             </div>
@@ -100,13 +100,13 @@ export default function DocsPage() {
 
             <h3 className="text-xl font-semibold mb-4">The Hybrid Architecture Decision</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              FinanceFlow employs a <strong className="text-foreground">bifurcated architecture</strong> that separates concerns 
+              FinanceFlow employs a <strong className="text-foreground">bifurcated architecture</strong> that separates concerns
               between two specialized runtimes:
             </p>
 
             <div className="bg-card border border-border rounded-xl p-6 mb-8 font-mono text-sm overflow-x-auto">
               <pre className="text-muted-foreground">
-{`┌─────────────────────────────────────────────────────────────────────────────┐
+                {`┌─────────────────────────────────────────────────────────────────────────────┐
 │                         CLIENT LAYER                                        │
 │  React 19 + Next.js App Router + SWR Cache                                  │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -136,7 +136,7 @@ export default function DocsPage() {
 
             <h3 className="text-xl font-semibold mb-4">Rationale: Why Two Runtimes?</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The decision to run Next.js and NestJS as separate processes—rather than consolidating into a monolithic 
+              The decision to run Next.js and NestJS as separate processes—rather than consolidating into a monolithic
               Node.js application—addresses three architectural constraints:
             </p>
 
@@ -171,14 +171,14 @@ export default function DocsPage() {
 
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 mb-8">
               <p className="text-foreground font-medium">
-                A failed AI classification job should never cascade into a degraded dashboard experience. 
+                A failed AI classification job should never cascade into a degraded dashboard experience.
                 The architectural boundary enforces this isolation.
               </p>
             </div>
 
             <h3 className="text-xl font-semibold mb-4">Fastify over Express: Quantified Decision</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The NestJS backend uses <strong className="text-foreground">Fastify</strong> as its HTTP adapter rather than Express. 
+              The NestJS backend uses <strong className="text-foreground">Fastify</strong> as its HTTP adapter rather than Express.
               This is not a stylistic preference—it is a throughput decision with measurable impact:
             </p>
 
@@ -225,14 +225,14 @@ export default function DocsPage() {
 
             <h3 className="text-xl font-semibold mb-4">Agentic Workflow Architecture</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The AI subsystem implements an <strong className="text-foreground">agentic pattern</strong>—autonomous processing 
-              with human-defined constraints and fallback behaviors. The pipeline is designed for <strong className="text-foreground">eventual 
-              consistency</strong> rather than synchronous blocking:
+              The AI subsystem implements an <strong className="text-foreground">agentic pattern</strong>—autonomous processing
+              with human-defined constraints and fallback behaviors. The pipeline is designed for <strong className="text-foreground">eventual
+                consistency</strong> rather than synchronous blocking:
             </p>
 
             <div className="bg-card border border-border rounded-xl p-6 mb-8 font-mono text-sm overflow-x-auto">
               <pre className="text-muted-foreground">
-{`┌──────────────────────────────────────────────────────────────────────────────┐
+                {`┌──────────────────────────────────────────────────────────────────────────────┐
 │                      TRANSACTION INGESTION PIPELINE                          │
 └──────────────────────────────────────────────────────────────────────────────┘
 
@@ -291,14 +291,14 @@ export default function DocsPage() {
 
             <h3 className="text-xl font-semibold mb-4">Confidence Scoring and Fallback Logic</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The AI does not operate as a black box. Every classification includes a <strong className="text-foreground">confidence 
-              score</strong>, and the system implements deterministic fallback:
+              The AI does not operate as a black box. Every classification includes a <strong className="text-foreground">confidence
+                score</strong>, and the system implements deterministic fallback:
             </p>
 
             <div className="bg-card border border-border rounded-xl p-6 mb-8">
               <pre className="text-sm overflow-x-auto">
                 <code className="text-muted-foreground">
-{`const CONFIDENCE_THRESHOLD = 0.85;
+                  {`const CONFIDENCE_THRESHOLD = 0.85;
 
 async function classifyTransaction(tx: RawTransaction) {
   const aiResult = await geminiClassifier.classify(tx);
@@ -317,8 +317,8 @@ async function classifyTransaction(tx: RawTransaction) {
 
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6 mb-8">
               <p className="text-foreground">
-                <strong>Why 0.85?</strong> Financial miscategorization has downstream effects on budgets, reports, and tax calculations. 
-                The threshold is calibrated to minimize false positives while maintaining reasonable automation rates. In production, 
+                <strong>Why 0.85?</strong> Financial miscategorization has downstream effects on budgets, reports, and tax calculations.
+                The threshold is calibrated to minimize false positives while maintaining reasonable automation rates. In production,
                 ~92% of transactions pass AI classification; the remaining 8% fall through to rule-based logic.
               </p>
             </div>
@@ -368,7 +368,7 @@ async function classifyTransaction(tx: RawTransaction) {
 
             <h3 className="text-xl font-semibold mb-4">PostgreSQL + Prisma: The Data Foundation</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The data layer is not merely a storage mechanism—it is the <strong className="text-foreground">source of truth</strong> for 
+              The data layer is not merely a storage mechanism—it is the <strong className="text-foreground">source of truth</strong> for
               financial state. The schema reflects this criticality with 29 domain models:
             </p>
 
@@ -485,7 +485,7 @@ async function classifyTransaction(tx: RawTransaction) {
 
             <h3 className="text-xl font-semibold mb-4">Authentication: Stateless JWT Architecture</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              The authentication layer is designed for <strong className="text-foreground">horizontal scalability</strong>—no 
+              The authentication layer is designed for <strong className="text-foreground">horizontal scalability</strong>—no
               session affinity required:
             </p>
 
@@ -685,9 +685,9 @@ async function classifyTransaction(tx: RawTransaction) {
             <div className="bg-primary/5 border-l-4 border-primary p-6 rounded-r-xl">
               <h4 className="font-semibold mb-2">Conclusion</h4>
               <p className="text-muted-foreground leading-relaxed">
-                FinanceFlow's architecture is not novel for novelty's sake. Each decision—the hybrid runtime split, 
-                the Fastify selection, the confidence-scored AI pipeline, the constraint-driven schema—addresses a 
-                specific problem in building production financial systems. This is not a prototype. 
+                FinanceFlow's architecture is not novel for novelty's sake. Each decision—the hybrid runtime split,
+                the Fastify selection, the confidence-scored AI pipeline, the constraint-driven schema—addresses a
+                specific problem in building production financial systems. This is not a prototype.
                 This is <strong className="text-foreground">production-ready infrastructure</strong> for financial intelligence.
               </p>
             </div>
@@ -716,7 +716,7 @@ async function classifyTransaction(tx: RawTransaction) {
 
           {/* Footer Meta */}
           <div className="mt-16 text-center text-sm text-muted-foreground">
-            <p>Document Version 1.0 · December 2024</p>
+            <p>Document Version 1.0 · December 2025</p>
             <p className="mt-1">Derived from direct codebase analysis. All architectural claims are verifiable in source.</p>
           </div>
         </div>
