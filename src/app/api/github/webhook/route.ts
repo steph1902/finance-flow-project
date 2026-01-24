@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 /**
  * GitHub Webhook handler for automatic versioning
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        console.log(`✅ Created version: ${version} from commit ${latestCommit.id.substring(0, 7)}`);
+        logger.info(`✅ Created version: ${version} from commit ${latestCommit.id.substring(0, 7)}`);
 
         return NextResponse.json({
             success: true,

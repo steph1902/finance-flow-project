@@ -201,8 +201,8 @@ export function NotificationCenter() {
                 <div
                   key={notification.id}
                   className={`group relative rounded-lg border p-4 transition-colors ${notification.status === 'UNREAD'
-                      ? 'bg-blue-50/50 border-blue-200'
-                      : 'hover:bg-muted/50'
+                    ? 'bg-blue-50/50 border-blue-200'
+                    : 'hover:bg-gray-100'
                     }`}
                 >
                   <div className="flex items-start gap-3">

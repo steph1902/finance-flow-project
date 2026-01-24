@@ -219,7 +219,7 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
               </thead>
               <tbody>
                 {report.categoryBreakdown.map((category) => (
-                  <tr key={category.category} className="border-b hover:bg-muted/50">
+                  <tr key={category.category} className="border-b hover:bg-gray-100">
                     <td className="py-3 px-4">{category.category}</td>
                     <td className="py-3 px-4 text-right font-medium">
                       {formatCurrency(category.amount)}
@@ -250,7 +250,7 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
               {report.topExpenses.map((expense, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                  className="flex items-center justify-between p-3 rounded-lg bg-gray-100"
                 >
                   <div className="flex-1">
                     <p className="font-medium">{expense.description}</p>

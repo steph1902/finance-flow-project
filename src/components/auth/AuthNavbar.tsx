@@ -1,46 +1,51 @@
-"use client";
-
-import Link from "next/link";
-import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import Link from "next/link";
+import { Wallet } from "lucide-react";
 
 interface AuthNavbarProps {
-  currentPage: "login" | "signup";
+  showSignIn?: boolean;
+  showGetStarted?: boolean;
+  hideGetStarted?: boolean;
+  ctaText?: string;
+  currentPage?: "login" | "signup";
 }
 
-export default function AuthNavbar({ currentPage }: AuthNavbarProps) {
+export default function AuthNavbar({
+  showSignIn = true,
+  showGetStarted = true,
+  hideGetStarted = false,
+  ctaText = "Get Started",
+}: AuthNavbarProps) {
+  const isAuthPage = typeof window !== 'undefined' && (window.location.pathname === '/login' || window.location.pathname === '/register');
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-      <div className="container mx-auto px-4">
-        <nav className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm transition-all duration-medium group-hover:shadow-md group-hover:scale-105">
-              <TrendingUp className="w-5 h-5 text-primary-foreground" />
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+      <div className="px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 font-semibold text-xl">
+          <Wallet className="h-6 w-6" />
+          <span>FinanceFlow</span>
+        </Link>
+
+        <nav className="flex items-center gap-3">
+          {showSignIn && (
+            <Button asChild variant="ghost" className="transition-all hover:shadow-sm">
+              <Link href="/login">Sign in</Link>
+            </Button>
+          )}
+
+          {showGetStarted && !hideGetStarted && (
+            <div className="flex gap-2">
+              {isAuthPage && (
+                <Button asChild variant="ghost" className="transition-all hover:shadow-sm">
+                  <Link href="/">Back to home</Link>
+                </Button>
+              )}
+
+              <Button asChild className="bg-primary hover:bg-primary-600 shadow-sm hover:shadow-md transition-all">
+                <Link href="/register">{ctaText}</Link>
+              </Button>
             </div>
-            <span className="text-xl font-semibold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
-              FinanceFlow
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-
-            {currentPage === "login" ? (
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Don&apos;t have an account?</span>
-                <Button asChild className="bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all">
-                  <Link href="/signup">Sign Up</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Already have an account?</span>
-                <Button variant="ghost" asChild className="hover:bg-accent">
-                  <Link href="/login">Login</Link>
-                </Button>
-              </div>
-            )}
-          </div>
+          )}
         </nav>
       </div>
     </header>

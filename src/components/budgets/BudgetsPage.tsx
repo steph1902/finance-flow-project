@@ -116,7 +116,7 @@ export function BudgetsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
-            <DialogHeader>
+            <DialogHeader className="mb-6">
               <DialogTitle className="type-h4">
                 {editingBudget ? "Edit budget" : "Create budget"}
               </DialogTitle>
@@ -136,7 +136,7 @@ export function BudgetsPage() {
       {/* AI Budget Optimizer */}
       <BudgetOptimizer />
 
-      <div className="rounded-xl border border-border/30 bg-card/50 p-6 shadow-soft">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label className="type-body font-medium">Month</Label>
@@ -178,7 +178,7 @@ export function BudgetsPage() {
 
           <div className="space-y-1">
             <Label>Total budgets</Label>
-            <div className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-gray-50 p-3 text-sm text-muted-foreground">
               Track budgets for each expense category to keep spending on target.
             </div>
           </div>

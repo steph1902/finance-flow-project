@@ -5,6 +5,7 @@
  */
 
 import { ComponentType, lazy, LazyExoticComponent } from 'react';
+import { logger } from '@/lib/logger';
 
 /**
  * Enhanced lazy loading with retry logic
@@ -15,14 +16,14 @@ export function lazyWithRetry<T extends ComponentType<Record<string, unknown>>>(
 ): LazyExoticComponent<T> {
   return lazy(() => {
     const MAX_RETRIES = 3;
-    
+
     const loadWithRetry = async (retryCount = 0): Promise<{ default: T }> => {
       try {
         return await componentImport();
       } catch (error) {
         if (retryCount < MAX_RETRIES) {
           // Wait before retrying (exponential backoff)
-          await new Promise(resolve => 
+          await new Promise(resolve =>
             setTimeout(resolve, Math.pow(2, retryCount) * 1000)
           );
           return loadWithRetry(retryCount + 1);
@@ -43,7 +44,7 @@ export function preloadComponent<T extends ComponentType<Record<string, unknown>
   componentImport: () => Promise<{ default: T }>
 ): void {
   componentImport().catch(err => {
-    console.warn('Failed to preload component:', err);
+    logger.warn('Failed to preload component:', err);
   });
 }
 
@@ -66,10 +67,10 @@ export function measurePerformance(name: string, startMark: string, endMark: str
       performance.measure(name, startMark, endMark);
       const measure = performance.getEntriesByName(name)[0];
       if (measure) {
-        console.log(`${name}: ${measure.duration.toFixed(2)}ms`);
+        logger.debug(`${name}: ${measure.duration.toFixed(2)}ms`);
       }
     } catch (err) {
-      console.warn('Performance measurement failed:', err);
+      logger.warn('Performance measurement failed:', err);
     }
   }
 }
@@ -104,7 +105,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
@@ -124,6 +125,6 @@ export const isProduction = process.env.NODE_ENV === 'production';
  */
 export function logPerformance(message: string, data?: unknown): void {
   if (!isProduction) {
-    console.log(`[Performance] ${message}`, data);
+    logger.debug(`[Performance] ${message}`, data);
   }
 }

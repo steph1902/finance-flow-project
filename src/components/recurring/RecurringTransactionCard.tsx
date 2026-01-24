@@ -130,11 +130,11 @@ export function RecurringTransactionCard({
 
           <div className="flex items-center gap-3 shrink-0">
             {type === "INCOME" ? (
-              <div className="p-2 rounded-lg bg-success/10">
+              <div className="p-2 rounded-lg bg-green-50">
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
             ) : (
-              <div className="p-2 rounded-lg bg-destructive/10">
+              <div className="p-2 rounded-lg bg-red-50">
                 <TrendingDown className="h-5 w-5 text-destructive" />
               </div>
             )}
@@ -149,7 +149,7 @@ export function RecurringTransactionCard({
         {/* Status Badges */}
         <div className="flex flex-wrap gap-2">
           {isActive ? (
-            <Badge variant="outline" className="bg-success/10 text-success border-success/30 font-medium">
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
               <Play className="h-3 w-3 mr-1.5" />
               Active
             </Badge>
@@ -175,7 +175,7 @@ export function RecurringTransactionCard({
         </div>
 
         {/* Next Occurrence */}
-        <div className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-muted/30 border border-border/30">
+        <div className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-gray-50 border border-gray-200">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
             <span className="font-medium">Next occurrence:</span>

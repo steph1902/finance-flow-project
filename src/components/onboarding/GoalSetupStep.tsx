@@ -47,7 +47,7 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
+          <div className="p-2 bg-blue-50 rounded-lg">
             <TargetIcon className="size-6 text-primary" />
           </div>
           <div>
@@ -118,7 +118,7 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
             </>
           )}
 
-          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+          <div className="bg-gray-100 p-4 rounded-lg space-y-2">
             <p className="text-sm font-medium">💡 Goal Examples</p>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Emergency fund: 6 months of expenses</li>

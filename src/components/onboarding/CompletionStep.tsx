@@ -51,7 +51,7 @@ export function CompletionStep({ onComplete, summary }: CompletionStepProps) {
         </CardContent>
       </Card>
 
-      <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 max-w-md mx-auto">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
         <h3 className="font-semibold mb-2">🚀 Next Steps</h3>
         <ul className="text-sm text-left space-y-2 text-muted-foreground">
           <li>• Add your first transaction to start tracking</li>

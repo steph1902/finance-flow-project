@@ -24,10 +24,10 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
     initialData?.length
       ? initialData
       : [
-          { category: 'Food', amount: 500 },
-          { category: 'Transportation', amount: 200 },
-          { category: 'Entertainment', amount: 150 },
-        ]
+        { category: 'Food', amount: 500 },
+        { category: 'Transportation', amount: 200 },
+        { category: 'Entertainment', amount: 150 },
+      ]
   );
 
   const handleAddBudget = () => {
@@ -35,7 +35,7 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
     const availableCategory = EXPENSE_CATEGORIES.find(
       (cat) => !usedCategories.includes(cat)
     );
-    
+
     if (availableCategory) {
       setBudgets([...budgets, { category: availableCategory, amount: 100 }]);
     }
@@ -68,7 +68,7 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
+          <div className="p-2 bg-blue-50 rounded-lg">
             <PiggyBankIcon className="size-6 text-primary" />
           </div>
           <div>
@@ -139,7 +139,7 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
             </Button>
           )}
 
-          <div className="bg-muted/50 p-4 rounded-lg">
+          <div className="bg-gray-100 p-4 rounded-lg">
             <p className="text-sm font-medium mb-1">Total Monthly Budget</p>
             <p className="text-2xl font-bold">
               ${budgets.reduce((sum, b) => sum + b.amount, 0).toLocaleString()}

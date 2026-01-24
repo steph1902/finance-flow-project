@@ -22,7 +22,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-blue-50 rounded-lg">
                 <TrendingUpIcon className="size-6 text-primary" />
               </div>
               <CardTitle className="text-lg">Track Expenses</CardTitle>
@@ -38,7 +38,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-blue-50 rounded-lg">
                 <TargetIcon className="size-6 text-primary" />
               </div>
               <CardTitle className="text-lg">Set Goals</CardTitle>
@@ -54,7 +54,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-blue-50 rounded-lg">
                 <RocketIcon className="size-6 text-primary" />
               </div>
               <CardTitle className="text-lg">Budget Smart</CardTitle>
@@ -70,7 +70,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-blue-50 rounded-lg">
                 <BellIcon className="size-6 text-primary" />
               </div>
               <CardTitle className="text-lg">Stay Informed</CardTitle>

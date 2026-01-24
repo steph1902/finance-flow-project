@@ -101,9 +101,8 @@ export function NotificationBell() {
               notifications.slice(0, 10).map((notification: NotificationData) => (
                 <DropdownMenuItem
                   key={notification.id}
-                  className={`flex flex-col items-start gap-2 p-3 cursor-pointer ${
-                    !notification.read ? 'bg-primary/5' : ''
-                  }`}
+                  className={`flex flex-col items-start gap-2 p-3 cursor-pointer ${!notification.read ? 'bg-blue-50' : ''
+                    }`}
                   onClick={() => {
                     if (!notification.read) {
                       markAsRead(notification.id)

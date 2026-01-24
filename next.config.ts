@@ -70,7 +70,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://generativelanguage.googleapis.com https://api.fixer.io https://vitals.vercel-insights.com",
+              "connect-src 'self' http://localhost:3001 https://generativelanguage.googleapis.com https://api.fixer.io https://vitals.vercel-insights.com",
               "frame-src https://js.stripe.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

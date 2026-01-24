@@ -156,7 +156,7 @@ export function RecurringTransactionsPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-primary/10">
+            <div className="p-3 rounded-xl bg-blue-50">
               <Repeat className="h-6 w-6 text-primary" />
             </div>
             <h1 className="type-h2 text-foreground">
@@ -195,7 +195,7 @@ export function RecurringTransactionsPage() {
           <div className="text-4xl font-bold text-foreground">{activeTransactions.length}</div>
         </div>
 
-        <div className="p-6 border border-success/20 rounded-xl bg-success/5 shadow-card hover:shadow-mist transition-shadow">
+        <div className="p-6 border border-green-200 rounded-xl bg-green-50 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 type-body text-success mb-3">
             <span>Monthly Income</span>
           </div>
@@ -204,7 +204,7 @@ export function RecurringTransactionsPage() {
           </div>
         </div>
 
-        <div className="p-6 border border-destructive/20 rounded-xl bg-destructive/5 shadow-card hover:shadow-mist transition-shadow">
+        <div className="p-6 border border-red-200 rounded-xl bg-red-50 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 type-body text-destructive mb-3">
             <span>Monthly Expenses</span>
           </div>
@@ -244,8 +244,8 @@ export function RecurringTransactionsPage() {
 
         <TabsContent value={selectedTab} className="mt-8">
           {displayedTransactions.length === 0 ? (
-            <div className="text-center py-16 border border-border/30 rounded-xl bg-muted/20 shadow-soft">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-muted/50 mb-6">
+            <div className="text-center py-16 border border-gray-200 rounded-xl bg-gray-50 shadow-sm">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-6">
                 <Repeat className="h-8 w-8 text-muted-foreground opacity-60" />
               </div>
               <h3 className="type-h3 mb-3">No recurring transactions yet</h3>
