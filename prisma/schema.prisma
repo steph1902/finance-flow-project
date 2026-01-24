@@ -225,6 +225,43 @@ model RecurringTransaction {
 }
 
 // ============================================
+// ANALYTICS MODEL
+// ============================================
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  // Session & User Info
+  userId      String?
+  sessionId   String
+  isDemo      Boolean @default(false)
+  
+  // Event Details
+  eventType   String  // 'login', 'page_view', 'transaction_create', 'budget_optimize', etc.
+  eventName   String
+  metadata    Json?   // Additional event-specific data
+  
+  // Navigation/Page Info
+  page        String?
+  referrer    String?
+  userAgent   String?
+  
+  // Geolocation (IP-based)
+  ipAddress   String?
+  country     String?
+  city        String?
+  region      String?
+  timezone    String?
+  
+  @@map("analytics_events")
+  @@index([userId])
+  @@index([sessionId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([isDemo])
+}
+
+// ============================================
 // GOALS & SAVINGS MODEL
 // ============================================
 enum GoalStatus {
