@@ -7,11 +7,28 @@ interface EmailNotificationData {
   link?: string;
 }
 
+interface BudgetAlertData {
+  category: string;
+  budgeted: number;
+  spent: number;
+  percentUsed: number;
+}
+
+interface WeeklyReportData {
+  totalIncome: number;
+  totalExpense: number;
+  netSavings: number;
+  categoryBreakdown: Array<{
+    category: string;
+    total: number;
+  }>;
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   /**
    * Send email notification
@@ -37,7 +54,7 @@ export class EmailService {
   /**
    * Send budget alert email
    */
-  async sendBudgetAlert(userEmail: string, budgetData: any): Promise<void> {
+  async sendBudgetAlert(userEmail: string, budgetData: BudgetAlertData): Promise<void> {
     this.logger.log(`Sending budget alert to ${userEmail}`);
     // TODO: Implement budget alert email template
   }
@@ -45,7 +62,7 @@ export class EmailService {
   /**
    * Send weekly report email
    */
-  async sendWeeklyReport(userEmail: string, reportData: any): Promise<void> {
+  async sendWeeklyReport(userEmail: string, reportData: WeeklyReportData): Promise<void> {
     this.logger.log(`Sending weekly report to ${userEmail}`);
     // TODO: Implement weekly report email template
   }

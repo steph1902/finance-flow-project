@@ -134,11 +134,11 @@ export class QueryTransactionDto {
 
   @ApiProperty({ required: false, enum: ['date', 'amount'], default: 'date' })
   @IsOptional()
-  @IsEnum(['date', 'amount'])
+  @IsString()
   sortBy?: 'date' | 'amount' = 'date';
 
   @ApiProperty({ required: false, enum: ['asc', 'desc'], default: 'desc' })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
+  @IsString()
   sortOrder?: 'asc' | 'desc' = 'desc';
 }

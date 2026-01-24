@@ -9,10 +9,11 @@ import {
 } from './dto';
 import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Budget } from '@prisma/client';
 
 @Injectable()
 export class BudgetsService {
-  constructor(private readonly budgetRepository: BudgetRepository) {}
+  constructor(private readonly budgetRepository: BudgetRepository) { }
 
   /**
    * Create a new budget
@@ -113,7 +114,7 @@ export class BudgetsService {
 
     for (const budget of budgets) {
       totalBudgeted = totalBudgeted.plus(budget.amount);
-      const spent = new Decimal(0); // TODO: Calculate actual spent from transactions
+      const spent = budget.spent; // Use actual spent from database
       totalSpent = totalSpent.plus(spent);
 
       const percentUsed = budget.amount.isZero()
@@ -170,13 +171,16 @@ export class BudgetsService {
   /**
    * Map budget entity to response DTO
    */
-  private mapToResponse(budget: any): BudgetResponseDto {
-    const spent = new Decimal(0); // TODO: Calculate actual spent from transactions
-    
+  private mapToResponse(budget: Budget): BudgetResponseDto {
+    const spent = budget.spent; // Use actual spent from database
+    const percentUsed = budget.amount.isZero()
+      ? 0
+      : spent.dividedBy(budget.amount).times(100).toNumber();
+
     // Convert month/year back to approximate dates
     const startDate = new Date(budget.year, budget.month - 1, 1);
     const endDate = new Date(budget.year, budget.month, 0); // Last day of month
-    
+
     return {
       id: budget.id,
       userId: budget.userId,
@@ -184,13 +188,11 @@ export class BudgetsService {
       amount: budget.amount.toNumber(),
       spent: spent.toNumber(),
       remaining: budget.amount.minus(spent).toNumber(),
-      percentUsed: budget.amount.isZero()
-        ? 0
-        : spent.dividedBy(budget.amount).times(100).toNumber(),
+      percentUsed,
       startDate,
       endDate,
-      rollover: false, // TODO: Add to schema
-      alertThreshold: undefined, // TODO: Add to schema
+      rollover: budget.rollover,
+      alertThreshold: budget.alertThreshold?.toNumber(),
       isOverBudget: spent.greaterThan(budget.amount),
       createdAt: budget.createdAt,
       updatedAt: budget.updatedAt,

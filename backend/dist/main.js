@@ -40,6 +40,8 @@ const ai_module_1 = __webpack_require__(/*! ./modules/ai/ai.module */ "./src/mod
 const currency_module_1 = __webpack_require__(/*! ./modules/currency/currency.module */ "./src/modules/currency/currency.module.ts");
 const integrations_module_1 = __webpack_require__(/*! ./modules/integrations/integrations.module */ "./src/modules/integrations/integrations.module.ts");
 const jobs_module_1 = __webpack_require__(/*! ./modules/jobs/jobs.module */ "./src/modules/jobs/jobs.module.ts");
+const admin_module_1 = __webpack_require__(/*! ./modules/admin/admin.module */ "./src/modules/admin/admin.module.ts");
+const analytics_module_2 = __webpack_require__(/*! ./common/analytics/analytics.module */ "./src/common/analytics/analytics.module.ts");
 const jwt_auth_guard_1 = __webpack_require__(/*! ./common/guards/jwt-auth.guard */ "./src/common/guards/jwt-auth.guard.ts");
 const throttler_2 = __webpack_require__(/*! @nestjs/throttler */ "@nestjs/throttler");
 let AppModule = class AppModule {
@@ -92,6 +94,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             database_module_1.DatabaseModule,
             common_module_1.CommonModule,
+            analytics_module_2.AnalyticsModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             transactions_module_1.TransactionsModule,
@@ -106,6 +109,7 @@ exports.AppModule = AppModule = __decorate([
             currency_module_1.CurrencyModule,
             integrations_module_1.IntegrationsModule,
             jobs_module_1.JobsModule,
+            admin_module_1.AdminModule,
         ],
         providers: [
             {
@@ -119,6 +123,184 @@ exports.AppModule = AppModule = __decorate([
         ],
     })
 ], AppModule);
+
+
+/***/ }),
+
+/***/ "./src/common/analytics/analytics.module.ts":
+/*!**************************************************!*\
+  !*** ./src/common/analytics/analytics.module.ts ***!
+  \**************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AnalyticsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const analytics_service_1 = __webpack_require__(/*! ./analytics.service */ "./src/common/analytics/analytics.service.ts");
+let AnalyticsModule = class AnalyticsModule {
+};
+exports.AnalyticsModule = AnalyticsModule;
+exports.AnalyticsModule = AnalyticsModule = __decorate([
+    (0, common_1.Global)(),
+    (0, common_1.Module)({
+        providers: [analytics_service_1.AnalyticsService],
+        exports: [analytics_service_1.AnalyticsService],
+    })
+], AnalyticsModule);
+
+
+/***/ }),
+
+/***/ "./src/common/analytics/analytics.service.ts":
+/*!***************************************************!*\
+  !*** ./src/common/analytics/analytics.service.ts ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var AnalyticsService_1;
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AnalyticsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! @/database/prisma.service */ "./src/database/prisma.service.ts");
+let AnalyticsService = AnalyticsService_1 = class AnalyticsService {
+    constructor(prisma) {
+        this.prisma = prisma;
+        this.logger = new common_1.Logger(AnalyticsService_1.name);
+    }
+    async trackEvent(data, geo) {
+        try {
+            await this.prisma.analyticsEvent.create({
+                data: {
+                    ...data,
+                    ...geo,
+                },
+            });
+        }
+        catch (error) {
+            this.logger.error(`Failed to track event: ${error.message}`, error.stack);
+        }
+    }
+    async getGeolocation(ipAddress) {
+        try {
+            if (!ipAddress || ipAddress === '::1' || ipAddress.startsWith('127.') || ipAddress.startsWith('192.168.')) {
+                return {};
+            }
+            const response = await fetch(`http://ip-api.com/json/${ipAddress}?fields=status,country,city,regionName,timezone`);
+            if (!response.ok) {
+                return {};
+            }
+            const data = await response.json();
+            if (data.status === 'success') {
+                return {
+                    country: data.country,
+                    city: data.city,
+                    region: data.regionName,
+                    timezone: data.timezone,
+                };
+            }
+            return {};
+        }
+        catch (error) {
+            this.logger.warn(`Failed to get geolocation for ${ipAddress}: ${error.message}`);
+            return {};
+        }
+    }
+    async getDemoAnalytics(startDate, endDate) {
+        const where = {
+            isDemo: true,
+            ...(startDate && endDate ? {
+                createdAt: {
+                    gte: startDate,
+                    lte: endDate,
+                },
+            } : {}),
+        };
+        const [totalEvents, uniqueSessions, eventsByType, eventsByCountry, recentEvents, loginEvents,] = await Promise.all([
+            this.prisma.analyticsEvent.count({ where }),
+            this.prisma.analyticsEvent.findMany({
+                where,
+                select: { sessionId: true },
+                distinct: ['sessionId'],
+            }),
+            this.prisma.analyticsEvent.groupBy({
+                by: ['eventType'],
+                where,
+                _count: true,
+                orderBy: { _count: { eventType: 'desc' } },
+            }),
+            this.prisma.analyticsEvent.groupBy({
+                by: ['country'],
+                where: { ...where, country: { not: null } },
+                _count: true,
+                orderBy: { _count: { country: 'desc' } },
+            }),
+            this.prisma.analyticsEvent.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                take: 50,
+            }),
+            this.prisma.analyticsEvent.findMany({
+                where: { ...where, eventType: 'login' },
+                orderBy: { createdAt: 'desc' },
+            }),
+        ]);
+        return {
+            summary: {
+                totalEvents,
+                uniqueSessions: uniqueSessions.length,
+                loginCount: loginEvents.length,
+            },
+            eventsByType: eventsByType.map((e) => ({
+                type: e.eventType,
+                count: e._count,
+            })),
+            eventsByCountry: eventsByCountry.map((e) => ({
+                country: e.country,
+                count: e._count,
+            })),
+            recentEvents: recentEvents.map((e) => ({
+                id: e.id,
+                timestamp: e.createdAt,
+                eventType: e.eventType,
+                eventName: e.eventName,
+                page: e.page,
+                country: e.country,
+                city: e.city,
+                metadata: e.metadata,
+            })),
+            sessions: loginEvents.map((e) => ({
+                sessionId: e.sessionId,
+                timestamp: e.createdAt,
+                country: e.country,
+                city: e.city,
+                userAgent: e.userAgent,
+            })),
+        };
+    }
+};
+exports.AnalyticsService = AnalyticsService;
+exports.AnalyticsService = AnalyticsService = AnalyticsService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], AnalyticsService);
 
 
 /***/ }),
@@ -600,7 +782,7 @@ let PrismaService = PrismaService_1 = class PrismaService extends client_1.Prism
         let lastError = null;
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                return await this.$transaction(callback);
+                return (await this.$transaction(callback));
             }
             catch (error) {
                 lastError = error;
@@ -619,6 +801,145 @@ exports.PrismaService = PrismaService = PrismaService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], PrismaService);
+
+
+/***/ }),
+
+/***/ "./src/modules/admin/admin.controller.ts":
+/*!***********************************************!*\
+  !*** ./src/modules/admin/admin.controller.ts ***!
+  \***********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AdminController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const analytics_service_1 = __webpack_require__(/*! @/common/analytics/analytics.service */ "./src/common/analytics/analytics.service.ts");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+const public_decorator_1 = __webpack_require__(/*! @/common/decorators/public.decorator */ "./src/common/decorators/public.decorator.ts");
+const fastify_1 = __webpack_require__(/*! fastify */ "fastify");
+let AdminController = class AdminController {
+    constructor(analyticsService, jwtService) {
+        this.analyticsService = analyticsService;
+        this.jwtService = jwtService;
+    }
+    async login(body, reply) {
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (!adminPassword) {
+            throw new common_1.UnauthorizedException('Admin system not configured');
+        }
+        if (body.password !== adminPassword) {
+            throw new common_1.UnauthorizedException('Invalid password');
+        }
+        const token = this.jwtService.sign({ admin: true }, { expiresIn: '24h' });
+        reply.setCookie('admin_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60,
+            sameSite: 'strict',
+            path: '/',
+        });
+        return reply.send({ success: true });
+    }
+    async getAnalytics(req) {
+        const token = req.cookies?.['admin_token'];
+        if (!token) {
+            throw new common_1.UnauthorizedException('Not authenticated');
+        }
+        try {
+            this.jwtService.verify(token);
+        }
+        catch {
+            throw new common_1.UnauthorizedException('Invalid token');
+        }
+        const analytics = await this.analyticsService.getDemoAnalytics();
+        return analytics;
+    }
+    async logout(reply) {
+        reply.clearCookie('admin_token');
+        return reply.send({ success: true });
+    }
+};
+exports.AdminController = AdminController;
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('login'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof fastify_1.FastifyReply !== "undefined" && fastify_1.FastifyReply) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "login", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('analytics'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAnalytics", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('logout'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_d = typeof fastify_1.FastifyReply !== "undefined" && fastify_1.FastifyReply) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "logout", null);
+exports.AdminController = AdminController = __decorate([
+    (0, common_1.Controller)('admin'),
+    __metadata("design:paramtypes", [typeof (_a = typeof analytics_service_1.AnalyticsService !== "undefined" && analytics_service_1.AnalyticsService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object])
+], AdminController);
+
+
+/***/ }),
+
+/***/ "./src/modules/admin/admin.module.ts":
+/*!*******************************************!*\
+  !*** ./src/modules/admin/admin.module.ts ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AdminModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const admin_controller_1 = __webpack_require__(/*! ./admin.controller */ "./src/modules/admin/admin.controller.ts");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+let AdminModule = class AdminModule {
+};
+exports.AdminModule = AdminModule;
+exports.AdminModule = AdminModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET || 'your-secret-key',
+                signOptions: { expiresIn: '24h' },
+            }),
+        ],
+        controllers: [admin_controller_1.AdminController],
+    })
+], AdminModule);
 
 
 /***/ }),
@@ -702,7 +1023,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -712,7 +1033,6 @@ const auth_dto_1 = __webpack_require__(/*! ./dto/auth.dto */ "./src/modules/auth
 const auth_response_dto_1 = __webpack_require__(/*! ./dto/auth-response.dto */ "./src/modules/auth/dto/auth-response.dto.ts");
 const public_decorator_1 = __webpack_require__(/*! @/common/decorators/public.decorator */ "./src/common/decorators/public.decorator.ts");
 const current_user_decorator_1 = __webpack_require__(/*! @/common/decorators/current-user.decorator */ "./src/common/decorators/current-user.decorator.ts");
-const jwt_payload_interface_1 = __webpack_require__(/*! ./interfaces/jwt-payload.interface */ "./src/modules/auth/interfaces/jwt-payload.interface.ts");
 const throttler_1 = __webpack_require__(/*! @nestjs/throttler */ "@nestjs/throttler");
 let AuthController = class AuthController {
     constructor(authService) {
@@ -794,7 +1114,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_h = typeof jwt_payload_interface_1.JwtPayload !== "undefined" && jwt_payload_interface_1.JwtPayload) === "function" ? _h : Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
 __decorate([
@@ -886,7 +1206,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var AuthService_1;
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -894,11 +1214,13 @@ const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const bcrypt = __webpack_require__(/*! bcrypt */ "bcrypt");
 const prisma_service_1 = __webpack_require__(/*! @/database/prisma.service */ "./src/database/prisma.service.ts");
+const analytics_service_1 = __webpack_require__(/*! @/common/analytics/analytics.service */ "./src/common/analytics/analytics.service.ts");
 let AuthService = AuthService_1 = class AuthService {
-    constructor(prisma, jwtService, configService) {
+    constructor(prisma, jwtService, configService, analyticsService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.analyticsService = analyticsService;
         this.logger = new common_1.Logger(AuthService_1.name);
     }
     async signup(signupDto) {
@@ -933,6 +1255,15 @@ let AuthService = AuthService_1 = class AuthService {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         this.logger.log(`User signed in with ID: ${user.id}`);
+        if (user.email === 'demo@financeflow.com') {
+            await this.analyticsService.trackEvent({
+                userId: user.id,
+                sessionId: user.id + '-' + Date.now(),
+                isDemo: true,
+                eventType: 'login',
+                eventName: 'Demo Account Login',
+            });
+        }
         return this.generateTokenResponse(user.id, user.email);
     }
     async refreshToken(refreshToken) {
@@ -1010,7 +1341,7 @@ let AuthService = AuthService_1 = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = AuthService_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object, typeof (_d = typeof analytics_service_1.AnalyticsService !== "undefined" && analytics_service_1.AnalyticsService) === "function" ? _d : Object])
 ], AuthService);
 
 
@@ -1129,18 +1460,6 @@ __decorate([
 
 /***/ }),
 
-/***/ "./src/modules/auth/interfaces/jwt-payload.interface.ts":
-/*!**************************************************************!*\
-  !*** ./src/modules/auth/interfaces/jwt-payload.interface.ts ***!
-  \**************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-
-/***/ }),
-
 /***/ "./src/modules/auth/strategies/jwt.strategy.ts":
 /*!*****************************************************!*\
   !*** ./src/modules/auth/strategies/jwt.strategy.ts ***!
@@ -1239,6 +1558,170 @@ exports.LocalStrategy = LocalStrategy = __decorate([
 
 /***/ }),
 
+/***/ "./src/modules/budgets/budgets.controller.ts":
+/*!***************************************************!*\
+  !*** ./src/modules/budgets/budgets.controller.ts ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BudgetsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const budgets_service_1 = __webpack_require__(/*! ./budgets.service */ "./src/modules/budgets/budgets.service.ts");
+const jwt_auth_guard_1 = __webpack_require__(/*! ../../common/guards/jwt-auth.guard */ "./src/common/guards/jwt-auth.guard.ts");
+const current_user_decorator_1 = __webpack_require__(/*! ../../common/decorators/current-user.decorator */ "./src/common/decorators/current-user.decorator.ts");
+const dto_1 = __webpack_require__(/*! ./dto */ "./src/modules/budgets/dto/index.ts");
+const budget_response_dto_1 = __webpack_require__(/*! ./dto/budget-response.dto */ "./src/modules/budgets/dto/budget-response.dto.ts");
+let BudgetsController = class BudgetsController {
+    constructor(budgetsService) {
+        this.budgetsService = budgetsService;
+    }
+    async create(userId, createBudgetDto) {
+        return this.budgetsService.create(userId, createBudgetDto);
+    }
+    async findAll(userId, query) {
+        return this.budgetsService.findAll(userId, query);
+    }
+    async getSummary(userId, month) {
+        return this.budgetsService.getBudgetSummary(userId, month);
+    }
+    async findOne(userId, id) {
+        return this.budgetsService.findOne(userId, id);
+    }
+    async update(userId, id, updateBudgetDto) {
+        return this.budgetsService.update(userId, id, updateBudgetDto);
+    }
+    async remove(userId, id) {
+        return this.budgetsService.remove(userId, id);
+    }
+    async optimize(userId, optimizeDto) {
+        return this.budgetsService.optimizeBudgets(userId, optimizeDto);
+    }
+    async createShared(userId, createSharedDto) {
+        return this.budgetsService.createSharedBudget(userId, createSharedDto);
+    }
+    async rollover(userId) {
+        return this.budgetsService.processRollover(userId);
+    }
+};
+exports.BudgetsController = BudgetsController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new budget' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, type: budget_response_dto_1.BudgetResponseDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_b = typeof dto_1.CreateBudgetDto !== "undefined" && dto_1.CreateBudgetDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], BudgetsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all budgets for user' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, type: [budget_response_dto_1.BudgetResponseDto] }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_d = typeof dto_1.BudgetQueryDto !== "undefined" && dto_1.BudgetQueryDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+], BudgetsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('summary'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get budget summary with spending analysis' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, type: budget_response_dto_1.BudgetSummaryDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Query)('month')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+], BudgetsController.prototype, "getSummary", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get budget by ID' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, type: budget_response_dto_1.BudgetResponseDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+], BudgetsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update budget' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, type: budget_response_dto_1.BudgetResponseDto }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, typeof (_h = typeof dto_1.UpdateBudgetDto !== "undefined" && dto_1.UpdateBudgetDto) === "function" ? _h : Object]),
+    __metadata("design:returntype", typeof (_j = typeof Promise !== "undefined" && Promise) === "function" ? _j : Object)
+], BudgetsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete budget' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.NO_CONTENT }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", typeof (_k = typeof Promise !== "undefined" && Promise) === "function" ? _k : Object)
+], BudgetsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('optimize'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get AI-powered budget optimization recommendations' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_l = typeof dto_1.OptimizeBudgetDto !== "undefined" && dto_1.OptimizeBudgetDto) === "function" ? _l : Object]),
+    __metadata("design:returntype", Promise)
+], BudgetsController.prototype, "optimize", null);
+__decorate([
+    (0, common_1.Post)('shared'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a shared budget' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_m = typeof dto_1.CreateSharedBudgetDto !== "undefined" && dto_1.CreateSharedBudgetDto) === "function" ? _m : Object]),
+    __metadata("design:returntype", Promise)
+], BudgetsController.prototype, "createShared", null);
+__decorate([
+    (0, common_1.Post)('rollover'),
+    (0, swagger_1.ApiOperation)({ summary: 'Process budget rollover for new month' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], BudgetsController.prototype, "rollover", null);
+exports.BudgetsController = BudgetsController = __decorate([
+    (0, swagger_1.ApiTags)('Budgets'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Controller)('budgets'),
+    __metadata("design:paramtypes", [typeof (_a = typeof budgets_service_1.BudgetsService !== "undefined" && budgets_service_1.BudgetsService) === "function" ? _a : Object])
+], BudgetsController);
+
+
+/***/ }),
+
 /***/ "./src/modules/budgets/budgets.module.ts":
 /*!***********************************************!*\
   !*** ./src/modules/budgets/budgets.module.ts ***!
@@ -1255,16 +1738,705 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsModule = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const budgets_controller_1 = __webpack_require__(/*! ./budgets.controller */ "./src/modules/budgets/budgets.controller.ts");
+const budgets_service_1 = __webpack_require__(/*! ./budgets.service */ "./src/modules/budgets/budgets.service.ts");
+const budget_repository_1 = __webpack_require__(/*! ./repositories/budget.repository */ "./src/modules/budgets/repositories/budget.repository.ts");
 let BudgetsModule = class BudgetsModule {
 };
 exports.BudgetsModule = BudgetsModule;
 exports.BudgetsModule = BudgetsModule = __decorate([
     (0, common_1.Module)({
-        controllers: [],
-        providers: [],
-        exports: [],
+        controllers: [budgets_controller_1.BudgetsController],
+        providers: [budgets_service_1.BudgetsService, budget_repository_1.BudgetRepository],
+        exports: [budgets_service_1.BudgetsService, budget_repository_1.BudgetRepository],
     })
 ], BudgetsModule);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/budgets.service.ts":
+/*!************************************************!*\
+  !*** ./src/modules/budgets/budgets.service.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BudgetsService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const budget_repository_1 = __webpack_require__(/*! ./repositories/budget.repository */ "./src/modules/budgets/repositories/budget.repository.ts");
+const library_1 = __webpack_require__(/*! @prisma/client/runtime/library */ "@prisma/client/runtime/library");
+let BudgetsService = class BudgetsService {
+    constructor(budgetRepository) {
+        this.budgetRepository = budgetRepository;
+    }
+    async create(userId, createBudgetDto) {
+        const overlapping = await this.budgetRepository.findOverlapping(userId, createBudgetDto.category, createBudgetDto.startDate, createBudgetDto.endDate);
+        if (overlapping.length > 0) {
+            throw new common_1.BadRequestException(`Budget for category "${createBudgetDto.category}" already exists for this period`);
+        }
+        const month = createBudgetDto.startDate.getMonth() + 1;
+        const year = createBudgetDto.startDate.getFullYear();
+        const budget = await this.budgetRepository.create({
+            userId,
+            category: createBudgetDto.category,
+            amount: createBudgetDto.amount,
+            month,
+            year,
+        });
+        return this.mapToResponse(budget);
+    }
+    async findAll(userId, query) {
+        const budgets = await this.budgetRepository.findAll(userId, query);
+        return budgets.map((budget) => this.mapToResponse(budget));
+    }
+    async findOne(userId, id) {
+        const budget = await this.budgetRepository.findById(id, userId);
+        if (!budget) {
+            throw new common_1.NotFoundException(`Budget with ID ${id} not found`);
+        }
+        return this.mapToResponse(budget);
+    }
+    async update(userId, id, updateBudgetDto) {
+        const existing = await this.budgetRepository.findById(id, userId);
+        if (!existing) {
+            throw new common_1.NotFoundException(`Budget with ID ${id} not found`);
+        }
+        const updated = await this.budgetRepository.update(id, updateBudgetDto);
+        return this.mapToResponse(updated);
+    }
+    async remove(userId, id) {
+        const budget = await this.budgetRepository.findById(id, userId);
+        if (!budget) {
+            throw new common_1.NotFoundException(`Budget with ID ${id} not found`);
+        }
+        await this.budgetRepository.delete(id);
+    }
+    async getBudgetSummary(userId, month) {
+        const currentDate = month ? new Date(month) : new Date();
+        const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        const budgets = await this.budgetRepository.findAll(userId, {
+            startDate,
+            endDate,
+        });
+        let totalBudgeted = new library_1.Decimal(0);
+        let totalSpent = new library_1.Decimal(0);
+        const categoryBreakdown = [];
+        for (const budget of budgets) {
+            totalBudgeted = totalBudgeted.plus(budget.amount);
+            const spent = budget.spent;
+            totalSpent = totalSpent.plus(spent);
+            const percentUsed = budget.amount.isZero()
+                ? 0
+                : spent.dividedBy(budget.amount).times(100).toNumber();
+            categoryBreakdown.push({
+                category: budget.category,
+                budgeted: budget.amount.toNumber(),
+                spent: spent.toNumber(),
+                remaining: budget.amount.minus(spent).toNumber(),
+                percentUsed,
+                isOverBudget: spent.greaterThan(budget.amount),
+            });
+        }
+        return {
+            totalBudgeted: totalBudgeted.toNumber(),
+            totalSpent: totalSpent.toNumber(),
+            totalRemaining: totalBudgeted.minus(totalSpent).toNumber(),
+            overallPercentUsed: totalBudgeted.isZero()
+                ? 0
+                : totalSpent.dividedBy(totalBudgeted).times(100).toNumber(),
+            categoryBreakdown,
+            period: {
+                start: startDate,
+                end: endDate,
+            },
+        };
+    }
+    async optimizeBudgets(userId, optimizeDto) {
+        throw new Error('Budget optimization not yet implemented');
+    }
+    async createSharedBudget(userId, createSharedDto) {
+        throw new Error('Shared budgets not yet implemented');
+    }
+    async processRollover(userId) {
+        return { message: 'Budget rollover not yet implemented' };
+    }
+    mapToResponse(budget) {
+        const spent = budget.spent;
+        const percentUsed = budget.amount.isZero()
+            ? 0
+            : spent.dividedBy(budget.amount).times(100).toNumber();
+        const startDate = new Date(budget.year, budget.month - 1, 1);
+        const endDate = new Date(budget.year, budget.month, 0);
+        return {
+            id: budget.id,
+            userId: budget.userId,
+            category: budget.category,
+            amount: budget.amount.toNumber(),
+            spent: spent.toNumber(),
+            remaining: budget.amount.minus(spent).toNumber(),
+            percentUsed,
+            startDate,
+            endDate,
+            rollover: budget.rollover,
+            alertThreshold: budget.alertThreshold?.toNumber(),
+            isOverBudget: spent.greaterThan(budget.amount),
+            createdAt: budget.createdAt,
+            updatedAt: budget.updatedAt,
+        };
+    }
+};
+exports.BudgetsService = BudgetsService;
+exports.BudgetsService = BudgetsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof budget_repository_1.BudgetRepository !== "undefined" && budget_repository_1.BudgetRepository) === "function" ? _a : Object])
+], BudgetsService);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/budget-query.dto.ts":
+/*!*****************************************************!*\
+  !*** ./src/modules/budgets/dto/budget-query.dto.ts ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BudgetQueryDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+const class_transformer_1 = __webpack_require__(/*! class-transformer */ "class-transformer");
+class BudgetQueryDto {
+}
+exports.BudgetQueryDto = BudgetQueryDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], BudgetQueryDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], BudgetQueryDto.prototype, "startDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], BudgetQueryDto.prototype, "endDate", void 0);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/budget-response.dto.ts":
+/*!********************************************************!*\
+  !*** ./src/modules/budgets/dto/budget-response.dto.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BudgetSummaryDto = exports.CategoryBreakdown = exports.BudgetResponseDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+class BudgetResponseDto {
+}
+exports.BudgetResponseDto = BudgetResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], BudgetResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], BudgetResponseDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], BudgetResponseDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetResponseDto.prototype, "amount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetResponseDto.prototype, "spent", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetResponseDto.prototype, "remaining", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetResponseDto.prototype, "percentUsed", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], BudgetResponseDto.prototype, "startDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], BudgetResponseDto.prototype, "endDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Boolean)
+], BudgetResponseDto.prototype, "rollover", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetResponseDto.prototype, "alertThreshold", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Boolean)
+], BudgetResponseDto.prototype, "isOverBudget", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], BudgetResponseDto.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], BudgetResponseDto.prototype, "updatedAt", void 0);
+class CategoryBreakdown {
+}
+exports.CategoryBreakdown = CategoryBreakdown;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], CategoryBreakdown.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CategoryBreakdown.prototype, "budgeted", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CategoryBreakdown.prototype, "spent", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CategoryBreakdown.prototype, "remaining", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CategoryBreakdown.prototype, "percentUsed", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Boolean)
+], CategoryBreakdown.prototype, "isOverBudget", void 0);
+class BudgetSummaryDto {
+}
+exports.BudgetSummaryDto = BudgetSummaryDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetSummaryDto.prototype, "totalBudgeted", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetSummaryDto.prototype, "totalSpent", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetSummaryDto.prototype, "totalRemaining", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], BudgetSummaryDto.prototype, "overallPercentUsed", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [CategoryBreakdown] }),
+    __metadata("design:type", Array)
+], BudgetSummaryDto.prototype, "categoryBreakdown", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Object)
+], BudgetSummaryDto.prototype, "period", void 0);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/create-budget.dto.ts":
+/*!******************************************************!*\
+  !*** ./src/modules/budgets/dto/create-budget.dto.ts ***!
+  \******************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateBudgetDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+const class_transformer_1 = __webpack_require__(/*! class-transformer */ "class-transformer");
+class CreateBudgetDto {
+}
+exports.CreateBudgetDto = CreateBudgetDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Food & Dining' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateBudgetDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 500 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateBudgetDto.prototype, "amount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-01' }),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], CreateBudgetDto.prototype, "startDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '2025-01-31' }),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], CreateBudgetDto.prototype, "endDate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, required: false }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateBudgetDto.prototype, "rollover", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 80, required: false, description: 'Alert when spending reaches this percentage' }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateBudgetDto.prototype, "alertThreshold", void 0);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/index.ts":
+/*!******************************************!*\
+  !*** ./src/modules/budgets/dto/index.ts ***!
+  \******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(/*! ./create-budget.dto */ "./src/modules/budgets/dto/create-budget.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./update-budget.dto */ "./src/modules/budgets/dto/update-budget.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./budget-query.dto */ "./src/modules/budgets/dto/budget-query.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./budget-response.dto */ "./src/modules/budgets/dto/budget-response.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./optimize-budget.dto */ "./src/modules/budgets/dto/optimize-budget.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./shared-budget.dto */ "./src/modules/budgets/dto/shared-budget.dto.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/optimize-budget.dto.ts":
+/*!********************************************************!*\
+  !*** ./src/modules/budgets/dto/optimize-budget.dto.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.OptimizeBudgetDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class OptimizeBudgetDto {
+}
+exports.OptimizeBudgetDto = OptimizeBudgetDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 3000, description: 'Total monthly income' }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], OptimizeBudgetDto.prototype, "totalIncome", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 3, required: false, description: 'Number of months to analyze' }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], OptimizeBudgetDto.prototype, "analysisMonths", void 0);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/shared-budget.dto.ts":
+/*!******************************************************!*\
+  !*** ./src/modules/budgets/dto/shared-budget.dto.ts ***!
+  \******************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateSharedBudgetDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+const create_budget_dto_1 = __webpack_require__(/*! ./create-budget.dto */ "./src/modules/budgets/dto/create-budget.dto.ts");
+class CreateSharedBudgetDto extends create_budget_dto_1.CreateBudgetDto {
+}
+exports.CreateSharedBudgetDto = CreateSharedBudgetDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: ['user1@example.com', 'user2@example.com'] }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsEmail)({}, { each: true }),
+    __metadata("design:type", Array)
+], CreateSharedBudgetDto.prototype, "sharedWith", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Family Groceries' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateSharedBudgetDto.prototype, "name", void 0);
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/dto/update-budget.dto.ts":
+/*!******************************************************!*\
+  !*** ./src/modules/budgets/dto/update-budget.dto.ts ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateBudgetDto = void 0;
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+const create_budget_dto_1 = __webpack_require__(/*! ./create-budget.dto */ "./src/modules/budgets/dto/create-budget.dto.ts");
+class UpdateBudgetDto extends (0, swagger_1.PartialType)(create_budget_dto_1.CreateBudgetDto) {
+}
+exports.UpdateBudgetDto = UpdateBudgetDto;
+
+
+/***/ }),
+
+/***/ "./src/modules/budgets/repositories/budget.repository.ts":
+/*!***************************************************************!*\
+  !*** ./src/modules/budgets/repositories/budget.repository.ts ***!
+  \***************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BudgetRepository = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! ../../../database/prisma.service */ "./src/database/prisma.service.ts");
+let BudgetRepository = class BudgetRepository {
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async create(data) {
+        return this.prisma.budget.create({ data });
+    }
+    async findById(id, userId) {
+        return this.prisma.budget.findFirst({
+            where: { id, userId },
+        });
+    }
+    async findAll(userId, query) {
+        const where = { userId };
+        if (query.category) {
+            where.category = query.category;
+        }
+        if (query.startDate || query.endDate) {
+            const startMonth = query.startDate ? query.startDate.getMonth() + 1 : undefined;
+            const startYear = query.startDate ? query.startDate.getFullYear() : undefined;
+            const endMonth = query.endDate ? query.endDate.getMonth() + 1 : undefined;
+            const endYear = query.endDate ? query.endDate.getFullYear() : undefined;
+            where.AND = [];
+            if (startYear && startMonth) {
+                where.AND.push({
+                    OR: [
+                        { year: { gt: startYear } },
+                        { year: startYear, month: { gte: startMonth } }
+                    ]
+                });
+            }
+            if (endYear && endMonth) {
+                where.AND.push({
+                    OR: [
+                        { year: { lt: endYear } },
+                        { year: endYear, month: { lte: endMonth } }
+                    ]
+                });
+            }
+        }
+        return this.prisma.budget.findMany({
+            where,
+            orderBy: { year: 'desc', month: 'desc' },
+        });
+    }
+    async findOverlapping(userId, category, startDate, endDate) {
+        const startMonth = startDate.getMonth() + 1;
+        const startYear = startDate.getFullYear();
+        const endMonth = endDate.getMonth() + 1;
+        const endYear = endDate.getFullYear();
+        return this.prisma.budget.findMany({
+            where: {
+                userId,
+                category,
+                OR: [
+                    {
+                        AND: [
+                            { year: startYear, month: { gte: startMonth } },
+                            { year: startYear, month: { lte: endMonth } }
+                        ]
+                    },
+                    {
+                        AND: [
+                            { year: endYear, month: { gte: startMonth } },
+                            { year: endYear, month: { lte: endMonth } }
+                        ]
+                    },
+                    {
+                        AND: [
+                            { year: startYear, month: { lte: startMonth } },
+                            { year: endYear, month: { gte: endMonth } }
+                        ]
+                    },
+                ],
+            },
+        });
+    }
+    async update(id, data) {
+        return this.prisma.budget.update({
+            where: { id },
+            data,
+        });
+    }
+    async delete(id) {
+        return this.prisma.budget.delete({
+            where: { id },
+        });
+    }
+    async updateSpent(id, spent) {
+        return this.prisma.budget.update({
+            where: { id },
+            data: { spent },
+        });
+    }
+    async findRolloverCandidates(userId) {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+        let prevMonth = currentMonth - 1;
+        let prevYear = currentYear;
+        if (prevMonth === 0) {
+            prevMonth = 12;
+            prevYear = currentYear - 1;
+        }
+        return this.prisma.budget.findMany({
+            where: {
+                userId,
+                rollover: true,
+                month: prevMonth,
+                year: prevYear,
+            },
+        });
+    }
+    async incrementSpent(id, amount) {
+        return this.prisma.budget.update({
+            where: { id },
+            data: {
+                spent: {
+                    increment: amount,
+                },
+            },
+        });
+    }
+};
+exports.BudgetRepository = BudgetRepository;
+exports.BudgetRepository = BudgetRepository = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], BudgetRepository);
 
 
 /***/ }),
@@ -1675,13 +2847,13 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ required: false, enum: ['date', 'amount'], default: 'date' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(['date', 'amount']),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], QueryTransactionDto.prototype, "sortBy", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ required: false, enum: ['asc', 'desc'], default: 'desc' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(['asc', 'desc']),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], QueryTransactionDto.prototype, "sortOrder", void 0);
 
@@ -1870,11 +3042,13 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const transactions_controller_1 = __webpack_require__(/*! ./transactions.controller */ "./src/modules/transactions/transactions.controller.ts");
 const transactions_service_1 = __webpack_require__(/*! ./transactions.service */ "./src/modules/transactions/transactions.service.ts");
 const transactions_repository_1 = __webpack_require__(/*! ./transactions.repository */ "./src/modules/transactions/transactions.repository.ts");
+const budgets_module_1 = __webpack_require__(/*! ../budgets/budgets.module */ "./src/modules/budgets/budgets.module.ts");
 let TransactionsModule = class TransactionsModule {
 };
 exports.TransactionsModule = TransactionsModule;
 exports.TransactionsModule = TransactionsModule = __decorate([
     (0, common_1.Module)({
+        imports: [budgets_module_1.BudgetsModule],
         controllers: [transactions_controller_1.TransactionsController],
         providers: [transactions_service_1.TransactionsService, transactions_repository_1.TransactionsRepository],
         exports: [transactions_service_1.TransactionsService],
@@ -1966,17 +3140,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var TransactionsService_1;
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransactionsService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
 const prisma_service_1 = __webpack_require__(/*! @/database/prisma.service */ "./src/database/prisma.service.ts");
 const transactions_repository_1 = __webpack_require__(/*! ./transactions.repository */ "./src/modules/transactions/transactions.repository.ts");
+const budget_repository_1 = __webpack_require__(/*! ../budgets/repositories/budget.repository */ "./src/modules/budgets/repositories/budget.repository.ts");
 let TransactionsService = TransactionsService_1 = class TransactionsService {
-    constructor(prisma, repository) {
+    constructor(prisma, repository, budgetRepository) {
         this.prisma = prisma;
         this.repository = repository;
+        this.budgetRepository = budgetRepository;
         this.logger = new common_1.Logger(TransactionsService_1.name);
     }
     async create(userId, dto) {
@@ -1987,6 +3163,10 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
             userId,
         };
         const transaction = await this.repository.create(data);
+        if (dto.type === client_1.TransactionType.EXPENSE) {
+            await this.updateBudgetSpent(userId, dto.category, transaction.date, data.amount);
+            await this.checkBudgetAlerts(userId, dto.category, transaction.date);
+        }
         return this.serializeTransaction(transaction);
     }
     async findAll(userId, query) {
@@ -2047,7 +3227,12 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
         return this.serializeTransaction(transaction);
     }
     async update(userId, id, dto) {
-        await this.findOne(userId, id);
+        const existing = await this.repository.findOne({
+            where: { id, userId, deletedAt: null },
+        });
+        if (!existing) {
+            throw new common_1.NotFoundException('Transaction not found');
+        }
         const data = {
             ...dto,
             ...(dto.amount && { amount: new client_1.Prisma.Decimal(dto.amount) }),
@@ -2056,15 +3241,51 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
             where: { id },
             data,
         });
+        const oldIsExpense = existing.type === client_1.TransactionType.EXPENSE;
+        const newIsExpense = (dto.type ?? existing.type) === client_1.TransactionType.EXPENSE;
+        const oldAmount = existing.amount;
+        const newAmount = dto.amount ? new client_1.Prisma.Decimal(dto.amount) : oldAmount;
+        const oldCategory = existing.category;
+        const newCategory = dto.category ?? oldCategory;
+        const newDate = dto.date ?? existing.date;
+        if (oldIsExpense && newIsExpense) {
+            if (oldCategory === newCategory) {
+                const difference = newAmount.minus(oldAmount);
+                if (!difference.isZero()) {
+                    await this.updateBudgetSpent(userId, newCategory, newDate, difference);
+                    await this.checkBudgetAlerts(userId, newCategory, newDate);
+                }
+            }
+            else {
+                await this.updateBudgetSpent(userId, oldCategory, existing.date, oldAmount.negated());
+                await this.updateBudgetSpent(userId, newCategory, newDate, newAmount);
+                await this.checkBudgetAlerts(userId, newCategory, newDate);
+            }
+        }
+        else if (oldIsExpense && !newIsExpense) {
+            await this.updateBudgetSpent(userId, oldCategory, existing.date, oldAmount.negated());
+        }
+        else if (!oldIsExpense && newIsExpense) {
+            await this.updateBudgetSpent(userId, newCategory, newDate, newAmount);
+            await this.checkBudgetAlerts(userId, newCategory, newDate);
+        }
         this.logger.log(`Updated transaction ${id}`);
         return this.serializeTransaction(transaction);
     }
     async softDelete(userId, id) {
-        await this.findOne(userId, id);
+        const transaction = await this.repository.findOne({
+            where: { id, userId, deletedAt: null },
+        });
+        if (!transaction) {
+            throw new common_1.NotFoundException('Transaction not found');
+        }
         await this.repository.update({
             where: { id },
             data: { deletedAt: new Date() },
         });
+        if (transaction.type === client_1.TransactionType.EXPENSE) {
+            await this.updateBudgetSpent(userId, transaction.category, transaction.date, transaction.amount.negated());
+        }
         this.logger.log(`Soft deleted transaction ${id}`);
         return { message: 'Transaction deleted successfully' };
     }
@@ -2160,6 +3381,67 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
             mimeType: 'text/csv',
         };
     }
+    async updateBudgetSpent(userId, category, date, amount) {
+        try {
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const budget = await this.prisma.budget.findFirst({
+                where: { userId, category, month, year },
+            });
+            if (budget) {
+                await this.budgetRepository.incrementSpent(budget.id, amount);
+                this.logger.log(`Updated budget ${budget.id} spent by ${amount.toString()} for category ${category}`);
+            }
+            else {
+                this.logger.debug(`No budget found for category ${category} in ${month}/${year}`);
+            }
+        }
+        catch (error) {
+            this.logger.error(`Failed to update budget spent: ${error.message}`, error.stack);
+        }
+    }
+    async checkBudgetAlerts(userId, category, date) {
+        try {
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const budget = await this.prisma.budget.findFirst({
+                where: { userId, category, month, year },
+            });
+            if (!budget || !budget.alertThreshold) {
+                return;
+            }
+            const percentUsed = budget.amount.isZero()
+                ? 0
+                : budget.spent.dividedBy(budget.amount).times(100).toNumber();
+            if (percentUsed >= budget.alertThreshold.toNumber()) {
+                const isOverBudget = percentUsed >= 100;
+                await this.prisma.notification.create({
+                    data: {
+                        userId,
+                        type: 'BUDGET_ALERT',
+                        title: isOverBudget
+                            ? `Budget Exceeded: ${category}`
+                            : `Budget Alert: ${category}`,
+                        message: isOverBudget
+                            ? `You have exceeded your ${category} budget by ${(percentUsed - 100).toFixed(1)}%. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`
+                            : `You have used ${percentUsed.toFixed(1)}% of your ${category} budget. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`,
+                        priority: isOverBudget ? 2 : 1,
+                        metadata: {
+                            budgetId: budget.id,
+                            category,
+                            percentUsed,
+                            spent: budget.spent.toNumber(),
+                            budgeted: budget.amount.toNumber(),
+                        },
+                    },
+                });
+                this.logger.log(`Created budget alert for user ${userId}, category ${category}: ${percentUsed.toFixed(1)}%`);
+            }
+        }
+        catch (error) {
+            this.logger.error(`Failed to check budget alerts: ${error.message}`, error.stack);
+        }
+    }
     serializeTransaction(transaction) {
         return {
             ...transaction,
@@ -2173,7 +3455,7 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
 exports.TransactionsService = TransactionsService;
 exports.TransactionsService = TransactionsService = TransactionsService_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof transactions_repository_1.TransactionsRepository !== "undefined" && transactions_repository_1.TransactionsRepository) === "function" ? _b : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof transactions_repository_1.TransactionsRepository !== "undefined" && transactions_repository_1.TransactionsRepository) === "function" ? _b : Object, typeof (_c = typeof budget_repository_1.BudgetRepository !== "undefined" && budget_repository_1.BudgetRepository) === "function" ? _c : Object])
 ], TransactionsService);
 
 
@@ -2466,6 +3748,16 @@ module.exports = require("@fastify/compress");
 
 /***/ }),
 
+/***/ "@fastify/cookie":
+/*!**********************************!*\
+  !*** external "@fastify/cookie" ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = require("@fastify/cookie");
+
+/***/ }),
+
 /***/ "@fastify/helmet":
 /*!**********************************!*\
   !*** external "@fastify/helmet" ***!
@@ -2626,6 +3918,16 @@ module.exports = require("class-validator");
 
 /***/ }),
 
+/***/ "fastify":
+/*!**************************!*\
+  !*** external "fastify" ***!
+  \**************************/
+/***/ ((module) => {
+
+module.exports = require("fastify");
+
+/***/ }),
+
 /***/ "joi":
 /*!**********************!*\
   !*** external "joi" ***!
@@ -2741,11 +4043,14 @@ async function bootstrap() {
     await app.register(compress_1.default, {
         encodings: ['gzip', 'deflate'],
     });
+    await app.register(__webpack_require__(/*! @fastify/cookie */ "@fastify/cookie"), {
+        secret: configService.get('JWT_SECRET'),
+    });
     app.enableVersioning({
         type: common_1.VersioningType.URI,
         defaultVersion: '1',
     });
-    app.setGlobalPrefix(configService.get('API_PREFIX') || 'api/v1');
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,

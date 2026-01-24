@@ -4,9 +4,10 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { Prisma, TransactionType } from '@prisma/client';
+import { Prisma, TransactionType, Transaction } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
 import { TransactionsRepository } from './transactions.repository';
+import { BudgetRepository } from '../budgets/repositories/budget.repository';
 import {
   CreateTransactionDto,
   UpdateTransactionDto,
@@ -25,7 +26,8 @@ export class TransactionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly repository: TransactionsRepository,
-  ) {}
+    private readonly budgetRepository: BudgetRepository,
+  ) { }
 
   /**
    * Create a new transaction
@@ -42,8 +44,13 @@ export class TransactionsService {
 
     const transaction = await this.repository.create(data);
 
+    // Update budget spent for expense transactions
+    if (dto.type === TransactionType.EXPENSE) {
+      await this.updateBudgetSpent(userId, dto.category, transaction.date, data.amount);
+      await this.checkBudgetAlerts(userId, dto.category, transaction.date);
+    }
+
     // TODO: Queue AI categorization if not provided
-    // TODO: Check budget alerts
 
     return this.serializeTransaction(transaction);
   }
@@ -79,11 +86,11 @@ export class TransactionsService {
       ...(category && { category }),
       ...(startDate || endDate
         ? {
-            date: {
-              ...(startDate && { gte: startDate }),
-              ...(endDate && { lte: endDate }),
-            },
-          }
+          date: {
+            ...(startDate && { gte: startDate }),
+            ...(endDate && { lte: endDate }),
+          },
+        }
         : {}),
       ...(search && {
         OR: [
@@ -139,8 +146,14 @@ export class TransactionsService {
    * Update transaction
    */
   async update(userId: string, id: string, dto: UpdateTransactionDto) {
-    // Verify transaction exists and belongs to user
-    await this.findOne(userId, id);
+    // Get existing transaction to calculate budget adjustments
+    const existing = await this.repository.findOne({
+      where: { id, userId, deletedAt: null },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Transaction not found');
+    }
 
     const data = {
       ...dto,
@@ -152,6 +165,39 @@ export class TransactionsService {
       data,
     });
 
+    // Update budget spent if amount, category, or type changed for expenses
+    const oldIsExpense = existing.type === TransactionType.EXPENSE;
+    const newIsExpense = (dto.type ?? existing.type) === TransactionType.EXPENSE;
+    const oldAmount = existing.amount;
+    const newAmount = dto.amount ? new Prisma.Decimal(dto.amount) : oldAmount;
+    const oldCategory = existing.category;
+    const newCategory = dto.category ?? oldCategory;
+    const newDate = dto.date ?? existing.date;
+
+    if (oldIsExpense && newIsExpense) {
+      // Both are expenses - adjust budgets
+      if (oldCategory === newCategory) {
+        // Same category - just adjust the difference
+        const difference = newAmount.minus(oldAmount);
+        if (!difference.isZero()) {
+          await this.updateBudgetSpent(userId, newCategory, newDate, difference);
+          await this.checkBudgetAlerts(userId, newCategory, newDate);
+        }
+      } else {
+        // Category changed - decrement old, increment new
+        await this.updateBudgetSpent(userId, oldCategory, existing.date, oldAmount.negated());
+        await this.updateBudgetSpent(userId, newCategory, newDate, newAmount);
+        await this.checkBudgetAlerts(userId, newCategory, newDate);
+      }
+    } else if (oldIsExpense && !newIsExpense) {
+      // Was expense, no longer is - decrement budget
+      await this.updateBudgetSpent(userId, oldCategory, existing.date, oldAmount.negated());
+    } else if (!oldIsExpense && newIsExpense) {
+      // Wasn't expense, now is - increment budget
+      await this.updateBudgetSpent(userId, newCategory, newDate, newAmount);
+      await this.checkBudgetAlerts(userId, newCategory, newDate);
+    }
+
     this.logger.log(`Updated transaction ${id}`);
 
     return this.serializeTransaction(transaction);
@@ -161,13 +207,29 @@ export class TransactionsService {
    * Soft delete transaction
    */
   async softDelete(userId: string, id: string) {
-    // Verify transaction exists and belongs to user
-    await this.findOne(userId, id);
+    // Get existing transaction to adjust budget
+    const transaction = await this.repository.findOne({
+      where: { id, userId, deletedAt: null },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
 
     await this.repository.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
+
+    // Decrement budget spent if it was an expense
+    if (transaction.type === TransactionType.EXPENSE) {
+      await this.updateBudgetSpent(
+        userId,
+        transaction.category,
+        transaction.date,
+        transaction.amount.negated(),
+      );
+    }
 
     this.logger.log(`Soft deleted transaction ${id}`);
 
@@ -183,11 +245,11 @@ export class TransactionsService {
       deletedAt: null,
       ...(startDate || endDate
         ? {
-            date: {
-              ...(startDate && { gte: startDate }),
-              ...(endDate && { lte: endDate }),
-            },
-          }
+          date: {
+            ...(startDate && { gte: startDate }),
+            ...(endDate && { lte: endDate }),
+          },
+        }
         : {}),
     };
 
@@ -295,9 +357,109 @@ export class TransactionsService {
   }
 
   /**
+   * Update budget spent for a category in a specific month/year
+   */
+  private async updateBudgetSpent(
+    userId: string,
+    category: string,
+    date: Date,
+    amount: Prisma.Decimal,
+  ): Promise<void> {
+    try {
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      // Find budget for this category and period
+      const budget = await this.prisma.budget.findFirst({
+        where: { userId, category, month, year },
+      });
+
+      if (budget) {
+        await this.budgetRepository.incrementSpent(budget.id, amount);
+        this.logger.log(
+          `Updated budget ${budget.id} spent by ${amount.toString()} for category ${category}`,
+        );
+      } else {
+        this.logger.debug(
+          `No budget found for category ${category} in ${month}/${year}`,
+        );
+      }
+    } catch (error) {
+      // Don't fail transaction if budget update fails
+      this.logger.error(
+        `Failed to update budget spent: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  /**
+   * Check budget alerts and create notifications if thresholds exceeded
+   */
+  private async checkBudgetAlerts(
+    userId: string,
+    category: string,
+    date: Date,
+  ): Promise<void> {
+    try {
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      const budget = await this.prisma.budget.findFirst({
+        where: { userId, category, month, year },
+      });
+
+      if (!budget || !budget.alertThreshold) {
+        return; // No budget or no alert threshold set
+      }
+
+      const percentUsed = budget.amount.isZero()
+        ? 0
+        : budget.spent.dividedBy(budget.amount).times(100).toNumber();
+
+      // Check if we should create an alert
+      if (percentUsed >= budget.alertThreshold.toNumber()) {
+        const isOverBudget = percentUsed >= 100;
+
+        // Create notification
+        await this.prisma.notification.create({
+          data: {
+            userId,
+            type: 'BUDGET_ALERT',
+            title: isOverBudget
+              ? `Budget Exceeded: ${category}`
+              : `Budget Alert: ${category}`,
+            message: isOverBudget
+              ? `You have exceeded your ${category} budget by ${(percentUsed - 100).toFixed(1)}%. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`
+              : `You have used ${percentUsed.toFixed(1)}% of your ${category} budget. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`,
+            priority: isOverBudget ? 2 : 1, // High priority if over budget
+            metadata: {
+              budgetId: budget.id,
+              category,
+              percentUsed,
+              spent: budget.spent.toNumber(),
+              budgeted: budget.amount.toNumber(),
+            },
+          },
+        });
+
+        this.logger.log(
+          `Created budget alert for user ${userId}, category ${category}: ${percentUsed.toFixed(1)}%`,
+        );
+      }
+    } catch (error) {
+      // Don't fail transaction if alert creation fails
+      this.logger.error(
+        `Failed to check budget alerts: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  /**
    * Serialize transaction for response
    */
-  private serializeTransaction(transaction: any) {
+  private serializeTransaction(transaction: Transaction) {
     return {
       ...transaction,
       amount: Number(transaction.amount),

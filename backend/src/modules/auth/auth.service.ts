@@ -11,6 +11,7 @@ import { PrismaService } from '@/database/prisma.service';
 import { SignupDto, SigninDto } from './dto/auth.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { AnalyticsService } from '@/common/analytics/analytics.service';
 
 /**
  * Authentication Service
@@ -24,7 +25,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+    private readonly analyticsService: AnalyticsService,
+  ) { }
 
   /**
    * Register a new user
@@ -84,6 +86,17 @@ export class AuthService {
 
     // Log sign-in without exposing email
     this.logger.log(`User signed in with ID: ${user.id}`);
+
+    // Track demo account login
+    if (user.email === 'demo@financeflow.com') {
+      await this.analyticsService.trackEvent({
+        userId: user.id,
+        sessionId: user.id + '-' + Date.now(),
+        isDemo: true,
+        eventType: 'login',
+        eventName: 'Demo Account Login',
+      });
+    }
 
     // Generate tokens
     return this.generateTokenResponse(user.id, user.email);
