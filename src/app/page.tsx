@@ -7,14 +7,14 @@ import { TrendingUp, Repeat, Sparkles, Shield, Zap, ArrowRight, Check, BarChart3
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg">
+      <a href="#main-content" className="sr-only-focusable fixed top-4 left-4 z-50 px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-lg">
         Skip to main content
       </a>
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4">
-          <nav className="flex items-center justify-between h-20">
+          <nav className="flex items-center justify-between h-20" aria-label="Main navigation">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-soft transition-all duration-200 group-hover:scale-105">
                 <TrendingUp className="w-6 h-6 text-primary-foreground" />
@@ -76,7 +76,7 @@ export default function LandingPage() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border bg-card">
                 <NextImage
                   src="/assets/dashboard-preview.png"
-                  alt="FinanceFlow Dashboard Preview"
+                  alt="FinanceFlow dashboard interface showing monthly expense chart with spending trends, budget overview with categories for groceries, transportation, and entertainment, and a list of recent transactions including amounts and dates"
                   width={1200}
                   height={675}
                   className="w-full h-auto object-cover"

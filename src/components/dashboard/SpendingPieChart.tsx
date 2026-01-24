@@ -18,6 +18,11 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const total = data.reduce((sum, item) => sum + item.amount, 0);
 
+  // Generate accessible description for screen readers
+  const chartDescription = data.length > 0
+    ? `Spending distribution across ${data.length} categories. ${data.slice(0, 3).map(item => `${item.category}: $${item.amount.toLocaleString()}`).join(", ")}`
+    : "No spending data available";
+
   return (
     <Card className="h-full border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       <CardHeader>
@@ -57,49 +62,81 @@ const SpendingPieChartComponent = ({ data, isLoading = false }: SpendingPieChart
           </div>
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={data}
-                  dataKey="amount"
-                  nameKey="category"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  innerRadius={55}
-                  paddingAngle={3}
-                  onMouseEnter={(_, index) => setActiveIndex(index)}
-                  onMouseLeave={() => setActiveIndex(null)}
-                >
-                  {data.map((entry, index) => (
-                    <Cell
-                      key={entry.category}
-                      fill={getChartColor(index)}
-                      opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
-                      style={{
-                        cursor: 'pointer',
-                        transition: 'opacity 0.2s ease',
-                        filter: activeIndex === index ? 'brightness(1.1)' : 'none'
-                      }}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                  }}
-                />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {/* Accessible chart with ARIA label */}
+            <div role="img" aria-label={chartDescription}>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={data}
+                    dataKey="amount"
+                    nameKey="category"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    innerRadius={55}
+                    paddingAngle={3}
+                    onMouseEnter={(_, index) => setActiveIndex(index)}
+                    onMouseLeave={() => setActiveIndex(null)}
+                  >
+                    {data.map((entry, index) => (
+                      <Cell
+                        key={entry.category}
+                        fill={getChartColor(index)}
+                        opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
+                        style={{
+                          cursor: 'pointer',
+                          transition: 'opacity 0.2s ease',
+                          filter: activeIndex === index ? 'brightness(1.1)' : 'none'
+                        }}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Accessible data table alternative (visually hidden) */}
+            <table className="sr-only" aria-label="Spending by category data table">
+              <caption>Detailed spending breakdown by category</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item) => {
+                  const percentage = total === 0 ? 0 : Math.round((item.amount / total) * 100);
+                  return (
+                    <tr key={item.category}>
+                      <th scope="row">{item.category}</th>
+                      <td>${item.amount.toLocaleString()}</td>
+                      <td>{percentage}%</td>
+                    </tr>
+                  );
+                })}
+                <tr>
+                  <th scope="row">Total</th>
+                  <td>${total.toLocaleString()}</td>
+                  <td>100%</td>
+                </tr>
+              </tbody>
+            </table>
             <div className="mt-4 space-y-2 max-h-32 overflow-y-auto">
               {data.map((item, index) => {
                 const percentage = total === 0 ? 0 : Math.round((item.amount / total) * 100);

@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { LiveRegion } from "@/components/ui/live-region";
 import type { CategorySuggestion, Transaction, TransactionType } from "@/types";
 import { logError } from "@/lib/logger";
 
@@ -84,6 +85,7 @@ export function TransactionForm({
   const [aiSuggestion, setAiSuggestion] = useState<CategorySuggestion | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState("");
 
   // Trigger AI categorization when description changes (for new transactions)
   useEffect(() => {
@@ -166,20 +168,24 @@ export function TransactionForm({
           <FormField
             control={form.control}
             name="amount"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Amount</FormLabel>
+                <FormLabel htmlFor="transaction-amount">Amount</FormLabel>
                 <FormControl>
                   <Input
+                    id="transaction-amount"
                     type="number"
                     step="0.01"
                     min="0"
                     placeholder="0.00"
                     className="transition-all focus:shadow-md"
+                    aria-required
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "amount-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="amount-error" />
               </FormItem>
             )}
           />
@@ -187,17 +193,21 @@ export function TransactionForm({
           <FormField
             control={form.control}
             name="date"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel>Date</FormLabel>
+                <FormLabel htmlFor="transaction-date">Date</FormLabel>
                 <FormControl>
                   <Input
+                    id="transaction-date"
                     type="date"
                     className="transition-all focus:shadow-md"
+                    aria-required
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "date-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="date-error" />
               </FormItem>
             )}
           />
@@ -274,24 +284,39 @@ export function TransactionForm({
           )}
         />
 
+        {/* Live region for screen reader announcements */}
+        <LiveRegion message={liveMessage} politeness="polite" clearAfter={3000} />
+
         {/* AI Category Suggestion - Loading State */}
         {isLoadingAI && !aiSuggestion && (
-          <AILoading message="AI is analyzing your transaction..." />
+          <>
+            <AILoading message="AI is analyzing your transaction..." />
+            {setLiveMessage("AI is analyzing your transaction")}
+          </>
         )}
 
         {/* AI Category Suggestion - Success State */}
         {aiSuggestion && !isLoadingAI && (
-          <CategorySuggestionCard
-            suggestion={aiSuggestion}
-            onAccept={handleAcceptSuggestion}
-            onReject={() => setAiSuggestion(null)}
-            isLoading={false}
-          />
+          <>
+            <CategorySuggestionCard
+              suggestion={aiSuggestion}
+              onAccept={() => {
+                handleAcceptSuggestion();
+                setLiveMessage(`Category suggestion applied: ${aiSuggestion.category}`);
+              }}
+              onReject={() => {
+                setAiSuggestion(null);
+                setLiveMessage("Category suggestion dismissed");
+              }}
+              isLoading={false}
+            />
+            {setLiveMessage(`AI suggests category: ${aiSuggestion.category}. ${aiSuggestion.reasoning}`)}
+          </>
         )}
 
         {/* AI Category Suggestion - Error State */}
         {aiError && !isLoadingAI && !aiSuggestion && (
-          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800" role="alert" aria-live="polite">
             <p className="font-medium">AI Suggestion Unavailable</p>
             <p className="mt-1 text-xs">{aiError}</p>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { DashboardDateFilter } from "@/components/dashboard/DashboardDateFilter";
 import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
@@ -12,11 +12,21 @@ import { AIInsights } from "@/components/ai/AIInsights";
 import { UpcomingRecurringWidget } from "@/components/recurring/UpcomingRecurringWidget";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Button } from "@/components/ui/button";
+import { LiveRegion } from "@/components/ui/live-region";
 import { useDashboard } from "@/hooks/useDashboard";
 
 export function DashboardContent() {
   const [dateRange, setDateRange] = useState<{ startDate?: string; endDate?: string }>({});
   const { data, isLoading, isError, error, refresh } = useDashboard(dateRange);
+  const [liveMessage, setLiveMessage] = useState("");
+
+  useEffect(() => {
+    if (isLoading) {
+      setLiveMessage("Loading dashboard data");
+    } else if (data) {
+      setLiveMessage("Dashboard data loaded successfully");
+    }
+  }, [isLoading, data]);
 
   const selectedRange = useMemo(() => {
     if (!data?.period) {
@@ -38,15 +48,20 @@ export function DashboardContent() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card p-8 text-center">
-        <p className="text-sm text-muted-foreground">Failed to load dashboard data: {error?.message}</p>
-        <Button onClick={() => refresh()}>Try again</Button>
-      </div>
+      <>
+        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card p-8 text-center" role="alert" aria-live="assertive">
+          <p className="text-sm text-muted-foreground">Failed to load dashboard data: {error?.message}</p>
+          <Button onClick={() => refresh()}>Try again</Button>
+        </div>
+        <LiveRegion message={`Error loading dashboard: ${error?.message}`} politeness="assertive" />
+      </>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Live region for dynamic updates */}
+      <LiveRegion message={liveMessage} politeness="polite" clearAfter={3000} />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-serif text-foreground">Overview</h2>
