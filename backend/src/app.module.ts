@@ -25,6 +25,8 @@ import { AiModule } from './modules/ai/ai.module';
 import { CurrencyModule } from './modules/currency/currency.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { JobsModule } from './modules/jobs/jobs.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { AnalyticsModule as CommonAnalyticsModule } from './common/analytics/analytics.module';
 
 // Guards
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -89,6 +91,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     // Core
     DatabaseModule,
     CommonModule,
+    CommonAnalyticsModule, // Global analytics module
 
     // Features
     AuthModule,
@@ -105,6 +108,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     CurrencyModule,
     IntegrationsModule,
     JobsModule,
+    AdminModule, // Admin dashboard
   ],
   providers: [
     // Global guards
@@ -118,4 +122,4 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

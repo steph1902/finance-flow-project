@@ -46,6 +46,11 @@ async function bootstrap() {
     encodings: ['gzip', 'deflate'],
   });
 
+  // Cookie support
+  await app.register(require('@fastify/cookie'), {
+    secret: configService.get<string>('JWT_SECRET'), // for signed cookies
+  });
+
   // API versioning
   app.enableVersioning({
     type: VersioningType.URI,
@@ -53,9 +58,7 @@ async function bootstrap() {
   });
 
   // Global prefix
-  app.setGlobalPrefix(
-    configService.get<string>('API_PREFIX') || 'api/v1',
-  );
+  app.setGlobalPrefix('api');
 
   // Global validation pipe with security hardening
   app.useGlobalPipes(
