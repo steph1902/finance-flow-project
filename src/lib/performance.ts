@@ -44,7 +44,7 @@ export function preloadComponent<T extends ComponentType<Record<string, unknown>
   componentImport: () => Promise<{ default: T }>
 ): void {
   componentImport().catch(err => {
-    logger.warn('Failed to preload component:', err);
+    logger.warn('Failed to preload component:', err instanceof Error ? { message: err.message } : undefined);
   });
 }
 
@@ -70,7 +70,7 @@ export function measurePerformance(name: string, startMark: string, endMark: str
         logger.debug(`${name}: ${measure.duration.toFixed(2)}ms`);
       }
     } catch (err) {
-      logger.warn('Performance measurement failed:', err);
+      logger.warn('Performance measurement failed:', err instanceof Error ? { message: err.message } : undefined);
     }
   }
 }
@@ -123,7 +123,7 @@ export const isProduction = process.env.NODE_ENV === 'production';
 /**
  * Log performance metrics in development only
  */
-export function logPerformance(message: string, data?: unknown): void {
+export function logPerformance(message: string, data?: Record<string, unknown>): void {
   if (!isProduction) {
     logger.debug(`[Performance] ${message}`, data);
   }
