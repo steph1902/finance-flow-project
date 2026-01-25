@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, NotificationType } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -635,7 +635,7 @@ async function main() {
     await prisma.notification.create({
       data: {
         userId: demoUser.id,
-        type: notif.type,
+        type: notif.type as NotificationType,
         title: notif.title,
         message: notif.message,
         isRead: false,
