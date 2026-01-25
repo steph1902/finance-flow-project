@@ -68,7 +68,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: randomAmount(3200, 3350),
             type: 'INCOME',
             category: 'Salary',
-            description: `Paycheck - ${MERCHANTS.Salary[0]}`,
+            description: `Paycheck - ${MERCHANTS.Salary[0]!}`,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 1, 9, 0),
         });
 
@@ -77,7 +77,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: randomAmount(3200, 3350),
             type: 'INCOME',
             category: 'Salary',
-            description: `Paycheck - ${MERCHANTS.Salary[0]}`,
+            description: `Paycheck - ${MERCHANTS.Salary[0]!}`,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 15, 9, 0),
         });
 
@@ -110,7 +110,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: randomAmount(110, 145),
             type: 'EXPENSE',
             category: 'Utilities',
-            description: MERCHANTS.Utilities[0],
+            description: MERCHANTS.Utilities[0]!,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 5),
         });
 
@@ -119,7 +119,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: 79.99,
             type: 'EXPENSE',
             category: 'Utilities',
-            description: `${MERCHANTS.Utilities[3]} - Internet`,
+            description: `${MERCHANTS.Utilities[3]!} - Internet`,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 10),
         });
 
@@ -128,7 +128,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: 85,
             type: 'EXPENSE',
             category: 'Utilities',
-            description: `${MERCHANTS.Utilities[5]} - Mobile`,
+            description: `${MERCHANTS.Utilities[5]!} - Mobile`,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 15),
         });
 
@@ -148,7 +148,7 @@ function generateEnhancedTransactions(userId: string, months: number) {
             amount: 49.99,
             type: 'EXPENSE',
             category: 'Healthcare',
-            description: MERCHANTS.Healthcare[2],
+            description: MERCHANTS.Healthcare[2]!,
             date: new Date(monthDate.getFullYear(), monthDate.getMonth(), 1),
         });
 
