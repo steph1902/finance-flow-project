@@ -11,7 +11,8 @@ import {
     Activity,
     LogOut,
     TrendingUp,
-    ArrowRight
+    ArrowRight,
+    Database
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,6 +45,7 @@ interface AnalyticsData {
 export default function AdminAnalyticsPage() {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [seeding, setSeeding] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -80,6 +82,34 @@ export default function AdminAnalyticsPage() {
             credentials: "include",
         });
         router.push("/admin/login");
+    };
+
+    const handleSeedDatabase = async () => {
+        const password = prompt("Enter admin password to seed production database:");
+        if (!password) return;
+
+        setSeeding(true);
+        try {
+            const res = await fetch("/api/admin/seed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password }),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.error || "Seeding failed");
+            }
+
+            toast.success(`Database seeded! ${result.stats.transactions} transactions added`);
+            // Reload analytics to show new data
+            await loadAnalytics();
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to seed database");
+        } finally {
+            setSeeding(false);
+        }
     };
 
     if (loading) {
@@ -137,10 +167,29 @@ export default function AdminAnalyticsPage() {
                             Track how visitors interact with your portfolio project
                         </p>
                     </div>
-                    <Button variant="outline" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="default"
+                            onClick={handleSeedDatabase}
+                            disabled={seeding}
+                        >
+                            {seeding ? (
+                                <>
+                                    <Activity className="h-4 w-4 mr-2 animate-spin" />
+                                    Seeding...
+                                </>
+                            ) : (
+                                <>
+                                    <Database className="h-4 w-4 mr-2" />
+                                    Seed Database
+                                </>
+                            )}
+                        </Button>
+                        <Button variant="outline" onClick={handleLogout}>
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Logout
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Summary Cards */}

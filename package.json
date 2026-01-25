@@ -17,8 +17,8 @@
     "postinstall": "prisma generate",
     "postbuild": "prisma db push --accept-data-loss",
     "prepare": "husky",
-    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts",
-    "db:seed:natural": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-natural.ts"
+    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:seed:enhanced": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-enhanced.ts"
   },
   "engines": {
     "node": "20.x"
