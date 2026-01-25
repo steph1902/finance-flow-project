@@ -21,30 +21,30 @@ export default function LoginForm() {
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
-    
+
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Invalid email format";
     }
-    
+
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
@@ -97,11 +97,10 @@ export default function LoginForm() {
             }
           }}
           onBlur={() => setTouchedFields(prev => ({ ...prev, email: true }))}
-          className={`${
-            errors.email && touchedFields.email
+          className={`${errors.email && touchedFields.email
               ? "border-destructive focus-visible:ring-destructive/20"
-              : "focus-visible:ring-primary/20"
-          } shadow-soft transition-all duration-medium`}
+              : "focus-visible:ring-[var(--ring)]/20"
+            } shadow-soft transition-all duration-medium`}
         />
         {errors.email && touchedFields.email && (
           <p className="text-sm text-destructive animate-fade-in">{errors.email}</p>
@@ -134,11 +133,10 @@ export default function LoginForm() {
               }
             }}
             onBlur={() => setTouchedFields(prev => ({ ...prev, password: true }))}
-            className={`${
-              errors.password && touchedFields.password
+            className={`${errors.password && touchedFields.password
                 ? "border-destructive focus-visible:ring-destructive/20"
-                : "focus-visible:ring-primary/20"
-            } shadow-soft pr-10 transition-all duration-medium`}
+                : "focus-visible:ring-[var(--ring)]/20"
+              } shadow-soft pr-10 transition-all duration-medium`}
           />
           <button
             type="button"

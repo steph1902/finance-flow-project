@@ -20,16 +20,16 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [errors, setErrors] = useState<{ 
-    name?: string; 
-    email?: string; 
-    password?: string; 
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
     confirmPassword?: string;
     terms?: string;
   }>({});
-  const [touchedFields, setTouchedFields] = useState<{ 
-    name?: boolean; 
-    email?: boolean; 
+  const [touchedFields, setTouchedFields] = useState<{
+    name?: boolean;
+    email?: boolean;
     password?: boolean;
     confirmPassword?: boolean;
   }>({});
@@ -40,17 +40,17 @@ export default function SignupForm() {
 
   const validateForm = () => {
     const newErrors: { name?: string; email?: string; password?: string; confirmPassword?: string; terms?: string } = {};
-    
+
     if (!name || name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
     }
-    
+
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Invalid email format";
     }
-    
+
     if (!password) {
       newErrors.password = "Password is required";
     } else {
@@ -69,18 +69,18 @@ export default function SignupForm() {
     if (!agreeToTerms) {
       newErrors.terms = "You must agree to the terms and conditions";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
@@ -147,11 +147,10 @@ export default function SignupForm() {
             }
           }}
           onBlur={() => setTouchedFields(prev => ({ ...prev, name: true }))}
-          className={`${
-            errors.name && touchedFields.name
+          className={`${errors.name && touchedFields.name
               ? "border-destructive focus-visible:ring-destructive/20"
-              : "focus-visible:ring-primary/20"
-          } shadow-soft transition-all duration-medium`}
+              : "focus-visible:ring-[var(--ring)]/20"
+            } shadow-soft transition-all duration-medium`}
         />
         {errors.name && touchedFields.name && (
           <p className="text-sm text-destructive animate-fade-in">{errors.name}</p>
@@ -178,11 +177,10 @@ export default function SignupForm() {
             }
           }}
           onBlur={() => setTouchedFields(prev => ({ ...prev, email: true }))}
-          className={`${
-            errors.email && touchedFields.email
+          className={`${errors.email && touchedFields.email
               ? "border-destructive focus-visible:ring-destructive/20"
-              : "focus-visible:ring-primary/20"
-          } shadow-soft transition-all duration-medium`}
+              : "focus-visible:ring-[var(--ring)]/20"
+            } shadow-soft transition-all duration-medium`}
         />
         {errors.email && touchedFields.email && (
           <p className="text-sm text-destructive animate-fade-in">{errors.email}</p>
@@ -209,11 +207,10 @@ export default function SignupForm() {
               }
             }}
             onBlur={() => setTouchedFields(prev => ({ ...prev, password: true }))}
-            className={`${
-              errors.password && touchedFields.password
+            className={`${errors.password && touchedFields.password
                 ? "border-destructive focus-visible:ring-destructive/20"
-                : "focus-visible:ring-primary/20"
-            } shadow-soft pr-10 transition-all duration-medium`}
+                : "focus-visible:ring-[var(--ring)]/20"
+              } shadow-soft pr-10 transition-all duration-medium`}
           />
           <button
             type="button"
@@ -231,7 +228,7 @@ export default function SignupForm() {
         {errors.password && touchedFields.password && (
           <p className="text-sm text-destructive animate-fade-in">{errors.password}</p>
         )}
-        
+
         {/* Password Strength Meter */}
         <PasswordStrengthMeter password={password} showRequirements={true} />
       </div>
@@ -256,13 +253,12 @@ export default function SignupForm() {
               }
             }}
             onBlur={() => setTouchedFields(prev => ({ ...prev, confirmPassword: true }))}
-            className={`${
-              errors.confirmPassword && touchedFields.confirmPassword
+            className={`${errors.confirmPassword && touchedFields.confirmPassword
                 ? "border-destructive focus-visible:ring-destructive/20"
                 : confirmPassword && password === confirmPassword
-                ? "border-success focus-visible:ring-success/20"
-                : "focus-visible:ring-primary/20"
-            } shadow-soft pr-10 transition-all duration-medium`}
+                  ? "border-success focus-visible:ring-success/20"
+                  : "focus-visible:ring-[var(--ring)]/20"
+              } shadow-soft pr-10 transition-all duration-medium`}
           />
           <button
             type="button"
