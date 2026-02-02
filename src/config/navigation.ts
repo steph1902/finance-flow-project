@@ -13,6 +13,10 @@ import {
   GitBranch,
   ScrollText,
   MessageCircle,
+  Sparkles,
+  TestTube,
+  Zap,
+  Database,
   type LucideIcon
 } from "lucide-react";
 
@@ -53,6 +57,16 @@ export const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/reports", label: "Reports", icon: FileText },
       { href: "/ai-assistant", label: "AI Assistant", icon: MessageSquare },
       { href: "/import-export", label: "Import/Export", icon: ArrowLeftRightIcon },
+    ]
+  },
+  // AI Phase 4
+  {
+    title: "AI",
+    items: [
+      { href: "/dashboard/insights", label: "Big 4 Insights", icon: Sparkles },
+      { href: "/admin/experiments", label: "Experiments", icon: TestTube },
+      { href: "/admin/ai-quality", label: "AI Quality", icon: Zap },
+      { href: "/admin/demo-data", label: "Demo Data", icon: Database },
     ]
   },
   // System & Maintenance
