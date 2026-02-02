@@ -118,9 +118,9 @@ export default function AIGuidePage() {
                                             <span><strong>Top 3 Actions:</strong> Specific steps to improve (like "reduce dining out by $200/month")</span>
                                         </li>
                                     </ul>
-                                    <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
-                                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">How to Use It:</p>
-                                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                                    <div className="border-l-4 border-l-blue-500 bg-card p-4 rounded-r-lg">
+                                        <p className="text-sm font-semibold text-foreground mb-1">How to Use It:</p>
+                                        <p className="text-sm text-card-foreground/80">
                                             Go to <strong>AI → Big 4 Insights</strong> in the sidebar and click <strong>Refresh Analysis</strong>.
                                             Wait 20 seconds. Read your report. That's it!
                                         </p>
@@ -156,9 +156,9 @@ export default function AIGuidePage() {
                                             <span><strong>You Can Edit:</strong> If it's wrong, just change it. The AI remembers for next time.</span>
                                         </li>
                                     </ul>
-                                    <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg">
-                                        <p className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-1">How to Use It:</p>
-                                        <p className="text-sm text-purple-800 dark:text-purple-200">
+                                    <div className="border-l-4 border-l-purple-500 bg-card p-4 rounded-r-lg">
+                                        <p className="text-sm font-semibold text-foreground mb-1">How to Use It:</p>
+                                        <p className="text-sm text-card-foreground/80">
                                             Just add transactions normally. The AI does the rest in the background. Check the category,
                                             and if it's wrong, click to change it.
                                         </p>
@@ -194,9 +194,9 @@ export default function AIGuidePage() {
                                             <span><strong>90-Day Outlook:</strong> "Large upcoming expenses detected (holiday season)"</span>
                                         </li>
                                     </ul>
-                                    <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg">
-                                        <p className="text-sm font-semibold text-orange-900 dark:text-orange-100 mb-1">How to Use It:</p>
-                                        <p className="text-sm text-orange-800 dark:text-orange-200">
+                                    <div className="border-l-4 border-l-orange-500 bg-card p-4 rounded-r-lg">
+                                        <p className="text-sm font-semibold text-foreground mb-1">How to Use It:</p>
+                                        <p className="text-sm text-card-foreground/80">
                                             The risk warnings appear automatically in your <strong>Big 4 Insights</strong> report.
                                             Green = you're safe, Yellow = watch out, Red = take action now.
                                         </p>
