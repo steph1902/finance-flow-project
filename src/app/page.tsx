@@ -52,7 +52,8 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-5xl md:text-7xl font-serif font-bold leading-[1.1] text-foreground">
-                Your Financial Life,\n                <span className="text-primary italic">Powered by AI</span>
+                Your Financial Life, <br />
+                <span className="text-primary italic">Powered by AI</span>
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
