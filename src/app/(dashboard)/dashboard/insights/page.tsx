@@ -75,7 +75,8 @@ export default function InsightsPage() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to generate analysis');
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to generate analysis');
             }
 
             const data = await res.json();

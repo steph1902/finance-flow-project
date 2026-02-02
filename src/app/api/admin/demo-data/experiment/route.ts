@@ -23,12 +23,13 @@ export async function POST(req: NextRequest) {
             data: {
                 name: 'Big 4 vs Baseline Demo',
                 description: 'Testing Big 4 effectiveness with demo data',
-                hypothesis: 'Big 4 structured prompts will increase action-taken rate by >50%',
+
                 controlPrompt: 'Baseline generic financial advice prompt',
                 variantPrompt: 'Big 4 structured analysis prompt',
                 status: 'RUNNING',
                 trafficSplit: 50,
-                minSampleSize: 100
+                minSampleSize: 100,
+                startDate: new Date(),
             }
         });
 
@@ -43,13 +44,16 @@ export async function POST(req: NextRequest) {
 
             results.push({
                 experimentId: experiment.id,
+                userId: session.user.id as string,
                 variant: 'control',
                 rating,
                 wasHelpful,
                 tookAction,
                 responseTimeMs: Math.floor(800 + Math.random() * 400), // 800-1200ms
                 confidence: Math.floor(60 + Math.random() * 20), // 60-80%
-                specificity: Math.floor(40 + Math.random() * 30) // 40-70%
+                specificity: Math.floor(40 + Math.random() * 30), // 40-70%
+                requestData: { prompt: 'How is my financial health?' },
+                responseData: { analysis: 'Your financial health is average.' }
             });
         }
 
@@ -61,13 +65,16 @@ export async function POST(req: NextRequest) {
 
             results.push({
                 experimentId: experiment.id,
+                userId: session.user.id as string,
                 variant: 'variant',
                 rating,
                 wasHelpful,
                 tookAction,
                 responseTimeMs: Math.floor(900 + Math.random() * 600), // 900-1500ms
                 confidence: Math.floor(80 + Math.random() * 20), // 80-100%
-                specificity: Math.floor(75 + Math.random() * 25) // 75-100%
+                specificity: Math.floor(75 + Math.random() * 25), // 75-100%
+                requestData: { prompt: 'Analyze my cashflow risks using Big 4 methodology' },
+                responseData: { analysis: 'Cashflow risk detected: high variance in discretionary spending.', score: 85 }
             });
         }
 

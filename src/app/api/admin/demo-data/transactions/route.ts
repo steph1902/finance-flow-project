@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
                 description,
                 category,
                 date,
-                type: isIncome ? 'INCOME' : 'EXPENSE',
+                type: (isIncome ? 'INCOME' : 'EXPENSE') as 'INCOME' | 'EXPENSE',
                 status: 'COMPLETED'
             });
         }

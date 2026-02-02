@@ -229,15 +229,17 @@ export default function DemoDataPage() {
                         </div>
 
                         <div className="p-3 bg-muted rounded-lg">
-                            <p className="text-sm">
+                            <div className="text-sm">
                                 <strong>Expected Results:</strong>
                                 <br />
                                 Control: 18.3% action rate
                                 <br />
-                                Variant: 43.1% action rate
+                                Variant B: 24.1% action rate
                                 <br />
-                                <Badge variant="outline" className="mt-2">p = 0.0023 (99.77% confidence)</Badge>
-                            </p>
+                                <Badge variant="outline" className="mt-2">
+                                    Statistically Significant (p &lt; 0.01)
+                                </Badge>
+                            </div>
                         </div>
 
                         <Button

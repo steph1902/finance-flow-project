@@ -9,16 +9,17 @@ import { experimentManager } from '@/lib/ai/ab-testing/experiment-manager';
  */
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const results = await experimentManager.getResults(params.id);
+        const results = await experimentManager.getResults(id);
 
         return NextResponse.json({
             success: true,
@@ -38,9 +39,10 @@ export async function GET(
  */
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.email) {
@@ -51,11 +53,11 @@ export async function PATCH(
         const { action } = body; // 'pause', 'resume', 'declare_winner'
 
         if (action === 'pause') {
-            await experimentManager.pauseExperiment(params.id);
+            await experimentManager.pauseExperiment(id);
         } else if (action === 'resume') {
-            await experimentManager.resumeExperiment(params.id);
+            await experimentManager.resumeExperiment(id);
         } else if (action === 'declare_winner') {
-            await experimentManager.declareWinner(params.id);
+            await experimentManager.declareWinner(id);
         }
 
         return NextResponse.json({

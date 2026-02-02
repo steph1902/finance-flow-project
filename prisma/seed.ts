@@ -638,7 +638,7 @@ async function main() {
         type: notif.type as NotificationType,
         title: notif.title,
         message: notif.message,
-        isRead: false,
+        // status: 'UNREAD', // Default is UNREAD
       },
     });
   }

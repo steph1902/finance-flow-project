@@ -10,31 +10,40 @@ export default function LoginPage() {
     <>
       <AuthNavbar currentPage="login" />
       <AuthLayout>
-        <Card className="bg-card/95 backdrop-blur-2xl border-border/50 shadow-2xl">
-          <CardHeader className="space-y-3 pb-6">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-7 w-7 text-primary" />
-              <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                Welcome Back
-              </CardTitle>
+        <div className="bg-white rounded-[2rem] p-8 sm:p-12 shadow-soft border border-[#F2EFE9]">
+          <div className="space-y-4 pb-8 text-center">
+            {/* Minimal Header */}
+            <h2 className="text-2xl font-bold tracking-tight text-sumi">
+              Agent Login
+            </h2>
+            <p className="text-sumi-500">
+              Hey, Enter your details to get sign in to your account
+            </p>
+          </div>
+
+          <LoginForm />
+
+          <div className="mt-8 text-center text-sm text-sumi-500">
+            <div className="relative py-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-400">Or Sign in with</span>
+              </div>
             </div>
-            <CardDescription className="text-base text-muted-foreground">
-              Sign in to access your AI-powered financial dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-            <div className="mt-6 text-center text-sm text-muted-foreground">
+            {/* Placeholder for social login icons if needed, or just the link */}
+            <p className="mt-4">
               Don&apos;t have an account?{' '}
               <Link
                 href="/signup"
-                className="font-semibold text-primary underline-offset-4 hover:underline transition-colors duration-200"
+                className="font-bold text-sumi hover:text-apricot transition-colors duration-200"
               >
-                Create one now
+                Request Now
               </Link>
-            </div>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+        </div>
       </AuthLayout>
     </>
   );

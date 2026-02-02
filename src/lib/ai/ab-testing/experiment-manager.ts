@@ -55,6 +55,20 @@ export interface ExperimentResults {
     };
 }
 
+export interface ExperimentResultItem {
+    id: string;
+    experimentId: string;
+    userId: string;
+    variant: string;
+    requestData: any; // Keep specific payloads flexible but typed elsewhere
+    responseData: any;
+    responseTimeMs: number;
+    userRating: number | null;
+    wasHelpful: boolean | null;
+    wasActedUpon: boolean | null;
+    feedbackText: string | null;
+}
+
 export class ExperimentManager {
 
     /**
@@ -119,8 +133,8 @@ export class ExperimentManager {
         userId: string,
         variant: 'control' | 'variant',
         data: {
-            requestData: any;
-            responseData: any;
+            requestData: unknown;
+            responseData: unknown;
             responseTimeMs: number;
             confidence?: number;
             specificity?: number;
@@ -131,8 +145,8 @@ export class ExperimentManager {
                 experimentId,
                 userId,
                 variant,
-                requestData: data.requestData,
-                responseData: data.responseData,
+                requestData: data.requestData as object,
+                responseData: data.responseData as object,
                 responseTimeMs: data.responseTimeMs,
                 confidence: data.confidence,
                 specificity: data.specificity
@@ -174,8 +188,9 @@ export class ExperimentManager {
         }
 
         // Separate control and variant results
-        const controlResults = experiment.results.filter(r => r.variant === 'control');
-        const variantResults = experiment.results.filter(r => r.variant === 'variant');
+        // Cast to unknown first to match strict type requirements if prisma types differ slightly
+        const controlResults = experiment.results.filter(r => r.variant === 'control') as unknown as ExperimentResultItem[];
+        const variantResults = experiment.results.filter(r => r.variant === 'variant') as unknown as ExperimentResultItem[];
 
         // Calculate metrics for each group
         const control = this.calculateGroupMetrics(controlResults, experiment.controlName);
@@ -270,7 +285,7 @@ export class ExperimentManager {
 
     // ========== PRIVATE HELPER METHODS ==========
 
-    private calculateGroupMetrics(results: any[], name: string) {
+    private calculateGroupMetrics(results: ExperimentResultItem[], name: string) {
         const samples = results.length;
 
         if (samples === 0) {
@@ -285,7 +300,7 @@ export class ExperimentManager {
         }
 
         // Calculate averages
-        const ratings = results.filter(r => r.userRating !== null).map(r => r.userRating);
+        const ratings = results.filter(r => r.userRating !== null).map(r => r.userRating!);
         const avgRating = ratings.length > 0
             ? ratings.reduce((a, b) => a + b, 0) / ratings.length
             : 0;
@@ -308,7 +323,7 @@ export class ExperimentManager {
         };
     }
 
-    private calculateSignificance(controlResults: any[], variantResults: any[]) {
+    private calculateSignificance(controlResults: ExperimentResultItem[], variantResults: ExperimentResultItem[]) {
         // Use "action taken" as primary metric for significance testing
         const controlActions = controlResults.filter(r => r.wasActedUpon === true).length;
         const variantActions = variantResults.filter(r => r.wasActedUpon === true).length;

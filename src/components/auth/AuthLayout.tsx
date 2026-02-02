@@ -1,13 +1,5 @@
-"use client";
-
 import { ReactNode } from "react";
-import dynamic from "next/dynamic";
-
-// Lazy load 3D component for better performance
-const CoinBackground = dynamic(() => import("@/components/3d/CoinBackground"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[#FDFCF8] to-[#F5F2EB]" />,
-});
+import { AuthBackground } from "./AuthBackground";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -15,14 +7,28 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#FDFCF8]">
-      {/* Fullscreen 3D Background */}
-      <CoinBackground />
+    <div className="relative min-h-screen w-full overflow-hidden bg-cream font-sans text-sumi">
+      {/* Geometric Background */}
+      <AuthBackground />
 
-      {/* Floating Form Container - Right Side */}
-      <div className="relative z-10 min-h-screen w-full flex items-center justify-end px-6 sm:px-8 lg:px-24 xl:px-32">
-        <div className="w-full max-w-md">
-          {children}
+      {/* Main Container - Centered */}
+      <div className="relative z-10 min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-lg">
+          {/* Brand Header */}
+          <div className="mb-12 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-sumi mb-2">FinanceFlow</h1>
+            <div className="h-1 w-12 bg-apricot mx-auto rounded-full"></div>
+          </div>
+
+          {/* Content Card (Forms) */}
+          <div className="relative">
+            {children}
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8 text-center text-sm text-sumi-500">
+            <p>&copy; {new Date().getFullYear()} FinanceFlow. Secure & Private.</p>
+          </div>
         </div>
       </div>
     </div>

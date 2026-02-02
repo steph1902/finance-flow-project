@@ -38,21 +38,31 @@ const config: Config = {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
         },
-        secondary: {
-          DEFAULT: 'var(--secondary)',
-          foreground: 'var(--secondary-foreground)',
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        // Zen Minimal / Japanese Modern Palette
+        cream: {
+          DEFAULT: "#F9F7F2", // Rice Paper
+          foreground: "#1A1A1A",
+        },
+        apricot: {
+          DEFAULT: "#F4B979", // Muted Peach
+          foreground: "#1A1A1A",
+          hover: "#E5AB6D",
+        },
+        sumi: {
+          DEFAULT: "#1A1A1A", // Ink Black
+          500: "#666666",     // Stone Gray
         },
         muted: {
-          DEFAULT: 'var(--muted)',
+          DEFAULT: "hsl(var(--muted))",
           foreground: 'var(--muted-foreground)',
         },
         accent: {
           DEFAULT: 'var(--accent)',
           foreground: 'var(--accent-foreground)',
-        },
-        destructive: {
-          DEFAULT: 'var(--destructive)',
-          foreground: 'var(--destructive-foreground)',
         },
         border: 'var(--border)',
         input: 'var(--input)',
@@ -63,12 +73,6 @@ const config: Config = {
           '3': 'var(--chart-3)',
           '4': 'var(--chart-4)',
           '5': 'var(--chart-5)',
-        },
-        // Warm Minimalist Palette Extension
-        cream: {
-          50: '#FDFCF8',
-          100: '#F5F2EB',
-          200: '#EBE5DA',
         },
         brown: {
           500: '#8C705F',

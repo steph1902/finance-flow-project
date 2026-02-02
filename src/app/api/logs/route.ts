@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) {
-        return new NextResponse("Unauthorized", { status: 401 });
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) {
-        return new NextResponse("Unauthorized", { status: 401 });
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     try {

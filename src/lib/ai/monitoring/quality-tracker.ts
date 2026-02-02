@@ -5,6 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export interface DailyMetrics {
     date: Date;
@@ -176,7 +177,7 @@ export class QualityTracker {
         endDate: Date,
         variant?: string
     ): Promise<DailyMetrics[]> {
-        const where: any = {
+        const where: Prisma.AIQualityMetricsWhereInput = {
             date: {
                 gte: startDate,
                 lte: endDate

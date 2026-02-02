@@ -19,6 +19,14 @@ export async function POST(request: Request) {
             );
         }
 
+        if (!process.env.GOOGLE_AI_API_KEY) {
+            console.error('Missing GOOGLE_AI_API_KEY');
+            return NextResponse.json(
+                { error: 'Server configuration error: Missing AI API Key' },
+                { status: 500 }
+            );
+        }
+
         const body = await request.json();
         const { variant = 'big4', force = false } = body;
 

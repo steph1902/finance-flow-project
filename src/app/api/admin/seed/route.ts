@@ -163,7 +163,7 @@ export async function POST(request: Request) {
                     type: notif.type as NotificationType,
                     title: notif.title,
                     message: notif.message,
-                    isRead: false,
+                    // status: 'UNREAD',
                 },
             });
         }
