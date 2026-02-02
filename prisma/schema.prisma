@@ -45,6 +45,10 @@ model User {
   budgetPermissions     BudgetPermission[]
   reports               Report[]
   investments           Investment[]
+  
+  // Phase 4: Decision Intelligence
+  financialSnapshots    FinancialSnapshot[]
+  big4Analyses          Big4Analysis[]
 
   @@map("users")
 }
@@ -748,3 +752,195 @@ model AgentMetrics {
   @@index([date])
   @@map("agent_metrics")
 }
+
+// ============================================================================
+// PHASE 4: Big 4 Decision Intelligence & MLOps
+// ============================================================================
+
+// Financial Snapshot for Big 4 Analysis
+model FinancialSnapshot {
+  id                    String   @id @default(cuid())
+  userId                String
+  periodStart           DateTime
+  periodEnd             DateTime
+  
+  // Cashflow Metrics (for Big 4 Analysis)
+  netCashflow90d        Decimal  @db.Decimal(10, 2)
+  cashflowTrendPercent  Decimal  @db.Decimal(5, 2)
+  discretionaryVariability Decimal @db.Decimal(5, 2)
+  burnRate              Decimal  @db.Decimal(10, 2)
+  safetyMargin          Decimal  @db.Decimal(5, 2)
+  
+  // Risk Metrics
+  cashBuffer            Decimal  @db.Decimal(10, 2)
+  bufferMultiple        Decimal  @db.Decimal(5, 2) // vs monthly avg
+  monthlyIncome         Decimal  @db.Decimal(10, 2)
+  incomeStability       String   // "stable", "variable", "volatile"
+  
+  // Spending Breakdown
+  totalExpenses90d      Decimal  @db.Decimal(10, 2)
+  discretionarySpending Decimal  @db.Decimal(10, 2)
+  fixedExpenses         Decimal  @db.Decimal(10, 2)
+  
+  // Metadata
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, periodEnd])
+  @@index([userId])
+  @@index([periodEnd])
+  @@map("financial_snapshots")
+}
+
+// Big 4 Decision Analysis Results
+model Big4Analysis {
+  id            String   @id @default(cuid())
+  userId        String
+  snapshotId    String?  // Reference to FinancialSnapshot
+  
+  // Analysis Results (stored as structured JSON)
+  cashflowDiagnosis    Json  // Section 1
+  riskProjection       Json  // Section 2 (30/60/90 day)
+  strategicWeakPoints  Json  // Section 3
+  recommendations      Json  // Section 4 (Top 3)
+  
+  // Metadata
+  analysisDate         DateTime @default(now())
+  variant              String   @default("big4") // "big4" or "baseline"
+  promptVersion        String   // Track prompt iterations
+  
+  // Quality Metrics
+  confidenceScore      Decimal? @db.Decimal(5, 2)
+  specificityScore     Decimal? @db.Decimal(5, 2)
+  responseTimeMs       Int?
+  
+  // User Feedback
+  userRating           Int?     // 1-5 stars
+  wasHelpful           Boolean?
+  wasActedUpon         Boolean?
+  feedbackText         String?  @db.Text
+  feedbackDate         DateTime?
+  
+  // Token Usage
+  promptTokens         Int?
+  completionTokens     Int?
+  totalTokens          Int?
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([analysisDate])
+  @@index([variant])
+  @@map("big4_analyses")
+}
+
+// A/B Testing Experiments
+model AIExperiment {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?  @db.Text
+  status        String   // RUNNING, PAUSED, COMPLETED
+  
+  // Variants
+  controlName   String   @default("baseline")
+  variantName   String   @default("big4")
+  controlPrompt String   @db.Text
+  variantPrompt String   @db.Text
+  
+  // Configuration
+  trafficSplit  Int      @default(50) // % to variant
+  minSampleSize Int      @default(100)
+  
+  // Results
+  winnerVariant String?  // "control", "variant", or null if ongoing
+  significance  Decimal? @db.Decimal(5, 4) // p-value
+  
+  // Dates
+  startDate     DateTime
+  endDate       DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  results AIExperimentResult[]
+  
+  @@index([status])
+  @@index([startDate])
+  @@map("ai_experiments")
+}
+
+// A/B Test Results
+model AIExperimentResult {
+  id              String   @id @default(cuid())
+  experimentId    String
+  userId          String
+  variant         String   // "control" or "variant"
+  
+  // Request/Response Data
+  requestData     Json
+  responseData    Json
+  responseTimeMs  Int
+  
+  // User Feedback
+  userRating      Int?     // 1-5 stars
+  wasHelpful      Boolean?
+  wasActedUpon    Boolean?
+  feedbackText    String?  @db.Text
+  
+  // Quality Metrics
+  confidence      Decimal? @db.Decimal(5, 2)
+  specificity     Decimal? @db.Decimal(5, 2)
+  
+  timestamp       DateTime @default(now())
+  
+  experiment AIExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  
+  @@index([experimentId])
+  @@index([userId])
+  @@index([variant])
+  @@index([timestamp])
+  @@map("ai_experiment_results")
+}
+
+// AI Quality Metrics (Daily Aggregates)
+model AIQualityMetrics {
+  id                     String   @id @default(cuid())
+  date                   DateTime @db.Date
+  variant                String   // "big4" or "baseline"
+  
+  // Performance
+  avgResponseTimeMs      Int
+  p95ResponseTimeMs      Int
+  totalRequests          Int
+  errorCount             Int
+  errorRate              Decimal  @db.Decimal(5, 2)
+  
+  // Quality
+  avgUserRating          Decimal? @db.Decimal(3, 2)
+  totalRatings           Int      @default(0)
+  actionTakenRate        Decimal? @db.Decimal(5, 2)
+  avgSpecificity         Decimal? @db.Decimal(5, 2)
+  avgConfidence          Decimal? @db.Decimal(5, 2)
+  
+  // Token Usage
+  avgPromptTokens        Int
+  avgCompletionTokens    Int
+  totalTokens            BigInt
+  
+  // Drift Detection
+  uniquePatternsDetected Int
+  anomalyScore           Decimal? @db.Decimal(5, 2)
+  
+  createdAt              DateTime @default(now())
+  
+  @@unique([date, variant])
+  @@index([date])
+  @@index([variant])
+  @@map("ai_quality_metrics")
+}
+
