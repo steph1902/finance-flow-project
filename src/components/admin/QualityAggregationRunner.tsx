@@ -17,16 +17,14 @@ export function QualityAggregationRunner() {
         setSuccess(null);
 
         try {
-            const res = await fetch('/api/admin/ai-quality/aggregate', {
-                method: 'POST'
-            });
+            const { runAggregationAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
+            const result = await runAggregationAction();
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Failed to trigger aggregation');
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to trigger aggregation');
             }
 
-            setSuccess('Daily aggregation completed successfully!');
+            setSuccess(result.message || 'Daily aggregation completed successfully!');
         } catch (err: any) {
             setError(err.message);
         } finally {

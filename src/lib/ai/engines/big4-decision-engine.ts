@@ -7,8 +7,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { financialDataAggregator, type FinancialMetrics } from '../analyzers/financial-data-aggregator';
 import { prisma } from '@/lib/prisma';
+import { AI_CONFIG } from '../config';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+let genAI: GoogleGenerativeAI | null = null;
 
 export interface Big4Analysis {
     cashflowDiagnosis: {
@@ -73,8 +74,17 @@ export class Big4DecisionEngine {
             ? this.buildBig4Prompt(metrics)
             : this.buildBaselinePrompt(metrics);
 
+        // Initialize Gemini AI lazily
+        if (!genAI) {
+            const apiKey = AI_CONFIG.apiKey;
+            if (!apiKey) {
+                throw new Error('GEMINI_API_KEY not configured. Please add it to your .env file.');
+            }
+            genAI = new GoogleGenerativeAI(apiKey);
+        }
+
         // Call Gemini API
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: AI_CONFIG.model });
         const result = await model.generateContent(prompt);
         const response = result.response;
         const text = response.text();

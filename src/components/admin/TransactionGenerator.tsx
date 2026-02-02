@@ -20,19 +20,16 @@ export function TransactionGenerator() {
         setSuccess(null);
 
         try {
-            const res = await fetch('/api/admin/demo-data/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ count: transactionCount })
-            });
+            // Import dynamically to avoid build issues if mixed server/client context persists
+            const { generateTransactionsAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Failed to generate transactions');
+            const result = await generateTransactionsAction(transactionCount);
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to generate transactions');
             }
 
-            const data = await res.json();
-            setSuccess(`Generated ${data.count} transactions successfully!`);
+            setSuccess(result.message || 'Success');
         } catch (err: any) {
             setError(err.message);
         } finally {

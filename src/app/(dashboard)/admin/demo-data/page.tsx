@@ -56,9 +56,49 @@ export default function DemoDataPage() {
                     Demo Data Generator
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                    Quickly generate demo data to test Phase 4 features
+                    Quickly populate your account with realistic data to test Phase 4 Decision Intelligence features.
                 </p>
-                <div className="mt-2 flex items-center gap-2">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">Big 4 Insights</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            Executive-grade analysis diagnosing cashflow, projecting 90-day risks, and providing actionable strategic recommendations.
+                        </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="flex items-center gap-2 mb-2">
+                            <TestTube className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">Experiments</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            Scientific A/B testing of AI prompts. Compare Big 4 models against baselines to verify accuracy and advice quality.
+                        </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Zap className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">AI Quality</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            MLOps monitoring for AI performance. Tracks response times, satisfaction scores, and detects model "drift" in real-time.
+                        </p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Database className="h-4 w-4 text-primary" />
+                            <h3 className="font-semibold text-sm">Demo Data</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            Populate thousands of transactions instantly to see high-density visualizations and complex AI insights in action.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="mt-6 flex items-center gap-2">
                     <Badge variant="outline">Logged in as {session?.user?.email}</Badge>
                 </div>
             </div>

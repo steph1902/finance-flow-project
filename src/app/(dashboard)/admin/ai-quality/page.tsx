@@ -75,14 +75,22 @@ export default function AIQualityPage() {
     };
 
     const triggerAggregation = async () => {
+        setLoading(true);
         try {
-            const res = await fetch('/api/admin/ai-quality/aggregate', { method: 'POST' });
-            if (res.ok) {
-                alert('Daily aggregation triggered successfully');
+            const { runAggregationAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
+            const result = await runAggregationAction();
+
+            if (result.success) {
+                alert(result.message || 'Daily aggregation complete');
                 fetchMetrics();
+            } else {
+                alert('Error: ' + result.error);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to trigger aggregation:', err);
+            alert('Failed: ' + err.message);
+        } finally {
+            setLoading(false);
         }
     };
 

@@ -1,7 +1,6 @@
 // src/app/api/ai/big4-analysis/route.ts
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/session';
 import { big4DecisionEngine } from '@/lib/ai/engines/big4-decision-engine';
 import { prisma } from '@/lib/prisma';
 
@@ -10,9 +9,9 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const user = await getCurrentUser();
 
-        if (!session?.user?.id) {
+        if (!user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
 
             const recent = await prisma.big4Analysis.findFirst({
                 where: {
-                    userId: session.user.id,
+                    userId: user.id,
                     variant,
                     createdAt: { gte: oneDayAgo }
                 },
@@ -65,7 +64,7 @@ export async function POST(request: Request) {
         }
 
         // Generate new analysis
-        const result = await big4DecisionEngine.analyze(session.user.id, variant);
+        const result = await big4DecisionEngine.analyze(user.id, variant);
 
         return NextResponse.json({
             success: true,
@@ -87,9 +86,9 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const user = await getCurrentUser();
 
-        if (!session?.user?.id) {
+        if (!user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }
@@ -102,7 +101,7 @@ export async function GET(request: Request) {
 
         const analyses = await prisma.big4Analysis.findMany({
             where: {
-                userId: session.user.id,
+                userId: user.id,
                 variant
             },
             orderBy: { createdAt: 'desc' },
@@ -142,9 +141,9 @@ export async function GET(request: Request) {
  */
 export async function PATCH(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const user = await getCurrentUser();
 
-        if (!session?.user?.id) {
+        if (!user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }
@@ -158,7 +157,7 @@ export async function PATCH(request: Request) {
             where: { id: analysisId }
         });
 
-        if (!analysis || analysis.userId !== session.user.id) {
+        if (!analysis || analysis.userId !== user.id) {
             return NextResponse.json(
                 { error: 'Analysis not found' },
                 { status: 404 }

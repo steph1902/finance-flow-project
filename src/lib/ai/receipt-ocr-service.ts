@@ -20,7 +20,7 @@ export async function extractTextFromReceipt(
   imageBase64: string
 ): Promise<OCRResult> {
   const API_KEY = ENV.GEMINI_API_KEY;
-  
+
   if (!API_KEY || API_KEY.trim() === '') {
     throw new Error(
       "GOOGLE_GENERATIVE_AI_API_KEY not configured. Please add it to your .env file to use receipt scanning."
@@ -39,7 +39,8 @@ export async function extractTextFromReceipt(
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const { AI_CONFIG } = await import('./config');
+    const model = genAI.getGenerativeModel({ model: AI_CONFIG.model });
 
     const prompt = `Extract ALL text visible in this receipt image. 
 Return the text exactly as it appears, line by line, preserving the order and spacing.

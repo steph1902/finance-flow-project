@@ -106,10 +106,10 @@ export default function InsightsPage() {
 
     const getRiskColor = (level: string) => {
         switch (level) {
-            case 'Safe': return 'border-green-500 bg-green-50 dark:bg-green-950';
-            case 'Warning': return 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950';
-            case 'Critical': return 'border-red-500 bg-red-50 dark:bg-red-950';
-            default: return '';
+            case 'Safe': return 'bg-card border-l-green-500 shadow-sm';
+            case 'Warning': return 'bg-card border-l-yellow-500 shadow-sm';
+            case 'Critical': return 'bg-card border-l-red-500 shadow-sm';
+            default: return 'bg-card shadow-sm';
         }
     };
 
@@ -279,13 +279,20 @@ export default function InsightsPage() {
                                     const label = period === 'thirtyDay' ? '30 Days' : period === 'sixtyDay' ? '60 Days' : '90 Days';
 
                                     return (
-                                        <div key={period} className={`p-3 rounded-lg border-l-4 ${getRiskColor(risk.level)}`}>
-                                            <div className="flex items-center gap-2 mb-1">
+                                        <div key={period} className={`p-4 rounded-xl border border-border border-l-[6px] transition-all hover:shadow-md ${getRiskColor(risk.level)}`}>
+                                            <div className="flex items-center gap-2 mb-2">
                                                 {getRiskIcon(risk.level)}
-                                                <span className="font-semibold">{label}</span>
-                                                <Badge variant="outline" className="ml-auto">{risk.level}</Badge>
+                                                <span className="font-bold text-card-foreground text-base tracking-tight">{label}</span>
+                                                <Badge
+                                                    variant={risk.level === 'Critical' ? 'destructive' : 'secondary'}
+                                                    className="ml-auto font-bold uppercase text-[10px]"
+                                                >
+                                                    {risk.level}
+                                                </Badge>
                                             </div>
-                                            <p className="text-sm text-muted-foreground">{risk.description}</p>
+                                            <p className="text-sm font-medium text-card-foreground/80 leading-relaxed">
+                                                {risk.description}
+                                            </p>
                                         </div>
                                     );
                                 })}
@@ -355,39 +362,125 @@ export default function InsightsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* Other tabs would have similar detailed views */}
-                <TabsContent value="cashflow">
+                {/* Cashflow Tab */}
+                <TabsContent value="cashflow" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Cashflow Analysis</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <DollarSign className="h-5 w-5" />
+                                Cashflow Diagnosis
+                            </CardTitle>
+                            <CardDescription>Detailed analysis of your cash flow patterns</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            {/* Detailed cashflow view */}
-                            <p className="text-muted-foreground">Detailed cashflow metrics and trends...</p>
+                        <CardContent className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="p-4 border rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Net Cashflow</span>
+                                    <p className="text-3xl font-bold mt-2">
+                                        ${analysis.cashflowDiagnosis.netCashflowAvg.toFixed(2)}
+                                    </p>
+                                </div>
+                                <div className="p-4 border rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Trend</span>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <Badge variant={analysis.cashflowDiagnosis.trend === 'improving' ? 'default' : 'destructive'} className="text-base">
+                                            {analysis.cashflowDiagnosis.trend === 'improving' ? (
+                                                <TrendingUp className="h-4 w-4 mr-1" />
+                                            ) : (
+                                                <TrendingDown className="h-4 w-4 mr-1" />
+                                            )}
+                                            {analysis.cashflowDiagnosis.trend}
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <div className="p-4 border rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Variability</span>
+                                    <p className="text-2xl font-bold mt-2">{analysis.cashflowDiagnosis.variability}</p>
+                                </div>
+                            </div>
+                            <div className="p-4 border-l-4 border-l-blue-500 bg-card rounded-lg">
+                                <h4 className="font-semibold mb-2">Assessment</h4>
+                                <p className="text-card-foreground/80">{analysis.cashflowDiagnosis.assessment}</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="risks">
+                {/* Risks Tab */}
+                <TabsContent value="risks" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Risk Projection Detail</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Calendar className="h-5 w-5" />
+                                Risk Projection Detail
+                            </CardTitle>
+                            <CardDescription>Forward-looking risk analysis across multiple time horizons</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            {/* Detailed risk view */}
-                            <p className="text-muted-foreground">Detailed risk analysis...</p>
+                        <CardContent className="space-y-4">
+                            {['thirtyDay', 'sixtyDay', 'ninetyDay'].map((period) => {
+                                const key = period as keyof typeof analysis.riskProjection;
+                                const risk = analysis.riskProjection[key];
+                                const label = period === 'thirtyDay' ? '30-Day Outlook' : period === 'sixtyDay' ? '60-Day Outlook' : '90-Day Outlook';
+
+                                return (
+                                    <Card key={period} className={`border-l-[6px] ${getRiskColor(risk.level)}`}>
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    {getRiskIcon(risk.level)}
+                                                    <span className="text-xl">{label}</span>
+                                                </div>
+                                                <Badge
+                                                    variant={risk.level === 'Critical' ? 'destructive' : risk.level === 'Warning' ? 'secondary' : 'default'}
+                                                    className="font-bold uppercase"
+                                                >
+                                                    {risk.level}
+                                                </Badge>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-card-foreground/90 leading-relaxed">{risk.description}</p>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="recommendations">
+                {/* Recommendations Tab */}
+                <TabsContent value="recommendations" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Action Plan</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <Target className="h-5 w-5" />
+                                Action Plan
+                            </CardTitle>
+                            <CardDescription>Prioritized recommendations to improve your financial health</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            {/* Action tracking */}
-                            <p className="text-muted-foreground">Track your progress on recommendations...</p>
+                        <CardContent className="space-y-4">
+                            {analysis.recommendations.map((rec, idx) => (
+                                <Card key={idx} className="border-l-4 border-l-primary">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-start gap-3">
+                                            <Badge className="text-base px-3 py-1">Priority #{rec.priority}</Badge>
+                                            <span className="flex-1">{rec.action}</span>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <span className="text-sm font-semibold text-muted-foreground">Expected Impact</span>
+                                                <p className="text-card-foreground/90 mt-1">{rec.impact}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-sm font-semibold text-muted-foreground">Target Metric</span>
+                                                <p className="text-card-foreground/90 mt-1">{rec.metric}</p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </CardContent>
                     </Card>
                 </TabsContent>

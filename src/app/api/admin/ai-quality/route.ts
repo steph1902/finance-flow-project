@@ -1,7 +1,6 @@
 // src/app/api/admin/ai-quality/route.ts
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/session';
 import { qualityTracker } from '@/lib/ai/monitoring/quality-tracker';
 
 /**
@@ -9,9 +8,9 @@ import { qualityTracker } from '@/lib/ai/monitoring/quality-tracker';
  */
 export async function GET(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const user = await getCurrentUser();
 
-        if (!session?.user?.email) {
+        if (!user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -51,9 +50,9 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const user = await getCurrentUser();
 
-        if (!session?.user?.email) {
+        if (!user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

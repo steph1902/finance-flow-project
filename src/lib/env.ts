@@ -24,12 +24,12 @@ const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
  */
 function getRequiredEnv(key: string): string {
   const value = process.env[key];
-  
+
   // During build: return empty string (prevents build crash)
   if (isBuildTime) {
     return '';
   }
-  
+
   // Runtime validation: throw if missing
   if (!value || value.trim() === '') {
     throw new Error(
@@ -38,7 +38,7 @@ function getRequiredEnv(key: string): string {
       `See .env.example for reference.`
     );
   }
-  
+
   return value;
 }
 
@@ -63,24 +63,24 @@ export const ENV = {
   // Authentication
   get NEXTAUTH_SECRET() { return getRequiredEnv('NEXTAUTH_SECRET'); },
   get NEXTAUTH_URL() { return getOptionalEnv('NEXTAUTH_URL', 'http://localhost:3000'); },
-  
+
   // Database
   get DATABASE_URL() { return getRequiredEnv('DATABASE_URL'); },
-  
+
   // AI Services (lazy evaluation prevents build crashes)
   get GEMINI_API_KEY() { return getRequiredEnv('GEMINI_API_KEY'); },
-  get AI_MODEL_VERSION() { return getOptionalEnv('AI_MODEL_VERSION', 'gemini-1.5-flash'); },
+  get AI_MODEL_VERSION() { return getOptionalEnv('AI_MODEL_VERSION', 'gemini-3-flash-preview'); },
   get AI_TEMPERATURE() { return getOptionalEnv('AI_TEMPERATURE', '0.7'); },
   get AI_MAX_TOKENS() { return getOptionalEnv('AI_MAX_TOKENS', '2048'); },
   get AI_AUTO_ACCEPT_THRESHOLD() { return getOptionalEnv('AI_AUTO_ACCEPT_THRESHOLD', '0'); },
-  
+
   // Google Cloud Services (optional)
   get GOOGLE_CLOUD_API_KEY() { return getOptionalEnv('GOOGLE_CLOUD_API_KEY', ''); },
-  
+
   // OAuth (optional)
   get GOOGLE_CLIENT_ID() { return getOptionalEnv('GOOGLE_CLIENT_ID', ''); },
   get GOOGLE_CLIENT_SECRET() { return getOptionalEnv('GOOGLE_CLIENT_SECRET', ''); },
-  
+
   // Stripe (optional)
   get STRIPE_SECRET_KEY() { return getOptionalEnv('STRIPE_SECRET_KEY', ''); },
   get STRIPE_PUBLISHABLE_KEY() { return getOptionalEnv('STRIPE_PUBLISHABLE_KEY', ''); },
@@ -88,25 +88,25 @@ export const ENV = {
   get STRIPE_PRICE_BASIC() { return getOptionalEnv('STRIPE_PRICE_BASIC', ''); },
   get STRIPE_PRICE_PREMIUM() { return getOptionalEnv('STRIPE_PRICE_PREMIUM', ''); },
   get STRIPE_PRICE_ENTERPRISE() { return getOptionalEnv('STRIPE_PRICE_ENTERPRISE', ''); },
-  
+
   // Resend (optional)
   get RESEND_API_KEY() { return getOptionalEnv('RESEND_API_KEY', ''); },
   get RESEND_FROM_EMAIL() { return getOptionalEnv('RESEND_FROM_EMAIL', 'noreply@financeflow.app'); },
-  
+
   // Currency API (optional)
   get FIXER_API_KEY() { return getOptionalEnv('FIXER_API_KEY', ''); },
-  
+
   // Plaid (optional)
   get PLAID_CLIENT_ID() { return getOptionalEnv('PLAID_CLIENT_ID', ''); },
   get PLAID_SECRET() { return getOptionalEnv('PLAID_SECRET', ''); },
   get PLAID_ENV() { return getOptionalEnv('PLAID_ENV', 'sandbox'); },
-  
+
   // Vercel KV / Redis (optional)
   get KV_URL() { return getOptionalEnv('KV_URL', ''); },
   get KV_REST_API_URL() { return getOptionalEnv('KV_REST_API_URL', ''); },
   get KV_REST_API_TOKEN() { return getOptionalEnv('KV_REST_API_TOKEN', ''); },
   get KV_REST_API_READ_ONLY_TOKEN() { return getOptionalEnv('KV_REST_API_READ_ONLY_TOKEN', ''); },
-  
+
   // Runtime
   get NODE_ENV() { return getOptionalEnv('NODE_ENV', 'development'); },
 } as const;
@@ -140,9 +140,9 @@ export function validateEnvVars(): { valid: boolean; missing: string[] } {
     'NEXTAUTH_SECRET',
     'GEMINI_API_KEY',
   ];
-  
+
   const missing = required.filter(key => !process.env[key]);
-  
+
   return {
     valid: missing.length === 0,
     missing,

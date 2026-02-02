@@ -18,18 +18,16 @@ export function ExperimentGenerator() {
         setSuccess(null);
 
         try {
-            const res = await fetch('/api/admin/demo-data/experiment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Import dynamically to avoid build issues
+            const { generateExperimentAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Failed to create experiment');
+            const result = await generateExperimentAction();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to create experiment');
             }
 
-            const data = await res.json();
-            setSuccess(`Created experiment "${data.experiment.name}" with demo results!`);
+            setSuccess(result.message || 'Success');
         } catch (err: any) {
             setError(err.message);
         } finally {
