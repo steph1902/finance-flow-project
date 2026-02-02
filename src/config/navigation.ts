@@ -67,6 +67,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/experiments", label: "Experiments", icon: TestTube },
       { href: "/admin/ai-quality", label: "AI Quality", icon: Zap },
       { href: "/admin/demo-data", label: "Demo Data", icon: Database },
+      { href: "/docs", label: "Documentation", icon: FileText },
     ]
   },
   // System & Maintenance

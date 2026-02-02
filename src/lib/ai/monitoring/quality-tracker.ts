@@ -278,11 +278,40 @@ export class QualityTracker {
      * Run daily aggregation for yesterday
      */
     async runDailyAggregation(): Promise<void> {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
+        // Find all unique dates that have Big4Analysis records
+        const analyses = await prisma.big4Analysis.findMany({
+            select: {
+                createdAt: true,
+                variant: true
+            }
+        });
 
-        await this.aggregateDailyMetrics(yesterday, 'big4');
-        await this.aggregateDailyMetrics(yesterday, 'baseline');
+        if (analyses.length === 0) {
+            console.log('⚠️  No analyses found to aggregate');
+            return;
+        }
+
+        // Extract unique date-variant combinations
+        const uniqueDates = new Map<string, Set<string>>();
+
+        for (const analysis of analyses) {
+            const dateKey = analysis.createdAt.toISOString().split('T')[0];
+            if (!uniqueDates.has(dateKey)) {
+                uniqueDates.set(dateKey, new Set());
+            }
+            uniqueDates.get(dateKey)!.add(analysis.variant);
+        }
+
+        console.log(`📊 Aggregating ${uniqueDates.size} unique dates...`);
+
+        // Aggregate each date-variant combination
+        for (const [dateStr, variants] of uniqueDates) {
+            const date = new Date(dateStr);
+
+            for (const variant of variants) {
+                await this.aggregateDailyMetrics(date, variant as 'big4' | 'baseline');
+            }
+        }
 
         console.log('✅ Daily aggregation complete');
     }
