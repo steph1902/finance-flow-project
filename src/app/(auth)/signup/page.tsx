@@ -8,12 +8,8 @@ export default function SignupPage() {
   return (
     <>
       <AuthNavbar currentPage="signup" />
-      <AuthLayout
-        title="Start your journey"
-        description="Create your free account and take control of your finances with AI-powered insights and intelligent budgeting tools."
-        showFeatures={true}
-      >
-        <Card className="bg-card/95 border-border/50 shadow-card hover:shadow-mist transition-shadow duration-medium">
+      <AuthLayout>
+        <Card className="bg-card/95 backdrop-blur-2xl border-border/40 shadow-2xl">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-3xl font-bold tracking-tight text-foreground">Create Account</CardTitle>
             <CardDescription className="text-base text-muted-foreground">

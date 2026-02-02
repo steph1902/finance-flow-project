@@ -8,12 +8,8 @@ export default function LoginPage() {
   return (
     <>
       <AuthNavbar currentPage="login" />
-      <AuthLayout
-        title="Welcome back"
-        description="Sign in to your account to access your financial dashboard and continue managing your money with confidence."
-        showFeatures={true}
-      >
-        <Card className="bg-card/95 border-border/50 shadow-card hover:shadow-mist transition-shadow duration-medium">
+      <AuthLayout>
+        <Card className="bg-card/95 backdrop-blur-2xl border-border/40 shadow-2xl">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-3xl font-bold tracking-tight text-foreground">Login</CardTitle>
             <CardDescription className="text-base text-muted-foreground">
