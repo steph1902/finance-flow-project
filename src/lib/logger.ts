@@ -16,14 +16,14 @@ function sanitizeError(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
     return {
       name: error.name,
-      message: process.env.NODE_ENV === 'production' 
-        ? 'An error occurred' 
+      message: process.env.NODE_ENV === 'production'
+        ? 'An error occurred'
         : error.message,
       // Only include stack trace in development
       ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
     };
   }
-  
+
   if (typeof error === 'object' && error !== null) {
     return {
       type: 'unknown',
@@ -32,7 +32,7 @@ function sanitizeError(error: unknown): Record<string, unknown> {
         : String(error),
     };
   }
-  
+
   return {
     type: 'primitive',
     message: process.env.NODE_ENV === 'production'
@@ -47,7 +47,7 @@ function sanitizeError(error: unknown): Record<string, unknown> {
 function sanitizeContext(context: LogContext): LogContext {
   const sensitiveKeys = ['password', 'token', 'apiKey', 'secret', 'authorization'];
   const sanitized: LogContext = {};
-  
+
   for (const [key, value] of Object.entries(context)) {
     const keyLower = key.toLowerCase();
     if (sensitiveKeys.some(sensitive => keyLower.includes(sensitive))) {
@@ -58,28 +58,69 @@ function sanitizeContext(context: LogContext): LogContext {
       sanitized[key] = value;
     }
   }
-  
+
   return sanitized;
 }
+
+import { prisma } from '@/lib/prisma';
+import { LogLevel as PrismaLogLevel, LogCategory } from '@prisma/client';
 
 /**
  * Log a message with optional context
  */
-function log(level: LogLevel, message: string, context?: LogContext) {
+async function log(level: LogLevel, message: string, context?: LogContext) {
   const timestamp = new Date().toISOString();
   const sanitizedContext = context ? sanitizeContext(context) : undefined;
-  
+
   if (process.env.NODE_ENV === 'development') {
     // Development: Full logging to console
-    const logFn = level === 'error' ? console.error : 
-                  level === 'warn' ? console.warn : 
-                  console.log;
-    
-    logFn(`[${timestamp}] [${level.toUpperCase()}] ${message}`, 
-          sanitizedContext ? sanitizedContext : '');
-  } else {
-    // Production: Could integrate with logging service (Sentry, LogRocket, etc.)
-    // For now, minimal console logging
+    const logFn = level === 'error' ? console.error :
+      level === 'warn' ? console.warn :
+        console.log;
+
+    logFn(`[${timestamp}] [${level.toUpperCase()}] ${message}`,
+      sanitizedContext ? sanitizedContext : '');
+  }
+
+  // Production & Database Logging
+  if (typeof window === 'undefined') { // Server-side only
+    try {
+      let prismaLevel: PrismaLogLevel = 'INFO';
+      switch (level) {
+        case 'error': prismaLevel = 'ERROR'; break;
+        case 'warn': prismaLevel = 'WARN'; break;
+        case 'debug': prismaLevel = 'DEBUG'; break;
+      }
+
+      let category: LogCategory = 'SYSTEM';
+      if (context?.category && typeof context.category === 'string') {
+        // quick check if it matches enum, otherwise default
+        if (['API', 'AUTH', 'SYSTEM', 'UI', 'DB'].includes(context.category)) {
+          category = context.category as LogCategory;
+        }
+      }
+
+      // We don't await this to avoid blocking the request
+      prisma.systemLog.create({
+        data: {
+          level: prismaLevel,
+          category: category,
+          message: message,
+          metadata: (sanitizedContext || {}) as any,
+          timestamp: new Date()
+        }
+      }).catch(err => {
+        // Fallback to console if DB fails
+        console.error('Failed to write to system_logs:', err);
+      });
+
+    } catch (e) {
+      console.error('Logger error:', e);
+    }
+  }
+
+  // Console fallback for production (minimal)
+  if (process.env.NODE_ENV === 'production') {
     if (level === 'error') {
       console.error(JSON.stringify({
         timestamp,
@@ -97,6 +138,7 @@ function log(level: LogLevel, message: string, context?: LogContext) {
 export function logError(message: string, error?: unknown, context?: LogContext) {
   const errorDetails = error ? sanitizeError(error) : undefined;
   log('error', message, {
+    category: 'SYSTEM',
     ...context,
     ...(errorDetails && { error: errorDetails }),
   });
@@ -138,7 +180,7 @@ export function apiError(
   status: number;
 } {
   logError(message, error);
-  
+
   return {
     error: process.env.NODE_ENV === 'production'
       ? 'An error occurred'

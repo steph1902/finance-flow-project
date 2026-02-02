@@ -4,12 +4,14 @@ import { prisma } from '@/lib/prisma';
 import type { Transaction, Budget, RecurringTransaction } from '@prisma/client';
 
 interface BudgetState extends AgentState {
+    timestamp: Date;
     data: {
         budgets: Budget[];
         transactions: Transaction[];
         recurring: RecurringTransaction[];
         historicalPatterns: MonthlySpendingPattern[];
     };
+    metadata?: Record<string, unknown>; // Override to strict unknown
 }
 
 interface MonthlySpendingPattern {
@@ -25,7 +27,7 @@ interface MonthlySpendingPattern {
  * Budget Guardian Agent
  * Continuously monitors budget health and provides autonomous recommendations
  */
-export class BudgetGuardianAgent extends AutonomousAgent {
+export class BudgetGuardianAgent extends AutonomousAgent<BudgetState, AgentInsight, AgentAction> {
     constructor() {
         super('BudgetGuardian', 60 * 60 * 1000); // Run every hour
     }
@@ -215,6 +217,9 @@ export class BudgetGuardianAgent extends AutonomousAgent {
         const actions: AgentAction[] = [];
 
         for (const insight of insights) {
+            // Safe casting for data access since we know the structure from analyze()
+            const data = insight.data as Record<string, any>;
+
             switch (insight.type) {
                 case 'BUDGET_OVERRUN_RISK':
                     if (insight.severity === 'critical' || insight.severity === 'high') {
@@ -222,13 +227,13 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                             type: 'SEND_ALERT',
                             priority: insight.severity === 'critical' ? 'urgent' : 'high',
                             payload: {
-                                userId: insight.data.userId,
-                                title: `⚠️ Budget Alert: ${insight.data.category}`,
-                                message: `Your ${insight.data.category} budget is projected to exceed by $${insight.data.overrunAmount.toFixed(2)} with ${insight.data.daysRemaining} days remaining.`,
-                                category: insight.data.category,
+                                userId: data.userId,
+                                title: `⚠️ Budget Alert: ${data.category}`,
+                                message: `Your ${data.category} budget is projected to exceed by $${data.overrunAmount.toFixed(2)} with ${data.daysRemaining} days remaining.`,
+                                category: data.category,
                                 type: 'BUDGET_ALERT'
                             },
-                            reasoning: `Projected spending ($${insight.data.projectedTotal.toFixed(2)}) exceeds budget ($${Number(insight.data.budgetAmount).toFixed(2)})`,
+                            reasoning: `Projected spending ($${data.projectedTotal.toFixed(2)}) exceeds budget ($${Number(data.budgetAmount).toFixed(2)})`,
                             requiresApproval: false
                         });
 
@@ -237,9 +242,9 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                             type: 'SUGGEST_REALLOCATION',
                             priority: 'medium',
                             payload: {
-                                userId: insight.data.userId,
-                                fromCategory: insight.data.category,
-                                suggestion: `Consider reducing discretionary spending or increasing budget by $${(insight.data.overrunAmount * 1.1).toFixed(2)}`
+                                userId: data.userId,
+                                fromCategory: data.category,
+                                suggestion: `Consider reducing discretionary spending or increasing budget by $${(data.overrunAmount * 1.1).toFixed(2)}`
                             },
                             reasoning: `Allow 10% buffer for unexpected expenses`,
                             requiresApproval: true
@@ -252,12 +257,12 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                         type: 'SEND_NOTIFICATION',
                         priority: 'medium',
                         payload: {
-                            userId: insight.data.userId,
-                            title: `Budget Threshold Reached: ${insight.data.category}`,
-                            message: `You've reached ${insight.data.spentPercent.toFixed(1)}% of your ${insight.data.category} budget.`,
+                            userId: data.userId,
+                            title: `Budget Threshold Reached: ${data.category}`,
+                            message: `You've reached ${data.spentPercent.toFixed(1)}% of your ${data.category} budget.`,
                             type: 'BUDGET_ALERT'
                         },
-                        reasoning: `User-defined threshold (${insight.data.thresholdPercent}%) exceeded`,
+                        reasoning: `User-defined threshold (${data.thresholdPercent}%) exceeded`,
                         requiresApproval: false
                     });
                     break;
@@ -268,12 +273,12 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                             type: 'SEND_INSIGHT',
                             priority: 'medium',
                             payload: {
-                                userId: insight.data.userId,
-                                title: `⚡ Spending Pace Alert: ${insight.data.category}`,
-                                message: `You're spending ${(insight.data.paceRatio * 100).toFixed(0)}% faster than expected. Consider slowing down to stay within budget.`,
+                                userId: data.userId,
+                                title: `⚡ Spending Pace Alert: ${data.category}`,
+                                message: `You're spending ${(data.paceRatio * 100).toFixed(0)}% faster than expected. Consider slowing down to stay within budget.`,
                                 type: 'ANOMALY_DETECTION'
                             },
-                            reasoning: `Spending pace significantly above expected (${insight.data.paceRatio.toFixed(2)}x)`,
+                            reasoning: `Spending pace significantly above expected (${data.paceRatio.toFixed(2)}x)`,
                             requiresApproval: false
                         });
                     }
@@ -284,9 +289,9 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                         type: 'SEND_INSIGHT',
                         priority: 'low',
                         payload: {
-                            userId: insight.data.userId,
-                            title: `📊 Spending Trend: ${insight.data.category}`,
-                            message: `Your ${insight.data.category} spending is ${insight.data.deviation.toFixed(1)}% above your historical average.`,
+                            userId: data.userId,
+                            title: `📊 Spending Trend: ${data.category}`,
+                            message: `Your ${data.category} spending is ${data.deviation.toFixed(1)}% above your historical average.`,
                             type: 'ANOMALY_DETECTION'
                         },
                         reasoning: `Historical pattern deviation detected`,
@@ -305,16 +310,18 @@ export class BudgetGuardianAgent extends AutonomousAgent {
     protected async act(actions: AgentAction[]): Promise<void> {
         for (const action of actions) {
             try {
+                const payload = action.payload as Record<string, any>;
+
                 switch (action.type) {
                     case 'SEND_ALERT':
                     case 'SEND_NOTIFICATION':
                     case 'SEND_INSIGHT':
                         await prisma.notification.create({
                             data: {
-                                userId: action.payload.userId,
-                                type: action.payload.type || 'BUDGET_ALERT',
-                                title: action.payload.title,
-                                message: action.payload.message,
+                                userId: payload.userId,
+                                type: payload.type || 'BUDGET_ALERT',
+                                title: payload.title,
+                                message: payload.message,
                                 priority: action.priority === 'urgent' ? 2 : action.priority === 'high' ? 1 : 0,
                                 metadata: {
                                     agentGenerated: true,
@@ -329,15 +336,15 @@ export class BudgetGuardianAgent extends AutonomousAgent {
                         // Create AI suggestion
                         await prisma.aISuggestion.create({
                             data: {
-                                userId: action.payload.userId,
+                                userId: payload.userId,
                                 suggestionType: 'BUDGET_REALLOCATION',
-                                suggestedValue: action.payload.suggestion,
+                                suggestedValue: payload.suggestion,
                                 confidenceScore: 0.80,
                                 metadata: {
                                     agentGenerated: true,
                                     agentName: this.name,
                                     reasoning: action.reasoning,
-                                    fromCategory: action.payload.fromCategory
+                                    fromCategory: payload.fromCategory
                                 }
                             }
                         });
@@ -352,7 +359,7 @@ export class BudgetGuardianAgent extends AutonomousAgent {
     /**
      * LEARN: Track outcomes for future improvement
      */
-    protected async learn(cycle: { state: AgentState; insights: AgentInsight[]; actions: AgentAction[] }): Promise<void> {
+    protected async learn(cycle: { state: BudgetState; insights: AgentInsight[]; actions: AgentAction[] }): Promise<void> {
         // In a full implementation, this would:
         // 1. Track which suggestions users accepted/rejected
         // 2. Adjust confidence thresholds based on accuracy
@@ -373,17 +380,17 @@ export class BudgetGuardianAgent extends AutonomousAgent {
     /**
      * Log the decision cycle to database
      */
-    protected async logDecision(log: AgentDecisionLog): Promise<void> {
+    protected async logDecision(log: AgentDecisionLog<BudgetState, AgentInsight, AgentAction>): Promise<void> {
         try {
             // Store in database for audit trail and monitoring
             await prisma.agentDecisionLog.create({
                 data: {
                     agentType: log.agentType,
-                    observation: log.observation as any,
+                    observation: log.observation as any, // Prisma Json type needs explicit cast or stricter type matching
                     insights: log.insights as any,
                     actions: log.actions as any,
                     reasoning: log.reasoning,
-                    executionTimeMs: log.metadata?.executionTimeMs || 0,
+                    executionTimeMs: log.metadata?.executionTimeMs as number || 0,
                     insightsCount: log.insights.length,
                     actionsCount: log.actions.length,
                     highSeverityCount: log.insights.filter(i =>

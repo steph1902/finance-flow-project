@@ -27,7 +27,8 @@ export function TransactionGenerator() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to generate transactions');
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to generate transactions');
             }
 
             const data = await res.json();

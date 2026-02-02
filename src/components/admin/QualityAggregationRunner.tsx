@@ -22,7 +22,8 @@ export function QualityAggregationRunner() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to run aggregation');
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to trigger aggregation');
             }
 
             setSuccess('Daily aggregation completed successfully!');

@@ -24,7 +24,8 @@ export function ExperimentGenerator() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to create experiment');
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to create experiment');
             }
 
             const data = await res.json();

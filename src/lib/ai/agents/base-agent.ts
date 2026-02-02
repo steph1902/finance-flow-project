@@ -6,37 +6,45 @@
 
 export interface AgentState {
     timestamp: Date;
-    data: any;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
+    [key: string]: unknown; // Allow extensions but safe unknown
 }
 
 export interface AgentInsight {
     type: string;
     severity: 'low' | 'medium' | 'high' | 'critical';
     description: string;
-    data: any;
+    data: unknown;
     confidence: number; // 0-1
 }
 
 export interface AgentAction {
     type: string;
     priority: 'low' | 'medium' | 'high' | 'urgent';
-    payload: any;
+    payload: unknown;
     reasoning: string;
     requiresApproval: boolean;
 }
 
-export interface AgentDecisionLog {
+export interface AgentDecisionLog<
+    TState = AgentState,
+    TInsight = AgentInsight,
+    TAction = AgentAction
+> {
     agentType: string;
-    observation: AgentState;
-    insights: AgentInsight[];
-    actions: AgentAction[];
+    observation: TState;
+    insights: TInsight[];
+    actions: TAction[];
     reasoning: string;
     timestamp: Date;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 
-export abstract class AutonomousAgent {
+export abstract class AutonomousAgent<
+    TState extends AgentState = AgentState,
+    TInsight extends AgentInsight = AgentInsight,
+    TAction extends AgentAction = AgentAction
+> {
     protected running: boolean = false;
     protected interval?: NodeJS.Timeout;
 
@@ -100,7 +108,7 @@ export abstract class AutonomousAgent {
             await this.learn({ state, insights, actions });
 
             // 6. Log the complete decision cycle
-            await this.logDecision({
+            this.logDecision({
                 agentType: this.name,
                 observation: state,
                 insights,
@@ -122,47 +130,47 @@ export abstract class AutonomousAgent {
      * STEP 1: Observe the current state
      * Each agent implements this to gather relevant data
      */
-    protected abstract observe(): Promise<AgentState>;
+    protected abstract observe(): Promise<TState>;
 
     /**
      * STEP 2: Analyze the observed state to generate insights
      * Pattern detection, anomaly detection, forecasting, etc.
      */
-    protected abstract analyze(state: AgentState): Promise<AgentInsight[]>;
+    protected abstract analyze(state: TState): Promise<TInsight[]>;
 
     /**
      * STEP 3: Decide what actions to take based on insights
      * Multi-step reasoning, constraint evaluation, option comparison
      */
-    protected abstract decide(insights: AgentInsight[]): Promise<AgentAction[]>;
+    protected abstract decide(insights: TInsight[]): Promise<TAction[]>;
 
     /**
      * STEP 4: Execute the decided actions
      * Send notifications, update database, call external APIs, etc.
      */
-    protected abstract act(actions: AgentAction[]): Promise<void>;
+    protected abstract act(actions: TAction[]): Promise<void>;
 
     /**
      * STEP 5: Learn from outcomes
      * Track user responses, update models, adjust thresholds
      */
     protected abstract learn(cycle: {
-        state: AgentState;
-        insights: AgentInsight[];
-        actions: AgentAction[];
+        state: TState;
+        insights: TInsight[];
+        actions: TAction[];
     }): Promise<void>;
 
     /**
      * Log the complete decision cycle for audit trail
      */
-    protected abstract logDecision(log: AgentDecisionLog): Promise<void>;
+    protected abstract logDecision(log: AgentDecisionLog<TState, TInsight, TAction>): Promise<void>;
 
     /**
      * Generate a human-readable summary of the reasoning
      */
     protected generateReasoningSummary(
-        insights: AgentInsight[],
-        actions: AgentAction[]
+        insights: TInsight[],
+        actions: TAction[]
     ): string {
         if (insights.length === 0) {
             return 'No significant patterns detected. No action required.';
@@ -183,11 +191,14 @@ export abstract class AutonomousAgent {
     /**
      * Handle errors in the agent loop
      */
-    protected async handleError(error: any): Promise<void> {
+    protected async handleError(error: unknown): Promise<void> {
         // Log error (in production, this would go to monitoring system)
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const stack = error instanceof Error ? error.stack : undefined;
+
         console.error(`Agent error in ${this.name}:`, {
-            error: error.message,
-            stack: error.stack,
+            error: errorMessage,
+            stack: stack,
             timestamp: new Date()
         });
 

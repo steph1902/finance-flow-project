@@ -5,7 +5,8 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { calculatePValue, calculateConfidenceInterval } from './statistics';
+import { Prisma, AIExperimentResult } from '@prisma/client';
+import { calculatePValue } from './statistics';
 
 export interface ExperimentConfig {
     name: string;
@@ -55,19 +56,8 @@ export interface ExperimentResults {
     };
 }
 
-export interface ExperimentResultItem {
-    id: string;
-    experimentId: string;
-    userId: string;
-    variant: string;
-    requestData: any; // Keep specific payloads flexible but typed elsewhere
-    responseData: any;
-    responseTimeMs: number;
-    userRating: number | null;
-    wasHelpful: boolean | null;
-    wasActedUpon: boolean | null;
-    feedbackText: string | null;
-}
+// Ensure 1:1 mapping with Prisma
+export type ExperimentResultItem = AIExperimentResult;
 
 export class ExperimentManager {
 
@@ -126,27 +116,48 @@ export class ExperimentManager {
     }
 
     /**
-     * Record experiment result
+     * Record experiment result with validation
      */
     async recordResult(
         experimentId: string,
         userId: string,
         variant: 'control' | 'variant',
         data: {
-            requestData: unknown;
-            responseData: unknown;
+            requestData: Record<string, unknown>;
+            responseData: Record<string, unknown>;
             responseTimeMs: number;
             confidence?: number;
             specificity?: number;
         }
     ): Promise<void> {
+        // Validate Experiment Status First
+        const experiment = await prisma.aIExperiment.findUnique({
+            where: { id: experimentId },
+            select: { status: true }
+        });
+
+        if (!experiment || experiment.status !== 'RUNNING') {
+            console.warn(`Attempted to record result for non-running experiment: ${experimentId}`);
+            return;
+        }
+
+        // Validate JSON Compatibility
+        // Prisma expects InputJsonValue, which Record<string, unknown> generally satisfies via index signature
+        // but explicit validation ensures no circular refs or functions
+        try {
+            JSON.stringify(data.requestData);
+            JSON.stringify(data.responseData);
+        } catch (e) {
+            throw new Error('Invalid JSON data provided for experiment tracking');
+        }
+
         await prisma.aIExperimentResult.create({
             data: {
                 experimentId,
                 userId,
                 variant,
-                requestData: data.requestData as object,
-                responseData: data.responseData as object,
+                requestData: data.requestData as Prisma.InputJsonValue,
+                responseData: data.responseData as Prisma.InputJsonValue,
                 responseTimeMs: data.responseTimeMs,
                 confidence: data.confidence,
                 specificity: data.specificity
@@ -173,54 +184,63 @@ export class ExperimentManager {
     }
 
     /**
-     * Get experiment results with statistical analysis
+     * Get experiment results with statistical analysis and error handling
      */
     async getResults(experimentId: string): Promise<ExperimentResults> {
-        const experiment = await prisma.aIExperiment.findUnique({
-            where: { id: experimentId },
-            include: {
-                results: true
+        try {
+            const experiment = await prisma.aIExperiment.findUnique({
+                where: { id: experimentId },
+                include: {
+                    results: true
+                }
+            });
+
+            if (!experiment) {
+                throw new Error('Experiment not found');
             }
-        });
 
-        if (!experiment) {
-            throw new Error('Experiment not found');
+            // Type-safe filtering without 'as unknown'
+            const controlResults: ExperimentResultItem[] = experiment.results.filter(
+                (r): r is AIExperimentResult => r.variant === 'control'
+            );
+
+            const variantResults: ExperimentResultItem[] = experiment.results.filter(
+                (r): r is AIExperimentResult => r.variant === 'variant'
+            );
+
+            // Calculate metrics for each group
+            const control = this.calculateGroupMetrics(controlResults, experiment.controlName);
+            const variant = this.calculateGroupMetrics(variantResults, experiment.variantName);
+
+            // Calculate statistical significance
+            const significance = this.calculateSignificance(controlResults, variantResults);
+
+            // Calculate improvements with safe division and rounding
+            const calculateImprovement = (a: number, b: number): number => {
+                if (b === 0) return 0;
+                const improvement = ((a - b) / b) * 100;
+                return Number(improvement.toFixed(2));
+            };
+
+            const metrics = {
+                ratingImprovement: calculateImprovement(variant.avgRating, control.avgRating),
+                helpfulImprovement: calculateImprovement(variant.helpfulRate, control.helpfulRate),
+                actionImprovement: calculateImprovement(variant.actionRate, control.actionRate)
+            };
+
+            return {
+                experimentId: experiment.id,
+                name: experiment.name,
+                status: experiment.status,
+                control,
+                variant,
+                significance,
+                metrics
+            };
+        } catch (error) {
+            console.error(`Error calculating experiment results [${experimentId}]:`, error);
+            throw error; // Re-throw to allow API to handle 500
         }
-
-        // Separate control and variant results
-        // Cast to unknown first to match strict type requirements if prisma types differ slightly
-        const controlResults = experiment.results.filter(r => r.variant === 'control') as unknown as ExperimentResultItem[];
-        const variantResults = experiment.results.filter(r => r.variant === 'variant') as unknown as ExperimentResultItem[];
-
-        // Calculate metrics for each group
-        const control = this.calculateGroupMetrics(controlResults, experiment.controlName);
-        const variant = this.calculateGroupMetrics(variantResults, experiment.variantName);
-
-        // Calculate statistical significance
-        const significance = this.calculateSignificance(controlResults, variantResults);
-
-        // Calculate improvements
-        const metrics = {
-            ratingImprovement: control.avgRating > 0
-                ? ((variant.avgRating - control.avgRating) / control.avgRating) * 100
-                : 0,
-            helpfulImprovement: control.helpfulRate > 0
-                ? ((variant.helpfulRate - control.helpfulRate) / control.helpfulRate) * 100
-                : 0,
-            actionImprovement: control.actionRate > 0
-                ? ((variant.actionRate - control.actionRate) / control.actionRate) * 100
-                : 0
-        };
-
-        return {
-            experimentId: experiment.id,
-            name: experiment.name,
-            status: experiment.status,
-            control,
-            variant,
-            significance,
-            metrics
-        };
     }
 
     /**
@@ -299,46 +319,47 @@ export class ExperimentManager {
             };
         }
 
-        // Calculate averages
+        // Calculate averages with safe fallbacks
         const ratings = results.filter(r => r.userRating !== null).map(r => r.userRating!);
-        const avgRating = ratings.length > 0
+        const rawAvgRating = ratings.length > 0
             ? ratings.reduce((a, b) => a + b, 0) / ratings.length
             : 0;
 
         const helpfulCount = results.filter(r => r.wasHelpful === true).length;
-        const helpfulRate = (helpfulCount / samples) * 100;
+        const rawHelpfulRate = (helpfulCount / samples) * 100;
 
         const actionCount = results.filter(r => r.wasActedUpon === true).length;
-        const actionRate = (actionCount / samples) * 100;
+        const rawActionRate = (actionCount / samples) * 100;
 
-        const avgResponseTime = results.reduce((sum, r) => sum + r.responseTimeMs, 0) / samples;
+        const rawAvgResponseTime = results.reduce((sum, r) => sum + r.responseTimeMs, 0) / samples;
 
+        // Round to 2 decimals for Executive Precision
         return {
             name,
             samples,
-            avgRating,
-            helpfulRate,
-            actionRate,
-            avgResponseTime
+            avgRating: Number(rawAvgRating.toFixed(2)),
+            helpfulRate: Number(rawHelpfulRate.toFixed(2)),
+            actionRate: Number(rawActionRate.toFixed(2)),
+            avgResponseTime: Math.round(rawAvgResponseTime) // Response time is usually integer ms
         };
     }
 
     private calculateSignificance(controlResults: ExperimentResultItem[], variantResults: ExperimentResultItem[]) {
-        // Use "action taken" as primary metric for significance testing
-        const controlActions = controlResults.filter(r => r.wasActedUpon === true).length;
-        const variantActions = variantResults.filter(r => r.wasActedUpon === true).length;
-
         const controlTotal = controlResults.length;
         const variantTotal = variantResults.length;
 
+        // Resilience: Handle zero samples in either group
         if (controlTotal === 0 || variantTotal === 0) {
             return {
-                pValue: 1.0,
+                pValue: 1.0, // No difference
                 isSignificant: false,
                 winner: null,
                 confidence: 0
             };
         }
+
+        const controlActions = controlResults.filter(r => r.wasActedUpon === true).length;
+        const variantActions = variantResults.filter(r => r.wasActedUpon === true).length;
 
         // Calculate p-value using chi-square test
         const pValue = calculatePValue(
@@ -366,7 +387,7 @@ export class ExperimentManager {
             pValue,
             isSignificant,
             winner,
-            confidence
+            confidence: Number(confidence.toFixed(2)) // Round confidence
         };
     }
 }
