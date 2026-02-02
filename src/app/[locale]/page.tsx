@@ -1,10 +1,17 @@
+'use client';
+
 import Link from "next/link";
 import NextImage from "next/image";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 import { TrendingUp, Repeat, Sparkles, Shield, Zap, ArrowRight, Check, BarChart3, Target, FileDown, Brain, Moon, Smartphone } from "lucide-react";
 
 export default function LandingPage() {
+  const t = useTranslations('home');
+  const tNav = useTranslations('nav');
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
       <a href="#main-content" className="sr-only-focusable fixed top-4 left-4 z-50 px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-lg">
@@ -24,16 +31,17 @@ export default function LandingPage() {
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-6">
                 <Link href="/ai-guide" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  AI Guide
+                  {tNav('aiGuide')}
                 </Link>
                 <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Docs
+                  {tNav('docs')}
                 </Link>
                 <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Login
+                  {tNav('login')}
                 </Link>
+                <LanguageSwitcher />
                 <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft rounded-full px-6">
-                  <Link href="/signup">Get Started</Link>
+                  <Link href="/signup">{tNav('getStarted')}</Link>
                 </Button>
               </div>
             </div>
@@ -48,28 +56,27 @@ export default function LandingPage() {
             <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-primary text-sm font-medium border border-border">
                 <Sparkles className="w-4 h-4" />
-                <span>AI-Powered Financial Clarity</span>
+                <span>{t('tagline')}</span>
               </div>
 
               <h1 className="text-5xl md:text-7xl font-serif font-bold leading-[1.1] text-foreground">
-                Your Financial Life, <br />
-                <span className="text-primary italic">Powered by AI</span>
+                {t('hero.title')} <br />
+                <span className="text-primary italic">{t('hero.titleHighlight')}</span>
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Transform complex financial data into crystal-clear insights. Get executive-grade analysis,
-                predictive risk alerts, and personalized action plans—all automated by advanced AI.
+                {t('hero.description')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
                 <Button size="lg" asChild className="h-14 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all bg-primary text-primary-foreground">
                   <Link href="/signup">
-                    Start Free Trial
+                    {t('hero.ctaPrimary')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="h-14 px-8 rounded-full text-lg border-2 hover:bg-secondary">
-                  <Link href="/ai-guide">Learn How It Works</Link>
+                  <Link href="/ai-guide">{t('hero.ctaSecondary')}</Link>
                 </Button>
               </div>
             </div>
@@ -95,7 +102,7 @@ export default function LandingPage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">
-                AI-Powered Features Built for You
+                {t('features.sectionTitle')}
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 No financial expertise required. Let AI handle the complexity.
@@ -107,30 +114,27 @@ export default function LandingPage() {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Brain className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-serif font-bold">Big 4 Decision Intelligence</h3>
+                <h3 className="text-2xl font-serif font-bold">{t('features.big4.title')}</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Get CFO-level insights in seconds. Our AI analyzes your cashflow, risk exposure, weak points,
-                  and delivers 3 prioritized action items to improve your finances.
+                  {t('features.big4.description')}
                 </p>
               </div>
               <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Zap className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-serif font-bold">Smart Categorization</h3>
+                <h3 className="text-2xl font-serif font-bold">{t('features.categorization.title')}</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Never manually tag transactions again. AI automatically categorizes expenses with 95% accuracy,
-                  learning your unique spending patterns over time.
+                  {t('features.categorization.description')}
                 </p>
               </div>
               <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Shield className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-serif font-bold">Risk Projection</h3>
+                <h3 className="text-2xl font-serif font-bold">{t('features.riskProjection.title')}</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  See 30, 60, and 90-day financial risk forecasts. Get early warnings before cash flow issues
-                  become problems, with clear explanations in plain language.
+                  {t('features.riskProjection.description')}
                 </p>
               </div>
             </div>
