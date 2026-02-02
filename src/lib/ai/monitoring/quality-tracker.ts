@@ -239,7 +239,7 @@ export class QualityTracker {
         const driftMetrics: string[] = [];
 
         // Check rating drift
-        const baselineR ating = this.average(baseline.map(m => m.avgUserRating));
+        const baselineRating = this.average(baseline.map(m => m.avgUserRating));
         const currentRating = this.average(current.map(m => m.avgUserRating));
 
         if (currentRating < baselineRating * 0.9) {

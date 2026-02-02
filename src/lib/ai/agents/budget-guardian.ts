@@ -379,9 +379,9 @@ export class BudgetGuardianAgent extends AutonomousAgent {
             await prisma.agentDecisionLog.create({
                 data: {
                     agentType: log.agentType,
-                    observation: log.observation,
-                    insights: log.insights,
-                    actions: log.actions,
+                    observation: log.observation as any,
+                    insights: log.insights as any,
+                    actions: log.actions as any,
                     reasoning: log.reasoning,
                     executionTimeMs: log.metadata?.executionTimeMs || 0,
                     insightsCount: log.insights.length,
