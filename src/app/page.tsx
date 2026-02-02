@@ -23,6 +23,9 @@ export default function LandingPage() {
             </Link>
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-6">
+                <Link href="/ai-guide" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  AI Guide
+                </Link>
                 <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Docs
                 </Link>
@@ -49,24 +52,23 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-5xl md:text-7xl font-serif font-bold leading-[1.1] text-foreground">
-                Bringing Simplicity <br />
-                <span className="text-primary italic">In The Financial Market</span>
+                Your Financial Life,\n                <span className="text-primary italic">Powered by AI</span>
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                FinanceFlow simplifies the complex process of managing your wealth.
-                Experience a new standard of financial clarity.
+                Transform complex financial data into crystal-clear insights. Get executive-grade analysis,
+                predictive risk alerts, and personalized action plans—all automated by advanced AI.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
                 <Button size="lg" asChild className="h-14 px-8 rounded-full text-lg shadow-xl hover:shadow-2xl transition-all bg-primary text-primary-foreground">
                   <Link href="/signup">
-                    Start Your Journey
+                    Start Free Trial
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="h-14 px-8 rounded-full text-lg border-2 hover:bg-secondary">
-                  <Link href="/login">View Demo</Link>
+                  <Link href="/ai-guide">Learn How It Works</Link>
                 </Button>
               </div>
             </div>
@@ -90,32 +92,44 @@ export default function LandingPage() {
         {/* Features Section */}
         <section className="py-32 bg-secondary/50">
           <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">
+                AI-Powered Features Built for You
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                No financial expertise required. Let AI handle the complexity.
+              </p>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-12">
-              <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <BarChart3 className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-serif font-bold">Analytics</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Deep dive into your spending habits with intuitive charts and personalized insights.
-                </p>
-              </div>
-              <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Target className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-serif font-bold">Budgets</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Set smart budgets and get notified when you're close to your limits.
-                </p>
-              </div>
               <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Brain className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-serif font-bold">AI Insights</h3>
+                <h3 className="text-2xl font-serif font-bold">Big 4 Decision Intelligence</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Let our AI agent analyze your finances and suggest ways to save more.
+                  Get CFO-level insights in seconds. Our AI analyzes your cashflow, risk exposure, weak points,
+                  and delivers 3 prioritized action items to improve your finances.
+                </p>
+              </div>
+              <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Zap className="w-7 h-7" />
+                </div>
+                <h3 className="text-2xl font-serif font-bold">Smart Categorization</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Never manually tag transactions again. AI automatically categorizes expenses with 95% accuracy,
+                  learning your unique spending patterns over time.
+                </p>
+              </div>
+              <div className="space-y-4 p-8 rounded-2xl bg-card border border-border shadow-soft hover:shadow-xl transition-all duration-300">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Shield className="w-7 h-7" />
+                </div>
+                <h3 className="text-2xl font-serif font-bold">Risk Projection</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  See 30, 60, and 90-day financial risk forecasts. Get early warnings before cash flow issues
+                  become problems, with clear explanations in plain language.
                 </p>
               </div>
             </div>
