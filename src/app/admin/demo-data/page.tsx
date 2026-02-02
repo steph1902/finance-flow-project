@@ -1,15 +1,52 @@
 'use client';
 
+import { useSession, signIn } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Database, Sparkles, TestTube, Zap } from 'lucide-react';
+import { Database, Sparkles, TestTube, Zap, Lock } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { TransactionGenerator } from '@/components/admin/TransactionGenerator';
 import { ExperimentGenerator } from '@/components/admin/ExperimentGenerator';
 import { QualityAggregationRunner } from '@/components/admin/QualityAggregationRunner';
 
 export default function DemoDataPage() {
+    const { data: session, status } = useSession();
+
+    if (status === 'loading') {
+        return <div className="p-8 text-center">Loading session...</div>;
+    }
+
+    if (status === 'unauthenticated') {
+        return (
+            <div className="container mx-auto p-6 max-w-2xl">
+                <Card className="border-destructive/50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-destructive">
+                            <Lock className="h-6 w-6" />
+                            Authentication Required
+                        </CardTitle>
+                        <CardDescription>
+                            You must be logged in to generate demo data.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Alert variant="destructive">
+                            <AlertTitle>Access Denied</AlertTitle>
+                            <AlertDescription>
+                                Administrative tools are protected. Please log in to continue.
+                            </AlertDescription>
+                        </Alert>
+                        <Button onClick={() => signIn()} className="w-full">
+                            Sign In
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
     return (
         <div className="container mx-auto p-6 space-y-6">
             {/* Header */}
@@ -21,6 +58,9 @@ export default function DemoDataPage() {
                 <p className="text-muted-foreground mt-1">
                     Quickly generate demo data to test Phase 4 features
                 </p>
+                <div className="mt-2 flex items-center gap-2">
+                    <Badge variant="outline">Logged in as {session?.user?.email}</Badge>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
