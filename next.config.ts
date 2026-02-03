@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
-// Create the next-intl plugin with the path to our config
-const withNextIntl = createNextIntlPlugin('./src/i18n/config.ts');
+// Create the next-intl plugin with the path to request.ts
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -50,8 +50,6 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-
-  // NOTE: i18n is handled with next-intl plugin
 };
 
 // Export wrapped config

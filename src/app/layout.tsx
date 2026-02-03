@@ -4,7 +4,7 @@ import AuthProvider from "@/providers/AuthProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
 import { ErrorBoundary, FullPageErrorFallback } from "@/components/errors/ErrorBoundary";
 import { fontInter, fontShippori } from "@/lib/fonts";
-import { isValidLocale, defaultLocale } from "@/i18n/config";
+import { routing } from "@/i18n/routing";
 
 export const metadata: Metadata = {
   title: "FinanceFlow",
@@ -21,13 +21,10 @@ export default async function RootLayout({
   // Await params Promise (Next.js 15+)
   const resolvedParams = await params;
 
-  // DEFENSIVE: Validate and fallback locale
-  let locale = resolvedParams?.locale;
-
-  if (!locale || !isValidLocale(locale)) {
-    console.warn(`[RootLayout] Invalid or missing locale: "${locale}", using default: "${defaultLocale}"`);
-    locale = defaultLocale;
-  }
+  // Get locale with fallback to default
+  const locale = resolvedParams?.locale && routing.locales.includes(resolvedParams.locale as any)
+    ? resolvedParams.locale
+    : routing.defaultLocale;
 
   return (
     <html lang={locale} suppressHydrationWarning>
