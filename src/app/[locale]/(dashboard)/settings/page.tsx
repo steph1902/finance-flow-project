@@ -12,7 +12,8 @@ import {
   Mail,
   Shield,
   Database,
-  Download
+  Download,
+  Key
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -107,6 +108,29 @@ export default function SettingsPage() {
           </div>
           <Button variant="outline" onClick={() => router.push("/profile")} className="font-medium shadow-soft">
             Edit Profile
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* API Keys Section */}
+      <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2 type-h3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Key className="h-5 w-5 text-primary" />
+            </div>
+            API Keys
+          </CardTitle>
+          <CardDescription className="type-body">
+            Manage API keys for integrations and services
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <p className="type-small text-muted-foreground">
+            Configure API keys for Google OAuth, Gemini AI, Resend Email, and other services.
+          </p>
+          <Button variant="outline" onClick={() => router.push("/settings/api-keys")} className="font-medium shadow-soft">
+            Manage API Keys
           </Button>
         </CardContent>
       </Card>

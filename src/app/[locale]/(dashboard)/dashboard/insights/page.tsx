@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnalysisProgress } from '@/components/ai/AnalysisProgress';
+import { AnalysisHistory } from '@/components/ai/AnalysisHistory';
 import {
     TrendingUp,
     TrendingDown,
@@ -17,7 +19,8 @@ import {
     Activity,
     DollarSign,
     Calendar,
-    RefreshCw
+    RefreshCw,
+    History as HistoryIcon
 } from 'lucide-react';
 
 interface Big4Analysis {
@@ -58,6 +61,8 @@ export default function InsightsPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [cached, setCached] = useState(false);
+    const [historyRecords, setHistoryRecords] = useState<any[]>([]);
+    const [selectedTab, setSelectedTab] = useState('overview');
 
     useEffect(() => {
         fetchAnalysis();
@@ -85,6 +90,15 @@ export default function InsightsPage() {
                 setAnalysis(data.analysis);
                 setMetadata(data.metadata);
                 setCached(data.cached || false);
+
+                // Add to history
+                const newRecord = {
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString(),
+                    analysis: data.analysis,
+                    metadata: data.metadata,
+                };
+                setHistoryRecords(prev => [newRecord, ...prev]);
             } else {
                 throw new Error(data.error || 'Unknown error');
             }
@@ -121,10 +135,7 @@ export default function InsightsPage() {
     if (loading && !analysis) {
         return (
             <div className="container mx-auto p-6">
-                <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                    <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Generating your Big 4 Decision Intelligence...</p>
-                </div>
+                <AnalysisProgress isAnalyzing={loading} onComplete={() => { }} />
             </div>
         );
     }
@@ -217,12 +228,16 @@ export default function InsightsPage() {
                 </div>
             )}
 
-            <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="cashflow">Cashflow</TabsTrigger>
                     <TabsTrigger value="risks">Risks</TabsTrigger>
                     <TabsTrigger value="recommendations">Actions</TabsTrigger>
+                    <TabsTrigger value="history">
+                        <HistoryIcon className="w-4 h-4 mr-2" />
+                        History
+                    </TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -483,6 +498,18 @@ export default function InsightsPage() {
                             ))}
                         </CardContent>
                     </Card>
+                </TabsContent>
+
+                {/* History Tab */}
+                <TabsContent value="history" className="space-y-4">
+                    <AnalysisHistory
+                        records={historyRecords}
+                        onViewDetails={(record) => {
+                            setAnalysis(record.analysis);
+                            setMetadata(record.metadata);
+                            setSelectedTab('overview');
+                        }}
+                    />
                 </TabsContent>
             </Tabs>
         </div>
