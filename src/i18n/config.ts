@@ -1,4 +1,6 @@
-// Locale configuration - can be imported from anywhere
+import { getRequestConfig } from 'next-intl/server';
+
+// Locale configuration
 export const locales = ['en', 'ja'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'en';
@@ -17,6 +19,18 @@ export function getValidatedLocale(locale: unknown): Locale {
     return defaultLocale;
 }
 
-// NOTE: We don't use getRequestConfig - we load messages directly in the layout
-// This is more reliable with Next.js 15's async params and avoids
-// "No locale was returned from getRequestConfig" errors
+// Minimal config to satisfy next-intl's requirement
+// We don't actually use this - we load messages directly in the layout
+// But next-intl requires this file to exist
+export default getRequestConfig(async ({ locale }) => {
+    // Validate and fallback
+    const validLocale = getValidatedLocale(locale);
+
+    // Return minimal config
+    // The actual messages are loaded in [locale]/layout.tsx
+    return {
+        messages: {},
+        timeZone: 'Asia/Tokyo',
+        now: new Date()
+    };
+});
