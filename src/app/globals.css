@@ -106,10 +106,69 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  .glass-dark {
+    background: rgba(45, 36, 32, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* 3D Depth utilities */
+  .depth-1 {
+    box-shadow: 
+      0 1px 2px rgba(45, 36, 32, 0.04),
+      0 2px 4px rgba(45, 36, 32, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .depth-2 {
+    box-shadow: 
+      0 2px 4px rgba(45, 36, 32, 0.06),
+      0 4px 8px rgba(45, 36, 32, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .depth-3 {
+    box-shadow: 
+      0 4px 8px rgba(45, 36, 32, 0.08),
+      0 8px 16px rgba(45, 36, 32, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  /* Hover glow effect */
+  .glow-hover {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .glow-hover:hover {
+    box-shadow: 
+      0 8px 24px rgba(93, 69, 56, 0.15),
+      0 16px 48px rgba(93, 69, 56, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+  }
+
   /* 3D canvas container */
   .canvas-container {
     position: absolute;
     inset: 0;
     z-index: 0;
   }
+
+  /* Pulse animation for XAI terminal */
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  /* Stagger animation delays */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
 }
