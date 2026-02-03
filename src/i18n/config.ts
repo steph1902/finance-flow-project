@@ -1,5 +1,3 @@
-import { getRequestConfig } from 'next-intl/server';
-
 // Locale configuration - can be imported from anywhere
 export const locales = ['en', 'ja'] as const;
 export type Locale = (typeof locales)[number];
@@ -19,39 +17,6 @@ export function getValidatedLocale(locale: unknown): Locale {
     return defaultLocale;
 }
 
-// NOTE: This config is used by next-intl internally
-// We also load messages directly in the layout for more control
-export default getRequestConfig(async ({ locale }) => {
-    // DEFENSIVE: Validate locale and provide fallback
-    const validatedLocale = getValidatedLocale(locale);
-
-    try {
-        // Import messages with validated locale
-        const messages = (await import(`./locales/${validatedLocale}.json`)).default;
-
-        return {
-            messages,
-            timeZone: 'Asia/Tokyo',
-            now: new Date()
-        };
-    } catch (error) {
-        console.error(`[i18n/config] Failed to load messages for locale "${validatedLocale}":`, error);
-
-        // Ultimate fallback: return English messages
-        if (validatedLocale !== defaultLocale) {
-            const fallbackMessages = (await import(`./locales/${defaultLocale}.json`)).default;
-            return {
-                messages: fallbackMessages,
-                timeZone: 'Asia/Tokyo',
-                now: new Date()
-            };
-        }
-
-        // If even English fails, return empty object to prevent crash
-        return {
-            messages: {},
-            timeZone: 'Asia/Tokyo',
-            now: new Date()
-        };
-    }
-});
+// NOTE: We don't use getRequestConfig - we load messages directly in the layout
+// This is more reliable with Next.js 15's async params and avoids
+// "No locale was returned from getRequestConfig" errors

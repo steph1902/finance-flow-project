@@ -1,6 +1,6 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
-import { locales, isValidLocale, getValidatedLocale, defaultLocale, type Locale } from '@/i18n/config';
+import { locales, isValidLocale, defaultLocale, type Locale } from '@/i18n/config';
 
 export function generateStaticParams() {
     return locales.map((locale) => ({ locale }));
@@ -16,63 +16,35 @@ export default async function LocaleLayout({
     // Await params Promise (Next.js 15+)
     const { locale: rawLocale } = await params;
 
-    // DEFENSIVE: Validate locale with proper error handling
-    if (!rawLocale) {
-        console.error('[LocaleLayout] No locale in params, using default');
-        // Redirect to default locale instead of showing error
-        return notFound();
-    }
-
-    // Validate locale is one of our supported locales
-    if (!isValidLocale(rawLocale)) {
+    // DEFENSIVE: Validate locale
+    if (!rawLocale || !isValidLocale(rawLocale)) {
         console.error(`[LocaleLayout] Invalid locale "${rawLocale}", returning 404`);
         notFound();
     }
 
     const locale = rawLocale as Locale;
 
+    // DEFENSIVE: Direct import with validated locale (most reliable approach)
+    let messages;
     try {
-        // Import messages directly with validated locale
-        const messages = (await import(`@/i18n/locales/${locale}.json`)).default;
-
-        // DEFENSIVE: Verify messages were loaded
-        if (!messages || typeof messages !== 'object') {
-            console.error(`[LocaleLayout] Invalid messages structure for locale "${locale}"`);
-            throw new Error('Invalid messages');
-        }
-
-        return (
-            <NextIntlClientProvider
-                locale={locale}
-                messages={messages}
-                timeZone="Asia/Tokyo"
-            >
-                {children}
-            </NextIntlClientProvider>
-        );
+        messages = (await import(`@/i18n/locales/${locale}.json`)).default;
     } catch (error) {
-        console.error(`[LocaleLayout] Failed to load messages for locale "${locale}":`, error);
-
-        // Fallback to English if not already English
+        console.error(`[LocaleLayout] Failed to load ${locale}:`, error);
+        // Fallback to English
         if (locale !== defaultLocale) {
-            console.warn(`[LocaleLayout] Attempting fallback to ${defaultLocale}`);
-            try {
-                const fallbackMessages = (await import(`@/i18n/locales/${defaultLocale}.json`)).default;
-                return (
-                    <NextIntlClientProvider
-                        locale={defaultLocale}
-                        messages={fallbackMessages}
-                        timeZone="Asia/Tokyo"
-                    >
-                        {children}
-                    </NextIntlClientProvider>
-                );
-            } catch (fallbackError) {
-                console.error('[LocaleLayout] Fallback also failed:', fallbackError);
-            }
+            messages = (await import(`@/i18n/locales/${defaultLocale}.json`)).default;
+        } else {
+            notFound();
         }
-
-        // Ultimate fallback: return 404
-        notFound();
     }
+
+    return (
+        <NextIntlClientProvider
+            locale={locale}
+            messages={messages}
+            timeZone="Asia/Tokyo"
+        >
+            {children}
+        </NextIntlClientProvider>
+    );
 }
