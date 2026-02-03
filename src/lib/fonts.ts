@@ -1,10 +1,10 @@
 /**
  * Premium Typography System (2025)
  * Primary: Inter (clean, modern, excellent readability)
- * Display: Shippori Mincho B1 (Japanese refinement)
+ * Display: Inter (temporary - Shippori Mincho B1 disabled due to Turbopack font loading)
  */
 
-import { Inter, Shippori_Mincho_B1 } from "next/font/google";
+import { Inter } from "next/font/google";
 
 // Inter - Primary sans-serif with excellent readability
 // Used for all UI, body text, and navigation
@@ -15,14 +15,13 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-// Shippori Mincho B1 - Japanese serif for display/headings
-// Used for hero headlines and special emphasis
-const shipporiMincho = Shippori_Mincho_B1({
-  subsets: ["latin"],
-  variable: "--font-shippori",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
+// TODO: Re-enable Shippori Mincho B1 after Turbopack font loading is fixed
+// const shipporiMincho = Shippori_Mincho_B1({
+//   subsets: ["latin"],  
+//   variable: "--font-shippori",
+//   display: "swap",
+//   weight: ["400", "500", "600", "700", "800"],
+// });
 
 export const fontInter = inter;
-export const fontShippori = shipporiMincho;
+export const fontShippori = inter; // Temporary: using Inter instead of Shippori

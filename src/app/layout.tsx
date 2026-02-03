@@ -10,13 +10,16 @@ export const metadata: Metadata = {
   description: "Personal Finance Management Application",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale }
+  params
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  // Await params Promise (Next.js 15+)
+  const { locale } = await params;
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${fontInter.variable} ${fontShippori.variable} font-sans antialiased`}>
