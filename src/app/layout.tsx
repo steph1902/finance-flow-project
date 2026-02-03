@@ -3,7 +3,7 @@ import "@/app/globals.css";
 import AuthProvider from "@/providers/AuthProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
 import { ErrorBoundary, FullPageErrorFallback } from "@/components/errors/ErrorBoundary";
-import { fontInter, fontShippori } from "@/lib/fonts";
+import { fontInter, fontPlayfair } from "@/lib/fonts";
 import { routing } from "@/i18n/routing";
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${fontInter.variable} ${fontShippori.variable} font-sans antialiased`}>
+      <body className={`${fontInter.variable} ${fontPlayfair.variable} font-sans antialiased`}>
         <ErrorBoundary fallback={<FullPageErrorFallback />}>
           <AuthProvider>
             {children}

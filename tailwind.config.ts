@@ -81,7 +81,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
-        serif: ['var(--font-shippori)', 'serif'],
+        serif: ['var(--font-playfair)', 'Playfair Display', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

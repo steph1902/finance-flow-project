@@ -44,7 +44,7 @@ function FeatureCard({
         </div>
 
         {/* Content */}
-        <h3 className="text-xl font-semibold text-sumi mb-3">{title}</h3>
+        <h3 className="text-xl font-semibold text-sumi mb-3 font-serif">{title}</h3>
         <p className="text-sumi-500 leading-relaxed">{description}</p>
       </div>
     </motion.div>
@@ -131,12 +131,12 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-8"
+                className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-8 font-serif"
               >
                 <span className="text-sumi">{t('hero.title')}</span>
                 <br />
                 <span className="relative inline-block mt-2">
-                  <span className="text-sumi">{t('hero.titleHighlight')}</span>
+                  <span className="text-sumi italic">{t('hero.titleHighlight')}</span>
                   <div className="absolute -bottom-2 left-0 right-0 h-3 bg-apricot/40 -skew-x-3 rounded-sm" />
                 </span>
               </motion.h1>
@@ -195,7 +195,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="max-w-3xl mx-auto text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-6 font-serif">
                 What Is FinanceFlow?
               </h2>
               <p className="text-lg text-sumi-500 leading-relaxed">
@@ -253,7 +253,7 @@ export default function LandingPage() {
               <span className="inline-block px-4 py-1.5 rounded-full bg-white text-sumi-500 text-sm border border-border/50 mb-6">
                 Features
               </span>
-              <h2 className="text-3xl md:text-5xl font-bold text-sumi mb-6">
+              <h2 className="text-3xl md:text-5xl font-bold text-sumi mb-6 font-serif">
                 {t('features.sectionTitle')}
               </h2>
               <p className="text-lg text-sumi-500 max-w-2xl mx-auto">
@@ -312,7 +312,7 @@ export default function LandingPage() {
               className="max-w-4xl mx-auto"
             >
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-4 font-serif">
                   Technical Excellence
                 </h2>
                 <p className="text-sumi-500">
@@ -359,7 +359,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="max-w-2xl mx-auto text-center"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-sumi mb-6 font-serif">
                 Ready to Build?
               </h2>
               <p className="text-lg text-sumi-500 mb-8">
