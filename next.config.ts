@@ -6,6 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/config.ts');
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  output: 'standalone', // Enable for Docker deployment
 
   // Turbopack configuration
   turbopack: {
@@ -29,6 +30,14 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+
+  webpack: (config) => {
+    config.externals.push({
+      'utf-8-validate': 'commonjs utf-8-validate',
+      'bufferutil': 'commonjs bufferutil',
+    });
+    return config;
   },
 
   // NOTE: i18n is not supported in App Router (Next.js 16+)

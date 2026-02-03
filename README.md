@@ -337,15 +337,108 @@ npm run dev
 cd backend && npm run start:dev
 ```
 
-### Docker
+### Docker Deployment
+
+**Production-ready Docker setup** with multi-stage builds:
 
 ```bash
+# Start all services (PostgreSQL, Redis, Backend, Frontend)
 docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Build and run frontend only
+docker build -t financeflow-frontend .
+docker run -p 3000:3000 financeflow-frontend
+
+# Build and run backend only
+docker build -t financeflow-backend -f Dockerfile.backend .
+docker run -p 3001:3001 financeflow-backend
 ```
+
+**Docker Features:**
+- ✅ Multi-stage builds (optimized ~150MB frontend, ~180MB backend)
+- ✅ Non-root users for security
+- ✅ Health checks for PostgreSQL and Redis
+- ✅ Named volumes for data persistence
+- ✅ Environment variable injection
+
+### GCP Cloud Run Deployment
+
+**Automated deployment to Google Cloud Platform:**
+
+```bash
+# Set your GCP project ID
+export GCP_PROJECT_ID=your-project-id
+
+# Run automated deployment script
+chmod +x deploy-gcp.sh
+./deploy-gcp.sh
+```
+
+**The script will:**
+1. Enable required GCP APIs (Cloud Run, Cloud SQL, Secret Manager)
+2. Create Cloud SQL PostgreSQL instance
+3. Configure secrets in Secret Manager
+4. Build and deploy via Cloud Build
+5. Deploy both frontend and backend to Cloud Run
+
+**Manual deployment via Cloud Build:**
+```bash
+gcloud builds submit \
+  --config=cloudbuild.yaml \
+  --project=YOUR_PROJECT_ID
+```
+
+**Services deployed:**
+- Frontend: `https://financeflow-frontend-[hash].a.run.app`
+- Backend: `https://financeflow-backend-[hash].a.run.app`
+- Database: Cloud SQL PostgreSQL 16
+- Secrets: Secret Manager
+
+### Internationalization (i18n)
+
+**FinanceFlow supports multiple languages** using `next-intl`:
+
+**Supported Languages:**
+- 🇺🇸 English (default)
+- 🇯🇵 Japanese (日本語)
+
+**Features:**
+- Automatic locale detection from browser
+- Cookie-based language preference
+- URL-based routing (`/en`, `/ja`)
+- Fully translated: Navigation, homepage, features
+- Language switcher component (Globe icon)
+
+**Usage:**
+```bash
+# English version
+http://localhost:3000/en
+
+# Japanese version
+http://localhost:3000/ja
+
+# Auto-redirect from root
+http://localhost:3000  →  /en (based on browser locale)
+```
+
+**Add a new language:**
+1. Create `src/i18n/locales/es.json` (Spanish example)
+2. Add `'es'` to `locales` array in `src/i18n/config.ts`
+3. Update middleware configuration if needed
+4. Translate all keys from `en.json`
+
 
 ---
 
 ## Environment Configuration
+
+### Local Development
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
@@ -355,6 +448,16 @@ docker-compose up -d
 | `GOOGLE_AI_API_KEY` | No* | Gemini API for AI features |
 | `GOOGLE_CLOUD_VISION_KEY` | No* | Receipt scanning OCR |
 | `PLAID_CLIENT_ID` | No* | Bank account linking |
+
+### GCP Production
+
+See [.env.gcp.example](file:///Users/step/Documents/finance-flow-project/.env.gcp.example) for full template.
+
+**Additional GCP Variables:**
+- `GCP_PROJECT_ID`: Your Google Cloud project ID
+- `GCP_REGION`: Deployment region (default: `asia-northeast1`)
+- Cloud SQL connection with Unix socket
+- Secrets managed via Secret Manager
 
 *Without optional keys, system falls back to rule-based logic
 

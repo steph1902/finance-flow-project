@@ -1,0 +1,88 @@
+steps:
+  # Build and push frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/financeflow-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/financeflow-frontend:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/financeflow-frontend'
+
+  # Build and push backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-backend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/financeflow-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/financeflow-backend:latest'
+      - '-f'
+      - 'Dockerfile.backend'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-backend'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/financeflow-backend'
+
+  # Deploy backend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-backend'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'financeflow-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/financeflow-backend:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,REDIS_URL=REDIS_URL:latest'
+
+  # Deploy frontend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-frontend'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'financeflow-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/financeflow-frontend:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,NEXT_PUBLIC_API_URL=${_BACKEND_URL}'
+
+images:
+  - 'gcr.io/$PROJECT_ID/financeflow-frontend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/financeflow-backend:$COMMIT_SHA'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1800s
