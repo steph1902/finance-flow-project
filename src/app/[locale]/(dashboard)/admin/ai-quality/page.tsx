@@ -77,7 +77,7 @@ export default function AIQualityPage() {
     const triggerAggregation = async () => {
         setLoading(true);
         try {
-            const { runAggregationAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
+            const { runAggregationAction } = await import('@/app/[locale]/(dashboard)/admin/demo-data/actions');
             const result = await runAggregationAction();
 
             if (result.success) {

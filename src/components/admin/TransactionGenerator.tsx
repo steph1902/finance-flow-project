@@ -21,7 +21,7 @@ export function TransactionGenerator() {
 
         try {
             // Import dynamically to avoid build issues if mixed server/client context persists
-            const { generateTransactionsAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
+            const { generateTransactionsAction } = await import('@/app/[locale]/(dashboard)/admin/demo-data/actions');
 
             const result = await generateTransactionsAction(transactionCount);
 

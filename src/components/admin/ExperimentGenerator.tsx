@@ -19,7 +19,7 @@ export function ExperimentGenerator() {
 
         try {
             // Import dynamically to avoid build issues
-            const { generateExperimentAction } = await import('@/app/(dashboard)/admin/demo-data/actions');
+            const { generateExperimentAction } = await import('@/app/[locale]/(dashboard)/admin/demo-data/actions');
 
             const result = await generateExperimentAction();
 
