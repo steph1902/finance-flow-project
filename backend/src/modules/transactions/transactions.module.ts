@@ -1,17 +1,28 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from './transactions.repository';
-import { BudgetsModule } from '../budgets/budgets.module';
+import { BudgetRepository } from '../budgets/repositories/budget.repository';
+import { AiCategorizationProcessor } from './processors/ai-categorization.processor';
 
 /**
  * Transactions Module
- * Handles all transaction-related operations
+ * Handles transaction CRUD, categorization, statistics, and bulk operations
  */
 @Module({
-  imports: [BudgetsModule],
+  imports: [
+    BullModule.registerQueue({
+      name: 'ai-categorization',
+    }),
+  ],
   controllers: [TransactionsController],
-  providers: [TransactionsService, TransactionsRepository],
-  exports: [TransactionsService],
+  providers: [
+    TransactionsService,
+    TransactionsRepository,
+    BudgetRepository,
+    AiCategorizationProcessor,
+  ],
+  exports: [TransactionsService, TransactionsRepository],
 })
 export class TransactionsModule { }

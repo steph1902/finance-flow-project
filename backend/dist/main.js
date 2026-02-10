@@ -68,14 +68,14 @@ const common_module_1 = __webpack_require__(16);
 const auth_module_1 = __webpack_require__(18);
 const users_module_1 = __webpack_require__(33);
 const transactions_module_1 = __webpack_require__(37);
-const budgets_module_1 = __webpack_require__(44);
-const recurring_module_1 = __webpack_require__(56);
-const goals_module_1 = __webpack_require__(57);
-const analytics_module_1 = __webpack_require__(58);
-const notifications_module_1 = __webpack_require__(59);
-const admin_module_1 = __webpack_require__(67);
-const analytics_module_2 = __webpack_require__(69);
-const jwt_auth_guard_1 = __webpack_require__(48);
+const budgets_module_1 = __webpack_require__(47);
+const recurring_module_1 = __webpack_require__(59);
+const goals_module_1 = __webpack_require__(60);
+const analytics_module_1 = __webpack_require__(61);
+const notifications_module_1 = __webpack_require__(62);
+const admin_module_1 = __webpack_require__(70);
+const analytics_module_2 = __webpack_require__(72);
+const jwt_auth_guard_1 = __webpack_require__(51);
 const throttler_2 = __webpack_require__(10);
 let AppModule = class AppModule {
 };
@@ -1357,19 +1357,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransactionsModule = void 0;
 const common_1 = __webpack_require__(3);
+const bullmq_1 = __webpack_require__(11);
 const transactions_controller_1 = __webpack_require__(38);
 const transactions_service_1 = __webpack_require__(39);
-const transactions_repository_1 = __webpack_require__(40);
-const budgets_module_1 = __webpack_require__(44);
+const transactions_repository_1 = __webpack_require__(41);
+const budget_repository_1 = __webpack_require__(42);
+const ai_categorization_processor_1 = __webpack_require__(45);
 let TransactionsModule = class TransactionsModule {
 };
 exports.TransactionsModule = TransactionsModule;
 exports.TransactionsModule = TransactionsModule = __decorate([
     (0, common_1.Module)({
-        imports: [budgets_module_1.BudgetsModule],
+        imports: [
+            bullmq_1.BullModule.registerQueue({
+                name: 'ai-categorization',
+            }),
+        ],
         controllers: [transactions_controller_1.TransactionsController],
-        providers: [transactions_service_1.TransactionsService, transactions_repository_1.TransactionsRepository],
-        exports: [transactions_service_1.TransactionsService],
+        providers: [
+            transactions_service_1.TransactionsService,
+            transactions_repository_1.TransactionsRepository,
+            budget_repository_1.BudgetRepository,
+            ai_categorization_processor_1.AiCategorizationProcessor,
+        ],
+        exports: [transactions_service_1.TransactionsService, transactions_repository_1.TransactionsRepository],
     })
 ], TransactionsModule);
 
@@ -1397,7 +1408,7 @@ exports.TransactionsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
 const transactions_service_1 = __webpack_require__(39);
-const dto_1 = __webpack_require__(42);
+const dto_1 = __webpack_require__(43);
 const current_user_decorator_1 = __webpack_require__(28);
 let TransactionsController = class TransactionsController {
     constructor(transactionsService) {
@@ -1547,20 +1558,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var TransactionsService_1;
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransactionsService = void 0;
 const common_1 = __webpack_require__(3);
 const client_1 = __webpack_require__(15);
+const bullmq_1 = __webpack_require__(11);
+const bullmq_2 = __webpack_require__(40);
 const prisma_service_1 = __webpack_require__(14);
-const transactions_repository_1 = __webpack_require__(40);
-const budget_repository_1 = __webpack_require__(41);
+const transactions_repository_1 = __webpack_require__(41);
+const budget_repository_1 = __webpack_require__(42);
 let TransactionsService = TransactionsService_1 = class TransactionsService {
-    constructor(prisma, repository, budgetRepository) {
+    constructor(prisma, repository, budgetRepository, aiQueue) {
         this.prisma = prisma;
         this.repository = repository;
         this.budgetRepository = budgetRepository;
+        this.aiQueue = aiQueue;
         this.logger = new common_1.Logger(TransactionsService_1.name);
     }
     async create(userId, dto) {
@@ -1575,7 +1592,33 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
             await this.updateBudgetSpent(userId, dto.category, transaction.date, data.amount);
             await this.checkBudgetAlerts(userId, dto.category, transaction.date);
         }
+        if (!dto.category || dto.category === 'Other' || dto.category === 'Uncategorized') {
+            await this.queueAICategorization(transaction);
+        }
         return this.serializeTransaction(transaction);
+    }
+    async queueAICategorization(transaction) {
+        try {
+            await this.aiQueue.add('categorize-transaction', {
+                transactionId: transaction.id,
+                userId: transaction.userId,
+                description: transaction.description || 'Transaction',
+                amount: Number(transaction.amount),
+                type: transaction.type,
+            }, {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 2000,
+                },
+                removeOnComplete: true,
+                removeOnFail: false,
+            });
+            this.logger.log(`Queued AI categorization for transaction ${transaction.id}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to queue AI categorization for transaction ${transaction.id}`, error instanceof Error ? error.stack : String(error));
+        }
     }
     async findAll(userId, query) {
         const { page = 1, limit = 10, type, category, startDate, endDate, search, sortBy = 'date', sortOrder = 'desc', } = query;
@@ -1863,12 +1906,19 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
 exports.TransactionsService = TransactionsService;
 exports.TransactionsService = TransactionsService = TransactionsService_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof transactions_repository_1.TransactionsRepository !== "undefined" && transactions_repository_1.TransactionsRepository) === "function" ? _b : Object, typeof (_c = typeof budget_repository_1.BudgetRepository !== "undefined" && budget_repository_1.BudgetRepository) === "function" ? _c : Object])
+    __param(3, (0, bullmq_1.InjectQueue)('ai-categorization')),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof transactions_repository_1.TransactionsRepository !== "undefined" && transactions_repository_1.TransactionsRepository) === "function" ? _b : Object, typeof (_c = typeof budget_repository_1.BudgetRepository !== "undefined" && budget_repository_1.BudgetRepository) === "function" ? _c : Object, typeof (_d = typeof bullmq_2.Queue !== "undefined" && bullmq_2.Queue) === "function" ? _d : Object])
 ], TransactionsService);
 
 
 /***/ }),
 /* 40 */
+/***/ ((module) => {
+
+module.exports = require("bullmq");
+
+/***/ }),
+/* 41 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1929,7 +1979,7 @@ exports.TransactionsRepository = TransactionsRepository = __decorate([
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2079,7 +2129,7 @@ exports.BudgetRepository = BudgetRepository = __decorate([
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2096,7 +2146,7 @@ var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.QueryTransactionDto = exports.UpdateTransactionDto = exports.CreateTransactionDto = void 0;
 const class_validator_1 = __webpack_require__(25);
-const class_transformer_1 = __webpack_require__(43);
+const class_transformer_1 = __webpack_require__(44);
 const swagger_1 = __webpack_require__(4);
 const client_1 = __webpack_require__(15);
 class CreateTransactionDto {
@@ -2254,13 +2304,199 @@ __decorate([
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ ((module) => {
 
 module.exports = require("class-transformer");
 
 /***/ }),
-/* 44 */
+/* 45 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var AiCategorizationProcessor_1;
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AiCategorizationProcessor = void 0;
+const bullmq_1 = __webpack_require__(11);
+const common_1 = __webpack_require__(3);
+const bullmq_2 = __webpack_require__(40);
+const prisma_service_1 = __webpack_require__(14);
+const generative_ai_1 = __webpack_require__(46);
+let AiCategorizationProcessor = AiCategorizationProcessor_1 = class AiCategorizationProcessor extends bullmq_1.WorkerHost {
+    constructor(prisma) {
+        super();
+        this.prisma = prisma;
+        this.logger = new common_1.Logger(AiCategorizationProcessor_1.name);
+        this.genAI = null;
+        const apiKey = process.env.GOOGLE_AI_API_KEY;
+        if (apiKey) {
+            this.genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
+            this.logger.log('Gemini AI initialized for transaction categorization');
+        }
+        else {
+            this.logger.warn('GOOGLE_AI_API_KEY not configured - AI categorization will be skipped');
+        }
+    }
+    async process(job) {
+        const { transactionId, description, amount, type } = job.data;
+        this.logger.log(`Processing AI categorization for transaction ${transactionId}`);
+        try {
+            if (!this.genAI) {
+                throw new Error('Gemini AI not initialized');
+            }
+            const { category, confidence } = await this.categorizeTransaction(description, amount, type);
+            await this.prisma.transaction.update({
+                where: { id: transactionId },
+                data: {
+                    category,
+                },
+            });
+            await this.prisma.aISuggestion.create({
+                data: {
+                    userId: job.data.userId,
+                    transactionId,
+                    suggestionType: 'CATEGORY',
+                    suggestedValue: category,
+                    confidenceScore: confidence / 100,
+                    accepted: true,
+                    metadata: {
+                        processedAt: new Date().toISOString(),
+                        originalDescription: description,
+                        aiModel: 'gemini-1.5-flash',
+                    },
+                },
+            });
+            this.logger.log(`Successfully categorized transaction ${transactionId} as "${category}" (confidence: ${confidence}%)`);
+            return { category, confidence };
+        }
+        catch (error) {
+            this.logger.error(`Failed to categorize transaction ${transactionId}`, error instanceof Error ? error.stack : String(error));
+            throw error;
+        }
+    }
+    async categorizeTransaction(description, amount, type) {
+        if (!this.genAI) {
+            throw new Error('Gemini AI not configured');
+        }
+        const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const prompt = `You are a financial transaction categorization expert.
+
+Task: Categorize this transaction into ONE of the following standard categories:
+
+**Valid Categories:**
+- Housing (rent, mortgage, utilities, repairs)
+- Transportation (car payments, gas, public transit, ride-sharing)
+- Food (groceries, restaurants, dining out)
+- Healthcare (doctors, medicine, insurance)
+- Entertainment (movies, games, subscriptions, hobbies)
+- Shopping (clothing, electronics, general retail)
+- Travel (flights, hotels, vacation expenses)
+- Education (tuition, books, courses)
+- Insurance (any type of insurance)
+- Debt (loan payments, credit card payments)
+- Savings (transfers to savings, investments)
+- Income (salary, freelance, side income)
+- Other (anything that doesn't fit above)
+
+Transaction Details:
+- Description: "${description}"
+- Amount: $${amount}
+- Type: ${type}
+
+IMPORTANT: Respond ONLY with a JSON object in this exact format:
+{
+  "category": "<one of the valid categories above>",
+  "confidence": <number between 0-100>
+}
+
+No explanation, no markdown, just the JSON object.`;
+        const result = await model.generateContent(prompt);
+        const response = result.response.text();
+        try {
+            const cleanResponse = response.replace(/```json\n?|\n?```/g, '').trim();
+            const parsed = JSON.parse(cleanResponse);
+            if (!parsed.category || typeof parsed.confidence !== 'number') {
+                throw new Error('Invalid AI response format');
+            }
+            return {
+                category: parsed.category,
+                confidence: Math.min(100, Math.max(0, parsed.confidence)),
+            };
+        }
+        catch (error) {
+            this.logger.error(`Failed to parse AI response: ${response}`, error);
+            return this.fallbackCategorization(description, type);
+        }
+    }
+    fallbackCategorization(description, type) {
+        const lowercaseDesc = description.toLowerCase();
+        const categories = {
+            food: ['grocery', 'restaurant', 'cafe', 'food', 'dining', 'uber eats', 'doordash'],
+            transportation: ['uber', 'lyft', 'gas', 'fuel', 'parking', 'transit', 'metro'],
+            housing: ['rent', 'mortgage', 'utilities', 'electric', 'water', 'internet'],
+            shopping: ['amazon', 'store', 'mall', 'retail', 'purchase'],
+            entertainment: ['netflix', 'spotify', 'movie', 'game', 'subscription'],
+            healthcare: ['pharmacy', 'doctor', 'hospital', 'medical', 'clinic'],
+        };
+        for (const [category, keywords] of Object.entries(categories)) {
+            if (keywords.some((keyword) => lowercaseDesc.includes(keyword))) {
+                return {
+                    category: category.charAt(0).toUpperCase() + category.slice(1),
+                    confidence: 60,
+                };
+            }
+        }
+        return {
+            category: type === 'INCOME' ? 'Income' : 'Other',
+            confidence: 30,
+        };
+    }
+    onCompleted(job) {
+        this.logger.debug(`Categorization job ${job.id} completed`);
+    }
+    onFailed(job, error) {
+        this.logger.error(`Categorization job ${job.id} failed: ${error.message}`);
+    }
+};
+exports.AiCategorizationProcessor = AiCategorizationProcessor;
+__decorate([
+    (0, bullmq_1.OnWorkerEvent)('completed'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof bullmq_2.Job !== "undefined" && bullmq_2.Job) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], AiCategorizationProcessor.prototype, "onCompleted", null);
+__decorate([
+    (0, bullmq_1.OnWorkerEvent)('failed'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof bullmq_2.Job !== "undefined" && bullmq_2.Job) === "function" ? _c : Object, typeof (_d = typeof Error !== "undefined" && Error) === "function" ? _d : Object]),
+    __metadata("design:returntype", void 0)
+], AiCategorizationProcessor.prototype, "onFailed", null);
+exports.AiCategorizationProcessor = AiCategorizationProcessor = AiCategorizationProcessor_1 = __decorate([
+    (0, bullmq_1.Processor)('ai-categorization', {
+        concurrency: 5,
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], AiCategorizationProcessor);
+
+
+/***/ }),
+/* 46 */
+/***/ ((module) => {
+
+module.exports = require("@google/generative-ai");
+
+/***/ }),
+/* 47 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2273,9 +2509,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsModule = void 0;
 const common_1 = __webpack_require__(3);
-const budgets_controller_1 = __webpack_require__(45);
-const budgets_service_1 = __webpack_require__(46);
-const budget_repository_1 = __webpack_require__(41);
+const budgets_controller_1 = __webpack_require__(48);
+const budgets_service_1 = __webpack_require__(49);
+const budget_repository_1 = __webpack_require__(42);
 let BudgetsModule = class BudgetsModule {
 };
 exports.BudgetsModule = BudgetsModule;
@@ -2289,7 +2525,7 @@ exports.BudgetsModule = BudgetsModule = __decorate([
 
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2310,11 +2546,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
-const budgets_service_1 = __webpack_require__(46);
-const jwt_auth_guard_1 = __webpack_require__(48);
+const budgets_service_1 = __webpack_require__(49);
+const jwt_auth_guard_1 = __webpack_require__(51);
 const current_user_decorator_1 = __webpack_require__(28);
-const dto_1 = __webpack_require__(49);
-const budget_response_dto_1 = __webpack_require__(53);
+const dto_1 = __webpack_require__(52);
+const budget_response_dto_1 = __webpack_require__(56);
 let BudgetsController = class BudgetsController {
     constructor(budgetsService) {
         this.budgetsService = budgetsService;
@@ -2411,7 +2647,7 @@ exports.BudgetsController = BudgetsController = __decorate([
 
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2428,8 +2664,8 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsService = void 0;
 const common_1 = __webpack_require__(3);
-const budget_repository_1 = __webpack_require__(41);
-const library_1 = __webpack_require__(47);
+const budget_repository_1 = __webpack_require__(42);
+const library_1 = __webpack_require__(50);
 let BudgetsService = class BudgetsService {
     constructor(budgetRepository) {
         this.budgetRepository = budgetRepository;
@@ -2550,13 +2786,13 @@ exports.BudgetsService = BudgetsService = __decorate([
 
 
 /***/ }),
-/* 47 */
+/* 50 */
 /***/ ((module) => {
 
 module.exports = require("@prisma/client/runtime/library");
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2607,7 +2843,7 @@ exports.JwtAuthGuard = JwtAuthGuard = __decorate([
 
 
 /***/ }),
-/* 49 */
+/* 52 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2626,16 +2862,16 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__webpack_require__(50), exports);
-__exportStar(__webpack_require__(51), exports);
-__exportStar(__webpack_require__(52), exports);
 __exportStar(__webpack_require__(53), exports);
 __exportStar(__webpack_require__(54), exports);
 __exportStar(__webpack_require__(55), exports);
+__exportStar(__webpack_require__(56), exports);
+__exportStar(__webpack_require__(57), exports);
+__exportStar(__webpack_require__(58), exports);
 
 
 /***/ }),
-/* 50 */
+/* 53 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2653,7 +2889,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateBudgetDto = void 0;
 const swagger_1 = __webpack_require__(4);
 const class_validator_1 = __webpack_require__(25);
-const class_transformer_1 = __webpack_require__(43);
+const class_transformer_1 = __webpack_require__(44);
 class CreateBudgetDto {
 }
 exports.CreateBudgetDto = CreateBudgetDto;
@@ -2696,21 +2932,21 @@ __decorate([
 
 
 /***/ }),
-/* 51 */
+/* 54 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateBudgetDto = void 0;
 const swagger_1 = __webpack_require__(4);
-const create_budget_dto_1 = __webpack_require__(50);
+const create_budget_dto_1 = __webpack_require__(53);
 class UpdateBudgetDto extends (0, swagger_1.PartialType)(create_budget_dto_1.CreateBudgetDto) {
 }
 exports.UpdateBudgetDto = UpdateBudgetDto;
 
 
 /***/ }),
-/* 52 */
+/* 55 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2728,7 +2964,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetQueryDto = void 0;
 const swagger_1 = __webpack_require__(4);
 const class_validator_1 = __webpack_require__(25);
-const class_transformer_1 = __webpack_require__(43);
+const class_transformer_1 = __webpack_require__(44);
 class BudgetQueryDto {
 }
 exports.BudgetQueryDto = BudgetQueryDto;
@@ -2755,7 +2991,7 @@ __decorate([
 
 
 /***/ }),
-/* 53 */
+/* 56 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2888,7 +3124,7 @@ __decorate([
 
 
 /***/ }),
-/* 54 */
+/* 57 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2924,7 +3160,7 @@ __decorate([
 
 
 /***/ }),
-/* 55 */
+/* 58 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2941,7 +3177,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateSharedBudgetDto = void 0;
 const swagger_1 = __webpack_require__(4);
 const class_validator_1 = __webpack_require__(25);
-const create_budget_dto_1 = __webpack_require__(50);
+const create_budget_dto_1 = __webpack_require__(53);
 class CreateSharedBudgetDto extends create_budget_dto_1.CreateBudgetDto {
 }
 exports.CreateSharedBudgetDto = CreateSharedBudgetDto;
@@ -2959,7 +3195,7 @@ __decorate([
 
 
 /***/ }),
-/* 56 */
+/* 59 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2985,7 +3221,7 @@ exports.RecurringModule = RecurringModule = __decorate([
 
 
 /***/ }),
-/* 57 */
+/* 60 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3011,7 +3247,7 @@ exports.GoalsModule = GoalsModule = __decorate([
 
 
 /***/ }),
-/* 58 */
+/* 61 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3037,7 +3273,7 @@ exports.AnalyticsModule = AnalyticsModule = __decorate([
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3050,10 +3286,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsModule = void 0;
 const common_1 = __webpack_require__(3);
-const notifications_controller_1 = __webpack_require__(60);
-const notifications_service_1 = __webpack_require__(61);
-const notification_repository_1 = __webpack_require__(62);
-const email_service_1 = __webpack_require__(63);
+const notifications_controller_1 = __webpack_require__(63);
+const notifications_service_1 = __webpack_require__(64);
+const notification_repository_1 = __webpack_require__(65);
+const email_service_1 = __webpack_require__(66);
 let NotificationsModule = class NotificationsModule {
 };
 exports.NotificationsModule = NotificationsModule;
@@ -3067,7 +3303,7 @@ exports.NotificationsModule = NotificationsModule = __decorate([
 
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3088,10 +3324,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
-const notifications_service_1 = __webpack_require__(61);
-const jwt_auth_guard_1 = __webpack_require__(48);
+const notifications_service_1 = __webpack_require__(64);
+const jwt_auth_guard_1 = __webpack_require__(51);
 const current_user_decorator_1 = __webpack_require__(28);
-const dto_1 = __webpack_require__(65);
+const dto_1 = __webpack_require__(68);
 let NotificationsController = class NotificationsController {
     constructor(notificationsService) {
         this.notificationsService = notificationsService;
@@ -3172,7 +3408,7 @@ exports.NotificationsController = NotificationsController = __decorate([
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3189,8 +3425,8 @@ var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsService = void 0;
 const common_1 = __webpack_require__(3);
-const notification_repository_1 = __webpack_require__(62);
-const email_service_1 = __webpack_require__(63);
+const notification_repository_1 = __webpack_require__(65);
+const email_service_1 = __webpack_require__(66);
 const client_1 = __webpack_require__(15);
 const prisma_service_1 = __webpack_require__(14);
 let NotificationsService = class NotificationsService {
@@ -3282,7 +3518,7 @@ exports.NotificationsService = NotificationsService = __decorate([
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3358,7 +3594,7 @@ exports.NotificationRepository = NotificationRepository = __decorate([
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3377,7 +3613,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.EmailService = void 0;
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(5);
-const resend_1 = __webpack_require__(64);
+const resend_1 = __webpack_require__(67);
 let EmailService = EmailService_1 = class EmailService {
     constructor(configService) {
         this.configService = configService;
@@ -3634,13 +3870,13 @@ exports.EmailService = EmailService = EmailService_1 = __decorate([
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ ((module) => {
 
 module.exports = require("resend");
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3659,11 +3895,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__webpack_require__(66), exports);
+__exportStar(__webpack_require__(69), exports);
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3681,7 +3917,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationQueryDto = void 0;
 const swagger_1 = __webpack_require__(4);
 const class_validator_1 = __webpack_require__(25);
-const class_transformer_1 = __webpack_require__(43);
+const class_transformer_1 = __webpack_require__(44);
 const client_1 = __webpack_require__(15);
 class NotificationQueryDto {
 }
@@ -3718,7 +3954,7 @@ __decorate([
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3731,7 +3967,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AdminModule = void 0;
 const common_1 = __webpack_require__(3);
-const admin_controller_1 = __webpack_require__(68);
+const admin_controller_1 = __webpack_require__(71);
 const jwt_1 = __webpack_require__(17);
 let AdminModule = class AdminModule {
 };
@@ -3750,7 +3986,7 @@ exports.AdminModule = AdminModule = __decorate([
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3842,7 +4078,7 @@ exports.AdminController = AdminController = __decorate([
 
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3869,7 +4105,7 @@ exports.AnalyticsModule = AnalyticsModule = __decorate([
 
 
 /***/ }),
-/* 70 */
+/* 73 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3883,7 +4119,7 @@ var HttpExceptionFilter_1;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpExceptionFilter = void 0;
 const common_1 = __webpack_require__(3);
-const library_1 = __webpack_require__(47);
+const library_1 = __webpack_require__(50);
 let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
     constructor() {
         this.logger = new common_1.Logger(HttpExceptionFilter_1.name);
@@ -3971,7 +4207,7 @@ exports.HttpExceptionFilter = HttpExceptionFilter = HttpExceptionFilter_1 = __de
 
 
 /***/ }),
-/* 71 */
+/* 74 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3984,7 +4220,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LoggingInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const operators_1 = __webpack_require__(72);
+const operators_1 = __webpack_require__(75);
 let LoggingInterceptor = class LoggingInterceptor {
     constructor() {
         this.logger = new common_1.Logger('HTTP');
@@ -4015,13 +4251,13 @@ exports.LoggingInterceptor = LoggingInterceptor = __decorate([
 
 
 /***/ }),
-/* 72 */
+/* 75 */
 /***/ ((module) => {
 
 module.exports = require("rxjs/operators");
 
 /***/ }),
-/* 73 */
+/* 76 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4034,8 +4270,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TimeoutInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const rxjs_1 = __webpack_require__(74);
-const operators_1 = __webpack_require__(72);
+const rxjs_1 = __webpack_require__(77);
+const operators_1 = __webpack_require__(75);
 let TimeoutInterceptor = class TimeoutInterceptor {
     constructor() {
         this.TIMEOUT_MS = 30000;
@@ -4056,13 +4292,13 @@ exports.TimeoutInterceptor = TimeoutInterceptor = __decorate([
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4075,7 +4311,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransformInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const operators_1 = __webpack_require__(72);
+const operators_1 = __webpack_require__(75);
 let TransformInterceptor = class TransformInterceptor {
     intercept(context, next) {
         const request = context.switchToHttp().getRequest();
@@ -4095,7 +4331,7 @@ exports.TransformInterceptor = TransformInterceptor = __decorate([
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ ((module) => {
 
 module.exports = require("@fastify/cookie");
@@ -4142,10 +4378,10 @@ const config_1 = __webpack_require__(5);
 const helmet_1 = __webpack_require__(6);
 const compress_1 = __webpack_require__(7);
 const app_module_1 = __webpack_require__(8);
-const http_exception_filter_1 = __webpack_require__(70);
-const logging_interceptor_1 = __webpack_require__(71);
-const timeout_interceptor_1 = __webpack_require__(73);
-const transform_interceptor_1 = __webpack_require__(75);
+const http_exception_filter_1 = __webpack_require__(73);
+const logging_interceptor_1 = __webpack_require__(74);
+const timeout_interceptor_1 = __webpack_require__(76);
+const transform_interceptor_1 = __webpack_require__(78);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_fastify_1.FastifyAdapter({
         logger: false,
@@ -4163,7 +4399,7 @@ async function bootstrap() {
     await app.register(compress_1.default, {
         encodings: ['gzip', 'deflate'],
     });
-    await app.register(__webpack_require__(76), {
+    await app.register(__webpack_require__(79), {
         secret: configService.get('JWT_SECRET'),
     });
     app.enableVersioning({

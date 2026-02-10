@@ -5,6 +5,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Prisma, TransactionType, Transaction } from '@prisma/client';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { PrismaService } from '@/database/prisma.service';
 import { TransactionsRepository } from './transactions.repository';
 import { BudgetRepository } from '../budgets/repositories/budget.repository';
@@ -14,6 +16,7 @@ import {
   QueryTransactionDto,
 } from './dto';
 import { PaginatedResponse } from '@/common/interfaces/common.interface';
+import { CategorizationJobData } from './processors/ai-categorization.processor';
 
 /**
  * Transactions Service
@@ -27,6 +30,7 @@ export class TransactionsService {
     private readonly prisma: PrismaService,
     private readonly repository: TransactionsRepository,
     private readonly budgetRepository: BudgetRepository,
+    @InjectQueue('ai-categorization') private readonly aiQueue: Queue<CategorizationJobData>,
   ) { }
 
   /**
@@ -50,9 +54,47 @@ export class TransactionsService {
       await this.checkBudgetAlerts(userId, dto.category, transaction.date);
     }
 
-    // TODO: Queue AI categorization if not provided
+    // Queue AI categorization if category not provided or is generic
+    if (!dto.category || dto.category === 'Other' || dto.category === 'Uncategorized') {
+      await this.queueAICategorization(transaction);
+    }
 
     return this.serializeTransaction(transaction);
+  }
+
+  /**
+   * Queue a transaction for AI categorization
+   */
+  private async queueAICategorization(transaction: Transaction): Promise<void> {
+    try {
+      await this.aiQueue.add(
+        'categorize-transaction',
+        {
+          transactionId: transaction.id,
+          userId: transaction.userId,
+          description: transaction.description || 'Transaction',
+          amount: Number(transaction.amount),
+          type: transaction.type,
+        },
+        {
+          attempts: 3, // Retry up to 3 times
+          backoff: {
+            type: 'exponential',
+            delay: 2000, // Start with 2 second delay
+          },
+          removeOnComplete: true, // Clean up completed jobs
+          removeOnFail: false, // Keep failed jobs for debugging
+        },
+      );
+
+      this.logger.log(`Queued AI categorization for transaction ${transaction.id}`);
+    } catch (error) {
+      // Don't fail transaction creation if queueing fails
+      this.logger.error(
+        `Failed to queue AI categorization for transaction ${transaction.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
   }
 
   /**
