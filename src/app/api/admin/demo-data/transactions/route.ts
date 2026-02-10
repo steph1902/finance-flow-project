@@ -61,10 +61,10 @@ export async function POST(req: NextRequest) {
             message: `Generated ${transactions.length} demo transactions`
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         logger.error('Demo data generation error', error);
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }

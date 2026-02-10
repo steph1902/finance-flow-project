@@ -25,9 +25,9 @@ export async function GET(request: Request) {
             experiments
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -61,9 +61,9 @@ export async function POST(request: Request) {
             experimentId
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }

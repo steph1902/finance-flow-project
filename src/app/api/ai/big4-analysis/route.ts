@@ -72,10 +72,10 @@ export async function POST(request: Request) {
             ...result
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Big 4 Analysis Error:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to generate analysis' },
+            { error: getErrorMessage(error) || 'Failed to generate analysis' },
             { status: 500 }
         );
     }
@@ -127,10 +127,10 @@ export async function GET(request: Request) {
             }))
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Get Big 4 Analysis Error:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to retrieve analyses' },
+            { error: getErrorMessage(error) || 'Failed to retrieve analyses' },
             { status: 500 }
         );
     }
@@ -180,10 +180,10 @@ export async function PATCH(request: Request) {
             message: 'Feedback submitted successfully'
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Submit Feedback Error:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to submit feedback' },
+            { error: getErrorMessage(error) || 'Failed to submit feedback' },
             { status: 500 }
         );
     }

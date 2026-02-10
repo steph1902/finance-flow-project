@@ -26,17 +26,17 @@ interface DashboardStats {
         budgets: number;
         goals: number;
         big4Analyses: number;
-    aiCategor izations: number;
-  };
-geographic: Array<{
-    country: string;
-    users: number;
-}>;
-systemHealth: {
-    apiCalls: number;
-    avgResponseTime: number;
-    errorRate: number;
-};
+        aiCategorizations: number;
+    };
+    geographic: Array<{
+        country: string;
+        users: number;
+    }>;
+    systemHealth: {
+        apiCalls: number;
+        avgResponseTime: number;
+        errorRate: number;
+    };
 }
 
 export default function OwnerDashboardPage() {

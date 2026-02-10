@@ -1,30 +1,23 @@
 import { Module } from '@nestjs/common';
+import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
+import { NotificationRepository } from './repositories/notification.repository';
+import { EmailService } from './services/email.service';
 
 /**
- * Notifications Module
- * In-app and email notification system
+ * Notifications Module  
+ * In-app and email notification system with Resend integration
  * 
- * TODO: Implement:
- * - notifications.controller.ts
- * - notifications.service.ts
- * - notifications.processor.ts (BullMQ for email queue)
- * - dto/ directory
- * 
- * Key features:
- * - Notification types: BUDGET_ALERT, BILL_REMINDER, GOAL_MILESTONE, ANOMALY_DETECTION, SYSTEM
- * - Status: UNREAD, READ, ARCHIVED
+ * Features:
+ * - Notification types: BUDGET_ALERT, BILL_REMINDER, GOAL_MILESTONE, etc.
+ * - Status tracking: UNREAD, READ, ARCHIVED
  * - Priority levels (0=low, 1=medium, 2=high)
- * - In-app notifications
- * - Email notifications (queued via BullMQ)
- * - Mark as read/unread
- * - Mark all as read
- * - Delete notifications
- * - Get unread count
+ * - Rich HTML email templates
  * - Action URLs for deep linking
  */
 @Module({
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [NotificationsController],
+  providers: [NotificationsService, NotificationRepository, EmailService],
+  exports: [NotificationsService],
 })
-export class NotificationsModule {}
+export class NotificationsModule { }

@@ -146,7 +146,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error('Daily cron job failed', error);
     return NextResponse.json(
-      { error: 'Cron job failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Cron job failed', details: error instanceof Error ? getErrorMessage(error) : 'Unknown error' },
       { status: 500 }
     );
   }

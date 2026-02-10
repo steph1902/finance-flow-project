@@ -17,14 +17,8 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { BudgetsModule } from './modules/budgets/budgets.module';
 import { RecurringModule } from './modules/recurring/recurring.module';
 import { GoalsModule } from './modules/goals/goals.module';
-import { InvestmentsModule } from './modules/investments/investments.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
-import { ReportsModule } from './modules/reports/reports.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
-import { AiModule } from './modules/ai/ai.module';
-import { CurrencyModule } from './modules/currency/currency.module';
-import { IntegrationsModule } from './modules/integrations/integrations.module';
-import { JobsModule } from './modules/jobs/jobs.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AnalyticsModule as CommonAnalyticsModule } from './common/analytics/analytics.module';
 
@@ -100,14 +94,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     BudgetsModule,
     RecurringModule,
     GoalsModule,
-    InvestmentsModule,
     AnalyticsModule,
-    ReportsModule,
     NotificationsModule,
-    AiModule,
-    CurrencyModule,
-    IntegrationsModule,
-    JobsModule,
     AdminModule, // Admin dashboard
   ],
   providers: [

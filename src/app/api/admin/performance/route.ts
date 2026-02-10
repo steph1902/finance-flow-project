@@ -26,9 +26,9 @@ export async function GET() {
                 totalMetrics: metrics.length
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -45,9 +45,9 @@ export async function DELETE() {
             success: true,
             message: 'Performance metrics cleared'
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }

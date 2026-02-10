@@ -4,8 +4,6 @@ import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetQueryDto,
-  OptimizeBudgetDto,
-  CreateSharedBudgetDto,
 } from './dto';
 import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -144,28 +142,6 @@ export class BudgetsService {
         end: endDate,
       },
     };
-  }
-
-  /**
-   * AI-powered budget optimization
-   */
-  async optimizeBudgets(userId: string, optimizeDto: OptimizeBudgetDto) {
-    // TODO: Integrate with AI module for budget optimization
-    // This would analyze spending patterns and provide recommendations
-    throw new Error('Budget optimization not yet implemented');
-  }
-
-  /**
-   * Create a shared budget
-   */
-  async createSharedBudget(userId: string, createSharedDto: CreateSharedBudgetDto) {
-    // TODO: Implement shared budget creation with proper permissions
-    throw new Error('Shared budgets not yet implemented');
-  }
-
-  async processRollover(userId: string) {
-    // TODO: Implement when rollover field is added to schema
-    return { message: 'Budget rollover not yet implemented' };
   }
 
   /**

@@ -275,12 +275,12 @@ Keep your response structured and actionable.`;
 
     private parseRecommendationsSection(text: string): Big4Analysis['recommendations'] {
         // In production, would parse from AI response
-        // For now, generating template recommendations
+        // For now, generating template recommendations with static values
         return [
             {
                 priority: 1,
                 action: 'Set hard discretionary spending cap at -15% current average',
-                impact: 'Reduce monthly burn by $XXX',
+                impact: 'Reduce monthly burn by 15%',
                 metric: '15% reduction'
             },
             {

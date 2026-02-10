@@ -35,9 +35,9 @@ export async function GET(request: NextRequest) {
                 hasMore: offset + limit < total
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }

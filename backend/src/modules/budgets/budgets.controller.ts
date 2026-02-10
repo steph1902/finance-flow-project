@@ -19,8 +19,6 @@ import {
   CreateBudgetDto,
   UpdateBudgetDto,
   BudgetQueryDto,
-  OptimizeBudgetDto,
-  CreateSharedBudgetDto,
 } from './dto';
 import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 
@@ -29,7 +27,7 @@ import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('budgets')
 export class BudgetsController {
-  constructor(private readonly budgetsService: BudgetsService) {}
+  constructor(private readonly budgetsService: BudgetsService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new budget' })
@@ -92,31 +90,5 @@ export class BudgetsController {
   ): Promise<void> {
     return this.budgetsService.remove(userId, id);
   }
-
-  @Post('optimize')
-  @ApiOperation({ summary: 'Get AI-powered budget optimization recommendations' })
-  @ApiResponse({ status: HttpStatus.OK })
-  async optimize(
-    @CurrentUser('id') userId: string,
-    @Body() optimizeDto: OptimizeBudgetDto,
-  ) {
-    return this.budgetsService.optimizeBudgets(userId, optimizeDto);
-  }
-
-  @Post('shared')
-  @ApiOperation({ summary: 'Create a shared budget' })
-  @ApiResponse({ status: HttpStatus.CREATED })
-  async createShared(
-    @CurrentUser('id') userId: string,
-    @Body() createSharedDto: CreateSharedBudgetDto,
-  ) {
-    return this.budgetsService.createSharedBudget(userId, createSharedDto);
-  }
-
-  @Post('rollover')
-  @ApiOperation({ summary: 'Process budget rollover for new month' })
-  @ApiResponse({ status: HttpStatus.OK })
-  async rollover(@CurrentUser('id') userId: string) {
-    return this.budgetsService.processRollover(userId);
-  }
 }
+

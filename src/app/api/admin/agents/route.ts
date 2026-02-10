@@ -18,9 +18,9 @@ export async function GET() {
                 runningAgents: status.filter(a => a.running).length
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
             message: `Agent ${agentName || 'all'} ${action} successful`,
             data: agentOrchestrator.getStatus()
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }

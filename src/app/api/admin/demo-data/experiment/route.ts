@@ -54,10 +54,10 @@ export async function POST(req: NextRequest) {
             message: 'Demo experiment created with statistical significance'
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         logger.error('Demo experiment generation error', error);
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: getErrorMessage(error) },
             { status: 500 }
         );
     }

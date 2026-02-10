@@ -104,7 +104,7 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId: string) => {
       );
     }
 
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+    if (error instanceof Error && getErrorMessage(error) === "NOT_FOUND") {
       return NextResponse.json(
         { error: "Recurring transaction not found" },
         { status: 404 }
@@ -143,7 +143,7 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId: string) => {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+    if (error instanceof Error && getErrorMessage(error) === "NOT_FOUND") {
       return NextResponse.json(
         { error: "Recurring transaction not found" },
         { status: 404 }

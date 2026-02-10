@@ -37,9 +37,9 @@ export async function GET(request: Request) {
             }
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -63,9 +63,9 @@ export async function POST(request: Request) {
             message: 'Daily aggregation complete'
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }

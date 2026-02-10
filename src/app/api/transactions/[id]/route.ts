@@ -124,7 +124,7 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
       data: serialize(transaction),
     });
   } catch (error) {
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+    if (error instanceof Error && getErrorMessage(error) === "NOT_FOUND") {
       return NextResponse.json({ error: "Not Found" }, { status: 404 });
     }
 
@@ -159,7 +159,7 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
 
     return NextResponse.json({ message: "Transaction deleted" }, { status: 200 });
   } catch (error) {
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+    if (error instanceof Error && getErrorMessage(error) === "NOT_FOUND") {
       return NextResponse.json({ error: "Not Found" }, { status: 404 });
     }
 

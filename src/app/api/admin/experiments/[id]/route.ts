@@ -26,9 +26,9 @@ export async function GET(
             results
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -65,9 +65,9 @@ export async function PATCH(
             message: `Experiment ${action} successful`
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { error: error.message },
+            { error: getErrorMessage(error) },
             { status: 500 }
         );
     }

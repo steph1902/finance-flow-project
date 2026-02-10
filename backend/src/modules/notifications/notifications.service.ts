@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { NotificationRepository } from './repositories/notification.repository';
 import { EmailService } from './services/email.service';
 import { NotificationQueryDto } from './dto';
-import { NotificationStatus } from '@prisma/client';
+import { NotificationStatus, NotificationType } from '@prisma/client';
+import { PrismaService } from '../../database/prisma.service';
 
 export interface CreateNotificationData {
   userId: string;
@@ -18,7 +19,8 @@ export class NotificationsService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
     private readonly emailService: EmailService,
-  ) {}
+    private readonly prisma: PrismaService,
+  ) { }
 
   /**
    * Create a new notification
@@ -28,18 +30,25 @@ export class NotificationsService {
       userId: data.userId,
       title: data.title,
       message: data.message,
-      type: data.type as any, // TODO: Fix type casting
+      type: data.type as NotificationType,
       actionUrl: data.link,
       status: 'UNREAD',
     });
 
     // Send email if requested
     if (data.sendEmail) {
-      await this.emailService.sendNotification(data.userId, {
-        title: data.title,
-        message: data.message,
-        link: data.link,
+      const user = await this.prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { email: true },
       });
+
+      if (user?.email) {
+        await this.emailService.sendNotification(user.email, {
+          title: data.title,
+          message: data.message,
+          link: data.link,
+        });
+      }
     }
 
     return notification;
@@ -94,14 +103,28 @@ export class NotificationsService {
   /**
    * Send budget alert notification
    */
-  async sendBudgetAlert(userId: string, budgetData: { category: string; percentUsed: number }) {
+  async sendBudgetAlert(
+    userId: string,
+    budgetData: { category: string; budgeted: number; spent: number; percentUsed: number }
+  ) {
+    // Create in-app notification
     await this.create({
       userId,
       title: 'Budget Alert',
       message: `You have used ${budgetData.percentUsed.toFixed(0)}% of your ${budgetData.category} budget`,
       type: 'BUDGET_ALERT',
-      sendEmail: true,
+      sendEmail: false, // We'll send email directly
     });
+
+    // Send detailed email
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (user?.email) {
+      await this.emailService.sendBudgetAlert(user.email, budgetData);
+    }
   }
 
   /**
@@ -117,3 +140,4 @@ export class NotificationsService {
     });
   }
 }
+
