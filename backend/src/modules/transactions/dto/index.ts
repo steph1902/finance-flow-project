@@ -142,3 +142,6 @@ export class QueryTransactionDto {
   @IsString()
   sortOrder?: 'asc' | 'desc' = 'desc';
 }
+
+// Export RejectAISuggestionDto
+export { RejectAISuggestionDto } from './reject-ai-suggestion.dto';

@@ -98,6 +98,141 @@ export class TransactionsService {
   }
 
   /**
+   * Get AI suggestion for a transaction
+   */
+  async getAISuggestion(userId: string, transactionId: string) {
+    const transaction = await this.repository.findOne(
+      { where: { id: transactionId } },
+    );
+
+    if (!transaction || transaction.userId !== userId) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    const suggestion = await this.prisma.aISuggestion.findFirst({
+      where: {
+        transactionId,
+        suggestionType: 'CATEGORY',
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!suggestion) {
+      return null;
+    }
+
+    return {
+      id: suggestion.id,
+      suggestedValue: suggestion.suggestedValue,
+      confidenceScore: Number(suggestion.confidenceScore || 0),
+      accepted: suggestion.accepted,
+      metadata: suggestion.metadata,
+      createdAt: suggestion.createdAt,
+    };
+  }
+
+  /**
+   * Reject AI suggestion and provide feedback
+   */
+  async rejectAISuggestion(
+    userId: string,
+    transactionId: string,
+    feedback: {
+      correctCategory: string;
+      reason: string;
+      comment?: string;
+    },
+  ) {
+    const transaction = await this.repository.findOne({
+      where: { id: transactionId },
+    });
+
+    if (!transaction || transaction.userId !== userId) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    // Update transaction with correct category
+    await this.repository.update({
+      where: { id: transactionId },
+      data: { category: feedback.correctCategory },
+    });
+
+    // Find the AI suggestion
+    const suggestion = await this.prisma.aISuggestion.findFirst({
+      where: {
+        transactionId,
+        suggestionType: 'CATEGORY',
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (suggestion) {
+      // Update AI suggestion as rejected with feedback
+      await this.prisma.aISuggestion.update({
+        where: { id: suggestion.id },
+        data: {
+          accepted: false,
+          metadata: {
+            ...(suggestion.metadata as object),
+            rejectionReason: feedback.reason,
+            correctCategory: feedback.correctCategory,
+            userComment: feedback.comment || null,
+            rejectedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      this.logger.log(
+        `AI suggestion rejected for transaction ${transactionId}. ` +
+        `Suggested: ${suggestion.suggestedValue}, Correct: ${feedback.correctCategory}`,
+      );
+    }
+
+    return this.serializeTransaction(transaction);
+  }
+
+  /**
+   * Accept AI suggestion (mark it as accepted)
+   */
+  async acceptAISuggestion(userId: string, transactionId: string) {
+    const transaction = await this.repository.findOne({
+      where: { id: transactionId },
+    });
+
+    if (!transaction || transaction.userId !== userId) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    // Find the AI suggestion
+    const suggestion = await this.prisma.aISuggestion.findFirst({
+      where: {
+        transactionId,
+        suggestionType: 'CATEGORY',
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (suggestion && suggestion.accepted === null) {
+      // Mark as explicitly accepted
+      await this.prisma.aISuggestion.update({
+        where: { id: suggestion.id },
+        data: {
+          accepted: true,
+          metadata: {
+            ...(suggestion.metadata as object),
+            acceptedAt: new Date().toISOString(),
+            explicitlyAccepted: true, // User manually accepted vs auto-accepted
+          },
+        },
+      });
+
+      this.logger.log(`AI suggestion accepted for transaction ${transactionId}`);
+    }
+
+    return this.serializeTransaction(transaction);
+  }
+
+  /**
    * Get all transactions with pagination and filters
    */
   async findAll(

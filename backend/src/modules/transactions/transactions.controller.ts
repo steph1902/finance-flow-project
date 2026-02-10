@@ -22,6 +22,7 @@ import {
   CreateTransactionDto,
   UpdateTransactionDto,
   QueryTransactionDto,
+  RejectAISuggestionDto,
 } from './dto';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
@@ -33,7 +34,7 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 @ApiBearerAuth('JWT-auth')
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(private readonly transactionsService: TransactionsService) { }
 
   /**
    * Create a new transaction
@@ -153,5 +154,48 @@ export class TransactionsController {
     @Query() query: QueryTransactionDto,
   ) {
     return this.transactionsService.exportToCsv(userId, query);
+  }
+
+  /**
+   * Get AI suggestion for a transaction
+   */
+  @Get(':id/ai-suggestion')
+  @ApiOperation({ summary: 'Get AI categorization suggestion for a transaction' })
+  @ApiResponse({ status: 200, description: 'AI suggestion retrieved' })
+  @ApiResponse({ status: 404, description: 'Transaction or suggestion not found' })
+  async getAISuggestion(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.transactionsService.getAISuggestion(userId, id);
+  }
+
+  /**
+   * Accept AI categorization suggestion
+   */
+  @Post(':id/ai-suggestion/accept')
+  @ApiOperation({ summary: 'Accept AI categorization suggestion' })
+  @ApiResponse({ status: 200, description: 'AI suggestion accepted' })
+  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  async acceptAISuggestion(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.transactionsService.acceptAISuggestion(userId, id);
+  }
+
+  /**
+   * Reject AI suggestion and provide feedback
+   */
+  @Post(':id/ai-suggestion/reject')
+  @ApiOperation({ summary: 'Reject AI categorization and provide correct category' })
+  @ApiResponse({ status: 200, description: 'AI suggestion rejected and feedback recorded' })
+  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  async rejectAISuggestion(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+    @Body() rejectDto: RejectAISuggestionDto,
+  ) {
+    return this.transactionsService.rejectAISuggestion(userId, id, rejectDto);
   }
 }

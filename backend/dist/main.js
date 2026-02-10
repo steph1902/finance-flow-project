@@ -68,14 +68,14 @@ const common_module_1 = __webpack_require__(16);
 const auth_module_1 = __webpack_require__(18);
 const users_module_1 = __webpack_require__(33);
 const transactions_module_1 = __webpack_require__(37);
-const budgets_module_1 = __webpack_require__(47);
-const recurring_module_1 = __webpack_require__(59);
-const goals_module_1 = __webpack_require__(60);
-const analytics_module_1 = __webpack_require__(61);
-const notifications_module_1 = __webpack_require__(64);
-const admin_module_1 = __webpack_require__(72);
-const analytics_module_2 = __webpack_require__(74);
-const jwt_auth_guard_1 = __webpack_require__(51);
+const budgets_module_1 = __webpack_require__(48);
+const recurring_module_1 = __webpack_require__(60);
+const goals_module_1 = __webpack_require__(61);
+const analytics_module_1 = __webpack_require__(62);
+const notifications_module_1 = __webpack_require__(65);
+const admin_module_1 = __webpack_require__(73);
+const analytics_module_2 = __webpack_require__(75);
+const jwt_auth_guard_1 = __webpack_require__(52);
 const throttler_2 = __webpack_require__(10);
 let AppModule = class AppModule {
 };
@@ -1362,7 +1362,7 @@ const transactions_controller_1 = __webpack_require__(38);
 const transactions_service_1 = __webpack_require__(39);
 const transactions_repository_1 = __webpack_require__(41);
 const budget_repository_1 = __webpack_require__(42);
-const ai_categorization_processor_1 = __webpack_require__(45);
+const ai_categorization_processor_1 = __webpack_require__(46);
 let TransactionsModule = class TransactionsModule {
 };
 exports.TransactionsModule = TransactionsModule;
@@ -1402,7 +1402,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransactionsController = void 0;
 const common_1 = __webpack_require__(3);
@@ -1437,6 +1437,15 @@ let TransactionsController = class TransactionsController {
     }
     async exportCsv(userId, query) {
         return this.transactionsService.exportToCsv(userId, query);
+    }
+    async getAISuggestion(userId, id) {
+        return this.transactionsService.getAISuggestion(userId, id);
+    }
+    async acceptAISuggestion(userId, id) {
+        return this.transactionsService.acceptAISuggestion(userId, id);
+    }
+    async rejectAISuggestion(userId, id, rejectDto) {
+        return this.transactionsService.rejectAISuggestion(userId, id, rejectDto);
     }
 };
 exports.TransactionsController = TransactionsController;
@@ -1536,6 +1545,40 @@ __decorate([
     __metadata("design:paramtypes", [String, typeof (_g = typeof dto_1.QueryTransactionDto !== "undefined" && dto_1.QueryTransactionDto) === "function" ? _g : Object]),
     __metadata("design:returntype", Promise)
 ], TransactionsController.prototype, "exportCsv", null);
+__decorate([
+    (0, common_1.Get)(':id/ai-suggestion'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get AI categorization suggestion for a transaction' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'AI suggestion retrieved' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction or suggestion not found' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TransactionsController.prototype, "getAISuggestion", null);
+__decorate([
+    (0, common_1.Post)(':id/ai-suggestion/accept'),
+    (0, swagger_1.ApiOperation)({ summary: 'Accept AI categorization suggestion' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'AI suggestion accepted' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction not found' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TransactionsController.prototype, "acceptAISuggestion", null);
+__decorate([
+    (0, common_1.Post)(':id/ai-suggestion/reject'),
+    (0, swagger_1.ApiOperation)({ summary: 'Reject AI categorization and provide correct category' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'AI suggestion rejected and feedback recorded' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Transaction not found' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, typeof (_h = typeof dto_1.RejectAISuggestionDto !== "undefined" && dto_1.RejectAISuggestionDto) === "function" ? _h : Object]),
+    __metadata("design:returntype", Promise)
+], TransactionsController.prototype, "rejectAISuggestion", null);
 exports.TransactionsController = TransactionsController = __decorate([
     (0, swagger_1.ApiTags)('transactions'),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
@@ -1619,6 +1662,97 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
         catch (error) {
             this.logger.error(`Failed to queue AI categorization for transaction ${transaction.id}`, error instanceof Error ? error.stack : String(error));
         }
+    }
+    async getAISuggestion(userId, transactionId) {
+        const transaction = await this.repository.findOne({ where: { id: transactionId } });
+        if (!transaction || transaction.userId !== userId) {
+            throw new common_1.NotFoundException('Transaction not found');
+        }
+        const suggestion = await this.prisma.aISuggestion.findFirst({
+            where: {
+                transactionId,
+                suggestionType: 'CATEGORY',
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (!suggestion) {
+            return null;
+        }
+        return {
+            id: suggestion.id,
+            suggestedValue: suggestion.suggestedValue,
+            confidenceScore: Number(suggestion.confidenceScore || 0),
+            accepted: suggestion.accepted,
+            metadata: suggestion.metadata,
+            createdAt: suggestion.createdAt,
+        };
+    }
+    async rejectAISuggestion(userId, transactionId, feedback) {
+        const transaction = await this.repository.findOne({
+            where: { id: transactionId },
+        });
+        if (!transaction || transaction.userId !== userId) {
+            throw new common_1.NotFoundException('Transaction not found');
+        }
+        await this.repository.update({
+            where: { id: transactionId },
+            data: { category: feedback.correctCategory },
+        });
+        const suggestion = await this.prisma.aISuggestion.findFirst({
+            where: {
+                transactionId,
+                suggestionType: 'CATEGORY',
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (suggestion) {
+            await this.prisma.aISuggestion.update({
+                where: { id: suggestion.id },
+                data: {
+                    accepted: false,
+                    metadata: {
+                        ...suggestion.metadata,
+                        rejectionReason: feedback.reason,
+                        correctCategory: feedback.correctCategory,
+                        userComment: feedback.comment || null,
+                        rejectedAt: new Date().toISOString(),
+                    },
+                },
+            });
+            this.logger.log(`AI suggestion rejected for transaction ${transactionId}. ` +
+                `Suggested: ${suggestion.suggestedValue}, Correct: ${feedback.correctCategory}`);
+        }
+        return this.serializeTransaction(transaction);
+    }
+    async acceptAISuggestion(userId, transactionId) {
+        const transaction = await this.repository.findOne({
+            where: { id: transactionId },
+        });
+        if (!transaction || transaction.userId !== userId) {
+            throw new common_1.NotFoundException('Transaction not found');
+        }
+        const suggestion = await this.prisma.aISuggestion.findFirst({
+            where: {
+                transactionId,
+                suggestionType: 'CATEGORY',
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (suggestion && suggestion.accepted === null) {
+            await this.prisma.aISuggestion.update({
+                where: { id: suggestion.id },
+                data: {
+                    accepted: true,
+                    metadata: {
+                        ...suggestion.metadata,
+                        acceptedAt: new Date().toISOString(),
+                        explicitlyAccepted: true,
+                    },
+                },
+            });
+            this.logger.log(`AI suggestion accepted for transaction ${transactionId}`);
+        }
+        return this.serializeTransaction(transaction);
     }
     async findAll(userId, query) {
         const { page = 1, limit = 10, type, category, startDate, endDate, search, sortBy = 'date', sortOrder = 'desc', } = query;
@@ -2144,7 +2278,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.QueryTransactionDto = exports.UpdateTransactionDto = exports.CreateTransactionDto = void 0;
+exports.RejectAISuggestionDto = exports.QueryTransactionDto = exports.UpdateTransactionDto = exports.CreateTransactionDto = void 0;
 const class_validator_1 = __webpack_require__(25);
 const class_transformer_1 = __webpack_require__(44);
 const swagger_1 = __webpack_require__(4);
@@ -2301,6 +2435,8 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], QueryTransactionDto.prototype, "sortOrder", void 0);
+var reject_ai_suggestion_dto_1 = __webpack_require__(45);
+Object.defineProperty(exports, "RejectAISuggestionDto", ({ enumerable: true, get: function () { return reject_ai_suggestion_dto_1.RejectAISuggestionDto; } }));
 
 
 /***/ }),
@@ -2323,6 +2459,64 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RejectAISuggestionDto = exports.RejectionReason = void 0;
+const class_validator_1 = __webpack_require__(25);
+const swagger_1 = __webpack_require__(4);
+var RejectionReason;
+(function (RejectionReason) {
+    RejectionReason["INCORRECT_CATEGORY"] = "incorrect_category";
+    RejectionReason["TOO_GENERIC"] = "too_generic";
+    RejectionReason["WRONG_MERCHANT"] = "wrong_merchant";
+    RejectionReason["OTHER"] = "other";
+})(RejectionReason || (exports.RejectionReason = RejectionReason = {}));
+class RejectAISuggestionDto {
+}
+exports.RejectAISuggestionDto = RejectAISuggestionDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'The correct category for this transaction',
+        example: 'Housing',
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RejectAISuggestionDto.prototype, "correctCategory", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Reason for rejecting the AI suggestion',
+        enum: RejectionReason,
+        example: RejectionReason.INCORRECT_CATEGORY,
+    }),
+    (0, class_validator_1.IsEnum)(RejectionReason),
+    __metadata("design:type", String)
+], RejectAISuggestionDto.prototype, "reason", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Optional comment explaining the rejection',
+        example: 'This is my rent payment, not transportation',
+        maxLength: 500,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], RejectAISuggestionDto.prototype, "comment", void 0);
+
+
+/***/ }),
+/* 46 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var AiCategorizationProcessor_1;
 var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -2331,7 +2525,7 @@ const bullmq_1 = __webpack_require__(11);
 const common_1 = __webpack_require__(3);
 const bullmq_2 = __webpack_require__(40);
 const prisma_service_1 = __webpack_require__(14);
-const generative_ai_1 = __webpack_require__(46);
+const generative_ai_1 = __webpack_require__(47);
 let AiCategorizationProcessor = AiCategorizationProcessor_1 = class AiCategorizationProcessor extends bullmq_1.WorkerHost {
     constructor(prisma) {
         super();
@@ -2490,13 +2684,13 @@ exports.AiCategorizationProcessor = AiCategorizationProcessor = AiCategorization
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ ((module) => {
 
 module.exports = require("@google/generative-ai");
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2509,8 +2703,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsModule = void 0;
 const common_1 = __webpack_require__(3);
-const budgets_controller_1 = __webpack_require__(48);
-const budgets_service_1 = __webpack_require__(49);
+const budgets_controller_1 = __webpack_require__(49);
+const budgets_service_1 = __webpack_require__(50);
 const budget_repository_1 = __webpack_require__(42);
 let BudgetsModule = class BudgetsModule {
 };
@@ -2525,7 +2719,7 @@ exports.BudgetsModule = BudgetsModule = __decorate([
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2546,11 +2740,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
-const budgets_service_1 = __webpack_require__(49);
-const jwt_auth_guard_1 = __webpack_require__(51);
+const budgets_service_1 = __webpack_require__(50);
+const jwt_auth_guard_1 = __webpack_require__(52);
 const current_user_decorator_1 = __webpack_require__(28);
-const dto_1 = __webpack_require__(52);
-const budget_response_dto_1 = __webpack_require__(56);
+const dto_1 = __webpack_require__(53);
+const budget_response_dto_1 = __webpack_require__(57);
 let BudgetsController = class BudgetsController {
     constructor(budgetsService) {
         this.budgetsService = budgetsService;
@@ -2647,7 +2841,7 @@ exports.BudgetsController = BudgetsController = __decorate([
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2665,7 +2859,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BudgetsService = void 0;
 const common_1 = __webpack_require__(3);
 const budget_repository_1 = __webpack_require__(42);
-const library_1 = __webpack_require__(50);
+const library_1 = __webpack_require__(51);
 let BudgetsService = class BudgetsService {
     constructor(budgetRepository) {
         this.budgetRepository = budgetRepository;
@@ -2786,13 +2980,13 @@ exports.BudgetsService = BudgetsService = __decorate([
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ ((module) => {
 
 module.exports = require("@prisma/client/runtime/library");
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2843,7 +3037,7 @@ exports.JwtAuthGuard = JwtAuthGuard = __decorate([
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2862,16 +3056,16 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__webpack_require__(53), exports);
 __exportStar(__webpack_require__(54), exports);
 __exportStar(__webpack_require__(55), exports);
 __exportStar(__webpack_require__(56), exports);
 __exportStar(__webpack_require__(57), exports);
 __exportStar(__webpack_require__(58), exports);
+__exportStar(__webpack_require__(59), exports);
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2932,21 +3126,21 @@ __decorate([
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UpdateBudgetDto = void 0;
 const swagger_1 = __webpack_require__(4);
-const create_budget_dto_1 = __webpack_require__(53);
+const create_budget_dto_1 = __webpack_require__(54);
 class UpdateBudgetDto extends (0, swagger_1.PartialType)(create_budget_dto_1.CreateBudgetDto) {
 }
 exports.UpdateBudgetDto = UpdateBudgetDto;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2991,7 +3185,7 @@ __decorate([
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3124,7 +3318,7 @@ __decorate([
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3160,7 +3354,7 @@ __decorate([
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3177,7 +3371,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateSharedBudgetDto = void 0;
 const swagger_1 = __webpack_require__(4);
 const class_validator_1 = __webpack_require__(25);
-const create_budget_dto_1 = __webpack_require__(53);
+const create_budget_dto_1 = __webpack_require__(54);
 class CreateSharedBudgetDto extends create_budget_dto_1.CreateBudgetDto {
 }
 exports.CreateSharedBudgetDto = CreateSharedBudgetDto;
@@ -3195,7 +3389,7 @@ __decorate([
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3221,7 +3415,7 @@ exports.RecurringModule = RecurringModule = __decorate([
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3247,7 +3441,7 @@ exports.GoalsModule = GoalsModule = __decorate([
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3260,8 +3454,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AnalyticsModule = void 0;
 const common_1 = __webpack_require__(3);
-const ai_analytics_service_1 = __webpack_require__(62);
-const ai_analytics_controller_1 = __webpack_require__(63);
+const ai_analytics_service_1 = __webpack_require__(63);
+const ai_analytics_controller_1 = __webpack_require__(64);
 let AnalyticsModule = class AnalyticsModule {
 };
 exports.AnalyticsModule = AnalyticsModule;
@@ -3275,7 +3469,7 @@ exports.AnalyticsModule = AnalyticsModule = __decorate([
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3435,7 +3629,7 @@ exports.AIAnalyticsService = AIAnalyticsService = AIAnalyticsService_1 = __decor
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3456,9 +3650,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AIAnalyticsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
-const jwt_auth_guard_1 = __webpack_require__(51);
+const jwt_auth_guard_1 = __webpack_require__(52);
 const current_user_decorator_1 = __webpack_require__(28);
-const ai_analytics_service_1 = __webpack_require__(62);
+const ai_analytics_service_1 = __webpack_require__(63);
 let AIAnalyticsController = class AIAnalyticsController {
     constructor(aiAnalyticsService) {
         this.aiAnalyticsService = aiAnalyticsService;
@@ -3525,7 +3719,7 @@ exports.AIAnalyticsController = AIAnalyticsController = __decorate([
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3538,10 +3732,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsModule = void 0;
 const common_1 = __webpack_require__(3);
-const notifications_controller_1 = __webpack_require__(65);
-const notifications_service_1 = __webpack_require__(66);
-const notification_repository_1 = __webpack_require__(67);
-const email_service_1 = __webpack_require__(68);
+const notifications_controller_1 = __webpack_require__(66);
+const notifications_service_1 = __webpack_require__(67);
+const notification_repository_1 = __webpack_require__(68);
+const email_service_1 = __webpack_require__(69);
 let NotificationsModule = class NotificationsModule {
 };
 exports.NotificationsModule = NotificationsModule;
@@ -3555,7 +3749,7 @@ exports.NotificationsModule = NotificationsModule = __decorate([
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3576,10 +3770,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsController = void 0;
 const common_1 = __webpack_require__(3);
 const swagger_1 = __webpack_require__(4);
-const notifications_service_1 = __webpack_require__(66);
-const jwt_auth_guard_1 = __webpack_require__(51);
+const notifications_service_1 = __webpack_require__(67);
+const jwt_auth_guard_1 = __webpack_require__(52);
 const current_user_decorator_1 = __webpack_require__(28);
-const dto_1 = __webpack_require__(70);
+const dto_1 = __webpack_require__(71);
 let NotificationsController = class NotificationsController {
     constructor(notificationsService) {
         this.notificationsService = notificationsService;
@@ -3660,7 +3854,7 @@ exports.NotificationsController = NotificationsController = __decorate([
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3677,8 +3871,8 @@ var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NotificationsService = void 0;
 const common_1 = __webpack_require__(3);
-const notification_repository_1 = __webpack_require__(67);
-const email_service_1 = __webpack_require__(68);
+const notification_repository_1 = __webpack_require__(68);
+const email_service_1 = __webpack_require__(69);
 const client_1 = __webpack_require__(15);
 const prisma_service_1 = __webpack_require__(14);
 let NotificationsService = class NotificationsService {
@@ -3770,7 +3964,7 @@ exports.NotificationsService = NotificationsService = __decorate([
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3846,7 +4040,7 @@ exports.NotificationRepository = NotificationRepository = __decorate([
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -3865,7 +4059,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.EmailService = void 0;
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(5);
-const resend_1 = __webpack_require__(69);
+const resend_1 = __webpack_require__(70);
 let EmailService = EmailService_1 = class EmailService {
     constructor(configService) {
         this.configService = configService;
@@ -4122,13 +4316,13 @@ exports.EmailService = EmailService = EmailService_1 = __decorate([
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ ((module) => {
 
 module.exports = require("resend");
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4147,11 +4341,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__webpack_require__(71), exports);
+__exportStar(__webpack_require__(72), exports);
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4206,7 +4400,7 @@ __decorate([
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4219,7 +4413,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AdminModule = void 0;
 const common_1 = __webpack_require__(3);
-const admin_controller_1 = __webpack_require__(73);
+const admin_controller_1 = __webpack_require__(74);
 const jwt_1 = __webpack_require__(17);
 let AdminModule = class AdminModule {
 };
@@ -4238,7 +4432,7 @@ exports.AdminModule = AdminModule = __decorate([
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4330,7 +4524,7 @@ exports.AdminController = AdminController = __decorate([
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4357,7 +4551,7 @@ exports.AnalyticsModule = AnalyticsModule = __decorate([
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4371,7 +4565,7 @@ var HttpExceptionFilter_1;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpExceptionFilter = void 0;
 const common_1 = __webpack_require__(3);
-const library_1 = __webpack_require__(50);
+const library_1 = __webpack_require__(51);
 let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
     constructor() {
         this.logger = new common_1.Logger(HttpExceptionFilter_1.name);
@@ -4459,7 +4653,7 @@ exports.HttpExceptionFilter = HttpExceptionFilter = HttpExceptionFilter_1 = __de
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4472,7 +4666,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LoggingInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const operators_1 = __webpack_require__(77);
+const operators_1 = __webpack_require__(78);
 let LoggingInterceptor = class LoggingInterceptor {
     constructor() {
         this.logger = new common_1.Logger('HTTP');
@@ -4503,13 +4697,13 @@ exports.LoggingInterceptor = LoggingInterceptor = __decorate([
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ ((module) => {
 
 module.exports = require("rxjs/operators");
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4522,8 +4716,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TimeoutInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const rxjs_1 = __webpack_require__(79);
-const operators_1 = __webpack_require__(77);
+const rxjs_1 = __webpack_require__(80);
+const operators_1 = __webpack_require__(78);
 let TimeoutInterceptor = class TimeoutInterceptor {
     constructor() {
         this.TIMEOUT_MS = 30000;
@@ -4544,13 +4738,13 @@ exports.TimeoutInterceptor = TimeoutInterceptor = __decorate([
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -4563,7 +4757,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TransformInterceptor = void 0;
 const common_1 = __webpack_require__(3);
-const operators_1 = __webpack_require__(77);
+const operators_1 = __webpack_require__(78);
 let TransformInterceptor = class TransformInterceptor {
     intercept(context, next) {
         const request = context.switchToHttp().getRequest();
@@ -4583,7 +4777,7 @@ exports.TransformInterceptor = TransformInterceptor = __decorate([
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ ((module) => {
 
 module.exports = require("@fastify/cookie");
@@ -4630,10 +4824,10 @@ const config_1 = __webpack_require__(5);
 const helmet_1 = __webpack_require__(6);
 const compress_1 = __webpack_require__(7);
 const app_module_1 = __webpack_require__(8);
-const http_exception_filter_1 = __webpack_require__(75);
-const logging_interceptor_1 = __webpack_require__(76);
-const timeout_interceptor_1 = __webpack_require__(78);
-const transform_interceptor_1 = __webpack_require__(80);
+const http_exception_filter_1 = __webpack_require__(76);
+const logging_interceptor_1 = __webpack_require__(77);
+const timeout_interceptor_1 = __webpack_require__(79);
+const transform_interceptor_1 = __webpack_require__(81);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_fastify_1.FastifyAdapter({
         logger: false,
@@ -4651,7 +4845,7 @@ async function bootstrap() {
     await app.register(compress_1.default, {
         encodings: ['gzip', 'deflate'],
     });
-    await app.register(__webpack_require__(81), {
+    await app.register(__webpack_require__(82), {
         secret: configService.get('JWT_SECRET'),
     });
     app.enableVersioning({
