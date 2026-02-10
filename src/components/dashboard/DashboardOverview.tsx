@@ -30,6 +30,7 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { formatCurrency } from "@/lib/formatters";
 import { SpendingLineChart } from "@/components/dashboard/SpendingLineChart";
 import { EmptyTransactions } from "@/components/dashboard/EmptyTransactions";
+import { QuickAddTransactions } from "@/components/dashboard/QuickAddTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import {
@@ -41,6 +42,7 @@ import {
     getDaysElapsedInMonth,
     getTotalDaysInMonth
 } from "@/lib/dashboard-utils";
+import { generateDemoChartData, DEMO_AI_INSIGHTS } from "@/lib/demo-data";
 
 // Animation Variants
 const containerVariants: Variants = {
@@ -79,16 +81,9 @@ export function DashboardOverview() {
     // Filter data based on period
     const filteredData = useMemo(() => {
         if (!data?.dailyTrend || data.dailyTrend.length === 0) {
-            // Mock Chart Data if empty
-            return [
-                { date: "2024-01-01", income: 4000, expenses: 2400 },
-                { date: "2024-01-02", income: 3000, expenses: 1398 },
-                { date: "2024-01-03", income: 2000, expenses: 9800 },
-                { date: "2024-01-04", income: 2780, expenses: 3908 },
-                { date: "2024-01-05", income: 1890, expenses: 4800 },
-                { date: "2024-01-06", income: 2390, expenses: 3800 },
-                { date: "2024-01-07", income: 3490, expenses: 4300 },
-            ];
+            // Realistic demo data with relatable patterns
+            const demoData = generateDemoChartData();
+            return period === 'weekly' ? demoData.slice(-7) : demoData;
         }
         return period === 'weekly'
             ? filterDataByDays(data.dailyTrend, 7)
@@ -176,9 +171,9 @@ export function DashboardOverview() {
                         <Sparkles className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                        <h4 className="font-medium text-indigo-900 text-base">AI Insight</h4>
+                        <h4 className="font-medium text-indigo-900 text-base">💡 AI Insight</h4>
                         <p className="text-indigo-700/80 text-base mt-1 leading-relaxed">
-                            Your spending on <strong>Dining Out</strong> is 15% higher than last month. Consider setting a stricter budget for next week to stay on track.
+                            {DEMO_AI_INSIGHTS[0].message}
                         </p>
                     </div>
                     <button
@@ -282,6 +277,11 @@ export function DashboardOverview() {
                             </Card>
                         </motion.div>
                     </div>
+
+                    {/* Quick Add Transactions */}
+                    <motion.div variants={itemVariants} className="h-auto">
+                        <QuickAddTransactions />
+                    </motion.div>
                 </div>
 
                 {/* Column 2: Main Content (Expanded to 8 cols) */}
@@ -320,16 +320,16 @@ export function DashboardOverview() {
                                     {budgetUsage}%
                                 </div>
                                 <div>
-                                    <div className="text-base font-medium">Budget Usage</div>
+                                    <div className="text-base font-medium">Budget Status</div>
                                     <div className="text-sm text-neutral-400">
-                                        {budgetUsage < 80 ? 'You are on track' : budgetUsage < 100 ? 'Close to limit' : 'Over budget'}
+                                        {budgetUsage < 80 ? 'Nice restraint! You\'re on track 🎯' : budgetUsage < 100 ? 'Getting close - watch those impulse buys!' : 'Over budget - let\'s rein it in'}
                                     </div>
                                 </div>
                                 <div className="ml-auto flex gap-4">
                                     <div className="text-right">
-                                        <div className="text-sm text-neutral-400">Projected Savings</div>
+                                        <div className="text-sm text-neutral-400">If you keep this up...</div>
                                         <div className={`font-medium text-lg ${projectedSavings > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {projectedSavings > 0 ? '+' : ''}{formatCurrency(projectedSavings)}
+                                            {projectedSavings > 0 ? '💰 +' : ''}{formatCurrency(projectedSavings)} this month
                                         </div>
                                     </div>
                                 </div>

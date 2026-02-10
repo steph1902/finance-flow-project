@@ -49,7 +49,7 @@ export function useNotifications(unreadOnly = false) {
       mutate();
       mutateCount();
     } catch (error) {
-      logger.error('Failed to mark as read:', error);
+      console.error('Failed to mark as read:', error);
       throw error;
     }
   };
@@ -73,7 +73,7 @@ export function useNotifications(unreadOnly = false) {
       mutate();
       mutateCount();
     } catch (error) {
-      logger.error('Failed to mark all as read:', error);
+      console.error('Failed to mark all as read:', error);
       throw error;
     } finally {
       setIsMarking(false);
@@ -98,7 +98,7 @@ export function useNotifications(unreadOnly = false) {
       mutate();
       mutateCount();
     } catch (error) {
-      logger.error('Failed to delete notification:', error);
+      console.error('Failed to delete notification:', error);
       throw error;
     }
   };
