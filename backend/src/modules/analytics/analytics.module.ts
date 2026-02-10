@@ -1,27 +1,14 @@
 import { Module } from '@nestjs/common';
+import { AIAnalyticsService } from './services/ai-analytics.service';
+import { AIAnalyticsController } from './controllers/ai-analytics.controller';
 
 /**
  * Analytics Module
- * Dashboard statistics and financial insights
- * 
- * TODO: Implement:
- * - analytics.controller.ts
- * - analytics.service.ts
- * - dto/ directory
- * 
- * Key features:
- * - Dashboard stats (total income, expenses, net savings)
- * - Budget vs actual comparison
- * - Spending trends (weekly, monthly, yearly)
- * - Category breakdown (pie chart data)
- * - Top spending categories
- * - Comparative analysis (month-over-month, year-over-year)
- * - Date range filtering
- * - Spending patterns and insights
+ * Dashboard statistics, financial insights, and AI performance monitoring
  */
 @Module({
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [AIAnalyticsController],
+  providers: [AIAnalyticsService],
+  exports: [AIAnalyticsService],
 })
-export class AnalyticsModule {}
+export class AnalyticsModule { }
