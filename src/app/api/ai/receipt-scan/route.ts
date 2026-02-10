@@ -1,7 +1,7 @@
 /**
  * Receipt Scan API Route
  * POST /api/ai/receipt-scan
- * 
+ *
  * Accepts a base64-encoded receipt image, performs OCR,
  * parses transaction data, and suggests a category
  */
@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getErrorMessage } from '@/lib/utils/error';
 import { extractTextFromReceipt, validateReceiptImage } from "@/lib/ai/receipt-ocr-service";
 import { processReceipt } from "@/lib/ai/receipt-parser-service";
 import { checkAIRateLimit } from "@/lib/rate-limiter";

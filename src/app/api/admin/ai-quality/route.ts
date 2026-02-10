@@ -1,6 +1,7 @@
 // src/app/api/admin/ai-quality/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/session';
+import { getErrorMessage } from '@/lib/utils/error';
 import { qualityTracker } from '@/lib/ai/monitoring/quality-tracker';
 
 /**

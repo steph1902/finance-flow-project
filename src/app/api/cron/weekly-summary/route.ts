@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/utils/error';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { sendWeeklySummary, isEmailConfigured } from '@/lib/services/email-service';

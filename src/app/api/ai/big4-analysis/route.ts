@@ -1,4 +1,5 @@
 // src/app/api/ai/big4-analysis/route.ts
+import { getErrorMessage } from '@/lib/utils/error';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/session';
 import { big4DecisionEngine } from '@/lib/ai/engines/big4-decision-engine';

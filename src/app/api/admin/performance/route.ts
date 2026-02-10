@@ -1,4 +1,5 @@
 // src/app/api/admin/performance/route.ts
+import { getErrorMessage } from '@/lib/utils/error';
 import { NextResponse } from 'next/server';
 import { performanceMonitor } from '@/lib/monitoring/performance';
 

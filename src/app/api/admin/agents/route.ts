@@ -1,5 +1,7 @@
 // src/app/api/admin/agents/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getErrorMessage } from '@/lib/utils/error';
 import { agentOrchestrator } from '@/lib/ai/agents/orchestrator';
 
 /**

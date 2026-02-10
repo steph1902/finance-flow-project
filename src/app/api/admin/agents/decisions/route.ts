@@ -36,8 +36,9 @@ export async function GET(request: NextRequest) {
             }
         });
     } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Internal server error';
         return NextResponse.json(
-            { success: false, error: getErrorMessage(error) },
+            { success: false, error: errorMessage },
             { status: 500 }
         );
     }

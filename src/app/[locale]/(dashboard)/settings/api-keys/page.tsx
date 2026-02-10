@@ -56,9 +56,13 @@ const API_KEYS = [
     },
 ];
 
+type ApiKeyWithValue = typeof API_KEYS[number] & { value: string | undefined };
+
 export default function ApiKeysPage() {
     const router = useRouter();
-    const [apiKeys, setApiKeys] = useState(API_KEYS.map(key => ({ ...key, value: undefined })));
+    const [apiKeys, setApiKeys] = useState<ApiKeyWithValue[]>(
+        API_KEYS.map(key => ({ ...key, value: undefined }))
+    );
     const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (id: string, value: string) => {

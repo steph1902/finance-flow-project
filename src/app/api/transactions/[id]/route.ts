@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { getErrorMessage } from '@/lib/utils/error';
 import { NextRequest, NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth-helpers";
