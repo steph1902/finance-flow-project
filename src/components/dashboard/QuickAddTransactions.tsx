@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QUICK_ADD_TEMPLATES } from '@/lib/demo-data';
+import { haptics } from '@/lib/celebrations';
 import { toast } from 'sonner';
 
 interface QuickAddTransactionsProps {
@@ -18,6 +19,9 @@ interface QuickAddTransactionsProps {
 export function QuickAddTransactions({ onAddTransaction }: QuickAddTransactionsProps) {
     const handleQuickAdd = async (template: typeof QUICK_ADD_TEMPLATES[number]) => {
         try {
+            // Haptic feedback for tactile feel
+            haptics.tap();
+
             if (onAddTransaction) {
                 await onAddTransaction(template);
                 toast.success(`Added ${template.emoji} ${template.label}`);
