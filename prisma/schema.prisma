@@ -170,8 +170,27 @@ model AISuggestion {
 
   @@index([userId])
   @@index([transactionId])
-  @@index([suggestionType])
+  @@index([createdAt])
   @@map("ai_suggestions")
+}
+
+// Category Keywords (learned from user feedback)
+model CategoryKeyword {
+  id          String   @id @default(cuid())
+  keyword     String   // Extracted keyword (lowercase)
+  category    String   // Associated category
+  occurrences Int      @default(1) // Number of times seen
+  confidence  Decimal  @default(0.5) @db.Decimal(3, 2) // 0.00 to 1.00
+  source      String   @default("user_feedback") // "user_feedback" or "manual"
+  lastSeen    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([keyword, category]) // One entry per keyword-category pair
+  @@index([keyword])
+  @@index([category])
+  @@index([confidence])
+  @@map("category_keywords")
 }
 
 model AIChatHistory {

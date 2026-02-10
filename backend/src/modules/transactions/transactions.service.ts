@@ -17,6 +17,7 @@ import {
 } from './dto';
 import { PaginatedResponse } from '@/common/interfaces/common.interface';
 import { CategorizationJobData } from './processors/ai-categorization.processor';
+import { KeywordLearningService } from './services/keyword-learning.service';
 
 /**
  * Transactions Service
@@ -31,6 +32,7 @@ export class TransactionsService {
     private readonly repository: TransactionsRepository,
     private readonly budgetRepository: BudgetRepository,
     @InjectQueue('ai-categorization') private readonly aiQueue: Queue<CategorizationJobData>,
+    private readonly keywordLearningService: KeywordLearningService,
   ) { }
 
   /**
@@ -185,6 +187,12 @@ export class TransactionsService {
       this.logger.log(
         `AI suggestion rejected for transaction ${transactionId}. ` +
         `Suggested: ${suggestion.suggestedValue}, Correct: ${feedback.correctCategory}`,
+      );
+
+      // Learn from this feedback for future categorizations
+      await this.keywordLearningService.learnFromFeedback(
+        transactionId,
+        feedback.correctCategory,
       );
     }
 

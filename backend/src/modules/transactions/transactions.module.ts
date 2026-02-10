@@ -5,10 +5,11 @@ import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from './transactions.repository';
 import { BudgetRepository } from '../budgets/repositories/budget.repository';
 import { AiCategorizationProcessor } from './processors/ai-categorization.processor';
+import { KeywordLearningService } from './services/keyword-learning.service';
 
 /**
  * Transactions Module
- * Handles transaction CRUD, categorization, statistics, and bulk operations
+ * Handles all transaction-related operations with AI categorization
  */
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { AiCategorizationProcessor } from './processors/ai-categorization.proces
     TransactionsRepository,
     BudgetRepository,
     AiCategorizationProcessor,
+    KeywordLearningService,
   ],
-  exports: [TransactionsService, TransactionsRepository],
+  exports: [TransactionsService, TransactionsRepository, KeywordLearningService],
 })
 export class TransactionsModule { }
