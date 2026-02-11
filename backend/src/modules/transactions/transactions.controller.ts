@@ -71,6 +71,25 @@ export class TransactionsController {
   }
 
   /**
+   * Scan receipt image using AI
+   * IMPORTANT: Must be before :id routes to avoid 405 errors
+   */
+  @Post('receipt-scan')
+  @ApiOperation({
+    summary: 'Scan receipt image',
+    description: 'Extract transaction data from receipt image using AI OCR',
+  })
+  @ApiResponse({ status: 200, description: 'Receipt scanned successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid image data' })
+  @HttpCode(HttpStatus.OK)
+  async scanReceipt(
+    @CurrentUser('id') userId: string,
+    @Body() body: { image: string },
+  ) {
+    return this.transactionsService.scanReceipt(userId, body.image);
+  }
+
+  /**
    * Get transaction by ID
    */
   @Get(':id')
@@ -185,17 +204,25 @@ export class TransactionsController {
   }
 
   /**
-   * Reject AI suggestion and provide feedback
+   * Reject AI categorization suggestion and provide feedback
    */
-  @Post(':id/ai-suggestion/reject')
-  @ApiOperation({ summary: 'Reject AI categorization and provide correct category' })
-  @ApiResponse({ status: 200, description: 'AI suggestion rejected and feedback recorded' })
+  @Post(':id/reject-ai-suggestion')
+  @ApiOperation({
+    summary: 'Reject AI categorization suggestion',
+    description: 'User rejects the AI suggestion and provides feedback for improvement',
+  })
+  @ApiResponse({ status: 200, description: 'Feedback recorded successfully' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
+  @HttpCode(HttpStatus.OK)
   async rejectAISuggestion(
     @CurrentUser('id') userId: string,
-    @Param('id') id: string,
+    @Param('id') transactionId: string,
     @Body() rejectDto: RejectAISuggestionDto,
   ) {
-    return this.transactionsService.rejectAISuggestion(userId, id, rejectDto);
+    return this.transactionsService.rejectAISuggestion(
+      transactionId,
+      userId,
+      rejectDto,
+    );
   }
 }

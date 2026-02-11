@@ -29,7 +29,7 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/financeflow-backend:latest'
       - '-f'
-      - 'Dockerfile.backend'
+      - 'backend/Dockerfile'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'
