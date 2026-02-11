@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useTransactions } from "@/hooks/useTransactions";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Transaction } from "@/types";
 
 const defaultFilters: FilterState = {
@@ -44,10 +43,7 @@ export function TransactionsPage() {
     setIsDialogOpen(true);
   };
 
-  // Keyboard shortcuts (Cmd/Ctrl+N to create new transaction)
-  useKeyboardShortcuts({
-    onNewTransaction: handleOpenCreate,
-  });
+
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);

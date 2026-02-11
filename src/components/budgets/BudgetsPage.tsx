@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { useBudgets } from "@/hooks/useBudgets";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Budget } from "@/types";
 
 const now = new Date();
@@ -45,8 +44,7 @@ export function BudgetsPage() {
     setEditingBudget(null);
   };
 
-  // Keyboard shortcuts for navigation
-  useKeyboardShortcuts();
+
 
   const handleSubmit = async (values: {
     category: string;
