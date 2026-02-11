@@ -57,9 +57,9 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-lg border border-border/50 bg-card p-6 shadow-md"
+      className="rounded-xl bg-white p-6 shadow-sm"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Filter className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold text-foreground">Filters</h3>
