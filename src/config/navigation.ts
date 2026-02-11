@@ -17,6 +17,9 @@ import {
   TestTube,
   Zap,
   Database,
+  BookOpen,
+  PartyPopper,
+  Code,
   type LucideIcon
 } from "lucide-react";
 
@@ -68,6 +71,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/ai-quality", label: "AI Quality", icon: Zap },
       { href: "/admin/demo-data", label: "Demo Data", icon: Database },
       { href: "/ai-docs", label: "Documentation", icon: FileText },
+      { href: "/api-docs", label: "API Docs", icon: Code },
     ]
   },
   // System & Maintenance
@@ -83,6 +87,8 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 
 // Footer navigation (sticky bottom)
 export const NAV_FOOTER: readonly NavItem[] = [
+  { href: "/how-to-use", label: "How to Use", icon: BookOpen },
+  { href: "/whats-new", label: "What's New", icon: PartyPopper },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/dashboard/feedback", label: "Feedback", icon: MessageCircle },
 ] as const;
