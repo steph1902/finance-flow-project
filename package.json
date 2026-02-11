@@ -16,7 +16,6 @@
     "validate": "tsc --noEmit && next lint && jest",
     "postinstall": "prisma generate",
     "postbuild": "prisma db push --accept-data-loss",
-    "prepare": "husky install || true",
     "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
     "db:seed:enhanced": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-enhanced.ts"
   },
