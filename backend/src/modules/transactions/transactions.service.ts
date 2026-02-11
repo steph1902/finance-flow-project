@@ -642,6 +642,110 @@ export class TransactionsService {
   }
 
   /**
+   * Scan receipt image using Gemini Vision API
+   */
+  async scanReceipt(userId: string, imageBase64: string) {
+    this.logger.log(`Scanning receipt for user ${userId}`);
+
+    try {
+      // Import Gemini AI
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+
+      if (!process.env.GEMINI_API_KEY) {
+        throw new BadRequestException('AI service not configured');
+      }
+
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+      // Extract base64 data (remove data:image/...;base64, prefix if present)
+      const base64Data = imageBase64.includes(',')
+        ? imageBase64.split(',')[1]
+        : imageBase64;
+
+      // Prepare the prompt for receipt scanning
+      const prompt = `Analyze this receipt image and extract the following information in JSON format:
+{
+  "merchant": "store/restaurant name",
+  "amount": total_amount_as_number,
+  "date": "YYYY-MM-DD format",
+  "category": "one of: Food & Dining, Shopping, Groceries, Entertainment, Utilities, Transportation, Healthcare, Other",
+  "items": [
+    {"name": "item name", "quantity": number, "price": number}
+  ],
+  "confidence": 0-1 confidence score
+}
+
+Extract the merchant name, total amount, date, and categorize the purchase. 
+List individual items if visible.
+Return ONLY valid JSON, no other text.`;
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: 'image/jpeg', // Assuming JPEG, could be improved
+          },
+        },
+      ]);
+
+      const response = await result.response;
+      const text = response.text();
+
+      // Parse the JSON response
+      let parsedData;
+      try {
+        let jsonText = text;
+
+        // Remove markdown code blocks if present (```json ... ``` or ``` ... ```)
+        jsonText = jsonText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+
+        // Try to extract JSON from the response
+        const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          this.logger.error('No JSON found in Gemini response:', text);
+          throw new Error('Could not extract JSON from AI response');
+        }
+
+        parsedData = JSON.parse(jsonMatch[0]);
+        this.logger.log('Successfully parsed receipt data:', JSON.stringify(parsedData));
+      } catch (parseError) {
+        this.logger.error('Failed to parse AI response:', {
+          error: parseError.message,
+          responseText: text.substring(0, 500), // Log first 500 chars
+        });
+        throw new BadRequestException(
+          'Could not understand receipt image. Please try a clearer photo.'
+        );
+      }
+
+      // Validate and format the response
+      const receiptData = {
+        merchant: parsedData.merchant || 'Unknown',
+        amount: parseFloat(parsedData.amount) || 0,
+        date: parsedData.date || new Date().toISOString().split('T')[0],
+        category: parsedData.category || 'Other',
+        items: Array.isArray(parsedData.items) ? parsedData.items : [],
+        confidence: parsedData.confidence || 0.5,
+        ocrText: text,
+      };
+
+      this.logger.log(`Receipt scanned successfully: ${receiptData.merchant} - $${receiptData.amount}`);
+
+      return {
+        success: true,
+        data: receiptData,
+      };
+    } catch (error) {
+      this.logger.error('Receipt scan error:', error);
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to scan receipt',
+      );
+    }
+  }
+
+  /**
    * Serialize transaction for response
    */
   private serializeTransaction(transaction: Transaction) {
