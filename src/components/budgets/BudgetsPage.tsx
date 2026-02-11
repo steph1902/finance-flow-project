@@ -45,10 +45,8 @@ export function BudgetsPage() {
     setEditingBudget(null);
   };
 
-  // Keyboard shortcuts (Cmd/Ctrl+B to create new budget)
-  useKeyboardShortcuts({
-    onNewBudget: handleOpen,
-  });
+  // Keyboard shortcuts for navigation
+  useKeyboardShortcuts();
 
   const handleSubmit = async (values: {
     category: string;
