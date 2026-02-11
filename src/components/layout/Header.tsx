@@ -97,7 +97,7 @@ export default function Header() {
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+          <DropdownMenuContent align="end" className="w-56 bg-white border-border shadow-lg">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">Demo User</p>
