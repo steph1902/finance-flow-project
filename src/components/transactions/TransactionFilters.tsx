@@ -132,12 +132,12 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 lg:col-span-1">
           <Label className="text-neutral-700 font-medium flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             Date Range
           </Label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
             <Input
               type="date"
               value={value.startDate ?? ""}
