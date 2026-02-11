@@ -101,7 +101,7 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
             <SelectTrigger>
               <SelectValue placeholder="All" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
+            <SelectContent>
               <SelectItem value="ALL">All Types</SelectItem>
               {TRANSACTION_TYPE_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
@@ -121,7 +121,7 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
             <SelectTrigger>
               <SelectValue placeholder="All categories" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
+            <SelectContent>
               <SelectItem value="ALL">All Categories</SelectItem>
               {categoryOptions.map((category) => (
                 <SelectItem key={category} value={category}>
@@ -137,7 +137,7 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
             <Calendar className="h-4 w-4" />
             Date Range
           </Label>
-          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Input
               type="date"
               value={value.startDate ?? ""}
