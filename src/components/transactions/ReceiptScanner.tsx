@@ -79,7 +79,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
     setScannedData(null);
 
     try {
-      const response = await fetch("/api/ai/receipt-scan", {
+      const response = await fetch("/api/transactions/receipt-scan", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,11 +88,27 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to scan receipt");
+        // Try to parse error message, but handle non-JSON responses
+        let errorMessage = "Failed to scan receipt";
+        try {
+          const error = await response.json();
+          errorMessage = error.message || error.error || errorMessage;
+        } catch (parseError) {
+          // Response is not JSON, use status text
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const result = await response.json();
+      // Parse successful response
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error("Failed to parse success response:", parseError);
+        throw new Error("Invalid response from server");
+      }
+
       const data: ScannedReceipt = result.data;
 
       setScannedData(data);
