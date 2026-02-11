@@ -656,7 +656,8 @@ export class TransactionsService {
       }
 
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use lite model to bypass potential rate limits on standard flash
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite-001' });
 
       // Extract base64 data (remove data:image/...;base64, prefix if present)
       const base64Data = imageBase64.includes(',')

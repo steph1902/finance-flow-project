@@ -43,7 +43,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
     type: filters.type && filters.type !== "ALL" ? filters.type : undefined,
   });
 
-  const { data, error, isLoading, mutate } = useSWR(`/api/transactions${queryString}`, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(`/api/v1/transactions${queryString}`, fetcher);
 
   const createTransaction = useCallback(
     async (payload: TransactionPayload) => {
@@ -51,7 +51,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
         await mutate(
           async (currentData) => {
             await apiFetch<{ message: string; data: Transaction }>(
-              "/api/transactions",
+              "/api/v1/transactions",
               {
                 method: "POST",
                 body: {
@@ -74,7 +74,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                   meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
                 };
               }
-              
+
               // Create optimistic transaction with temporary ID
               const optimisticTransaction: Transaction = {
                 id: `temp-${Date.now()}`,
@@ -118,7 +118,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
         await mutate(
           async (currentData) => {
             await apiFetch<{ message: string; data: Transaction }>(
-              `/api/transactions/${id}`,
+              `/api/v1/transactions/${id}`,
               {
                 method: "PATCH",
                 body: {
@@ -144,15 +144,15 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
               data: currentData.data.map((txn) =>
                 txn.id === id
                   ? {
-                      ...txn,
-                      ...payload,
-                      date: payload.date
-                        ? payload.date instanceof Date
-                          ? payload.date.toISOString()
-                          : payload.date
-                        : txn.date,
-                      updatedAt: new Date().toISOString(),
-                    }
+                    ...txn,
+                    ...payload,
+                    date: payload.date
+                      ? payload.date instanceof Date
+                        ? payload.date.toISOString()
+                        : payload.date
+                      : txn.date,
+                    updatedAt: new Date().toISOString(),
+                  }
                   : txn
               ),
             };
@@ -171,15 +171,15 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                 data: currentData.data.map((txn) =>
                   txn.id === id
                     ? {
-                        ...txn,
-                        ...payload,
-                        date: payload.date
-                          ? payload.date instanceof Date
-                            ? payload.date.toISOString()
-                            : payload.date
-                          : txn.date,
-                        updatedAt: new Date().toISOString(),
-                      }
+                      ...txn,
+                      ...payload,
+                      date: payload.date
+                        ? payload.date instanceof Date
+                          ? payload.date.toISOString()
+                          : payload.date
+                        : txn.date,
+                      updatedAt: new Date().toISOString(),
+                    }
                     : txn
                 ),
               };
@@ -203,7 +203,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
       try {
         await mutate(
           async (currentData) => {
-            await apiFetch<{ message: string }>(`/api/transactions/${id}`, {
+            await apiFetch<{ message: string }>(`/api/v1/transactions/${id}`, {
               method: "DELETE",
             });
 

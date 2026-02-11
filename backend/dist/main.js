@@ -4797,7 +4797,7 @@ let TransactionsService = TransactionsService_1 = class TransactionsService {
                 throw new common_1.BadRequestException('AI service not configured');
             }
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite-001' });
             const base64Data = imageBase64.includes(',')
                 ? imageBase64.split(',')[1]
                 : imageBase64;

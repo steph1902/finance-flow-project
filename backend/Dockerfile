@@ -7,14 +7,14 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install root dependencies (for shared tools if any, but mainly to cache layer)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Setup backend
 WORKDIR /app/backend
 COPY backend/package*.json ./
 
 # Install backend dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy backend source
 COPY backend/ .

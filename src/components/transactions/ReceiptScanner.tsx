@@ -79,7 +79,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
     setScannedData(null);
 
     try {
-      const response = await fetch("/api/transactions/receipt-scan", {
+      const response = await fetch("/api/v1/transactions/receipt-scan", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
 
     try {
       // Create transaction
-      const response = await fetch("/api/transactions", {
+      const response = await fetch("/api/v1/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
