@@ -14,10 +14,15 @@ export class DemoDataService {
     static generateTransactions(count: number, userId: string): Prisma.TransactionCreateManyInput[] {
         const transactions: Prisma.TransactionCreateManyInput[] = [];
         const now = new Date();
+
+        // Dynamic Income Profile: Randomize the income ratio between 15% and 35%
+        // This makes some demo users "savers" (35% income events) and others "spenders" (15%)
+        const incomeRatio = 0.15 + Math.random() * 0.20;
+
         const categories = {
-            income: ['Salary', 'Freelance', 'Investment'],
-            fixed: ['Rent', 'Utilities', 'Insurance', 'Phone'],
-            discretionary: ['Dining', 'Shopping', 'Entertainment', 'Travel']
+            income: ['Salary', 'Freelance', 'Investment', 'Side Hustle', 'Business Profit', 'Consulting'],
+            fixed: ['Rent', 'Utilities', 'Insurance', 'Phone', 'Internet', 'Subscription'],
+            discretionary: ['Dining', 'Shopping', 'Entertainment', 'Travel', 'Hobbies', 'Gadgets']
         };
 
         for (let i = 0; i < count; i++) {
@@ -26,35 +31,43 @@ export class DemoDataService {
             const date = new Date(now);
             date.setDate(date.getDate() - daysAgo);
 
-            // Determine transaction type (20% income, 80% expenses)
-            const isIncome = Math.random() < 0.2;
+            // Determine transaction type based on dynamic ratio
+            const isIncome = Math.random() < incomeRatio;
 
             let amount: number;
             let category: string;
             let description: string;
 
             if (isIncome) {
-                // Income: $3000-5000
-                amount = 3000 + Math.random() * 2000;
+                // Income: $500-8000 (More variety)
+                amount = 500 + Math.random() * 7500;
                 category = categories.income[Math.floor(Math.random() * categories.income.length)];
-                description = `${category} payment`;
+
+                // Add contextual descriptions
+                if (category === 'Side Hustle') description = 'Etsy Shop Sales';
+                else if (category === 'Business Profit') description = 'Q3 Dividend';
+                else if (category === 'Consulting') description = 'Project Milestone Payment';
+                else description = `${category} payment`;
+
             } else {
                 // Expenses: Mix of fixed and discretionary
-                const isFixed = Math.random() < 0.5;
+                const isFixed = Math.random() < 0.4; // Slightly less fixed expenses for more interesting data
 
                 if (isFixed) {
-                    // Fixed: $500-1500
-                    amount = -(500 + Math.random() * 1000);
+                    // Fixed: $100-2000
+                    amount = -(100 + Math.random() * 1900);
                     category = categories.fixed[Math.floor(Math.random() * categories.fixed.length)];
                     description = `${category} bill`;
                 } else {
-                    // Discretionary: $20-500
-                    amount = -(20 + Math.random() * 480);
+                    // Discretionary: $10-800
+                    amount = -(10 + Math.random() * 790);
                     category = categories.discretionary[Math.floor(Math.random() * categories.discretionary.length)];
-                    description = category === 'Dining' ? 'Restaurant' :
-                        category === 'Shopping' ? 'Online purchase' :
-                            category === 'Entertainment' ? 'Movie/Concert' :
-                                'Trip expense';
+                    description = category === 'Dining' ? 'Restaurant / Cafe' :
+                        category === 'Shopping' ? 'Online Order' :
+                            category === 'Entertainment' ? 'Movie/Concert/Game' :
+                                category === 'Hobbies' ? 'Art Supplies / Gear' :
+                                    category === 'Gadgets' ? 'Tech Upgrade' :
+                                        'Trip expense';
                 }
             }
 
