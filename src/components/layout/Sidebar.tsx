@@ -30,13 +30,32 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
 function NavigationSections({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
   return (
     <>
-      {NAV_SECTIONS.map((section, sectionIndex) => (
+      {NAV_SECTIONS.filter(section => section.title !== "ADMIN").map((section, sectionIndex) => (
         <div key={sectionIndex} className={section.title ? "mt-6" : ""}>
           {section.title && (
             <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground/70">
               {section.title}
             </h3>
           )}
+          <div className="space-y-1">
+            {section.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
+                onClick={onItemClick}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* Admin Section */}
+      {NAV_SECTIONS.filter(section => section.title === "ADMIN").map((section, sectionIndex) => (
+        <div key={`admin-${sectionIndex}`} className="mt-8 pt-4 border-t border-border/50">
+          <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-amber-600/80 dark:text-amber-500/80 flex items-center gap-2">
+            {section.title} AREA
+          </h3>
           <div className="space-y-1">
             {section.items.map((item) => (
               <NavLink

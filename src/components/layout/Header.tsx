@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, Settings, HelpCircle, Search, TrendingUp } from "lucide-react";
+import { Menu, LogOut, Settings, HelpCircle, Search, TrendingUp, BookOpen, Rocket } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
@@ -78,7 +78,23 @@ export default function Header() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center gap-1 md:gap-2 ml-auto">
+        {/* Help & Updates (Desktop Only) */}
+        <div className="hidden md:flex items-center gap-1 mr-2">
+          <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+            <Link href="/how-to-use" title="How to Use">
+              <BookOpen className="h-4 w-4 mr-2" />
+              <span className="text-xs font-medium">Guide</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+            <Link href="/whats-new" title="What's New">
+              <Rocket className="h-4 w-4 mr-2" />
+              <span className="text-xs font-medium">Updates</span>
+            </Link>
+          </Button>
+        </div>
+
         {/* Notifications */}
         <NotificationBell />
 

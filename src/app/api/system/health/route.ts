@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { createErrorResponse } from "@/lib/api-error";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+try {
     const session = await getServerSession(authOptions);
     if (!session) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -17,6 +18,7 @@ export async function GET() {
         await prisma.$queryRaw`SELECT 1`;
         apiLatency = Date.now() - start;
     } catch (e) {
+        console.error("Health Check DB Error:", e);
         dbStatus = "error";
     }
 
@@ -35,4 +37,7 @@ export async function GET() {
     };
 
     return NextResponse.json(healthData);
+} catch (error) {
+    return createErrorResponse(error);
+}
 }
