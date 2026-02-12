@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 24 * 60 * 60, // 1 day
   },
   secret: process.env.NEXTAUTH_SECRET,
-  useSecureCookies: false, // Force false for localhost handling
+  useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
     sessionToken: {
       name: 'next-auth.session-token',
@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: false, // Clearly disable secure for dev
+        secure: process.env.NODE_ENV === "production",
       },
     },
   },
