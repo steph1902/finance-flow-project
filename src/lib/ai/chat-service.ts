@@ -1,4 +1,4 @@
-import { geminiClient } from "./gemini-client";
+import { getGeminiClient } from "./gemini-client";
 import { getChatPrompt } from "./prompts/assistant";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
@@ -73,13 +73,13 @@ export async function chatWithAssistant({
     const monthlyRecurringTotal = recurringTransactions
       .filter((r) => r.type === "EXPENSE")
       .reduce((sum, r) => {
-        const multiplier = 
+        const multiplier =
           r.frequency === "DAILY" ? 30 :
-          r.frequency === "WEEKLY" ? 4 :
-          r.frequency === "BIWEEKLY" ? 2 :
-          r.frequency === "MONTHLY" ? 1 :
-          r.frequency === "QUARTERLY" ? 0.33 :
-          r.frequency === "YEARLY" ? 0.083 : 0;
+            r.frequency === "WEEKLY" ? 4 :
+              r.frequency === "BIWEEKLY" ? 2 :
+                r.frequency === "MONTHLY" ? 1 :
+                  r.frequency === "QUARTERLY" ? 0.33 :
+                    r.frequency === "YEARLY" ? 0.083 : 0;
         return sum + (Number(r.amount) * multiplier);
       }, 0);
 
@@ -140,7 +140,9 @@ export async function chatWithAssistant({
 
     let aiResponse: string;
     try {
-      aiResponse = await geminiClient.generateContentWithRetry(fullPrompt);
+      // Use factory to get client with user's specific API key
+      const gemini = await getGeminiClient(userId);
+      aiResponse = await gemini.generateContentWithRetry(fullPrompt);
     } catch (aiError) {
       logError("Gemini API error in chat service", aiError);
       aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";
@@ -150,7 +152,7 @@ export async function chatWithAssistant({
 
     // Store conversation in database - generate UUIDs for database
     const conversationId = randomUUID();
-    
+
     await Promise.all([
       prisma.aIChatHistory.create({
         data: {

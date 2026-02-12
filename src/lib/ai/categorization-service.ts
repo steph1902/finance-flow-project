@@ -15,7 +15,8 @@ export class CategorizationService {
   ): Promise<CategorizationResponse> {
     try {
       const prompt = createCategorizationPrompt(input);
-      const response = await geminiClient.generateStructuredContent<CategorizationResponse>(
+      const gemini = await getGeminiClient(userId);
+      const response = await gemini.generateStructuredContent<CategorizationResponse>(
         prompt,
         CATEGORIZATION_SCHEMA
       );
@@ -26,7 +27,7 @@ export class CategorizationService {
       return response;
     } catch (error) {
       logError('Categorization error', error, { userId, description: input.description });
-      
+
       // Fallback to rule-based categorization
       return this.fallbackCategorization(input);
     }
@@ -43,14 +44,14 @@ export class CategorizationService {
         ${userId}::uuid,
         'category',
         ${JSON.stringify({
-          category: response.category,
-          subcategory: response.subcategory,
-        })},
+      category: response.category,
+      subcategory: response.subcategory,
+    })},
         ${response.confidence},
         ${JSON.stringify({
-          input,
-          reasoning: response.reasoning,
-        })}::jsonb
+      input,
+      reasoning: response.reasoning,
+    })}::jsonb
       )
     `;
   }
@@ -92,7 +93,7 @@ export class CategorizationService {
     ];
 
     for (const rule of rules) {
-      if (rule.keywords.some(keyword => 
+      if (rule.keywords.some(keyword =>
         description.includes(keyword) || merchant.includes(keyword)
       )) {
         return {

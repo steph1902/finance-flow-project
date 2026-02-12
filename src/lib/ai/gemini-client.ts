@@ -1,17 +1,26 @@
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
 import { logError, logWarn } from '@/lib/logger';
+import { prisma } from '@/lib/prisma';
 
 /**
  * ⚠️ VERCEL BUILD FIX:
  * GeminiClient now uses lazy initialization to prevent build-time crashes
  * when GEMINI_API_KEY is missing. The client is only initialized when
  * actually used (runtime), not when the module loads (build-time).
+ * 
+ * 🔄 DYNAMIC KEY UPDATE:
+ * Now supports per-user API keys fetched from the database.
  */
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI | null = null;
   private model: GenerativeModel | null = null;
+  private apiKey: string | undefined;
+
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey;
+  }
 
   /**
    * Lazy initialization - only creates client when first used (runtime)
@@ -22,14 +31,17 @@ export class GeminiClient {
       return; // Already initialized
     }
 
-    if (!AI_CONFIG.apiKey) {
+    // Use provided key or fallback to env var
+    const keyToUse = this.apiKey || AI_CONFIG.apiKey;
+
+    if (!keyToUse) {
       throw new Error(
         'GEMINI_API_KEY not configured. ' +
-        'Please set GEMINI_API_KEY in your Vercel environment variables.'
+        'Please set GEMINI_API_KEY in your Vercel environment variables or in Settings > API Keys.'
       );
     }
 
-    this.genAI = new GoogleGenerativeAI(AI_CONFIG.apiKey);
+    this.genAI = new GoogleGenerativeAI(keyToUse);
     this.model = this.genAI.getGenerativeModel({
       model: AI_CONFIG.model,
     });
@@ -53,7 +65,7 @@ export class GeminiClient {
       return response.text();
     } catch (error) {
       logError('Gemini API Error', error, { context: 'gemini-client' });
-      throw new Error('Failed to generate AI response');
+      throw new Error('Failed to generate AI response: ' + (error as Error).message);
     }
   }
 
@@ -64,14 +76,14 @@ export class GeminiClient {
     this.initialize(); // Lazy init
 
     let lastError: Error | null = null;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await this.generateContent(prompt);
       } catch (error) {
         lastError = error as Error;
         logWarn(`Gemini retry attempt ${attempt} failed`, { error, attempt, maxRetries });
-        
+
         if (attempt < maxRetries) {
           // Exponential backoff
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
@@ -94,12 +106,12 @@ export class GeminiClient {
       : `${prompt}\n\nRespond with valid JSON only.`;
 
     const response = await this.generateContentWithRetry(fullPrompt);
-    
+
     try {
       // Extract JSON from markdown code blocks if present
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
-                       response.match(/```\n([\s\S]*?)\n```/);
-      
+      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) ||
+        response.match(/```\n([\s\S]*?)\n```/);
+
       const jsonString = jsonMatch?.[1] ?? response;
       return JSON.parse(jsonString.trim()) as T;
     } catch (parseError) {
@@ -110,8 +122,33 @@ export class GeminiClient {
 }
 
 /**
+ * Factory to get a GeminiClient instance for a specific user.
+ * Fetches the API key from the database (User.apiKeys), falls back to env var.
+ */
+export async function getGeminiClient(userId?: string): Promise<GeminiClient> {
+  let userKey: string | undefined;
+
+  if (userId) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { apiKeys: true },
+      });
+
+      const keys = user?.apiKeys as Record<string, string> | null;
+      if (keys && keys['gemini-ai']) {
+        userKey = keys['gemini-ai'];
+      }
+    } catch (error) {
+      logWarn('Failed to fetch user API key, falling back to env', { userId, error });
+    }
+  }
+
+  return new GeminiClient(userKey);
+}
+
+/**
  * Export singleton instance (lazy initialization)
- * ⚠️ VERCEL BUILD FIX: Instance creation is safe now because
- * the client doesn't initialize until actually used at runtime
+ * @deprecated Use getGeminiClient(userId) instead for multi-tenant support
  */
 export const geminiClient = new GeminiClient();

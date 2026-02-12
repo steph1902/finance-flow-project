@@ -1,4 +1,4 @@
-import { geminiClient } from "./gemini-client";
+import { geminiClient, getGeminiClient } from "./gemini-client";
 import { createInsightsPrompt } from "./prompts/assistant";
 import { prisma } from "@/lib/prisma";
 import { logError } from "@/lib/logger";
@@ -183,7 +183,9 @@ export async function generateInsights({
 
     let aiResponse: string;
     try {
-      aiResponse = await geminiClient.generateContentWithRetry(prompt, 2);
+      // Use factory to get client with user's specific API key
+      const gemini = await getGeminiClient(userId);
+      aiResponse = await gemini.generateContentWithRetry(prompt, 2);
     } catch (aiError) {
       logError("AI insights generation failed, using fallback", aiError, { userId });
       // Return fallback insights if AI fails
@@ -218,7 +220,7 @@ function generateFallbackInsights(
   data: any,
   budgets: any[]
 ): Insight[] {
-/* eslint-enable @typescript-eslint/no-explicit-any */
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   const insights: Insight[] = [];
 
   // Spending trend insight
@@ -256,7 +258,7 @@ function generateFallbackInsights(
   // Budget alerts
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
-  
+
   budgets.forEach((budget) => {
     if (budget.month === currentMonth && budget.year === currentYear) {
       const spent = data.currentPeriod.byCategory[budget.category] || 0;

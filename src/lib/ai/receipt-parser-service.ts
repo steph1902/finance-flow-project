@@ -3,7 +3,7 @@
  * Uses Gemini AI to parse structured transaction data from receipt OCR text
  */
 
-import { geminiClient } from "./gemini-client";
+import { getGeminiClient } from "./gemini-client";
 import { logInfo, logError } from "@/lib/logger";
 
 interface ParsedReceipt {
@@ -28,10 +28,11 @@ interface ParsedReceipt {
 /**
  * Parse receipt text using Gemini AI
  */
-export async function parseReceiptText(ocrText: string): Promise<ParsedReceipt> {
+export async function parseReceiptText(ocrText: string, userId: string): Promise<ParsedReceipt> {
   try {
     logInfo("Parsing receipt with Gemini AI", {
       textLength: ocrText.length,
+      userId
     });
 
     const prompt = `You are an expert at parsing receipt data. Extract structured information from this receipt text.
@@ -72,7 +73,9 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "confidence": 0.85
 }`;
 
-    const result = await geminiClient.generateContent(prompt);
+    // Use factory to get client with user's specific API key
+    const gemini = await getGeminiClient(userId);
+    const result = await gemini.generateContent(prompt);
     const text = result.trim();
 
     // Extract JSON from response (handle markdown code blocks)
@@ -125,9 +128,9 @@ Return ONLY valid JSON (no markdown, no code blocks):
 /**
  * Combine OCR + Parsing + Categorization
  */
-export async function processReceipt(ocrText: string): Promise<ParsedReceipt & { suggestedCategory?: string | undefined }> {
+export async function processReceipt(ocrText: string, userId: string): Promise<ParsedReceipt & { suggestedCategory?: string | undefined }> {
   // Parse receipt data
-  const parsed = await parseReceiptText(ocrText);
+  const parsed = await parseReceiptText(ocrText, userId);
 
   // Auto-categorize if we have the categorization service
   let suggestedCategory: string | undefined = undefined;
@@ -135,14 +138,13 @@ export async function processReceipt(ocrText: string): Promise<ParsedReceipt & {
   try {
     // Dynamic import to avoid circular dependencies
     const { categorizationService } = await import("./categorization-service");
-    
-    // Note: We need userId for categorization, but for receipt scanning we don't have it yet
-    // So we'll just suggest a category without storing it
+
+    // Use real userId for categorization (allows it to learn from history)
     const categoryResult = await categorizationService.categorizeTransaction({
       description: `${parsed.merchant} ${parsed.items?.map(i => i.name).join(", ") || ""}`,
       amount: parsed.amount,
       type: "expense", // Receipts are typically expenses
-    }, "temp"); // Temporary userId, won't be stored
+    }, userId);
 
     suggestedCategory = categoryResult.category;
   } catch (error) {

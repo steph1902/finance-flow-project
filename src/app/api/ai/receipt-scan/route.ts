@@ -26,8 +26,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Capture user ID for dynamic API key lookup
+    const userId = (session.user as { id: string }).id;
+    const userEmail = session.user.email;
+
+    if (!userId) {
+      logError("User ID missing from session", { user: session.user });
+      return NextResponse.json({ error: "Unauthorized: User ID missing" }, { status: 401 });
+    }
+
     // 2. Rate limiting (AI operations are expensive)
-    const userId = session.user.email;
     if (!checkAIRateLimit(userId)) {
       logInfo("Receipt scan rate limit exceeded", { userId });
       return NextResponse.json(
@@ -76,8 +84,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. Parse receipt data with Gemini
-    const parsedData = await processReceipt(ocrResult.fullText);
+    // 6. Parse receipt data with Gemini (passing userId for dynamic key)
+    const parsedData = await processReceipt(ocrResult.fullText, userId);
 
     // 7. Return parsed transaction data
     return NextResponse.json({
