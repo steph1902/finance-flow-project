@@ -1,4 +1,4 @@
-import { geminiClient } from './gemini-client';
+import { geminiClient, getGeminiClient } from './gemini-client';
 import {
   createCategorizationPrompt,
   CATEGORIZATION_SCHEMA,
