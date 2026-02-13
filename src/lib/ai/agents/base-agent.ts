@@ -1,4 +1,5 @@
 // src/lib/ai/agents/base-agent.ts
+import { logInfo, logError, logWarn } from '@/lib/logger';
 /**
  * Base class for all autonomous agents
  * Implements the observe-analyze-decide-act-learn loop
@@ -58,12 +59,12 @@ export abstract class AutonomousAgent<
      */
     async start(): Promise<void> {
         if (this.running) {
-            console.warn(`Agent ${this.name} is already running`);
+            logWarn(`Agent ${this.name} is already running`);
             return;
         }
 
         this.running = true;
-        console.log(`🤖 Agent ${this.name} started (interval: ${this.runIntervalMs}ms)`);
+        logInfo(`🤖 Agent ${this.name} started (interval: ${this.runIntervalMs}ms)`);
 
         // Run immediately on start
         await this.runLoop();
@@ -82,7 +83,7 @@ export abstract class AutonomousAgent<
             clearInterval(this.interval);
         }
         this.running = false;
-        console.log(`🛑 Agent ${this.name} stopped`);
+        logInfo(`🛑 Agent ${this.name} stopped`);
     }
 
     /**
@@ -121,7 +122,7 @@ export abstract class AutonomousAgent<
             });
 
         } catch (error) {
-            console.error(`❌ Agent ${this.name} encountered error:`, error);
+            logError(`❌ Agent ${this.name} encountered error:`, error);
             await this.handleError(error);
         }
     }
@@ -196,7 +197,7 @@ export abstract class AutonomousAgent<
         const errorMessage = error instanceof Error ? error.message : String(error);
         const stack = error instanceof Error ? error.stack : undefined;
 
-        console.error(`Agent error in ${this.name}:`, {
+        logError(`Agent error in ${this.name}`, error, {
             error: errorMessage,
             stack: stack,
             timestamp: new Date()

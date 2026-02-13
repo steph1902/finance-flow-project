@@ -1,6 +1,7 @@
 // src/lib/ai/agents/orchestrator.ts
 import { AutonomousAgent } from './base-agent';
 import { BudgetGuardianAgent } from './budget-guardian';
+import { logInfo, logError } from '@/lib/logger';
 
 /**
  * Agent Orchestrator
@@ -37,38 +38,38 @@ export class AgentOrchestrator {
         // this.agents.set('ForecastEngine', new ForecastAgent());
         // this.agents.set('OptimizationAdvisor', new OptimizationAgent());
 
-        console.log(`📋 Registered ${this.agents.size} agents`);
+        logInfo(`📋 Registered ${this.agents.size} agents`);
     }
 
     /**
      * Start all registered agents
      */
     async startAll(): Promise<void> {
-        console.log(`🚀 Starting ${this.agents.size} agents...`);
+        logInfo(`🚀 Starting ${this.agents.size} agents...`);
 
         const startPromises = Array.from(this.agents.entries()).map(async ([name, agent]) => {
             try {
                 await agent.start();
-                console.log(`✅ ${name} started successfully`);
+                logInfo(`✅ ${name} started successfully`);
             } catch (error) {
-                console.error(`❌ Failed to start ${name}:`, error);
+                logError(`❌ Failed to start ${name}:`, error);
             }
         });
 
         await Promise.all(startPromises);
-        console.log(`🎉 All agents started`);
+        logInfo(`🎉 All agents started`);
     }
 
     /**
      * Stop all running agents
      */
     async stopAll(): Promise<void> {
-        console.log(`🛑 Stopping ${this.agents.size} agents...`);
+        logInfo(`🛑 Stopping ${this.agents.size} agents...`);
 
         const stopPromises = Array.from(this.agents.values()).map(agent => agent.stop());
         await Promise.all(stopPromises);
 
-        console.log(`✅ All agents stopped`);
+        logInfo(`✅ All agents stopped`);
     }
 
     /**
@@ -124,5 +125,5 @@ export const agentOrchestrator = AgentOrchestrator.getInstance();
 
 // Auto-start agents in production (can be controlled via env var)
 if (process.env.AUTO_START_AGENTS === 'true') {
-    agentOrchestrator.startAll().catch(console.error);
+    agentOrchestrator.startAll().catch(err => logError('Failed to auto-start agents', err));
 }

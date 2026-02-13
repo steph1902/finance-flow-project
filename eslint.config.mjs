@@ -8,7 +8,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       // Prevent console statements in production code
-      'no-console': ['error', { allow: [] }],
+      'no-console': 'error',
       // Prefer unknown over any for better type safety
       '@typescript-eslint/no-explicit-any': 'warn',
     },

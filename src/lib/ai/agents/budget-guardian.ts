@@ -1,6 +1,7 @@
 // src/lib/ai/agents/budget-guardian.ts
 import { AutonomousAgent, type AgentState, type AgentInsight, type AgentAction, type AgentDecisionLog } from './base-agent';
 import { prisma } from '@/lib/prisma';
+import { logInfo, logError } from '@/lib/logger';
 import type { Transaction, Budget, RecurringTransaction } from '@prisma/client';
 
 interface BudgetState extends AgentState {
@@ -351,7 +352,7 @@ export class BudgetGuardianAgent extends AutonomousAgent<BudgetState, AgentInsig
                         break;
                 }
             } catch (error) {
-                console.error(`Failed to execute action ${action.type}:`, error);
+                logError(`Failed to execute action ${action.type}:`, error);
             }
         }
     }
@@ -374,7 +375,7 @@ export class BudgetGuardianAgent extends AutonomousAgent<BudgetState, AgentInsig
             highSeverityCount: cycle.insights.filter(i => i.severity === 'high' || i.severity === 'critical').length
         };
 
-        console.log(`🧠 ${this.name} Learning Metrics:`, learningMetrics);
+        logInfo(`🧠 ${this.name} Learning Metrics:`, learningMetrics);
     }
 
     /**
@@ -400,13 +401,13 @@ export class BudgetGuardianAgent extends AutonomousAgent<BudgetState, AgentInsig
                 }
             });
 
-            console.log(`✅ ${this.name} logged decision to database:`, {
+            logInfo(`✅ ${this.name} logged decision to database:`, {
                 insightsCount: log.insights.length,
                 actionsCount: log.actions.length,
                 executionTime: log.metadata?.executionTimeMs
             });
         } catch (error) {
-            console.error(`❌ Failed to log decision to database:`, error);
+            logError(`❌ Failed to log decision to database:`, error);
             // Don't throw - logging failure shouldn't break the agent
         }
     }
