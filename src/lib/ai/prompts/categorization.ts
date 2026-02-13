@@ -10,7 +10,7 @@ export interface TransactionInput {
 
 export interface CategorizationResponse {
   category: string;
-  subcategory?: string | undefined;
+  subcategory?: string | null | undefined;
   confidence: number;
   reasoning: string;
 }
@@ -60,3 +60,12 @@ export const CATEGORIZATION_SCHEMA = `{
   "confidence": "number between 0 and 1",
   "reasoning": "string (brief explanation)"
 }`;
+
+import { z } from 'zod';
+
+export const categorizationResponseSchema = z.object({
+  category: z.string(),
+  subcategory: z.string().nullable().optional(),
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string(),
+});

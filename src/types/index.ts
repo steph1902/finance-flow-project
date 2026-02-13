@@ -96,25 +96,25 @@ export type BudgetFilters = {
 // AI-related types
 export type AISuggestion = {
   id: string;
-  user_id: string;
-  transaction_id?: string;
-  suggestion_type: 'category' | 'insight' | 'recommendation';
-  suggested_value: string;
-  confidence_score: number;
-  accepted?: boolean;
+  userId: string;
+  transactionId?: string | null;
+  suggestionType: string;
+  suggestedValue: string;
+  confidenceScore: number | null;
+  accepted?: boolean | null;
   metadata?: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ChatMessage = {
   id: string;
-  user_id: string;
-  session_id: string;
-  message_type: 'user' | 'assistant';
-  content: string;
+  userId: string;
+  sessionId: string;
+  role: 'user' | 'assistant'; // mapped from message_type
+  message: string; // mapped from content? No, content in Prisma is message
   metadata?: Record<string, unknown>;
-  created_at: string;
+  createdAt: string;
 };
 
 export type CategorySuggestion = {

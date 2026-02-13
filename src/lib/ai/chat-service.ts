@@ -142,7 +142,7 @@ export async function chatWithAssistant({
     try {
       // Use factory to get client with user's specific API key
       const gemini = await getGeminiClient(userId);
-      aiResponse = await gemini.generateContentWithRetry(fullPrompt);
+      aiResponse = await gemini.generateContent(fullPrompt);
     } catch (aiError) {
       logError("Gemini API error in chat service", aiError);
       aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";

@@ -2,6 +2,7 @@ import { geminiClient, getGeminiClient } from './gemini-client';
 import {
   createCategorizationPrompt,
   CATEGORIZATION_SCHEMA,
+  categorizationResponseSchema,
   TransactionInput,
   CategorizationResponse,
 } from './prompts/categorization';
@@ -9,16 +10,22 @@ import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/logger';
 
 export class CategorizationService {
+  constructor(
+    private clientFactory = getGeminiClient,
+    private db = prisma
+  ) { }
+
   async categorizeTransaction(
     input: TransactionInput,
     userId: string
   ): Promise<CategorizationResponse> {
     try {
       const prompt = createCategorizationPrompt(input);
-      const gemini = await getGeminiClient(userId);
-      const response = await gemini.generateStructuredContent<CategorizationResponse>(
+      const gemini = await this.clientFactory(userId);
+      const response = await gemini.generateObject<CategorizationResponse>(
         prompt,
-        CATEGORIZATION_SCHEMA
+        CATEGORIZATION_SCHEMA,
+        categorizationResponseSchema
       );
 
       // Store suggestion in database
@@ -38,22 +45,21 @@ export class CategorizationService {
     response: CategorizationResponse,
     input: TransactionInput
   ): Promise<void> {
-    await prisma.$executeRaw`
-      INSERT INTO ai_suggestions (user_id, suggestion_type, suggested_value, confidence_score, metadata)
-      VALUES (
-        ${userId}::uuid,
-        'category',
-        ${JSON.stringify({
-      category: response.category,
-      subcategory: response.subcategory,
-    })},
-        ${response.confidence},
-        ${JSON.stringify({
-      input,
-      reasoning: response.reasoning,
-    })}::jsonb
-      )
-    `;
+    await this.db.aISuggestion.create({
+      data: {
+        userId,
+        suggestionType: 'category',
+        suggestedValue: JSON.stringify({
+          category: response.category,
+          subcategory: response.subcategory,
+        }),
+        confidenceScore: response.confidence,
+        metadata: {
+          input: input as any,
+          reasoning: response.reasoning,
+        },
+      },
+    });
   }
 
   async recordFeedback(
@@ -61,18 +67,20 @@ export class CategorizationService {
     accepted: boolean,
     actualCategory?: string
   ): Promise<void> {
-    const metadata = actualCategory
-      ? JSON.stringify({ actual_category: actualCategory })
-      : null;
+    const metadataUpdate = actualCategory
+      ? { actual_category: actualCategory }
+      : undefined;
 
-    await prisma.$executeRaw`
-      UPDATE ai_suggestions
-      SET 
-        accepted = ${accepted},
-        metadata = COALESCE(${metadata}::jsonb, metadata),
-        updated_at = NOW()
-      WHERE id = ${suggestionId}::uuid
-    `;
+    await this.db.aISuggestion.update({
+      where: { id: suggestionId },
+      data: {
+        accepted,
+        // If actualCategory is provided, we update metadata. 
+        // Note: This replaces metadata. To merge, we'd need to fetch first or use raw JSON.
+        // Assuming replacement or simple update is fine for now/schema default is {}.
+        ...(metadataUpdate ? { metadata: metadataUpdate } : {}),
+      }
+    });
   }
 
   private fallbackCategorization(input: TransactionInput): CategorizationResponse {

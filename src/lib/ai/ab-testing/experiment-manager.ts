@@ -60,12 +60,13 @@ export interface ExperimentResults {
 export type ExperimentResultItem = AIExperimentResult;
 
 export class ExperimentManager {
+    constructor(private db = prisma) { }
 
     /**
      * Create a new experiment
      */
     async createExperiment(config: ExperimentConfig): Promise<string> {
-        const experiment = await prisma.aIExperiment.create({
+        const experiment = await this.db.aIExperiment.create({
             data: {
                 name: config.name,
                 description: config.description,
@@ -88,7 +89,7 @@ export class ExperimentManager {
      * Assign user to variant (control or variant)
      */
     async assignVariant(experimentId: string, userId: string): Promise<'control' | 'variant'> {
-        const experiment = await prisma.aIExperiment.findUnique({
+        const experiment = await this.db.aIExperiment.findUnique({
             where: { id: experimentId }
         });
 
@@ -97,7 +98,7 @@ export class ExperimentManager {
         }
 
         // Check if user already assigned
-        const existing = await prisma.aIExperimentResult.findFirst({
+        const existing = await this.db.aIExperimentResult.findFirst({
             where: {
                 experimentId,
                 userId
@@ -131,7 +132,7 @@ export class ExperimentManager {
         }
     ): Promise<void> {
         // Validate Experiment Status First
-        const experiment = await prisma.aIExperiment.findUnique({
+        const experiment = await this.db.aIExperiment.findUnique({
             where: { id: experimentId },
             select: { status: true }
         });
@@ -151,7 +152,7 @@ export class ExperimentManager {
             throw new Error('Invalid JSON data provided for experiment tracking');
         }
 
-        await prisma.aIExperimentResult.create({
+        await this.db.aIExperimentResult.create({
             data: {
                 experimentId,
                 userId,
@@ -177,7 +178,7 @@ export class ExperimentManager {
             feedbackText?: string;
         }
     ): Promise<void> {
-        await prisma.aIExperimentResult.update({
+        await this.db.aIExperimentResult.update({
             where: { id: resultId },
             data: feedback
         });
@@ -188,7 +189,7 @@ export class ExperimentManager {
      */
     async getResults(experimentId: string): Promise<ExperimentResults> {
         try {
-            const experiment = await prisma.aIExperiment.findUnique({
+            const experiment = await this.db.aIExperiment.findUnique({
                 where: { id: experimentId },
                 include: {
                     results: true
@@ -253,7 +254,7 @@ export class ExperimentManager {
             throw new Error('Cannot declare winner: results not statistically significant');
         }
 
-        await prisma.aIExperiment.update({
+        await this.db.aIExperiment.update({
             where: { id: experimentId },
             data: {
                 status: 'COMPLETED',
@@ -270,7 +271,7 @@ export class ExperimentManager {
      * Pause experiment
      */
     async pauseExperiment(experimentId: string): Promise<void> {
-        await prisma.aIExperiment.update({
+        await this.db.aIExperiment.update({
             where: { id: experimentId },
             data: { status: 'PAUSED' }
         });
@@ -280,7 +281,7 @@ export class ExperimentManager {
      * Resume experiment
      */
     async resumeExperiment(experimentId: string): Promise<void> {
-        await prisma.aIExperiment.update({
+        await this.db.aIExperiment.update({
             where: { id: experimentId },
             data: { status: 'RUNNING' }
         });
@@ -292,7 +293,7 @@ export class ExperimentManager {
     async listExperiments(status?: string): Promise<any[]> {
         const where = status ? { status } : {};
 
-        return await prisma.aIExperiment.findMany({
+        return await this.db.aIExperiment.findMany({
             where,
             orderBy: { startDate: 'desc' },
             include: {

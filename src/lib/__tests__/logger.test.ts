@@ -9,6 +9,15 @@ import {
   apiError,
 } from '../logger';
 
+// Mock Prisma to prevent DB calls during tests
+jest.mock('@/lib/prisma', () => ({
+  prisma: {
+    systemLog: {
+      create: jest.fn().mockResolvedValue({}),
+    },
+  },
+}));
+
 describe('logger', () => {
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
@@ -27,8 +36,10 @@ describe('logger', () => {
     consoleErrorSpy.mockRestore();
     // Restore original NODE_ENV
     if (originalNodeEnv !== undefined) {
+      // @ts-ignore
       process.env.NODE_ENV = originalNodeEnv;
     } else {
+      // @ts-ignore
       delete process.env.NODE_ENV;
     }
   });
@@ -77,7 +88,7 @@ describe('logger', () => {
       expect(contextArg.password).toBe('[REDACTED]');
       expect(contextArg.token).toBe('[REDACTED]');
       expect(contextArg.safeData).toBe('visible');
-      
+
       // apiKey should be redacted because 'apikey' includes 'apikey'
       expect(contextArg.apiKey).toBe('[REDACTED]');
     });
@@ -340,7 +351,7 @@ describe('logger', () => {
       Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
       const error = new Error('Detailed error message');
       error.stack = 'Error stack trace...';
-      
+
       logError('Test', error);
 
       expect(consoleErrorSpy).toHaveBeenCalled();
@@ -352,7 +363,7 @@ describe('logger', () => {
     it('should include error details in development', () => {
       Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
       const error = new Error('Detailed error message');
-      
+
       logError('Test', error);
 
       const context = consoleErrorSpy.mock.calls[0][1];

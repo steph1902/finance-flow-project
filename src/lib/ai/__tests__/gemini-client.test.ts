@@ -1,157 +1,113 @@
-/**
- * @jest-environment node
- */
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { GeminiClient } from '../gemini-client';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 
-// Mock the Google AI SDK
-jest.mock('@google/generative-ai');
+// Mock Config
+jest.mock('../config', () => ({
+  AI_CONFIG: {
+    apiKey: 'test-key',
+    model: 'gemini-pro',
+    temperature: 0.7,
+  },
+}));
+
+// Mock logger
+jest.mock('@/lib/logger', () => ({
+  logError: jest.fn(),
+  logWarn: jest.fn(),
+}));
 
 describe('GeminiClient', () => {
   let client: GeminiClient;
-  let mockGenerateContent: jest.Mock;
-  let mockGetGenerativeModel: jest.Mock;
+  let mockModel: any;
+  let mockGenerateContent: any;
 
   beforeEach(() => {
-    // Reset mocks
     jest.clearAllMocks();
 
-    // Setup mock responses
     mockGenerateContent = jest.fn();
-    mockGetGenerativeModel = jest.fn().mockReturnValue({
+    mockModel = {
       generateContent: mockGenerateContent,
-    });
+    };
 
-    (GoogleGenerativeAI as jest.MockedClass<typeof GoogleGenerativeAI>).mockImplementation(
-      () =>
-        ({
-          getGenerativeModel: mockGetGenerativeModel,
-        }) as unknown as GoogleGenerativeAI
-    );
-
-    // Set API key
-    process.env.GEMINI_API_KEY = 'test-api-key';
-    
-    client = new GeminiClient();
-  });
-
-  afterEach(() => {
-    delete process.env.GEMINI_API_KEY;
+    // Inject mock model
+    client = new GeminiClient('test-key', mockModel);
   });
 
   describe('generateContent', () => {
     it('should generate content successfully', async () => {
-      const mockResponse = {
-        response: {
-          text: () => 'Generated content',
-        },
-      };
-      mockGenerateContent.mockResolvedValue(mockResponse);
+      mockGenerateContent.mockResolvedValue({
+        response: Promise.resolve({
+          text: () => 'Test response',
+        }),
+      });
 
       const result = await client.generateContent('Test prompt');
-
-      expect(result).toBe('Generated content');
-      expect(mockGenerateContent).toHaveBeenCalledWith({
-        contents: [{ role: 'user', parts: [{ text: 'Test prompt' }] }],
-      });
+      expect(result).toBe('Test response');
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
     });
 
-    it('should throw error when API key is missing', () => {
-      delete process.env.GEMINI_API_KEY;
-      
-      expect(() => new GeminiClient()).toThrow('GEMINI_API_KEY not configured');
-    });
-
-    it('should handle API errors', async () => {
-      mockGenerateContent.mockRejectedValue(new Error('API Error'));
-
-      await expect(client.generateContent('Test prompt')).rejects.toThrow('API Error');
-    });
-  });
-
-  describe('generateContentWithRetry', () => {
-    it('should retry on failure and succeed', async () => {
-      const mockResponse = {
-        response: {
-          text: () => 'Success after retry',
-        },
-      };
-
-      // Fail twice, then succeed
+    it('should retry on failure', async () => {
+      // Mock failure then success
       mockGenerateContent
-        .mockRejectedValueOnce(new Error('Temporary error'))
-        .mockRejectedValueOnce(new Error('Another error'))
-        .mockResolvedValueOnce(mockResponse);
+        .mockRejectedValueOnce(new Error('429 Rate limit exceeded'))
+        .mockResolvedValue({
+          response: Promise.resolve({
+            text: () => 'Retry success',
+          }),
+        });
 
-      const result = await client.generateContentWithRetry('Test prompt');
-
-      expect(result).toBe('Success after retry');
-      expect(mockGenerateContent).toHaveBeenCalledTimes(3);
-    });
-
-    it('should fail after max retries', async () => {
-      mockGenerateContent.mockRejectedValue(new Error('Persistent error'));
-
-      await expect(client.generateContentWithRetry('Test prompt', 2)).rejects.toThrow(
-        'Persistent error'
-      );
-
+      // We need to bypass `generateContent` direct call for retry test IF we test `generateContent`.
+      // But `generateContent` uses `withRetry` internaly now.
+      const result = await client.generateContent('Retry prompt');
+      expect(result).toBe('Retry success');
       expect(mockGenerateContent).toHaveBeenCalledTimes(2);
     });
-
-    it('should respect custom retry attempts', async () => {
-      mockGenerateContent.mockRejectedValue(new Error('Error'));
-
-      await expect(client.generateContentWithRetry('Test prompt', 5)).rejects.toThrow();
-
-      expect(mockGenerateContent).toHaveBeenCalledTimes(5);
-    });
   });
 
-  describe('generateStructuredContent', () => {
-    it('should generate and parse JSON content', async () => {
-      const mockResponse = {
-        response: {
-          text: () => JSON.stringify({ category: 'Food', confidence: 0.9 }),
-        },
-      };
-      mockGenerateContent.mockResolvedValue(mockResponse);
-
-      const schema = JSON.stringify({
-        type: 'object',
-        properties: {
-          category: { type: 'string' },
-          confidence: { type: 'number' },
-        },
+  describe('generateObject', () => {
+    it('should parse and validate JSON', async () => {
+      const schema = z.object({
+        answer: z.string(),
+        confidence: z.number(),
       });
 
-      const result = await client.generateStructuredContent('Categorize this', schema);
+      mockGenerateContent.mockResolvedValue({
+        response: Promise.resolve({
+          text: () => '```json\n{ "answer": "Yes", "confidence": 0.9 }\n```',
+        }),
+      });
 
-      expect(result).toEqual({ category: 'Food', confidence: 0.9 });
+      const result = await client.generateObject('Prompt', 'Schema Desc', schema);
+
+      expect(result).toEqual({ answer: 'Yes', confidence: 0.9 });
     });
 
-    it('should handle JSON wrapped in code blocks', async () => {
-      const mockResponse = {
-        response: {
-          text: () => '```json\n{"key": "value"}\n```',
-        },
-      };
-      mockGenerateContent.mockResolvedValue(mockResponse);
+    it('should throw on validation error', async () => {
+      const schema = z.object({
+        answer: z.string(),
+      });
 
-      const result = await client.generateStructuredContent('Test');
+      mockGenerateContent.mockResolvedValue({
+        response: Promise.resolve({
+          text: () => '{ "wrong": "field" }',
+        }),
+      });
 
-      expect(result).toEqual({ key: 'value' });
+      await expect(client.generateObject('Prompt', 'Schema', schema))
+        .rejects.toThrow('AI response did not match expected schema');
     });
 
-    it('should throw error on invalid JSON', async () => {
-      const mockResponse = {
-        response: {
-          text: () => 'Not valid JSON',
-        },
-      };
-      mockGenerateContent.mockResolvedValue(mockResponse);
+    it('should throw on invalid JSON', async () => {
+      const schema = z.object({ answer: z.string() });
+      mockGenerateContent.mockResolvedValue({
+        response: Promise.resolve({
+          text: () => 'Not JSON',
+        }),
+      });
 
-      await expect(client.generateStructuredContent('Test')).rejects.toThrow();
+      await expect(client.generateObject('Prompt', 'Schema', schema))
+        .rejects.toThrow('Invalid JSON response from AI');
     });
   });
 });

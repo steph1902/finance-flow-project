@@ -7,6 +7,7 @@ import {
   transactionQuerySchema,
   transactionSchema,
 } from "@/lib/validations";
+import { createTransaction, getTransactions } from "@/lib/services/transaction-service";
 
 const transactionSelect = {
   id: true,
@@ -40,65 +41,19 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
     );
   }
 
-  const { page, limit, type, category, startDate, endDate, search, sort, order } = parsed.data;
+  try {
+    const { data: transactions, meta } = await getTransactions(userId, parsed.data);
 
-  const where: Prisma.TransactionWhereInput = {
-    userId,
-    deletedAt: null,
-  };
-
-  if (type) {
-    where.type = type;
+    return NextResponse.json({
+      data: transactions.map(serializeTransaction),
+      meta,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch transactions" },
+      { status: 500 }
+    );
   }
-
-  if (category) {
-    where.category = category;
-  }
-
-  if (startDate || endDate) {
-    where.date = {
-      ...(startDate ? { gte: startDate } : {}),
-      ...(endDate ? { lte: endDate } : {}),
-    };
-  }
-
-  if (search) {
-    where.OR = [
-      { description: { contains: search, mode: "insensitive" } },
-      { notes: { contains: search, mode: "insensitive" } },
-      { category: { contains: search, mode: "insensitive" } },
-    ];
-  }
-
-  const skip = (page - 1) * limit;
-
-  const [transactions, total] = await prisma.$transaction([
-    prisma.transaction.findMany({
-      select: transactionSelect,
-      where,
-      orderBy:
-        sort === "amount"
-          ? { amount: order }
-          : sort === "date"
-            ? { date: order }
-            : { createdAt: "desc" },
-      skip,
-      take: limit,
-    }),
-    prisma.transaction.count({ where }),
-  ]);
-
-  const totalPages = Math.max(Math.ceil(total / limit), 1);
-
-  return NextResponse.json({
-    data: transactions.map(serializeTransaction),
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages,
-    },
-  });
 });
 
 export const POST = withApiAuth(async (req: NextRequest, userId) => {
@@ -112,27 +67,21 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
     );
   }
 
-  const { amount, date, ...rest } = parsed.data;
+  try {
+    const transaction = await createTransaction(userId, parsed.data);
 
-  const transaction = await prisma.transaction.create({
-    data: {
-      userId,
-      amount: new Prisma.Decimal(amount),
-      date,
-      type: rest.type,
-      category: rest.category,
-      description: rest.description ?? null,
-      notes: rest.notes ?? null,
-    },
-    select: transactionSelect,
-  });
-
-  return NextResponse.json(
-    {
-      message: "Transaction created",
-      data: serializeTransaction(transaction),
-    },
-    { status: 201 },
-  );
+    return NextResponse.json(
+      {
+        message: "Transaction created",
+        data: serializeTransaction(transaction),
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create transaction" },
+      { status: 500 }
+    );
+  }
 });
 

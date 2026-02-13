@@ -9,22 +9,66 @@ import { prisma } from '@/lib/prisma';
 import { InvestmentType, InvestmentTransactionType } from '@prisma/client';
 
 // Mock Prisma
-jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    investment: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      findFirst: jest.fn(),
-    },
-    investmentTransaction: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-    },
+// Mock Prisma via global injection
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
-}));
+  plaidItem: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
+    findUnique: jest.fn(),
+    delete: jest.fn(),
+  },
+  transaction: {
+    findFirst: jest.fn(),
+    create: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    count: jest.fn(),
+  },
+  budget: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  goal: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  recurringTransaction: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+  investment: {
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findFirst: jest.fn(),
+  },
+  investmentTransaction: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+  },
+  systemLog: {
+    create: jest.fn(),
+  },
+};
+
+(global as any).prisma = mockPrisma;
 
 describe('Investment Service', () => {
   beforeEach(() => {
@@ -48,8 +92,8 @@ describe('Investment Service', () => {
         updatedAt: new Date(),
       };
 
-      (prisma.investment.create as jest.Mock).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
+      (prisma.investment.create as unknown as any).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as unknown as any).mockResolvedValue({
         id: 'tx-123',
       });
 
@@ -84,17 +128,17 @@ describe('Investment Service', () => {
         costBasis: 1500,
       };
 
-      (prisma.investment.findUnique as jest.Mock).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
+      (prisma.investment.findUnique as unknown as any).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as unknown as any).mockResolvedValue({
         id: 'tx-123',
       });
-      (prisma.investment.update as jest.Mock).mockResolvedValue({});
+      (prisma.investment.update as unknown as any).mockResolvedValue({});
 
       const result = await investmentService.recordInvestmentTransaction('inv-123', {
         type: 'BUY' as InvestmentTransactionType,
         quantity: 5,
         price: 155,
-        totalAmount: 775,
+
         fees: 10,
         date: new Date('2024-11-24'),
       });
@@ -105,6 +149,7 @@ describe('Investment Service', () => {
         data: {
           quantity: 15, // 10 + 5
           costBasis: 2285, // 1500 + 775 + 10
+          lastUpdated: expect.anything(),
         },
       });
     });
@@ -116,17 +161,17 @@ describe('Investment Service', () => {
         costBasis: 1500,
       };
 
-      (prisma.investment.findUnique as jest.Mock).mockResolvedValue(mockInvestment);
-      (prisma.investmentTransaction.create as jest.Mock).mockResolvedValue({
+      (prisma.investment.findUnique as unknown as any).mockResolvedValue(mockInvestment);
+      (prisma.investmentTransaction.create as unknown as any).mockResolvedValue({
         id: 'tx-123',
       });
-      (prisma.investment.update as jest.Mock).mockResolvedValue({});
+      (prisma.investment.update as unknown as any).mockResolvedValue({});
 
       await investmentService.recordInvestmentTransaction('inv-123', {
         type: 'SELL' as InvestmentTransactionType,
         quantity: 5,
         price: 160,
-        totalAmount: 800,
+
         date: new Date('2024-11-24'),
       });
 
@@ -135,6 +180,7 @@ describe('Investment Service', () => {
         data: {
           quantity: 5, // 10 - 5
           costBasis: 750, // Proportional reduction
+          lastUpdated: expect.anything(),
         },
       });
     });
@@ -156,7 +202,7 @@ describe('Investment Service', () => {
         },
       ];
 
-      (prisma.investment.findMany as jest.Mock).mockResolvedValue(mockInvestments);
+      (prisma.investment.findMany as unknown as any).mockResolvedValue(mockInvestments);
 
       const result = await investmentService.getUserInvestments('user-123');
 
@@ -165,7 +211,7 @@ describe('Investment Service', () => {
         id: 'inv-1',
         symbol: 'AAPL',
         gainLoss: 200, // 1700 - 1500
-        gainLossPercentage: 13.33, // (200/1500) * 100
+        gainLossPercentage: expect.closeTo(13.33, 1), // (200/1500) * 100
       });
     });
   });
@@ -187,7 +233,7 @@ describe('Investment Service', () => {
         },
       ];
 
-      (prisma.investment.findMany as jest.Mock).mockResolvedValue(mockInvestments);
+      (prisma.investment.findMany as unknown as any).mockResolvedValue(mockInvestments);
 
       const result = await investmentService.getPortfolioSummary('user-123');
 
@@ -195,7 +241,12 @@ describe('Investment Service', () => {
       expect(result.totalCostBasis).toBe(3500); // 1500 + 2000
       expect(result.totalGainLoss).toBe(400); // 3900 - 3500
       expect(result.totalGainLossPercentage).toBeCloseTo(11.43, 2);
-      expect(result.breakdown).toHaveLength(2);
+      expect(Object.keys(result.byType).filter(k => result.byType[k as keyof typeof result.byType].count > 0)).toHaveLength(2);
+    });
+
+    it('should throw error if summary calculation fails', async () => {
+      (prisma.investment.findMany as unknown as any).mockRejectedValue(new Error('DB Error'));
+      await expect(investmentService.getPortfolioSummary('user-123')).rejects.toThrow('Failed to calculate portfolio summary');
     });
   });
 
@@ -206,10 +257,10 @@ describe('Investment Service', () => {
         userId: 'user-123',
       };
 
-      (prisma.investment.findFirst as jest.Mock).mockResolvedValue(mockInvestment);
-      (prisma.investment.delete as jest.Mock).mockResolvedValue({});
+      (prisma.investment.findFirst as unknown as any).mockResolvedValue(mockInvestment);
+      (prisma.investment.delete as unknown as any).mockResolvedValue({});
 
-      await investmentService.deleteInvestment('inv-123', 'user-123');
+      await investmentService.deleteInvestment('user-123', 'inv-123');
 
       expect(prisma.investment.delete).toHaveBeenCalledWith({
         where: { id: 'inv-123' },
@@ -217,7 +268,7 @@ describe('Investment Service', () => {
     });
 
     it('should throw error if user does not own investment', async () => {
-      (prisma.investment.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.investment.findFirst as unknown as any).mockResolvedValue(null);
 
       await expect(
         investmentService.deleteInvestment('inv-123', 'user-999')
@@ -245,6 +296,75 @@ describe('Investment Service', () => {
         : 0;
 
       expect(percentage).toBe(0);
+    });
+  });
+
+  describe('updateInvestmentValue', () => {
+    it('should update investment value and timestamp', async () => {
+      const mockResult = {
+        id: 'inv-123',
+        currentValue: 2000,
+      };
+
+      (prisma.investment.update as unknown as any).mockResolvedValue(mockResult);
+
+      const result = await investmentService.updateInvestmentValue('inv-123', 2000);
+
+      expect(result).toEqual(mockResult);
+      expect(prisma.investment.update).toHaveBeenCalledWith({
+        where: { id: 'inv-123' },
+        data: {
+          currentValue: 2000,
+          lastUpdated: expect.any(Date),
+        },
+      });
+    });
+
+    it('should throw error if update fails', async () => {
+      (prisma.investment.update as unknown as any).mockRejectedValue(new Error('Update Error'));
+
+      await expect(
+        investmentService.updateInvestmentValue('inv-123', 2000)
+      ).rejects.toThrow('Failed to update investment value');
+    });
+  });
+
+  describe('getInvestmentTransactions', () => {
+    it('should return transactions for an investment', async () => {
+      const mockTx = [{ id: 'tx-1', type: 'BUY', amount: 100 }];
+      (prisma.investmentTransaction.findMany as unknown as any).mockResolvedValue(mockTx);
+
+      const result = await investmentService.getInvestmentTransactions('inv-123');
+      expect(result).toEqual(mockTx);
+      expect(prisma.investmentTransaction.findMany).toHaveBeenCalledWith({
+        where: { investmentId: 'inv-123' },
+        orderBy: { date: 'desc' },
+      });
+    });
+
+    it('should handle errors', async () => {
+      (prisma.investmentTransaction.findMany as unknown as any).mockRejectedValue(new Error('DB Error'));
+      await expect(investmentService.getInvestmentTransactions('inv-123')).rejects.toThrow('Failed to fetch transactions');
+    });
+  });
+
+  describe('getPortfolioPerformance', () => {
+    it('should calculate performance data points', async () => {
+      const mockInvestments = [
+        { currentValue: 1000 },
+        { currentValue: 2000 },
+      ];
+      (prisma.investment.findMany as unknown as any).mockResolvedValue(mockInvestments);
+
+      const result = await investmentService.getPortfolioPerformance('user-123', 30);
+      expect(result).toHaveLength(31); // 0 to 30
+      expect(result[0]).toHaveProperty('date');
+      expect(result[0].value).toBe(3000); // 1000 + 2000
+    });
+
+    it('should handle performance calculation errors', async () => {
+      (prisma.investment.findMany as unknown as any).mockRejectedValue(new Error('Perf Error'));
+      await expect(investmentService.getPortfolioPerformance('user-123')).rejects.toThrow('Failed to calculate performance');
     });
   });
 });

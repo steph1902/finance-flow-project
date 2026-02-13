@@ -1,7 +1,9 @@
-import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
+import { GoogleGenerativeAI, GenerativeModel, Part } from '@google/generative-ai';
 import { AI_CONFIG } from './config';
 import { logError, logWarn } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { withRetry } from './retry-handler';
+import { ZodType, ZodError } from 'zod';
 
 /**
  * ⚠️ VERCEL BUILD FIX:
@@ -18,8 +20,9 @@ export class GeminiClient {
   private model: GenerativeModel | null = null;
   private apiKey: string | undefined;
 
-  constructor(apiKey?: string) {
+  constructor(apiKey?: string, model?: GenerativeModel) {
     this.apiKey = apiKey;
+    this.model = model || null;
   }
 
   /**
@@ -27,8 +30,8 @@ export class GeminiClient {
    * This prevents build failures when env vars are missing
    */
   private initialize() {
-    if (this.genAI && this.model) {
-      return; // Already initialized
+    if (this.model) {
+      return; // Already initialized or injected
     }
 
     // Use provided key or fallback to env var
@@ -47,12 +50,21 @@ export class GeminiClient {
     });
   }
 
-  async generateContent(prompt: string): Promise<string> {
+  async generateContent(prompt: string | Array<string | Part>): Promise<string> {
     this.initialize(); // Lazy init
 
-    try {
+    return withRetry(async () => {
+      // Normalize input to Part[]
+      let parts: Part[];
+
+      if (typeof prompt === 'string') {
+        parts = [{ text: prompt }];
+      } else {
+        parts = prompt.map(p => typeof p === 'string' ? { text: p } : p);
+      }
+
       const result = await this.model!.generateContent({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        contents: [{ role: 'user', parts }],
         generationConfig: {
           temperature: AI_CONFIG.temperature,
           maxOutputTokens: AI_CONFIG.maxTokens,
@@ -63,52 +75,63 @@ export class GeminiClient {
 
       const response = await result.response;
       return response.text();
-    } catch (error) {
-      logError('Gemini API Error', error, { context: 'gemini-client' });
-      throw new Error('Failed to generate AI response: ' + (error as Error).message);
-    }
+    });
   }
 
-  async generateContentWithRetry(
+  /**
+   * Generates structured content and validates it against a Zod schema.
+   * @param prompt The prompt to send to the AI
+   * @param schemaDescription A text description of the expected JSON schema for the prompt
+   * @param validationSchema The Zod schema to validate the response against
+   */
+  async generateObject<T>(
     prompt: string,
-    maxRetries = 3
-  ): Promise<string> {
-    this.initialize(); // Lazy init
+    schemaDescription: string,
+    validationSchema: ZodType<T>
+  ): Promise<T> {
+    const fullPrompt = `${prompt}\n\nRespond with valid JSON matching this structure:\n${schemaDescription}\n\nReturn JSON only.`;
 
-    let lastError: Error | null = null;
+    const responseText = await this.generateContent(fullPrompt);
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await this.generateContent(prompt);
-      } catch (error) {
-        lastError = error as Error;
-        logWarn(`Gemini retry attempt ${attempt} failed`, { error, attempt, maxRetries });
+    try {
+      // Extract JSON from markdown code blocks if present
+      const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) ||
+        responseText.match(/```\n([\s\S]*?)\n```/);
 
-        if (attempt < maxRetries) {
-          // Exponential backoff
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
+      const jsonString = jsonMatch?.[1] ?? responseText;
+      const parsed = JSON.parse(jsonString.trim());
+
+      // Validate with Zod
+      return validationSchema.parse(parsed);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        logError('AI Response Validation Failed', error, { responseText });
+        throw new Error('AI response did not match expected schema: ' + error.message);
       }
+      if (error instanceof SyntaxError) {
+        logError('AI Response JSON Parse Failed', error, { responseText });
+        throw new Error('Invalid JSON response from AI');
+      }
+      throw error;
     }
-
-    throw lastError || new Error('Failed after all retry attempts');
   }
 
+  /**
+   * @deprecated Use generateObject with Zod schema instead
+   */
   async generateStructuredContent<T>(
     prompt: string,
     schema?: string
   ): Promise<T> {
-    this.initialize(); // Lazy init
-
+    // Wrapper for backward compatibility if needed, strict validtion not possible without schema
+    // We will fallback to basic parsing
     const fullPrompt = schema
       ? `${prompt}\n\nRespond with valid JSON matching this schema:\n${schema}`
       : `${prompt}\n\nRespond with valid JSON only.`;
 
-    const response = await this.generateContentWithRetry(fullPrompt);
+    const response = await this.generateContent(fullPrompt);
 
     try {
-      // Extract JSON from markdown code blocks if present
       const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) ||
         response.match(/```\n([\s\S]*?)\n```/);
 

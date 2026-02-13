@@ -185,7 +185,7 @@ export async function generateInsights({
     try {
       // Use factory to get client with user's specific API key
       const gemini = await getGeminiClient(userId);
-      aiResponse = await gemini.generateContentWithRetry(prompt, 2);
+      aiResponse = await gemini.generateContent(prompt);
     } catch (aiError) {
       logError("AI insights generation failed, using fallback", aiError, { userId });
       // Return fallback insights if AI fails

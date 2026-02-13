@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logInfo, logError } from "@/lib/logger";
-import { optimizeBudgets } from "@/lib/ai/budget-optimizer-service";
+import { budgetOptimizerService } from "@/lib/ai/budget-optimizer-service";
 import { checkAIRateLimit } from "@/lib/rate-limiter";
 
 /**
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 7. Generate optimization suggestions
-    const optimization = await optimizeBudgets({
+    const optimization = await budgetOptimizerService.optimizeBudgets({
       budgets,
       transactions,
       months,

@@ -45,13 +45,15 @@ function sanitizeError(error: unknown): Record<string, unknown> {
  * Sanitizes context object to remove sensitive data
  */
 function sanitizeContext(context: LogContext): LogContext {
-  const sensitiveKeys = ['password', 'token', 'apiKey', 'secret', 'authorization'];
+  const sensitiveKeys = ['password', 'token', 'apikey', 'api_key', 'secret', 'authorization'];
   const sanitized: LogContext = {};
 
   for (const [key, value] of Object.entries(context)) {
     const keyLower = key.toLowerCase();
     if (sensitiveKeys.some(sensitive => keyLower.includes(sensitive))) {
       sanitized[key] = '[REDACTED]';
+    } else if (key === 'error' && typeof value === 'object') {
+      sanitized[key] = value;
     } else if (typeof value === 'object' && value !== null) {
       sanitized[key] = '[OBJECT]';
     } else {
@@ -63,7 +65,7 @@ function sanitizeContext(context: LogContext): LogContext {
 }
 
 import { prisma } from '@/lib/prisma';
-import { LogLevel as PrismaLogLevel, LogCategory } from '@prisma/client';
+import { LogLevel as PrismaLogLevel, LogCategory, Prisma } from '@prisma/client';
 
 /**
  * Log a message with optional context
@@ -106,7 +108,7 @@ async function log(level: LogLevel, message: string, context?: LogContext) {
           level: prismaLevel,
           category: category,
           message: message,
-          metadata: (sanitizedContext || {}) as any,
+          metadata: (sanitizedContext || {}) as Prisma.InputJsonValue,
           timestamp: new Date()
         }
       }).catch(err => {

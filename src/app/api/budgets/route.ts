@@ -8,6 +8,7 @@ import {
   budgetQuerySchema,
   budgetSchema,
 } from "@/lib/validations";
+import { createBudget, getBudgets } from "@/lib/services/budget-service";
 
 const serializeBudget = (budget: Prisma.BudgetGetPayload<true>) => ({
   ...budget,
@@ -31,56 +32,24 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
   const month = parsed.data.month ?? now.getMonth() + 1;
   const year = parsed.data.year ?? now.getFullYear();
 
-  const periodStart = startOfMonth(new Date(year, month - 1));
-  const periodEnd = endOfMonth(periodStart);
+  try {
+    const budgets = await getBudgets(userId, month, year);
 
-  const budgets = await prisma.budget.findMany({
-    where: { userId, month, year },
-    orderBy: { category: "asc" },
-  });
-
-  const spendingByCategory = await prisma.transaction.groupBy({
-    by: ["category"],
-    where: {
-      userId,
-      deletedAt: null,
-      type: "EXPENSE",
-      date: {
-        gte: periodStart,
-        lte: periodEnd,
+    return NextResponse.json({
+      data: budgets,
+      period: {
+        month,
+        year,
+        start: startOfMonth(new Date(year, month - 1)).toISOString(),
+        end: endOfMonth(startOfMonth(new Date(year, month - 1))).toISOString(),
       },
-    },
-    _sum: { amount: true },
-  });
-
-  const spendingMap = new Map<string, number>();
-  spendingByCategory.forEach((item) => {
-    spendingMap.set(item.category, Number(item._sum.amount ?? 0));
-  });
-
-  const data = budgets.map((budget) => {
-    const amount = Number(budget.amount);
-    const spent = spendingMap.get(budget.category) ?? 0;
-    const remaining = Math.max(amount - spent, 0);
-    const progress = amount === 0 ? 0 : Math.min((spent / amount) * 100, 100);
-
-    return {
-      ...serializeBudget(budget),
-      spent,
-      remaining,
-      progress,
-    };
-  });
-
-  return NextResponse.json({
-    data,
-    period: {
-      month,
-      year,
-      start: periodStart.toISOString(),
-      end: periodEnd.toISOString(),
-    },
-  });
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch budgets" },
+      { status: 500 }
+    );
+  }
 });
 
 export const POST = withApiAuth(async (req: NextRequest, userId) => {
@@ -94,16 +63,8 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
     );
   }
 
-  const { amount, ...rest } = parsed.data;
-
   try {
-    const budget = await prisma.budget.create({
-      data: {
-        ...rest,
-        amount: new Prisma.Decimal(amount),
-        userId,
-      },
-    });
+    const budget = await createBudget(userId, parsed.data);
 
     return NextResponse.json(
       {
@@ -113,14 +74,17 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
       { status: 201 },
     );
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (error instanceof Error && error.message.includes("already exists")) {
       return NextResponse.json(
-        { error: "Budget for this category already exists for the selected month" },
+        { error: error.message },
         { status: 409 },
       );
     }
 
-    throw error;
+    return NextResponse.json(
+      { error: "Failed to create budget" },
+      { status: 500 },
+    );
   }
 });
 

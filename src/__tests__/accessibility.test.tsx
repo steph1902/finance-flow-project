@@ -4,6 +4,7 @@
  */
 
 import { render } from '@testing-library/react';
+// @ts-ignore
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ describe('WCAG 2.1 Level AA Compliance', () => {
         it('should have no accessibility violations', async () => {
             const { container } = render(<Button>Click me</Button>);
             const results = await axe(container);
+            // @ts-ignore
             expect(results).toHaveNoViolations();
         });
 
@@ -25,6 +27,7 @@ describe('WCAG 2.1 Level AA Compliance', () => {
                 </Button>
             );
             const results = await axe(container);
+            // @ts-ignore
             expect(results).toHaveNoViolations();
         });
     });
@@ -38,6 +41,7 @@ describe('WCAG 2.1 Level AA Compliance', () => {
                 </div>
             );
             const results = await axe(container);
+            // @ts-ignore
             expect(results).toHaveNoViolations();
         });
 
@@ -54,6 +58,7 @@ describe('WCAG 2.1 Level AA Compliance', () => {
                 </div>
             );
             const results = await axe(container);
+            // @ts-ignore
             expect(results).toHaveNoViolations();
         });
     });
@@ -84,6 +89,7 @@ describe('WCAG 2.1 Level AA Compliance', () => {
                 </form>
             );
             const results = await axe(container);
+            // @ts-ignore
             expect(results).toHaveNoViolations();
         });
     });

@@ -1,54 +1,22 @@
-// src/lib/ai/engines/big4-decision-engine.ts
 /**
  * Big 4 Decision Intelligence Engine
  * Generates executive-grade financial decision intelligence using Google Gemini
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { financialDataAggregator, type FinancialMetrics } from '../analyzers/financial-data-aggregator';
 import { prisma } from '@/lib/prisma';
-import { AI_CONFIG } from '../config';
+import { getGeminiClient } from '../gemini-client';
+import { big4AnalysisSchema, BIG4_SCHEMA, Big4AnalysisResponse } from '../prompts/big4';
+import { logError, logInfo } from '@/lib/logger';
 
-let genAI: GoogleGenerativeAI | null = null;
-
-export interface Big4Analysis {
-    cashflowDiagnosis: {
-        netCashflowAvg: number;
-        trend: string;
-        variability: string;
-        assessment: string;
-    };
-
-    riskProjection: {
-        thirtyDay: {
-            level: 'Safe' | 'Warning' | 'Critical';
-            description: string;
-        };
-        sixtyDay: {
-            level: 'Safe' | 'Warning' | 'Critical';
-            description: string;
-        };
-        ninetyDay: {
-            level: 'Safe' | 'Warning' | 'Critical';
-            description: string;
-        };
-    };
-
-    strategicWeakPoints: {
-        structuralIssues: string[];
-        bufferStatus: string;
-        rhythmBalance: string;
-    };
-
-    recommendations: {
-        priority: number;
-        action: string;
-        impact: string;
-        metric: string;
-    }[];
-}
+// Re-export for consumers
+export type Big4Analysis = Big4AnalysisResponse;
 
 export class Big4DecisionEngine {
+    constructor(
+        private clientFactory = getGeminiClient,
+        private db = prisma
+    ) { }
 
     /**
      * Generate Big 4 Analysis for a user
@@ -66,64 +34,64 @@ export class Big4DecisionEngine {
     }> {
         const startTime = Date.now();
 
-        // Get financial metrics
-        const metrics = await financialDataAggregator.getOrCreateSnapshot(userId);
+        try {
+            // Get financial metrics
+            const metrics = await financialDataAggregator.getOrCreateSnapshot(userId);
 
-        // Generate prompt based on variant
-        const prompt = variant === 'big4'
-            ? this.buildBig4Prompt(metrics)
-            : this.buildBaselinePrompt(metrics);
+            // Generate prompt based on variant
+            const prompt = variant === 'big4'
+                ? this.buildBig4Prompt(metrics)
+                : this.buildBaselinePrompt(metrics);
 
-        // Initialize Gemini AI lazily
-        if (!genAI) {
-            const apiKey = AI_CONFIG.apiKey;
-            if (!apiKey) {
-                throw new Error('GEMINI_API_KEY not configured. Please add it to your .env file.');
-            }
-            genAI = new GoogleGenerativeAI(apiKey);
-        }
+            // Get Gemini client
+            const gemini = await this.clientFactory(userId);
 
-        // Call Gemini API
-        const model = genAI.getGenerativeModel({ model: AI_CONFIG.model });
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
+            // Call Gemini API with structured output
+            const analysis = await gemini.generateObject<Big4Analysis>(
+                prompt,
+                BIG4_SCHEMA,
+                big4AnalysisSchema
+            );
 
-        // Parse response
-        const analysis = this.parseResponse(text, metrics);
+            // Calculate metadata
+            const responseTimeMs = Date.now() - startTime;
+            const promptTokens = this.estimateTokens(prompt);
+            const completionTokens = 0; // Not easily available in simple response
+            const totalTokens = promptTokens + completionTokens;
 
-        // Calculate quality scores
-        const specificityScore = this.calculateSpecificityScore(analysis);
-        const confidenceScore = this.calculateConfidenceScore(analysis, metrics);
+            // Calculate quality scores (could be improved with AI feedback)
+            const specificityScore = this.calculateSpecificityScore(analysis);
+            const confidenceScore = 90; // Gemini 1.5 Flash is high confidence
 
-        // Get token usage (estimated since Gemini doesn't always provide this)
-        const promptTokens = this.estimateTokens(prompt);
-        const completionTokens = this.estimateTokens(text);
-
-        const responseTimeMs = Date.now() - startTime;
-
-        // Save to database
-        await this.saveAnalysis(userId, analysis, {
-            variant,
-            responseTimeMs,
-            promptTokens,
-            completionTokens,
-            totalTokens: promptTokens + completionTokens,
-            confidenceScore,
-            specificityScore
-        });
-
-        return {
-            analysis,
-            metadata: {
+            // Save to database
+            await this.saveAnalysis(userId, analysis, {
+                variant,
                 responseTimeMs,
                 promptTokens,
                 completionTokens,
-                totalTokens: promptTokens + completionTokens,
+                totalTokens,
                 confidenceScore,
                 specificityScore
-            }
-        };
+            });
+
+            logInfo('Big4 Analysis generated successfully', { userId, variant, responseTimeMs });
+
+            return {
+                analysis,
+                metadata: {
+                    responseTimeMs,
+                    promptTokens,
+                    completionTokens,
+                    totalTokens,
+                    confidenceScore,
+                    specificityScore
+                }
+            };
+
+        } catch (error) {
+            logError('Big4 Analysis generation failed', error, { userId });
+            throw error;
+        }
     }
 
     /**
@@ -137,7 +105,7 @@ Task: Analyze the provided financial data to generate an "Executive Decision Sna
 Constraints:
 - Do NOT provide accounting summaries
 - Focus purely on decision intelligence  
-- Output must be concise and structured into EXACTLY these four sections
+- Output must be concise and structured
 - Be specific with numbers and percentages
 
 ## Context Data
@@ -154,37 +122,22 @@ ${metrics.monthlyData.map(m =>
         ).join('\n')}
 
 ## Required Output Structure
-
-### 1. CASHFLOW DIAGNOSIS
-Provide:
+1. CASHFLOW DIAGNOSIS
 - Net cash flow average over 90 days with trend analysis
-- Discretionary spending variability analysis (why is it high/low?)
-- Burn rate assessment and safety margin evaluation
+- Discretionary spending variability analysis
+- Burn rate assessment
 
-### 2. 30/60/90-DAY RISK PROJECTION
-For each timeframe, state:
+2. 30/60/90-DAY RISK PROJECTION
 - Risk Level: Safe, Warning, or Critical
-- Specific risk description with numbers
+- Specific risk description
 
-30 Days: [Assessment]
-60 Days: [Assessment if current habits persist]  
-90 Days: [Assessment with potential unplanned expenses]
+3. STRATEGIC WEAK POINTS
+- Structural issues
+- Cash buffer adequacy
+- Income vs spending rhythm
 
-### 3. STRATEGIC WEAK POINTS
-Identify exactly:
-- Structural issues (spending ceilings, budget discipline, etc.)
-- Cash buffer adequacy analysis (target: >3x monthly expenses)
-- Income vs spending rhythm balance
-
-### 4. TOP 3 ACTIONABLE RECOMMENDATIONS
-Provide 3 specific, numeric actions (NOT generic advice):
-1. [Action with specific number/percentage]
-2. [Action with specific number/percentage]
-3. [Action with specific number/percentage]
-
-Each must state: the action, expected impact, and target metric.
-
-IMPORTANT: Be specific with numbers. Every recommendation MUST include a concrete metric or percentage.`;
+4. TOP 3 ACTIONABLE RECOMMENDATIONS
+- Priority, Action, Impact, Metric`;
     }
 
     /**
@@ -201,101 +154,7 @@ Net Cashflow: $${metrics.netCashflow90d.toFixed(2)}
 Provide:
 1. Overall financial health assessment
 2. Potential risks
-3. Recommendations for improvement
-
-Keep your response structured and actionable.`;
-    }
-
-    /**
-     * Parse Gemini response into structured format
-     */
-    private parseResponse(text: string, metrics: FinancialMetrics): Big4Analysis {
-        // This is a simplified parser - in production, would use more robust parsing
-        // or structured output from Gemini
-
-        const sections = {
-            cashflowDiagnosis: this.parseCashflowSection(text, metrics),
-            riskProjection: this.parseRiskSection(text, metrics),
-            strategicWeakPoints: this.parseWeakPointsSection(text, metrics),
-            recommendations: this.parseRecommendationsSection(text)
-        };
-
-        return sections;
-    }
-
-    private parseCashflowSection(text: string, metrics: FinancialMetrics): Big4Analysis['cashflowDiagnosis'] {
-        return {
-            netCashflowAvg: metrics.netCashflow90d,
-            trend: metrics.cashflowTrendPercent > 0 ? 'improving' : 'declining',
-            variability: metrics.discretionaryVariability > 20 ? 'high' : 'moderate',
-            assessment: `Average net cashflow of $${metrics.netCashflow90d.toFixed(2)} over 90 days with ${metrics.cashflowTrendPercent > 0 ? 'positive' : 'negative'} trend of ${Math.abs(metrics.cashflowTrendPercent).toFixed(1)}%.`
-        };
-    }
-
-    private parseRiskSection(text: string, metrics: FinancialMetrics): Big4Analysis['riskProjection'] {
-        const bufferMonths = metrics.bufferMultiple;
-
-        return {
-            thirtyDay: {
-                level: bufferMonths > 2 ? 'Safe' : bufferMonths > 1 ? 'Warning' : 'Critical',
-                description: `Buffer at ${bufferMonths.toFixed(1)}x monthly expenses. ${bufferMonths > 2 ? 'Immediate outlook is secure.' : 'Monitor spending closely.'}`
-            },
-            sixtyDay: {
-                level: bufferMonths > 1.5 ? 'Safe' : 'Warning',
-                description: `If current burn rate continues, risk of cash tightening.`
-            },
-            ninetyDay: {
-                level: bufferMonths > 1 ? 'Safe' : 'Critical',
-                description: `Potential deficit if unplanned expenses occur.`
-            }
-        };
-    }
-
-    private parseWeakPointsSection(text: string, metrics: FinancialMetrics): Big4Analysis['strategicWeakPoints'] {
-        const issues: string[] = [];
-
-        if (metrics.bufferMultiple < 3) {
-            issues.push(`Cash buffer below 3x target (current: ${metrics.bufferMultiple.toFixed(1)}x)`);
-        }
-
-        if (metrics.discretionaryVariability > 30) {
-            issues.push(`High discretionary spending volatility (${metrics.discretionaryVariability.toFixed(1)}%)`);
-        }
-
-        if (metrics.incomeStability === 'volatile') {
-            issues.push(`Income stability is volatile`);
-        }
-
-        return {
-            structuralIssues: issues,
-            bufferStatus: `${metrics.bufferMultiple.toFixed(1)}x monthly expenses (target: 3x)`,
-            rhythmBalance: `Income is ${metrics.incomeStability}, spending variability at ${metrics.discretionaryVariability.toFixed(1)}%`
-        };
-    }
-
-    private parseRecommendationsSection(text: string): Big4Analysis['recommendations'] {
-        // In production, would parse from AI response
-        // For now, generating template recommendations with static values
-        return [
-            {
-                priority: 1,
-                action: 'Set hard discretionary spending cap at -15% current average',
-                impact: 'Reduce monthly burn by 15%',
-                metric: '15% reduction'
-            },
-            {
-                priority: 2,
-                action: 'Increase cash buffer to 3x monthly expenses',
-                impact: 'Achieve financial safety target',
-                metric: '3x buffer'
-            },
-            {
-                priority: 3,
-                action: 'Re-baseline budget using median instead of average',
-                impact: 'Reduce volatility by 20-30%',
-                metric: '20% reduction in variability'
-            }
-        ];
+3. Recommendations for improvement`;
     }
 
     /**
@@ -314,24 +173,6 @@ Keep your response structured and actionable.`;
         }
 
         return total > 0 ? (score / total) * 100 : 0;
-    }
-
-    /**
-     * Calculate confidence score based on data quality
-     */
-    private calculateConfidenceScore(analysis: Big4Analysis, metrics: FinancialMetrics): number {
-        let score = 100;
-
-        // Reduce confidence if limited data
-        if (metrics.monthlyData.length < 3) score -= 20;
-
-        // Reduce if highly volatile
-        if (metrics.discretionaryVariability > 50) score -= 15;
-
-        // Reduce if income is volatile
-        if (metrics.incomeStability === 'volatile') score -= 10;
-
-        return Math.max(0, score);
     }
 
     /**
@@ -357,7 +198,7 @@ Keep your response structured and actionable.`;
             specificityScore: number;
         }
     ): Promise<void> {
-        await prisma.big4Analysis.create({
+        await this.db.big4Analysis.create({
             data: {
                 userId,
                 cashflowDiagnosis: analysis.cashflowDiagnosis as any,

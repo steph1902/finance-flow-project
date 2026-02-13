@@ -5,61 +5,30 @@
  * optimal budget reallocation using statistical analysis and Gemini AI.
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { ENV } from "@/lib/env";
-import { logInfo, logError } from "@/lib/logger";
+import { geminiClient, GeminiClient } from "./gemini-client";
+import { logInfo, logError } from "@/lib/logger"; // Assuming logger exists
+import {
+  createOptimizationPrompt,
+  optimizationResultSchema,
+  OptimizationResponse,
+  Budget,
+  Transaction
+} from "./prompts/optimization";
 
-/**
- * Lazy initialization to prevent build-time env var access
- */
-let genAI: GoogleGenerativeAI | null = null;
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY);
-  }
-  return genAI;
-}
-
-interface Budget {
-  id: string;
-  category: string;
-  amount: number | { toNumber: () => number };
-  month: number;
-  year: number;
-}
-
-interface Transaction {
-  amount: number | { toNumber: () => number };
-  category: string;
-  date: Date;
-}
-
-interface OptimizationInput {
+export interface OptimizationInput {
   budgets: Budget[];
   transactions: Transaction[];
   months: number;
   userId: string;
 }
 
-interface BudgetSuggestion {
-  fromCategory: string;
-  toCategory: string;
-  amount: number;
-  reason: string;
-  impact: string;
-  priority: "high" | "medium" | "low";
-}
-
-export interface OptimizationResult {
-  suggestions: BudgetSuggestion[];
+export interface OptimizationResult extends OptimizationResponse {
   totalSavings: number;
-  confidence: number;
   analysis: {
     overBudget: Array<{ category: string; budget: number; actual: number; variance: number }>;
     underBudget: Array<{ category: string; budget: number; actual: number; variance: number }>;
     balanced: Array<{ category: string; budget: number; actual: number }>;
   };
-  insights: string[];
   generatedAt: string;
 }
 
@@ -110,7 +79,8 @@ export function analyzeVariance(
     const budgetAmount = toNumber(budget.amount);
     const actualAmount = actualSpending.get(budget.category) || 0;
     const variance = actualAmount - budgetAmount;
-    const variancePercent = budgetAmount > 0 ? (variance / budgetAmount) * 100 : 0;
+    // Handle division by zero
+    const variancePercent = budgetAmount > 0 ? (variance / budgetAmount) * 100 : (actualAmount > 0 ? 100 : 0);
 
     if (variancePercent > 10) {
       // Over budget by >10%
@@ -145,118 +115,58 @@ export function analyzeVariance(
   return { overBudget, underBudget, balanced };
 }
 
-/**
- * Generate budget optimization suggestions using Gemini AI
- */
-export async function optimizeBudgets(input: OptimizationInput): Promise<OptimizationResult> {
-  try {
-    const { budgets, transactions, months, userId } = input;
+export class BudgetOptimizerService {
+  constructor(private client: GeminiClient = geminiClient) { }
 
-    logInfo("Optimizing budgets", { userId, months, budgetsCount: budgets.length });
-
-    // 1. Calculate actual spending
-    const actualSpending = calculateActualSpending(transactions, months);
-
-    // 2. Analyze variance
-    const analysis = analyzeVariance(budgets, actualSpending);
-
-    // 3. Use Gemini to generate optimization suggestions
-    const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-
-    const prompt = `You are a financial budget optimization expert. Analyze this budget variance data and suggest optimal reallocations.
-
-Current Budgets (${budgets.length} categories):
-${budgets.map(b => `- ${b.category}: $${toNumber(b.amount).toFixed(2)}/month`).join("\n")}
-
-Analysis Period: ${months} months
-
-Over Budget (spending too much):
-${analysis.overBudget.map(ob => 
-  `- ${ob.category}: Budget $${ob.budget.toFixed(2)}, Actual $${ob.actual.toFixed(2)} (${((ob.variance / ob.budget) * 100).toFixed(0)}% over)`
-).join("\n") || "None"}
-
-Under Budget (budget too high):
-${analysis.underBudget.map(ub => 
-  `- ${ub.category}: Budget $${ub.budget.toFixed(2)}, Actual $${ub.actual.toFixed(2)} (${((Math.abs(ub.variance) / ub.budget) * 100).toFixed(0)}% under)`
-).join("\n") || "None"}
-
-Balanced:
-${analysis.balanced.map(b => `- ${b.category}: $${b.budget.toFixed(2)}`).join("\n") || "None"}
-
-Please provide:
-1. Specific reallocation suggestions (move $X from Category A to Category B)
-2. Reason for each suggestion (why this reallocation makes sense)
-3. Expected impact (how this improves budget accuracy)
-4. Priority (high/medium/low)
-5. 3-5 actionable insights about spending patterns
-6. Overall confidence score (0-1)
-
-Return as JSON:
-{
-  "suggestions": [
-    {
-      "fromCategory": "category name",
-      "toCategory": "category name",
-      "amount": 100,
-      "reason": "explanation",
-      "impact": "expected outcome",
-      "priority": "high"
-    }
-  ],
-  "insights": ["insight1", "insight2", ...],
-  "confidence": 0.85
-}
-
-Only suggest reallocations if variance is significant (>15%). Limit to 5 suggestions maximum.`;
-
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
-
-    // Parse Gemini response
-    let geminiData: {
-      suggestions: BudgetSuggestion[];
-      insights: string[];
-      confidence: number;
-    };
-
+  /**
+   * Generate budget optimization suggestions using Gemini AI
+   */
+  async optimizeBudgets(input: OptimizationInput): Promise<OptimizationResult> {
     try {
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      geminiData = JSON.parse(jsonMatch?.[0] || "{}");
-    } catch {
-      // Fallback if parsing fails
-      geminiData = {
-        suggestions: [],
-        insights: [
-          "Your budgets are generally well-aligned with actual spending.",
-          "Consider reviewing categories with >20% variance.",
-        ],
-        confidence: 0.7,
+      const { budgets, transactions, months, userId } = input;
+
+      logInfo("Optimizing budgets", { userId, months, budgetsCount: budgets.length });
+
+      // 1. Calculate actual spending
+      const actualSpending = calculateActualSpending(transactions, months);
+
+      // 2. Analyze variance
+      const analysis = analyzeVariance(budgets, actualSpending);
+
+      // 3. Use Gemini to generate optimization suggestions
+      const prompt = createOptimizationPrompt(budgets, analysis, months);
+
+      const geminiData = await this.client.generateObject<OptimizationResponse>(
+        prompt,
+        "Budget Optimization Schema",
+        optimizationResultSchema
+      );
+
+      // 4. Calculate total savings (sum of amounts being reallocated)
+      const totalSavings = geminiData.suggestions.reduce(
+        (sum, s) => sum + s.amount,
+        0
+      );
+
+      logInfo("Budget optimization completed", {
+        userId,
+        suggestionsCount: geminiData.suggestions.length,
+        totalSavings,
+      });
+
+      return {
+        ...geminiData,
+        totalSavings,
+        analysis,
+        generatedAt: new Date().toISOString(),
       };
+
+    } catch (error) {
+      logError("Budget optimization failed", error);
+      throw new Error("Failed to optimize budgets");
     }
-
-    // 4. Calculate total savings (sum of amounts being reallocated)
-    const totalSavings = geminiData.suggestions.reduce(
-      (sum, s) => sum + s.amount,
-      0
-    );
-
-    logInfo("Budget optimization completed", {
-      userId,
-      suggestionsCount: geminiData.suggestions.length,
-      totalSavings,
-    });
-
-    return {
-      suggestions: geminiData.suggestions,
-      totalSavings,
-      confidence: geminiData.confidence,
-      analysis,
-      insights: geminiData.insights,
-      generatedAt: new Date().toISOString(),
-    };
-
-  } catch (error) {
-    logError("Budget optimization failed", error);
-    throw new Error("Failed to optimize budgets");
   }
 }
+
+export const budgetOptimizerService = new BudgetOptimizerService();
+

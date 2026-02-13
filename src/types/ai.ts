@@ -10,7 +10,7 @@ export interface AISuggestion {
     suggestedValue: string;
     confidenceScore: number | null; // 0-1 range
     accepted: boolean | null;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
 }

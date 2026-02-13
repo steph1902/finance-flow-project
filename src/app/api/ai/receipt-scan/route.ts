@@ -10,8 +10,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getErrorMessage } from '@/lib/utils/error';
-import { extractTextFromReceipt, validateReceiptImage } from "@/lib/ai/receipt-ocr-service";
-import { processReceipt } from "@/lib/ai/receipt-parser-service";
+import { receiptOCRService } from "@/lib/ai/receipt-ocr-service";
+import { receiptParserService } from "@/lib/ai/receipt-parser-service";
 import { checkAIRateLimit } from "@/lib/rate-limiter";
 import { logError, logInfo } from "@/lib/logger";
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Validate image
-    const validation = validateReceiptImage(image);
+    const validation = receiptOCRService.validateReceiptImage(image);
     if (!validation.valid) {
       return NextResponse.json(
         { error: validation.error },
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Extract text using OCR
-    const ocrResult = await extractTextFromReceipt(image);
+    const ocrResult = await receiptOCRService.extractTextFromReceipt(image, userId);
 
     if (!ocrResult.fullText || ocrResult.fullText.length === 0) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Parse receipt data with Gemini (passing userId for dynamic key)
-    const parsedData = await processReceipt(ocrResult.fullText, userId);
+    const parsedData = await receiptParserService.processReceipt(ocrResult.fullText, userId);
 
     // 7. Return parsed transaction data
     return NextResponse.json({

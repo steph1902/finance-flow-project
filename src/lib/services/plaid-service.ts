@@ -1,50 +1,9 @@
-/**
- * Plaid Bank Integration Service
- * Handles OAuth flow, transaction syncing, and account management
- */
-
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode, LinkTokenCreateResponse, ItemPublicTokenExchangeResponse, TransactionsGetResponse, InstitutionsGetByIdResponse, ItemGetResponse } from 'plaid';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
+import { getPlaidClient } from '@/lib/plaid';
 
-const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
-const PLAID_SECRET = process.env.PLAID_SECRET;
-const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
-
-// Environment mapping
-const plaidEnvMap: Record<string, string> = {
-  sandbox: PlaidEnvironments.sandbox as string,
-  development: PlaidEnvironments.development as string,
-  production: PlaidEnvironments.production as string,
-};
-
-let plaidClient: PlaidApi | null = null;
-
-/**
- * Initialize Plaid client
- */
-export function getPlaidClient(): PlaidApi {
-  if (!PLAID_CLIENT_ID || !PLAID_SECRET) {
-    throw new Error('Plaid credentials not configured. Set PLAID_CLIENT_ID and PLAID_SECRET in environment variables.');
-  }
-
-  if (!plaidClient) {
-    const configuration = new Configuration({
-      basePath: plaidEnvMap[PLAID_ENV],
-      baseOptions: {
-        headers: {
-          'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-          'PLAID-SECRET': PLAID_SECRET,
-        },
-      },
-    });
-
-    plaidClient = new PlaidApi(configuration);
-  }
-
-  return plaidClient;
-}
 
 /**
  * Encrypt access token for secure storage
@@ -107,8 +66,8 @@ export async function createLinkToken(userId: string): Promise<string> {
         client_user_id: userId,
       },
       client_name: 'FinanceFlow',
-      products: [Products.Transactions],
-      country_codes: [CountryCode.Us],
+      products: ['transactions' as Products],
+      country_codes: ['us' as CountryCode],
       language: 'en',
     });
 
@@ -153,7 +112,7 @@ export async function exchangePublicToken(
 
     const institutionResponse = await client.institutionsGetById({
       institution_id: institutionId,
-      country_codes: [CountryCode.Us],
+      country_codes: ['us' as CountryCode],
     });
 
     const institutionData: InstitutionsGetByIdResponse = institutionResponse.data;
@@ -364,5 +323,5 @@ export async function getConnectedBanks(userId: string) {
  * Check if Plaid is configured
  */
 export function isPlaidConfigured(): boolean {
-  return !!(PLAID_CLIENT_ID && PLAID_SECRET);
+  return !!(process.env.PLAID_CLIENT_ID && process.env.PLAID_SECRET);
 }

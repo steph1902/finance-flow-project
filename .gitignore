@@ -47,3 +47,10 @@ backend/node_modules
 BLOG_POST_DRAFT.md
 COMPLETION_REPORT.md
 PROJECT_PROGRESSION.md
+
+# Archive
+/archive
+
+# Mobile
+mobile/node_modules
+mobile/.expo

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logInfo, logError } from "@/lib/logger";
-import { generateForecast } from "@/lib/ai/forecast-service";
+import { forecastService } from "@/lib/ai/forecast-service";
 import { checkAIRateLimit } from "@/lib/rate-limiter";
 
 /**
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
     }));
 
     // 8. Generate forecast using Gemini AI
-    const forecast = await generateForecast({
+    const forecast = await forecastService.generateForecast({
       transactions: convertedTransactions,
       recurringTransactions: convertedRecurringTransactions,
       months,
@@ -141,14 +141,14 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     logError("Forecast generation failed", error);
-    
+
     // Provide more specific error messages
     const errorMessage = error instanceof Error ? getErrorMessage(error) : "Failed to generate forecast";
-    
+
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
-        details: error instanceof Error ? error.stack : undefined 
+        details: error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     );
