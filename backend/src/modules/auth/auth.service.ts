@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -26,7 +21,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly analyticsService: AnalyticsService,
-  ) { }
+  ) {}
 
   /**
    * Register a new user
@@ -185,10 +180,7 @@ export class AuthService {
   /**
    * Generate JWT tokens
    */
-  private async generateTokenResponse(
-    userId: string,
-    email: string,
-  ): Promise<AuthResponseDto> {
+  private async generateTokenResponse(userId: string, email: string): Promise<AuthResponseDto> {
     const payload: JwtPayload = {
       sub: userId,
       email,

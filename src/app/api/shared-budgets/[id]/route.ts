@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const updateSharedBudgetSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -14,16 +14,13 @@ const updateSharedBudgetSchema = z.object({
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -66,33 +63,30 @@ export async function GET(
 
     if (!sharedBudget) {
       return NextResponse.json(
-        { error: 'Shared budget not found' },
-        { status: 404 }
+        { error: "Shared budget not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json({ sharedBudget });
   } catch (error) {
-    logger.error('Failed to fetch shared budget', error);
+    logger.error("Failed to fetch shared budget", error);
     return NextResponse.json(
-      { error: 'Failed to fetch shared budget' },
-      { status: 500 }
+      { error: "Failed to fetch shared budget" },
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -113,8 +107,8 @@ export async function PATCH(
 
     if (!permission && budget?.ownerId !== session.user.id) {
       return NextResponse.json(
-        { error: 'Insufficient permissions' },
-        { status: 403 }
+        { error: "Insufficient permissions" },
+        { status: 403 },
       );
     }
 
@@ -123,16 +117,19 @@ export async function PATCH(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.issues },
-        { status: 400 }
+        { error: "Invalid request", details: validation.error.issues },
+        { status: 400 },
       );
     }
 
     // Filter out undefined values for exactOptionalPropertyTypes
     const updateData: Prisma.SharedBudgetUpdateInput = {};
-    if (validation.data.name !== undefined) updateData.name = validation.data.name;
-    if (validation.data.category !== undefined) updateData.category = validation.data.category;
-    if (validation.data.amount !== undefined) updateData.amount = new Prisma.Decimal(validation.data.amount);
+    if (validation.data.name !== undefined)
+      updateData.name = validation.data.name;
+    if (validation.data.category !== undefined)
+      updateData.category = validation.data.category;
+    if (validation.data.amount !== undefined)
+      updateData.amount = new Prisma.Decimal(validation.data.amount);
 
     const sharedBudget = await prisma.sharedBudget.update({
       where: { id },
@@ -161,26 +158,23 @@ export async function PATCH(
 
     return NextResponse.json({ sharedBudget });
   } catch (error) {
-    logger.error('Failed to update shared budget', error);
+    logger.error("Failed to update shared budget", error);
     return NextResponse.json(
-      { error: 'Failed to update shared budget' },
-      { status: 500 }
+      { error: "Failed to update shared budget" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -195,8 +189,8 @@ export async function DELETE(
 
     if (!sharedBudget) {
       return NextResponse.json(
-        { error: 'Only owner can delete shared budget' },
-        { status: 403 }
+        { error: "Only owner can delete shared budget" },
+        { status: 403 },
       );
     }
 
@@ -206,10 +200,10 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to delete shared budget', error);
+    logger.error("Failed to delete shared budget", error);
     return NextResponse.json(
-      { error: 'Failed to delete shared budget' },
-      { status: 500 }
+      { error: "Failed to delete shared budget" },
+      { status: 500 },
     );
   }
 }

@@ -86,7 +86,7 @@ export class GoalsService {
         (goal.targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
       );
       const dailyRequired = remaining / Math.max(daysRemaining, 1);
-      
+
       // Simple projection based on current progress
       if (progress > 0) {
         const daysElapsed = Math.ceil(

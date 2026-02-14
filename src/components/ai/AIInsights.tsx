@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { InsightsCard, Insight } from "./InsightsCard";
 import { AILoading } from "./AILoading";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,7 +68,10 @@ export function AIInsights() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Select value={period} onValueChange={(v) => setPeriod(v as typeof period)}>
+            <Select
+              value={period}
+              onValueChange={(v) => setPeriod(v as typeof period)}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -103,7 +112,12 @@ export function AIInsights() {
         {error && !isLoading && (
           <div className="py-8 text-center">
             <p className="text-destructive text-sm">{error}</p>
-            <Button variant="outline" size="sm" onClick={fetchInsights} className="mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchInsights}
+              className="mt-4"
+            >
               Try Again
             </Button>
           </div>
@@ -113,7 +127,9 @@ export function AIInsights() {
           <div className="py-8 text-center text-muted-foreground">
             <Sparkles className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">No insights available yet.</p>
-            <p className="text-xs mt-1">Add some transactions to get personalized insights!</p>
+            <p className="text-xs mt-1">
+              Add some transactions to get personalized insights!
+            </p>
           </div>
         )}
 

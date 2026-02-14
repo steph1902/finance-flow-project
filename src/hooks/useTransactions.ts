@@ -43,7 +43,10 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
     type: filters.type && filters.type !== "ALL" ? filters.type : undefined,
   });
 
-  const { data, error, isLoading, mutate } = useSWR(`/api/v1/transactions${queryString}`, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/v1/transactions${queryString}`,
+    fetcher,
+  );
 
   const createTransaction = useCallback(
     async (payload: TransactionPayload) => {
@@ -56,9 +59,12 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                 method: "POST",
                 body: {
                   ...payload,
-                  date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+                  date:
+                    payload.date instanceof Date
+                      ? payload.date.toISOString()
+                      : payload.date,
                 },
-              }
+              },
             );
 
             // Return updated data after API success
@@ -83,7 +89,10 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                 category: payload.category,
                 description: payload.description ?? null,
                 notes: payload.notes ?? null,
-                date: payload.date instanceof Date ? payload.date.toISOString() : payload.date,
+                date:
+                  payload.date instanceof Date
+                    ? payload.date.toISOString()
+                    : payload.date,
                 userId: "", // Will be set by server
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
@@ -100,12 +109,14 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
             },
             rollbackOnError: true,
             revalidate: true, // Revalidate to get real data from server
-          }
+          },
         );
         toast.success("Transaction created successfully");
       } catch (err) {
         logError("Create transaction error", err);
-        toast.error(err instanceof Error ? err.message : "Failed to create transaction");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to create transaction",
+        );
         throw err;
       }
     },
@@ -128,7 +139,7 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                       ? payload.date.toISOString()
                       : payload.date,
                 },
-              }
+              },
             );
 
             // Return updated data after API success
@@ -144,16 +155,16 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
               data: currentData.data.map((txn) =>
                 txn.id === id
                   ? {
-                    ...txn,
-                    ...payload,
-                    date: payload.date
-                      ? payload.date instanceof Date
-                        ? payload.date.toISOString()
-                        : payload.date
-                      : txn.date,
-                    updatedAt: new Date().toISOString(),
-                  }
-                  : txn
+                      ...txn,
+                      ...payload,
+                      date: payload.date
+                        ? payload.date instanceof Date
+                          ? payload.date.toISOString()
+                          : payload.date
+                        : txn.date,
+                      updatedAt: new Date().toISOString(),
+                    }
+                  : txn,
               ),
             };
           },
@@ -171,27 +182,29 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
                 data: currentData.data.map((txn) =>
                   txn.id === id
                     ? {
-                      ...txn,
-                      ...payload,
-                      date: payload.date
-                        ? payload.date instanceof Date
-                          ? payload.date.toISOString()
-                          : payload.date
-                        : txn.date,
-                      updatedAt: new Date().toISOString(),
-                    }
-                    : txn
+                        ...txn,
+                        ...payload,
+                        date: payload.date
+                          ? payload.date instanceof Date
+                            ? payload.date.toISOString()
+                            : payload.date
+                          : txn.date,
+                        updatedAt: new Date().toISOString(),
+                      }
+                    : txn,
                 ),
               };
             },
             rollbackOnError: true,
             revalidate: false,
-          }
+          },
         );
         toast.success("Transaction updated successfully");
       } catch (err) {
         logError("Update transaction error", err, { id });
-        toast.error(err instanceof Error ? err.message : "Failed to update transaction");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to update transaction",
+        );
         throw err;
       }
     },
@@ -239,12 +252,14 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
             },
             rollbackOnError: true,
             revalidate: false,
-          }
+          },
         );
         toast.success("Transaction deleted successfully");
       } catch (err) {
         logError("Delete transaction error", err, { id });
-        toast.error(err instanceof Error ? err.message : "Failed to delete transaction");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to delete transaction",
+        );
         throw err;
       }
     },
@@ -263,4 +278,3 @@ export function useTransactions(options: UseTransactionsOptions = {}) {
     refresh: mutate,
   };
 }
-

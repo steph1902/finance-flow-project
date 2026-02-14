@@ -180,7 +180,9 @@ describe('BudgetsController', () => {
 
   describe('rollover', () => {
     it('should process budget rollover', async () => {
-      service.processRollover.mockResolvedValue({ message: 'Budget rollover processed successfully' });
+      service.processRollover.mockResolvedValue({
+        message: 'Budget rollover processed successfully',
+      });
 
       const result = await controller.rollover(mockUserId);
 

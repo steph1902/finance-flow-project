@@ -2,13 +2,22 @@
 
 import { useMemo, useState } from "react";
 
-import { TransactionFilters, FilterState } from "@/components/transactions/TransactionFilters";
+import {
+  TransactionFilters,
+  FilterState,
+} from "@/components/transactions/TransactionFilters";
 import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
 import { ReceiptScanner } from "@/components/transactions/ReceiptScanner";
 import { TransactionsSkeleton } from "@/components/skeletons/TransactionsSkeleton";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useTransactions } from "@/hooks/useTransactions";
 import type { Transaction } from "@/types";
@@ -25,25 +34,35 @@ export function TransactionsPage() {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [page, setPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const queryFilters = useMemo(() => ({
-    ...filters,
-    page,
-    limit: 10,
-  }), [filters, page]);
+  const queryFilters = useMemo(
+    () => ({
+      ...filters,
+      page,
+      limit: 10,
+    }),
+    [filters, page],
+  );
 
-  const { transactions, meta, isLoading, isError, error, createTransaction, updateTransaction, deleteTransaction } =
-    useTransactions({ filters: queryFilters });
+  const {
+    transactions,
+    meta,
+    isLoading,
+    isError,
+    error,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction,
+  } = useTransactions({ filters: queryFilters });
 
   const handleOpenCreate = () => {
     setEditingTransaction(null);
     setIsDialogOpen(true);
   };
-
-
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);
@@ -92,7 +111,10 @@ export function TransactionsPage() {
       handleCloseDialog();
     } catch (submitError) {
       toast.error("Unable to save transaction", {
-        description: submitError instanceof Error ? submitError.message : "An error occurred. Please try again.",
+        description:
+          submitError instanceof Error
+            ? submitError.message
+            : "An error occurred. Please try again.",
         duration: 5000,
       });
     } finally {
@@ -101,7 +123,9 @@ export function TransactionsPage() {
   };
 
   const handleDelete = async (transaction: Transaction) => {
-    const confirmed = window.confirm("Are you sure you want to delete this transaction?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this transaction?",
+    );
     if (!confirmed) return;
 
     try {
@@ -112,7 +136,10 @@ export function TransactionsPage() {
       });
     } catch (deleteError) {
       toast.error("Unable to delete transaction", {
-        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
+        description:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "An error occurred",
       });
     }
   };
@@ -128,7 +155,12 @@ export function TransactionsPage() {
           </p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleCloseDialog() : handleOpenCreate())}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) =>
+            !open ? handleCloseDialog() : handleOpenCreate()
+          }
+        >
           <DialogTrigger asChild>
             <Button className="shadow-sm hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
               Add transaction
@@ -144,7 +176,11 @@ export function TransactionsPage() {
               transaction={editingTransaction ?? undefined}
               onSubmit={handleSubmit}
               onCancel={handleCloseDialog}
-              onDelete={editingTransaction ? () => handleDelete(editingTransaction) : undefined}
+              onDelete={
+                editingTransaction
+                  ? () => handleDelete(editingTransaction)
+                  : undefined
+              }
               isSubmitting={isSubmitting}
               submitLabel={editingTransaction ? "Update" : "Create"}
             />
@@ -194,9 +230,16 @@ export function TransactionsPage() {
       {meta ? (
         <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-border/30 bg-card/50 p-6 shadow-soft text-sm md:flex-row">
           <p className="type-body text-muted-foreground">
-            Page <span className="font-medium text-foreground">{meta.page}</span> of{" "}
-            <span className="font-medium text-foreground">{meta.totalPages}</span> ·{" "}
-            <span className="font-medium text-foreground">{meta.total.toLocaleString()}</span> transactions total
+            Page{" "}
+            <span className="font-medium text-foreground">{meta.page}</span> of{" "}
+            <span className="font-medium text-foreground">
+              {meta.totalPages}
+            </span>{" "}
+            ·{" "}
+            <span className="font-medium text-foreground">
+              {meta.total.toLocaleString()}
+            </span>{" "}
+            transactions total
           </p>
           <div className="flex gap-2">
             <Button
@@ -211,7 +254,9 @@ export function TransactionsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
+              onClick={() =>
+                setPage((prev) => Math.min(prev + 1, meta.totalPages))
+              }
               disabled={meta.page >= meta.totalPages}
               className="transition-all hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100"
             >
@@ -223,4 +268,3 @@ export function TransactionsPage() {
     </div>
   );
 }
-

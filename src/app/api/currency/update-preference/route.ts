@@ -2,11 +2,15 @@
  * Update User Currency Preference API Route
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { updateUserCurrency, SUPPORTED_CURRENCIES, Currency } from '@/lib/services/currency-service';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import {
+  updateUserCurrency,
+  SUPPORTED_CURRENCIES,
+  Currency,
+} from "@/lib/services/currency-service";
+import { logger } from "@/lib/logger";
 
 /**
  * PATCH /api/currency/update-preference
@@ -17,10 +21,7 @@ export async function PATCH(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -28,8 +29,12 @@ export async function PATCH(request: NextRequest) {
 
     if (!currency || !SUPPORTED_CURRENCIES.includes(currency as Currency)) {
       return NextResponse.json(
-        { error: 'Invalid currency. Must be one of: ' + SUPPORTED_CURRENCIES.join(', ') },
-        { status: 400 }
+        {
+          error:
+            "Invalid currency. Must be one of: " +
+            SUPPORTED_CURRENCIES.join(", "),
+        },
+        { status: 400 },
       );
     }
 
@@ -37,10 +42,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to update currency preference', error);
+    logger.error("Failed to update currency preference", error);
     return NextResponse.json(
-      { error: 'Failed to update currency preference' },
-      { status: 500 }
+      { error: "Failed to update currency preference" },
+      { status: 500 },
     );
   }
 }

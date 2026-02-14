@@ -1,10 +1,10 @@
-import { Metadata } from "next"
-import { ImportExportClient } from "@/components/import-export/ImportExportClient"
+import { Metadata } from "next";
+import { ImportExportClient } from "@/components/import-export/ImportExportClient";
 
 export const metadata: Metadata = {
   title: "Import & Export | FinanceFlow",
   description: "Import and export your financial data",
-}
+};
 
 export default function ImportExportPage() {
   return (
@@ -20,5 +20,5 @@ export default function ImportExportPage() {
       {/* Client Component */}
       <ImportExportClient />
     </div>
-  )
+  );
 }

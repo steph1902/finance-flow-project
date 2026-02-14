@@ -1,9 +1,9 @@
-import { CATEGORIES } from '../config';
+import { CATEGORIES } from "../config";
 
 export interface TransactionInput {
   description: string;
   amount: number;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   merchant?: string;
   date?: string;
 }
@@ -17,7 +17,7 @@ export interface CategorizationResponse {
 
 export function createCategorizationPrompt(input: TransactionInput): string {
   const categories = CATEGORIES[input.type];
-  const categoryList = categories.join(', ');
+  const categoryList = categories.join(", ");
 
   return `You are a financial transaction categorization expert. Analyze the following transaction and suggest the most appropriate category.
 
@@ -25,8 +25,8 @@ Transaction Details:
 - Description: ${input.description}
 - Amount: $${input.amount}
 - Type: ${input.type}
-${input.merchant ? `- Merchant: ${input.merchant}` : ''}
-${input.date ? `- Date: ${input.date}` : ''}
+${input.merchant ? `- Merchant: ${input.merchant}` : ""}
+${input.date ? `- Date: ${input.date}` : ""}
 
 Available Categories:
 ${categoryList}
@@ -61,7 +61,7 @@ export const CATEGORIZATION_SCHEMA = `{
   "reasoning": "string (brief explanation)"
 }`;
 
-import { z } from 'zod';
+import { z } from "zod";
 
 export const categorizationResponseSchema = z.object({
   category: z.string(),

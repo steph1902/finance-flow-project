@@ -14,9 +14,13 @@ const fetcher = (url: string) => apiFetch<DashboardStats>(url);
 
 export function useDashboard(filters: DashboardFilters = {}) {
   const queryString = buildQueryString(filters);
-  const { data, error, isLoading, mutate } = useSWR(`/api/dashboard/stats${queryString}`, fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/dashboard/stats${queryString}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    },
+  );
 
   return {
     data,
@@ -26,4 +30,3 @@ export function useDashboard(filters: DashboardFilters = {}) {
     refresh: mutate,
   };
 }
-

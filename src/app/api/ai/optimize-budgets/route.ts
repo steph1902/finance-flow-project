@@ -10,7 +10,7 @@ import { checkAIRateLimit } from "@/lib/rate-limiter";
  * AI Budget Optimizer API
  * GET /api/ai/optimize-budgets - Get optimization suggestions
  * POST /api/ai/optimize-budgets/apply - Apply suggested optimizations
- * 
+ *
  * Analyzes budget vs actual spending and suggests reallocation
  * to better align budgets with real spending patterns.
  */
@@ -20,10 +20,7 @@ export async function GET(req: NextRequest) {
     // 1. Authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // 2. Rate limiting
@@ -32,7 +29,7 @@ export async function GET(req: NextRequest) {
       logInfo("Budget optimization rate limit exceeded", { userId });
       return NextResponse.json(
         { error: "Rate limit exceeded. Please try again later." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -50,10 +47,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // 5. Get current month's budgets
@@ -113,12 +107,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       data: optimization,
     });
-
   } catch (error) {
     logError("Budget optimization failed", error);
     return NextResponse.json(
       { error: "Failed to optimize budgets" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -131,10 +124,7 @@ export async function POST(req: NextRequest) {
     // 1. Authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.email;
@@ -147,10 +137,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // 3. Parse request body
@@ -160,7 +147,7 @@ export async function POST(req: NextRequest) {
     if (!suggestions || !Array.isArray(suggestions)) {
       return NextResponse.json(
         { error: "Invalid request: suggestions array required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -244,12 +231,11 @@ export async function POST(req: NextRequest) {
         updates: results,
       },
     });
-
   } catch (error) {
     logError("Failed to apply budget optimizations", error);
     return NextResponse.json(
       { error: "Failed to apply optimizations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

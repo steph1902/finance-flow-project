@@ -18,12 +18,22 @@ type StatsCardProps = {
   index?: number;
 };
 
-export function StatsCard({ title, value, description, icon, trend, index = 0 }: StatsCardProps) {
+export function StatsCard({
+  title,
+  value,
+  description,
+  icon,
+  trend,
+  index = 0,
+}: StatsCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: DURATION.slow, delay: index * STAGGER_DELAY.slow }}
+      transition={{
+        duration: DURATION.slow,
+        delay: index * STAGGER_DELAY.slow,
+      }}
       className="h-full"
     >
       <Card className="relative h-full overflow-hidden border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group">
@@ -47,10 +57,11 @@ export function StatsCard({ title, value, description, icon, trend, index = 0 }:
               {value}
             </div>
             {trend && (
-              <div className={`flex items-center gap-1 text-sm font-medium transition-colors ${trend.isPositive
-                  ? "text-success"
-                  : "text-destructive"
-                }`}>
+              <div
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                  trend.isPositive ? "text-success" : "text-destructive"
+                }`}
+              >
                 {trend.isPositive ? (
                   <TrendingUp className="h-4 w-4" />
                 ) : (
@@ -70,4 +81,3 @@ export function StatsCard({ title, value, description, icon, trend, index = 0 }:
     </motion.div>
   );
 }
-

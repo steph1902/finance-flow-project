@@ -6,7 +6,7 @@ export const ROLES_KEY = 'roles';
 /**
  * Roles decorator
  * Specifies which roles can access a route
- * 
+ *
  * @example
  * @Roles(UserRole.ADMIN)
  * @Delete(':id')

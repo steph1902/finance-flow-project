@@ -1,10 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, TrendingUp, TrendingDown, Lightbulb, Check } from "lucide-react";
+import {
+  ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  Lightbulb,
+  Check,
+} from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { toast } from "sonner";
 
@@ -38,10 +50,14 @@ interface OptimizationData {
 }
 
 export function BudgetOptimizer() {
-  const [optimization, setOptimization] = useState<OptimizationData | null>(null);
+  const [optimization, setOptimization] = useState<OptimizationData | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
-  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(
+    new Set(),
+  );
 
   const loadOptimization = async () => {
     setLoading(true);
@@ -61,7 +77,9 @@ export function BudgetOptimizer() {
       setOptimization(data.data);
 
       // Select all suggestions by default
-      const allIndices = new Set<number>(data.data.suggestions.map((_: unknown, idx: number) => idx));
+      const allIndices = new Set<number>(
+        data.data.suggestions.map((_: unknown, idx: number) => idx),
+      );
       setSelectedSuggestions(allIndices);
 
       toast.success("Budget optimization analysis complete!");
@@ -80,7 +98,7 @@ export function BudgetOptimizer() {
 
     try {
       const suggestionsToApply = optimization.suggestions.filter((_, idx) =>
-        selectedSuggestions.has(idx)
+        selectedSuggestions.has(idx),
       );
 
       const res = await fetch("/api/ai/optimize-budgets", {
@@ -93,7 +111,9 @@ export function BudgetOptimizer() {
         throw new Error("Failed to apply optimizations");
       }
 
-      toast.success(`Applied ${suggestionsToApply.length} budget optimizations!`);
+      toast.success(
+        `Applied ${suggestionsToApply.length} budget optimizations!`,
+      );
 
       // Refresh page to show updated budgets
       setTimeout(() => {
@@ -119,9 +139,12 @@ export function BudgetOptimizer() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high": return "bg-red-500";
-      case "medium": return "bg-yellow-500";
-      default: return "bg-blue-500";
+      case "high":
+        return "bg-red-500";
+      case "medium":
+        return "bg-yellow-500";
+      default:
+        return "bg-blue-500";
     }
   };
 
@@ -139,10 +162,7 @@ export function BudgetOptimizer() {
             </CardDescription>
           </div>
 
-          <Button
-            onClick={loadOptimization}
-            disabled={loading}
-          >
+          <Button onClick={loadOptimization} disabled={loading}>
             {loading ? "Analyzing..." : "Analyze Budgets"}
           </Button>
         </div>
@@ -152,7 +172,9 @@ export function BudgetOptimizer() {
         {loading && (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-3 text-muted-foreground">Analyzing your budget variance...</span>
+            <span className="ml-3 text-muted-foreground">
+              Analyzing your budget variance...
+            </span>
           </div>
         )}
 
@@ -162,9 +184,7 @@ export function BudgetOptimizer() {
             <p className="text-muted-foreground mb-4">
               Get AI-powered suggestions to optimize your budget allocation
             </p>
-            <Button onClick={loadOptimization}>
-              Analyze My Budgets
-            </Button>
+            <Button onClick={loadOptimization}>Analyze My Budgets</Button>
           </div>
         )}
 
@@ -177,7 +197,9 @@ export function BudgetOptimizer() {
                   <div className="text-2xl font-bold">
                     {optimization.suggestions.length}
                   </div>
-                  <p className="text-xs text-muted-foreground">Optimization Suggestions</p>
+                  <p className="text-xs text-muted-foreground">
+                    Optimization Suggestions
+                  </p>
                 </CardContent>
               </Card>
               <Card>
@@ -208,14 +230,17 @@ export function BudgetOptimizer() {
                     <h3 className="font-semibold text-sm">Over Budget</h3>
                   </div>
                   <div className="space-y-2">
-                    {optimization.analysis.overBudget.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="text-sm">
-                        <div className="font-medium">{item.category}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {formatCurrency(item.actual)} / {formatCurrency(item.budget)}
+                    {optimization.analysis.overBudget
+                      .slice(0, 3)
+                      .map((item, idx) => (
+                        <div key={idx} className="text-sm">
+                          <div className="font-medium">{item.category}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatCurrency(item.actual)} /{" "}
+                            {formatCurrency(item.budget)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               )}
@@ -228,14 +253,17 @@ export function BudgetOptimizer() {
                     <h3 className="font-semibold text-sm">Under Budget</h3>
                   </div>
                   <div className="space-y-2">
-                    {optimization.analysis.underBudget.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="text-sm">
-                        <div className="font-medium">{item.category}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {formatCurrency(item.actual)} / {formatCurrency(item.budget)}
+                    {optimization.analysis.underBudget
+                      .slice(0, 3)
+                      .map((item, idx) => (
+                        <div key={idx} className="text-sm">
+                          <div className="font-medium">{item.category}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatCurrency(item.actual)} /{" "}
+                            {formatCurrency(item.budget)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               )}
@@ -248,14 +276,17 @@ export function BudgetOptimizer() {
                     <h3 className="font-semibold text-sm">Well Balanced</h3>
                   </div>
                   <div className="space-y-2">
-                    {optimization.analysis.balanced.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="text-sm">
-                        <div className="font-medium">{item.category}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {formatCurrency(item.actual)} / {formatCurrency(item.budget)}
+                    {optimization.analysis.balanced
+                      .slice(0, 3)
+                      .map((item, idx) => (
+                        <div key={idx} className="text-sm">
+                          <div className="font-medium">{item.category}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatCurrency(item.actual)} /{" "}
+                            {formatCurrency(item.budget)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               )}
@@ -271,7 +302,9 @@ export function BudgetOptimizer() {
                     disabled={applying || selectedSuggestions.size === 0}
                     size="sm"
                   >
-                    {applying ? "Applying..." : `Apply ${selectedSuggestions.size} Selected`}
+                    {applying
+                      ? "Applying..."
+                      : `Apply ${selectedSuggestions.size} Selected`}
                   </Button>
                 </div>
 
@@ -279,15 +312,18 @@ export function BudgetOptimizer() {
                   {optimization.suggestions.map((suggestion, idx) => (
                     <div
                       key={idx}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${selectedSuggestions.has(idx)
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        selectedSuggestions.has(idx)
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
-                        }`}
+                      }`}
                       onClick={() => toggleSuggestion(idx)}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${getPriorityColor(suggestion.priority)}`} />
+                          <div
+                            className={`w-2 h-2 rounded-full ${getPriorityColor(suggestion.priority)}`}
+                          />
                           <div>
                             <div className="flex items-center gap-2 font-semibold">
                               <span>{suggestion.fromCategory}</span>
@@ -301,7 +337,13 @@ export function BudgetOptimizer() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Badge variant={selectedSuggestions.has(idx) ? "default" : "outline"}>
+                          <Badge
+                            variant={
+                              selectedSuggestions.has(idx)
+                                ? "default"
+                                : "outline"
+                            }
+                          >
                             {suggestion.priority}
                           </Badge>
                           {selectedSuggestions.has(idx) ? (
@@ -314,11 +356,15 @@ export function BudgetOptimizer() {
 
                       <div className="space-y-2 text-sm">
                         <div>
-                          <span className="font-medium text-muted-foreground">Reason: </span>
+                          <span className="font-medium text-muted-foreground">
+                            Reason:{" "}
+                          </span>
                           {suggestion.reason}
                         </div>
                         <div>
-                          <span className="font-medium text-muted-foreground">Impact: </span>
+                          <span className="font-medium text-muted-foreground">
+                            Impact:{" "}
+                          </span>
                           {suggestion.impact}
                         </div>
                       </div>
@@ -344,7 +390,10 @@ export function BudgetOptimizer() {
                 <h3 className="font-semibold mb-3">AI Insights</h3>
                 <div className="space-y-2">
                   {optimization.insights.map((insight, idx) => (
-                    <div key={idx} className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                    <div
+                      key={idx}
+                      className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm"
+                    >
                       {insight}
                     </div>
                   ))}

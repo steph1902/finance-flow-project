@@ -12,4 +12,4 @@ import { BudgetRepository } from './repositories/budget.repository';
   providers: [BudgetsService, BudgetRepository],
   exports: [BudgetsService, BudgetRepository],
 })
-export class BudgetsModule { }
+export class BudgetsModule {}

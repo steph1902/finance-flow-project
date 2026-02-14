@@ -32,7 +32,7 @@ const backgroundClasses = {
 export const ZenSection = forwardRef<HTMLElement, ZenSectionProps>(
   (
     { spacing = "md", background = "default", className, children, ...props },
-    ref
+    ref,
   ) => {
     return (
       <section
@@ -41,14 +41,14 @@ export const ZenSection = forwardRef<HTMLElement, ZenSectionProps>(
           spacingClasses[spacing],
           backgroundClasses[background],
           "relative",
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </section>
     );
-  }
+  },
 );
 
 ZenSection.displayName = "ZenSection";

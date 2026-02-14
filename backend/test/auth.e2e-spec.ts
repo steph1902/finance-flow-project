@@ -15,7 +15,7 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    
+
     // Apply same global pipes as main.ts
     app.useGlobalPipes(
       new ValidationPipe({
@@ -26,9 +26,9 @@ describe('AuthController (e2e)', () => {
     );
 
     await app.init();
-    
+
     prisma = app.get<PrismaService>(PrismaService);
-    
+
     // Clean database before tests
     await TestDatabase.cleanup();
   });
@@ -76,10 +76,7 @@ describe('AuthController (e2e)', () => {
         name: 'Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto)
-        .expect(400);
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto).expect(400);
     });
 
     it('should fail with invalid email', async () => {
@@ -89,10 +86,7 @@ describe('AuthController (e2e)', () => {
         name: 'Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto)
-        .expect(400);
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto).expect(400);
     });
 
     it('should fail if email already exists', async () => {
@@ -103,16 +97,10 @@ describe('AuthController (e2e)', () => {
       };
 
       // First signup
-      await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto)
-        .expect(201);
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto).expect(201);
 
       // Second signup with same email
-      await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto)
-        .expect(409); // Conflict
+      await request(app.getHttpServer()).post('/auth/signup').send(signupDto).expect(409); // Conflict
     });
   });
 
@@ -125,9 +113,7 @@ describe('AuthController (e2e)', () => {
 
     beforeEach(async () => {
       // Create user for login tests
-      await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(userCredentials);
+      await request(app.getHttpServer()).post('/auth/signup').send(userCredentials);
     });
 
     it('should login successfully with valid credentials', async () => {
@@ -174,9 +160,7 @@ describe('AuthController (e2e)', () => {
         name: 'Refresh User',
       };
 
-      const response = await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto);
+      const response = await request(app.getHttpServer()).post('/auth/signup').send(signupDto);
 
       refreshToken = response.body.refreshToken;
     });
@@ -210,9 +194,7 @@ describe('AuthController (e2e)', () => {
         name: 'Profile User',
       };
 
-      const response = await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto);
+      const response = await request(app.getHttpServer()).post('/auth/signup').send(signupDto);
 
       accessToken = response.body.accessToken;
     });
@@ -230,9 +212,7 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should fail without authorization token', async () => {
-      await request(app.getHttpServer())
-        .get('/auth/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/profile').expect(401);
     });
 
     it('should fail with invalid token', async () => {
@@ -253,9 +233,7 @@ describe('AuthController (e2e)', () => {
         name: 'Logout User',
       };
 
-      const response = await request(app.getHttpServer())
-        .post('/auth/signup')
-        .send(signupDto);
+      const response = await request(app.getHttpServer()).post('/auth/signup').send(signupDto);
 
       accessToken = response.body.accessToken;
     });
@@ -270,9 +248,7 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should fail without authorization token', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/logout')
-        .expect(401);
+      await request(app.getHttpServer()).post('/auth/logout').expect(401);
     });
   });
 });

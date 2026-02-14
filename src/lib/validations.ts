@@ -92,7 +92,8 @@ export const recurringTransactionSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export const recurringTransactionUpdateSchema = recurringTransactionSchema.partial();
+export const recurringTransactionUpdateSchema =
+  recurringTransactionSchema.partial();
 
 // ============================================
 // AI SERVICE SCHEMAS
@@ -116,22 +117,26 @@ export const insightSchema = z.object({
 });
 
 export const forecastResponseSchema = z.object({
-  months: z.array(z.object({
-    month: z.number().int().min(1).max(12),
-    year: z.number().int(),
-    totalIncome: z.number(),
-    totalExpense: z.number(),
-    netBalance: z.number(),
-    categories: z.array(z.object({
-      category: z.string(),
-      type: z.enum(["INCOME", "EXPENSE"]),
-      projected: z.number(),
-      historical: z.number(),
-      trend: z.enum(["increasing", "decreasing", "stable"]),
-      confidence: z.number().min(0).max(1),
-      explanation: z.string(),
-    })),
-  })),
+  months: z.array(
+    z.object({
+      month: z.number().int().min(1).max(12),
+      year: z.number().int(),
+      totalIncome: z.number(),
+      totalExpense: z.number(),
+      netBalance: z.number(),
+      categories: z.array(
+        z.object({
+          category: z.string(),
+          type: z.enum(["INCOME", "EXPENSE"]),
+          projected: z.number(),
+          historical: z.number(),
+          trend: z.enum(["increasing", "decreasing", "stable"]),
+          confidence: z.number().min(0).max(1),
+          explanation: z.string(),
+        }),
+      ),
+    }),
+  ),
   totalProjected: z.number(),
   totalIncome: z.number(),
   totalExpense: z.number(),
@@ -142,34 +147,42 @@ export const forecastResponseSchema = z.object({
 });
 
 export const budgetOptimizationResponseSchema = z.object({
-  suggestions: z.array(z.object({
-    fromCategory: z.string(),
-    toCategory: z.string(),
-    amount: z.number(),
-    reason: z.string(),
-    impact: z.string(),
-    priority: z.enum(["high", "medium", "low"]),
-  })),
+  suggestions: z.array(
+    z.object({
+      fromCategory: z.string(),
+      toCategory: z.string(),
+      amount: z.number(),
+      reason: z.string(),
+      impact: z.string(),
+      priority: z.enum(["high", "medium", "low"]),
+    }),
+  ),
   totalSavings: z.number(),
   confidence: z.number().min(0).max(1),
   analysis: z.object({
-    overBudget: z.array(z.object({
-      category: z.string(),
-      budget: z.number(),
-      actual: z.number(),
-      variance: z.number(),
-    })),
-    underBudget: z.array(z.object({
-      category: z.string(),
-      budget: z.number(),
-      actual: z.number(),
-      variance: z.number(),
-    })),
-    balanced: z.array(z.object({
-      category: z.string(),
-      budget: z.number(),
-      actual: z.number(),
-    })),
+    overBudget: z.array(
+      z.object({
+        category: z.string(),
+        budget: z.number(),
+        actual: z.number(),
+        variance: z.number(),
+      }),
+    ),
+    underBudget: z.array(
+      z.object({
+        category: z.string(),
+        budget: z.number(),
+        actual: z.number(),
+        variance: z.number(),
+      }),
+    ),
+    balanced: z.array(
+      z.object({
+        category: z.string(),
+        budget: z.number(),
+        actual: z.number(),
+      }),
+    ),
   }),
   insights: z.array(z.string()),
   generatedAt: z.string().datetime(),
@@ -188,7 +201,7 @@ export const signupSchema = z.object({
     .max(100)
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number",
     ),
 });
 
@@ -202,7 +215,9 @@ export const signinSchema = z.object({
 // ============================================
 
 export const receiptScanRequestSchema = z.object({
-  image: z.string().regex(/^data:image\/(jpeg|jpg|png|webp);base64,/, "Invalid image format"),
+  image: z
+    .string()
+    .regex(/^data:image\/(jpeg|jpg|png|webp);base64,/, "Invalid image format"),
 });
 
 export const receiptScanResponseSchema = z.object({
@@ -212,10 +227,14 @@ export const receiptScanResponseSchema = z.object({
   category: z.string(),
   subcategory: z.string().optional(),
   confidence: z.number().min(0).max(1),
-  items: z.array(z.object({
-    description: z.string(),
-    amount: z.number(),
-  })).optional(),
+  items: z
+    .array(
+      z.object({
+        description: z.string(),
+        amount: z.number(),
+      }),
+    )
+    .optional(),
 });
 
 // ============================================
@@ -225,13 +244,18 @@ export const receiptScanResponseSchema = z.object({
 export type TransactionInput = z.infer<typeof transactionSchema>;
 export type TransactionFilters = z.infer<typeof transactionQuerySchema>;
 export type BudgetInput = z.infer<typeof budgetSchema>;
-export type RecurringTransactionInput = z.infer<typeof recurringTransactionSchema>;
-export type CategorizationResponse = z.infer<typeof categorizationResponseSchema>;
+export type RecurringTransactionInput = z.infer<
+  typeof recurringTransactionSchema
+>;
+export type CategorizationResponse = z.infer<
+  typeof categorizationResponseSchema
+>;
 export type Insight = z.infer<typeof insightSchema>;
 export type ForecastResponse = z.infer<typeof forecastResponseSchema>;
-export type BudgetOptimizationResponse = z.infer<typeof budgetOptimizationResponseSchema>;
+export type BudgetOptimizationResponse = z.infer<
+  typeof budgetOptimizationResponseSchema
+>;
 export type SignupInput = z.infer<typeof signupSchema>;
 export type SigninInput = z.infer<typeof signinSchema>;
 export type ReceiptScanRequest = z.infer<typeof receiptScanRequestSchema>;
 export type ReceiptScanResponse = z.infer<typeof receiptScanResponseSchema>;
-

@@ -1,43 +1,48 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { DownloadIcon, Trash2Icon, FileTextIcon, CalendarIcon } from "lucide-react"
-import { type Report, downloadReport, deleteReport } from "@/hooks/useReports"
-import { format } from "date-fns"
-import { toast } from "sonner"
-import { mutate } from "swr"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  DownloadIcon,
+  Trash2Icon,
+  FileTextIcon,
+  CalendarIcon,
+} from "lucide-react";
+import { type Report, downloadReport, deleteReport } from "@/hooks/useReports";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { mutate } from "swr";
 
 interface ReportCardProps {
   report: Report;
 }
 
-const REPORT_TYPE_LABELS: Record<Report['type'], string> = {
+const REPORT_TYPE_LABELS: Record<Report["type"], string> = {
   MONTHLY: "Monthly Summary",
   YEARLY: "Yearly Summary",
   CATEGORY: "Category Breakdown",
   TAX: "Tax Report",
   CUSTOM: "Custom Range",
-}
+};
 
 export function ReportCard({ report }: ReportCardProps) {
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this report?")) return
+    if (!confirm("Are you sure you want to delete this report?")) return;
 
     try {
-      await deleteReport(report.id)
-      toast.success("Report deleted")
-      mutate('/api/reports')
+      await deleteReport(report.id);
+      toast.success("Report deleted");
+      mutate("/api/reports");
     } catch (error) {
-      console.error("Failed to delete report:", error)
-      toast.error("Failed to delete report")
+      console.error("Failed to delete report:", error);
+      toast.error("Failed to delete report");
     }
-  }
+  };
 
-  const handleDownload = (format: 'csv' | 'json') => {
-    downloadReport(report.id, format)
-    toast.success(`Downloading ${format.toUpperCase()}...`)
-  }
+  const handleDownload = (format: "csv" | "json") => {
+    downloadReport(report.id, format);
+    toast.success(`Downloading ${format.toUpperCase()}...`);
+  };
 
   return (
     <Card>
@@ -56,20 +61,20 @@ export function ReportCard({ report }: ReportCardProps) {
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="size-4" />
           <span>
-            {format(new Date(report.startDate), 'MMM d, yyyy')} -{' '}
-            {format(new Date(report.endDate), 'MMM d, yyyy')}
+            {format(new Date(report.startDate), "MMM d, yyyy")} -{" "}
+            {format(new Date(report.endDate), "MMM d, yyyy")}
           </span>
         </div>
 
         <div className="text-xs text-muted-foreground">
-          Generated {format(new Date(report.createdAt), 'MMM d, yyyy')}
+          Generated {format(new Date(report.createdAt), "MMM d, yyyy")}
         </div>
 
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDownload('csv')}
+            onClick={() => handleDownload("csv")}
             className="flex-1"
           >
             <DownloadIcon className="size-3 mr-1" />
@@ -78,21 +83,17 @@ export function ReportCard({ report }: ReportCardProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDownload('json')}
+            onClick={() => handleDownload("json")}
             className="flex-1"
           >
             <DownloadIcon className="size-3 mr-1" />
             JSON
           </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-          >
+          <Button variant="destructive" size="sm" onClick={handleDelete}>
             <Trash2Icon className="size-3" />
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

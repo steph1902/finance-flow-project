@@ -11,17 +11,19 @@ const rangeSchema = z.object({
   endDate: z.coerce.date().optional(),
 });
 
-const serializeTransaction = (transaction: Prisma.TransactionGetPayload<{
-  select: {
-    id: true;
-    amount: true;
-    type: true;
-    category: true;
-    description: true;
-    notes: true;
-    date: true;
-  };
-}>) => ({
+const serializeTransaction = (
+  transaction: Prisma.TransactionGetPayload<{
+    select: {
+      id: true;
+      amount: true;
+      type: true;
+      category: true;
+      description: true;
+      notes: true;
+      date: true;
+    };
+  }>,
+) => ({
   ...transaction,
   amount: Number(transaction.amount),
   date: transaction.date.toISOString(),
@@ -58,49 +60,55 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
     },
   };
 
-  const [incomeAgg, expenseAgg, transactionCount, categoryGroup, transactions, recentTransactions] =
-    await prisma.$transaction([
-      prisma.transaction.aggregate({
-        where: { ...where, type: "INCOME" },
-        _sum: { amount: true },
-      }),
-      prisma.transaction.aggregate({
-        where: { ...where, type: "EXPENSE" },
-        _sum: { amount: true },
-      }),
-      prisma.transaction.count({ where }),
-      prisma.transaction.groupBy({
-        by: ["category"],
-        where: { ...where, type: "EXPENSE" },
-        _sum: { amount: true },
-        orderBy: { category: "asc" },
-      }),
-      prisma.transaction.findMany({
-        where,
-        select: {
-          id: true,
-          amount: true,
-          type: true,
-          category: true,
-          date: true,
-        },
-        orderBy: { date: "asc" },
-      }),
-      prisma.transaction.findMany({
-        where,
-        select: {
-          id: true,
-          amount: true,
-          type: true,
-          category: true,
-          description: true,
-          notes: true,
-          date: true,
-        },
-        orderBy: { date: "desc" },
-        take: 10,
-      }),
-    ]);
+  const [
+    incomeAgg,
+    expenseAgg,
+    transactionCount,
+    categoryGroup,
+    transactions,
+    recentTransactions,
+  ] = await prisma.$transaction([
+    prisma.transaction.aggregate({
+      where: { ...where, type: "INCOME" },
+      _sum: { amount: true },
+    }),
+    prisma.transaction.aggregate({
+      where: { ...where, type: "EXPENSE" },
+      _sum: { amount: true },
+    }),
+    prisma.transaction.count({ where }),
+    prisma.transaction.groupBy({
+      by: ["category"],
+      where: { ...where, type: "EXPENSE" },
+      _sum: { amount: true },
+      orderBy: { category: "asc" },
+    }),
+    prisma.transaction.findMany({
+      where,
+      select: {
+        id: true,
+        amount: true,
+        type: true,
+        category: true,
+        date: true,
+      },
+      orderBy: { date: "asc" },
+    }),
+    prisma.transaction.findMany({
+      where,
+      select: {
+        id: true,
+        amount: true,
+        type: true,
+        category: true,
+        description: true,
+        notes: true,
+        date: true,
+      },
+      orderBy: { date: "desc" },
+      take: 10,
+    }),
+  ]);
 
   const totalIncome = Number(incomeAgg._sum.amount ?? 0);
   const totalExpenses = Number(expenseAgg._sum.amount ?? 0);
@@ -141,7 +149,9 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
     }
   });
 
-  const dailyTrend = Array.from(dailyMap.values()).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const dailyTrend = Array.from(dailyMap.values()).sort((a, b) =>
+    a.date < b.date ? -1 : 1,
+  );
 
   return NextResponse.json({
     summary: {
@@ -159,4 +169,3 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
     },
   });
 });
-

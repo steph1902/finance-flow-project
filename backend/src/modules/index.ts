@@ -4,4 +4,3 @@ export { RecurringModule } from './recurring/recurring.module';
 export { GoalsModule } from './goals/goals.module';
 export { AnalyticsModule } from './analytics/analytics.module';
 export { NotificationsModule } from './notifications/notifications.module';
-

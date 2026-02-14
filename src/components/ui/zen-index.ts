@@ -11,11 +11,18 @@ export { ZenButton } from "./zen-button";
 
 // Motion Components
 export { ZenMotion } from "./zen-motion";
-export type { ZenMotionProps, ZenMotionVariant, EasingCurve } from "./zen-motion";
+export type {
+  ZenMotionProps,
+  ZenMotionVariant,
+  EasingCurve,
+} from "./zen-motion";
 
 export { PageTransition } from "./page-transition";
 export { StaggerContainer, StaggerItem } from "./stagger-animation";
-export type { StaggerContainerProps, StaggerItemProps } from "./stagger-animation";
+export type {
+  StaggerContainerProps,
+  StaggerItemProps,
+} from "./stagger-animation";
 
 // Scroll & UX Components
 export { ScrollProgress } from "./scroll-progress";

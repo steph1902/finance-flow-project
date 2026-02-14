@@ -1,16 +1,16 @@
 /**
  * Goals API Route
- * 
+ *
  * GET  - List all user goals
  * POST - Create new goal
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { createGoal, getUserGoals } from '@/lib/services/goal-service';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { createGoal, getUserGoals } from "@/lib/services/goal-service";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 // Validation schema
 const createGoalSchema = z.object({
@@ -29,26 +29,28 @@ const createGoalSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get status filter from query params
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') as 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'PAUSED' | undefined;
+    const status = searchParams.get("status") as
+      | "ACTIVE"
+      | "COMPLETED"
+      | "CANCELLED"
+      | "PAUSED"
+      | undefined;
 
     const goals = await getUserGoals(session.user.id, status);
 
     return NextResponse.json({ goals });
   } catch (error) {
-    logger.error('Failed to fetch goals', error);
+    logger.error("Failed to fetch goals", error);
     return NextResponse.json(
-      { error: 'Failed to fetch goals' },
-      { status: 500 }
+      { error: "Failed to fetch goals" },
+      { status: 500 },
     );
   }
 }
@@ -60,26 +62,24 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    
+
     // Validate input
     const validation = createGoalSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid input', details: validation.error.issues },
-        { status: 400 }
+        { error: "Invalid input", details: validation.error.issues },
+        { status: 400 },
       );
     }
 
-    const { name, description, targetAmount, targetDate, category, priority } = validation.data;
+    const { name, description, targetAmount, targetDate, category, priority } =
+      validation.data;
 
     const goal = await createGoal({
       userId: session.user.id,
@@ -93,10 +93,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ goal }, { status: 201 });
   } catch (error) {
-    logger.error('Failed to create goal', error);
+    logger.error("Failed to create goal", error);
     return NextResponse.json(
-      { error: 'Failed to create goal' },
-      { status: 500 }
+      { error: "Failed to create goal" },
+      { status: 500 },
     );
   }
 }

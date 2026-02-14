@@ -5,9 +5,9 @@ import { NotificationRepository } from './repositories/notification.repository';
 import { EmailService } from './services/email.service';
 
 /**
- * Notifications Module  
+ * Notifications Module
  * In-app and email notification system with Resend integration
- * 
+ *
  * Features:
  * - Notification types: BUDGET_ALERT, BILL_REMINDER, GOAL_MILESTONE, etc.
  * - Status tracking: UNREAD, READ, ARCHIVED
@@ -20,4 +20,4 @@ import { EmailService } from './services/email.service';
   providers: [NotificationsService, NotificationRepository, EmailService],
   exports: [NotificationsService],
 })
-export class NotificationsModule { }
+export class NotificationsModule {}

@@ -26,10 +26,7 @@ export class RecurringController {
   @Post()
   @ApiOperation({ summary: 'Create recurring transaction' })
   @ApiResponse({ status: HttpStatus.CREATED })
-  async create(
-    @CurrentUser('id') userId: string,
-    @Body() createRecurringDto: CreateRecurringDto,
-  ) {
+  async create(@CurrentUser('id') userId: string, @Body() createRecurringDto: CreateRecurringDto) {
     return this.recurringService.create(userId, createRecurringDto);
   }
 
@@ -43,10 +40,7 @@ export class RecurringController {
   @Get(':id')
   @ApiOperation({ summary: 'Get recurring transaction by ID' })
   @ApiResponse({ status: HttpStatus.OK })
-  async findOne(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async findOne(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.recurringService.findOne(userId, id);
   }
 
@@ -65,20 +59,14 @@ export class RecurringController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete recurring transaction' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  async remove(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async remove(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<void> {
     return this.recurringService.remove(userId, id);
   }
 
   @Post(':id/skip')
   @ApiOperation({ summary: 'Skip next occurrence' })
   @ApiResponse({ status: HttpStatus.OK })
-  async skipNext(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async skipNext(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.recurringService.skipNext(userId, id);
   }
 }

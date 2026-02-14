@@ -60,9 +60,7 @@ describe('HttpExceptionFilter', () => {
 
       filter.catch(error, mockHost);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
       expect(mockResponse.send).toHaveBeenCalledWith(
         expect.objectContaining({
           statusCode: 500,
@@ -76,9 +74,7 @@ describe('HttpExceptionFilter', () => {
 
       filter.catch(unknownException, mockHost);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
     });
   });
 });

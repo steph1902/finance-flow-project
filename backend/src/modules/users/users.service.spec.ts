@@ -79,12 +79,8 @@ describe('UsersService', () => {
     it('should throw NotFoundException when user not found', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.findById('nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.findById('nonexistent')).rejects.toThrow(
-        'User not found',
-      );
+      await expect(service.findById('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toThrow('User not found');
     });
   });
 
@@ -216,9 +212,7 @@ describe('UsersService', () => {
     it('should handle deletion errors', async () => {
       (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
-      await expect(service.deleteAccount('user-123')).rejects.toThrow(
-        'Database error',
-      );
+      await expect(service.deleteAccount('user-123')).rejects.toThrow('Database error');
     });
   });
 });

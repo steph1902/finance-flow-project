@@ -1,55 +1,67 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon, FileTextIcon } from "lucide-react"
-import { createReport, type Report } from "@/hooks/useReports"
-import { toast } from "sonner"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CalendarIcon, FileTextIcon } from "lucide-react";
+import { createReport, type Report } from "@/hooks/useReports";
+import { toast } from "sonner";
 
 interface ReportGeneratorProps {
   onReportGenerated?: (report: Report) => void;
 }
 
 export function ReportGenerator({ onReportGenerated }: ReportGeneratorProps) {
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [name, setName] = useState("")
-  const [type, setType] = useState<Report['type']>("MONTHLY")
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [name, setName] = useState("");
+  const [type, setType] = useState<Report["type"]>("MONTHLY");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const handleGenerate = async () => {
     if (!name || !startDate || !endDate) {
-      toast.error("Please fill all required fields")
-      return
+      toast.error("Please fill all required fields");
+      return;
     }
 
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
       const report = await createReport(
         name,
         type,
         new Date(startDate),
-        new Date(endDate)
-      )
-      
-      toast.success("Report generated successfully!")
-      onReportGenerated?.(report)
-      
+        new Date(endDate),
+      );
+
+      toast.success("Report generated successfully!");
+      onReportGenerated?.(report);
+
       // Reset form
-      setName("")
-      setStartDate("")
-      setEndDate("")
+      setName("");
+      setStartDate("");
+      setEndDate("");
     } catch (error) {
-      console.error("Failed to generate report:", error)
-      toast.error("Failed to generate report. Please try again.")
+      console.error("Failed to generate report:", error);
+      toast.error("Failed to generate report. Please try again.");
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -75,7 +87,10 @@ export function ReportGenerator({ onReportGenerated }: ReportGeneratorProps) {
 
         <div className="space-y-2">
           <Label htmlFor="report-type">Report Type</Label>
-          <Select value={type} onValueChange={(value) => setType(value as Report['type'])}>
+          <Select
+            value={type}
+            onValueChange={(value) => setType(value as Report["type"])}
+          >
             <SelectTrigger id="report-type">
               <SelectValue />
             </SelectTrigger>
@@ -126,5 +141,5 @@ export function ReportGenerator({ onReportGenerated }: ReportGeneratorProps) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

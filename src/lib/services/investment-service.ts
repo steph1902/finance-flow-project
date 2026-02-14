@@ -3,9 +3,9 @@
  * Handles portfolio management, performance tracking, and analytics
  */
 
-import { prisma } from '@/lib/prisma';
-import { logger } from '@/lib/logger';
-import { InvestmentType, InvestmentTransactionType } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import { InvestmentType, InvestmentTransactionType } from "@prisma/client";
 
 export interface InvestmentWithPerformance {
   id: string;
@@ -28,12 +28,15 @@ export interface PortfolioSummary {
   totalGainLoss: number;
   totalGainLossPercentage: number;
   investmentCount: number;
-  byType: Record<InvestmentType, {
-    count: number;
-    value: number;
-    costBasis: number;
-    gainLoss: number;
-  }>;
+  byType: Record<
+    InvestmentType,
+    {
+      count: number;
+      value: number;
+      costBasis: number;
+      gainLoss: number;
+    }
+  >;
 }
 
 /**
@@ -51,7 +54,7 @@ export async function createInvestment(
     currency?: string;
     purchaseDate: Date;
     notes?: string;
-  }
+  },
 ) {
   try {
     const investment = await prisma.investment.create({
@@ -63,7 +66,7 @@ export async function createInvestment(
         quantity: data.quantity,
         costBasis: data.costBasis,
         currentValue: data.currentValue ?? data.costBasis,
-        currency: data.currency ?? 'USD',
+        currency: data.currency ?? "USD",
         purchaseDate: data.purchaseDate,
         ...(data.notes && { notes: data.notes }),
       },
@@ -73,7 +76,7 @@ export async function createInvestment(
     await prisma.investmentTransaction.create({
       data: {
         investmentId: investment.id,
-        type: 'BUY',
+        type: "BUY",
         quantity: data.quantity,
         price: data.costBasis / data.quantity,
         totalAmount: data.costBasis,
@@ -81,11 +84,11 @@ export async function createInvestment(
       },
     });
 
-    logger.info('Investment created', { userId, investmentId: investment.id });
+    logger.info("Investment created", { userId, investmentId: investment.id });
     return investment;
   } catch (error: unknown) {
-    logger.error('Failed to create investment', error);
-    throw new Error('Failed to create investment');
+    logger.error("Failed to create investment", error);
+    throw new Error("Failed to create investment");
   }
 }
 
@@ -94,7 +97,7 @@ export async function createInvestment(
  */
 export async function updateInvestmentValue(
   investmentId: string,
-  currentValue: number
+  currentValue: number,
 ) {
   try {
     const investment = await prisma.investment.update({
@@ -105,11 +108,11 @@ export async function updateInvestmentValue(
       },
     });
 
-    logger.info('Investment value updated', { investmentId, currentValue });
+    logger.info("Investment value updated", { investmentId, currentValue });
     return investment;
   } catch (error: unknown) {
-    logger.error('Failed to update investment value', error);
-    throw new Error('Failed to update investment value');
+    logger.error("Failed to update investment value", error);
+    throw new Error("Failed to update investment value");
   }
 }
 
@@ -125,7 +128,7 @@ export async function recordInvestmentTransaction(
     fees?: number;
     date: Date;
     notes?: string;
-  }
+  },
 ) {
   try {
     const investment = await prisma.investment.findUnique({
@@ -133,7 +136,7 @@ export async function recordInvestmentTransaction(
     });
 
     if (!investment) {
-      throw new Error('Investment not found');
+      throw new Error("Investment not found");
     }
 
     const totalAmount = data.quantity * data.price;
@@ -157,10 +160,10 @@ export async function recordInvestmentTransaction(
     let newQuantity = Number(investment.quantity);
     let newCostBasis = Number(investment.costBasis);
 
-    if (data.type === 'BUY') {
+    if (data.type === "BUY") {
       newQuantity += data.quantity;
       newCostBasis += totalAmount + fees;
-    } else if (data.type === 'SELL') {
+    } else if (data.type === "SELL") {
       newQuantity -= data.quantity;
       // Proportional cost basis reduction
       const costBasisPerShare = newCostBasis / Number(investment.quantity);
@@ -176,7 +179,7 @@ export async function recordInvestmentTransaction(
       },
     });
 
-    logger.info('Investment transaction recorded', {
+    logger.info("Investment transaction recorded", {
       investmentId,
       type: data.type,
       amount: totalAmount,
@@ -184,8 +187,8 @@ export async function recordInvestmentTransaction(
 
     return transaction;
   } catch (error: unknown) {
-    logger.error('Failed to record investment transaction', error);
-    throw new Error('Failed to record transaction');
+    logger.error("Failed to record investment transaction", error);
+    throw new Error("Failed to record transaction");
   }
 }
 
@@ -193,12 +196,12 @@ export async function recordInvestmentTransaction(
  * Get user's investments with performance metrics
  */
 export async function getUserInvestments(
-  userId: string
+  userId: string,
 ): Promise<InvestmentWithPerformance[]> {
   try {
     const investments = await prisma.investment.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return investments.map((inv) => {
@@ -206,7 +209,8 @@ export async function getUserInvestments(
       const costBasis = Number(inv.costBasis);
       const currentValue = Number(inv.currentValue);
       const gainLoss = currentValue - costBasis;
-      const gainLossPercentage = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
+      const gainLossPercentage =
+        costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
 
       return {
         id: inv.id,
@@ -224,8 +228,8 @@ export async function getUserInvestments(
       };
     });
   } catch (error: unknown) {
-    logger.error('Failed to get user investments', error);
-    throw new Error('Failed to fetch investments');
+    logger.error("Failed to get user investments", error);
+    throw new Error("Failed to fetch investments");
   }
 }
 
@@ -233,7 +237,7 @@ export async function getUserInvestments(
  * Get portfolio summary with analytics
  */
 export async function getPortfolioSummary(
-  userId: string
+  userId: string,
 ): Promise<PortfolioSummary> {
   try {
     const investments = await getUserInvestments(userId);
@@ -244,16 +248,28 @@ export async function getPortfolioSummary(
       totalGainLoss: 0,
       totalGainLossPercentage: 0,
       investmentCount: investments.length,
-      byType: {} as Record<InvestmentType, {
-        count: number;
-        value: number;
-        costBasis: number;
-        gainLoss: number;
-      }>,
+      byType: {} as Record<
+        InvestmentType,
+        {
+          count: number;
+          value: number;
+          costBasis: number;
+          gainLoss: number;
+        }
+      >,
     };
 
     // Initialize byType for all investment types
-    const types: InvestmentType[] = ['STOCK', 'BOND', 'MUTUAL_FUND', 'ETF', 'CRYPTO', 'REAL_ESTATE', 'COMMODITY', 'OTHER'];
+    const types: InvestmentType[] = [
+      "STOCK",
+      "BOND",
+      "MUTUAL_FUND",
+      "ETF",
+      "CRYPTO",
+      "REAL_ESTATE",
+      "COMMODITY",
+      "OTHER",
+    ];
     types.forEach((type) => {
       summary.byType[type] = {
         count: 0,
@@ -283,8 +299,8 @@ export async function getPortfolioSummary(
 
     return summary;
   } catch (error: unknown) {
-    logger.error('Failed to get portfolio summary', error);
-    throw new Error('Failed to calculate portfolio summary');
+    logger.error("Failed to get portfolio summary", error);
+    throw new Error("Failed to calculate portfolio summary");
   }
 }
 
@@ -295,11 +311,11 @@ export async function getInvestmentTransactions(investmentId: string) {
   try {
     return await prisma.investmentTransaction.findMany({
       where: { investmentId },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
   } catch (error: unknown) {
-    logger.error('Failed to get investment transactions', error);
-    throw new Error('Failed to fetch transactions');
+    logger.error("Failed to get investment transactions", error);
+    throw new Error("Failed to fetch transactions");
   }
 }
 
@@ -316,7 +332,7 @@ export async function deleteInvestment(userId: string, investmentId: string) {
     });
 
     if (!investment) {
-      throw new Error('Investment not found');
+      throw new Error("Investment not found");
     }
 
     // Transactions will be cascade deleted
@@ -324,10 +340,10 @@ export async function deleteInvestment(userId: string, investmentId: string) {
       where: { id: investmentId },
     });
 
-    logger.info('Investment deleted', { userId, investmentId });
+    logger.info("Investment deleted", { userId, investmentId });
   } catch (error: unknown) {
-    logger.error('Failed to delete investment', error);
-    throw new Error('Failed to delete investment');
+    logger.error("Failed to delete investment", error);
+    throw new Error("Failed to delete investment");
   }
 }
 
@@ -336,7 +352,7 @@ export async function deleteInvestment(userId: string, investmentId: string) {
  */
 export async function getPortfolioPerformance(
   userId: string,
-  days: number = 30
+  days: number = 30,
 ) {
   try {
     const investments = await getUserInvestments(userId);
@@ -351,17 +367,20 @@ export async function getPortfolioPerformance(
       date.setDate(date.getDate() - i);
 
       // Simplified: use current values (in production, fetch historical data)
-      const totalValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+      const totalValue = investments.reduce(
+        (sum, inv) => sum + inv.currentValue,
+        0,
+      );
 
       dataPoints.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split("T")[0],
         value: totalValue,
       });
     }
 
     return dataPoints;
   } catch (error: unknown) {
-    logger.error('Failed to get portfolio performance', error);
-    throw new Error('Failed to calculate performance');
+    logger.error("Failed to get portfolio performance", error);
+    throw new Error("Failed to calculate performance");
   }
 }

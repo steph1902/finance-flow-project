@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { RocketIcon, TrendingUpIcon, TargetIcon, BellIcon } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { RocketIcon, TrendingUpIcon, TargetIcon, BellIcon } from "lucide-react";
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -30,7 +36,8 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Automatically categorize and track all your transactions with AI-powered insights
+              Automatically categorize and track all your transactions with
+              AI-powered insights
             </CardDescription>
           </CardContent>
         </Card>
@@ -46,7 +53,8 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Create financial goals and track your progress with visual milestones
+              Create financial goals and track your progress with visual
+              milestones
             </CardDescription>
           </CardContent>
         </Card>
@@ -62,7 +70,8 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Set budgets by category and get alerts when you&apos;re approaching limits
+              Set budgets by category and get alerts when you&apos;re
+              approaching limits
             </CardDescription>
           </CardContent>
         </Card>
@@ -78,7 +87,8 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
           </CardHeader>
           <CardContent>
             <CardDescription>
-              Receive smart notifications about spending patterns and upcoming bills
+              Receive smart notifications about spending patterns and upcoming
+              bills
             </CardDescription>
           </CardContent>
         </Card>
@@ -90,5 +100,5 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

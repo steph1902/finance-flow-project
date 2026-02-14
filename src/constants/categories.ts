@@ -21,7 +21,8 @@ export const TRANSACTION_TYPE_OPTIONS = [
   { label: "Expense", value: "EXPENSE" },
 ] as const;
 
-export function getCategoriesForType(type: "INCOME" | "EXPENSE"): readonly string[] {
+export function getCategoriesForType(
+  type: "INCOME" | "EXPENSE",
+): readonly string[] {
   return type === "INCOME" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 }
-

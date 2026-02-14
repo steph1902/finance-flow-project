@@ -16,7 +16,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Repeat, AlertCircle, CheckCircle, Clock, PauseCircle } from "lucide-react";
+import {
+  Plus,
+  Repeat,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  PauseCircle,
+} from "lucide-react";
 
 export function RecurringTransactionsPage() {
   const {
@@ -36,7 +43,7 @@ export function RecurringTransactionsPage() {
   const pausedTransactions = recurringTransactions.filter((t) => !t.isActive);
   const upcomingTransactions = recurringTransactions.filter((t) => {
     const daysUntilNext = Math.ceil(
-      (t.nextDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+      (t.nextDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
     );
     return t.isActive && daysUntilNext >= 0 && daysUntilNext <= 7;
   });
@@ -130,7 +137,10 @@ export function RecurringTransactionsPage() {
         {/* Premium Stats Cards Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 border border-border/30 rounded-xl bg-card shadow-card">
+            <div
+              key={i}
+              className="p-6 border border-border/30 rounded-xl bg-card shadow-card"
+            >
               <div className="h-5 w-32 bg-muted/50 animate-pulse rounded mb-4" />
               <div className="h-10 w-28 bg-muted/50 animate-pulse rounded" />
             </div>
@@ -159,9 +169,7 @@ export function RecurringTransactionsPage() {
             <div className="p-3 rounded-xl bg-blue-50">
               <Repeat className="h-6 w-6 text-primary" />
             </div>
-            <h1 className="type-h2 text-foreground">
-              Recurring Transactions
-            </h1>
+            <h1 className="type-h2 text-foreground">Recurring Transactions</h1>
           </div>
           <p className="type-body text-muted-foreground max-w-2xl">
             Manage your recurring income and expenses with automated tracking
@@ -179,7 +187,10 @@ export function RecurringTransactionsPage() {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive" className="shadow-soft border-destructive/20">
+        <Alert
+          variant="destructive"
+          className="shadow-soft border-destructive/20"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="type-body">{error}</AlertDescription>
         </Alert>
@@ -192,7 +203,9 @@ export function RecurringTransactionsPage() {
             <CheckCircle className="h-4 w-4 text-success" />
             Active Recurring
           </div>
-          <div className="text-4xl font-bold text-foreground">{activeTransactions.length}</div>
+          <div className="text-4xl font-bold text-foreground">
+            {activeTransactions.length}
+          </div>
         </div>
 
         <div className="p-6 border border-green-200 rounded-xl bg-green-50 shadow-sm hover:shadow-md transition-shadow">
@@ -219,26 +232,36 @@ export function RecurringTransactionsPage() {
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="all">
             All
-            <span className="ml-1.5 text-xs opacity-60">({recurringTransactions.length})</span>
+            <span className="ml-1.5 text-xs opacity-60">
+              ({recurringTransactions.length})
+            </span>
           </TabsTrigger>
           <TabsTrigger value="active">
             Active
-            <span className="ml-1.5 text-xs opacity-60">({activeTransactions.length})</span>
+            <span className="ml-1.5 text-xs opacity-60">
+              ({activeTransactions.length})
+            </span>
           </TabsTrigger>
           <TabsTrigger value="upcoming">
             <Clock className="h-3 w-3 mr-1" />
             Upcoming
-            <span className="ml-1.5 text-xs opacity-60">({upcomingTransactions.length})</span>
+            <span className="ml-1.5 text-xs opacity-60">
+              ({upcomingTransactions.length})
+            </span>
           </TabsTrigger>
           <TabsTrigger value="overdue">
             <AlertCircle className="h-3 w-3 mr-1" />
             Due
-            <span className="ml-1.5 text-xs opacity-60">({overdueTransactions.length})</span>
+            <span className="ml-1.5 text-xs opacity-60">
+              ({overdueTransactions.length})
+            </span>
           </TabsTrigger>
           <TabsTrigger value="paused">
             <PauseCircle className="h-3 w-3 mr-1" />
             Paused
-            <span className="ml-1.5 text-xs opacity-60">({pausedTransactions.length})</span>
+            <span className="ml-1.5 text-xs opacity-60">
+              ({pausedTransactions.length})
+            </span>
           </TabsTrigger>
         </TabsList>
 
@@ -255,7 +278,11 @@ export function RecurringTransactionsPage() {
                   : `No ${selectedTab} recurring transactions`}
               </p>
               {selectedTab === "all" && (
-                <Button onClick={() => setIsFormOpen(true)} size="lg" className="shadow-sm">
+                <Button
+                  onClick={() => setIsFormOpen(true)}
+                  size="lg"
+                  className="shadow-sm"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Recurring Transaction
                 </Button>
@@ -270,11 +297,15 @@ export function RecurringTransactionsPage() {
                   amount={transaction.amount}
                   type={transaction.type}
                   category={transaction.category}
-                  {...(transaction.description && { description: transaction.description })}
+                  {...(transaction.description && {
+                    description: transaction.description,
+                  })}
                   frequency={transaction.frequency}
                   nextDate={transaction.nextDate}
                   isActive={transaction.isActive}
-                  {...(transaction.lastGenerated && { lastGenerated: transaction.lastGenerated })}
+                  {...(transaction.lastGenerated && {
+                    lastGenerated: transaction.lastGenerated,
+                  })}
                   {...(transaction.endDate && { endDate: transaction.endDate })}
                   onToggleActive={toggleActive}
                   onDelete={deleteRecurringTransaction}
@@ -289,7 +320,9 @@ export function RecurringTransactionsPage() {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader className="space-y-3">
-            <DialogTitle className="type-h3">Create Recurring Transaction</DialogTitle>
+            <DialogTitle className="type-h3">
+              Create Recurring Transaction
+            </DialogTitle>
             <DialogDescription className="type-body">
               Set up a transaction that repeats automatically on a schedule.
             </DialogDescription>

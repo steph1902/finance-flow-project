@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import AuthProvider from "@/providers/AuthProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
-import { ErrorBoundary, FullPageErrorFallback } from "@/components/errors/ErrorBoundary";
+import {
+  ErrorBoundary,
+  FullPageErrorFallback,
+} from "@/components/errors/ErrorBoundary";
 import { fontInter, fontPlayfair } from "@/lib/fonts";
 import { routing } from "@/i18n/routing";
 
@@ -13,7 +16,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params
+  params,
 }: Readonly<{
   children: React.ReactNode;
   params: Promise<{ locale?: string }>;
@@ -22,13 +25,17 @@ export default async function RootLayout({
   const resolvedParams = await params;
 
   // Get locale with fallback to default
-  const locale = resolvedParams?.locale && routing.locales.includes(resolvedParams.locale as any)
-    ? resolvedParams.locale
-    : routing.defaultLocale;
+  const locale =
+    resolvedParams?.locale &&
+    routing.locales.includes(resolvedParams.locale as any)
+      ? resolvedParams.locale
+      : routing.defaultLocale;
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${fontInter.variable} ${fontPlayfair.variable} font-sans antialiased`}>
+      <body
+        className={`${fontInter.variable} ${fontPlayfair.variable} font-sans antialiased`}
+      >
         <ErrorBoundary fallback={<FullPageErrorFallback />}>
           <AuthProvider>
             {children}

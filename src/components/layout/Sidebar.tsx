@@ -8,7 +8,15 @@ import { NAV_SECTIONS, NAV_FOOTER, type NavItem } from "@/config/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
+function NavLink({
+  item,
+  isActive,
+  onClick,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  onClick?: () => void;
+}) {
   return (
     <Link
       href={item.href}
@@ -17,7 +25,7 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
         "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
         isActive
           ? "bg-primary text-primary-foreground shadow-sm"
-          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent",
       )}
       aria-current={isActive ? "page" : undefined}
     >
@@ -27,52 +35,71 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
   );
 }
 
-function NavigationSections({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
+function NavigationSections({
+  pathname,
+  onItemClick,
+}: {
+  pathname: string;
+  onItemClick?: () => void;
+}) {
   return (
     <>
-      {NAV_SECTIONS.filter(section => section.title !== "ADMIN").map((section, sectionIndex) => (
-        <div key={sectionIndex} className={section.title ? "mt-6" : ""}>
-          {section.title && (
-            <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground/70">
-              {section.title}
-            </h3>
-          )}
-          <div className="space-y-1">
-            {section.items.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={pathname === item.href}
-                onClick={onItemClick}
-              />
-            ))}
+      {NAV_SECTIONS.filter((section) => section.title !== "ADMIN").map(
+        (section, sectionIndex) => (
+          <div key={sectionIndex} className={section.title ? "mt-6" : ""}>
+            {section.title && (
+              <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground/70">
+                {section.title}
+              </h3>
+            )}
+            <div className="space-y-1">
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  isActive={pathname === item.href}
+                  onClick={onItemClick}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ),
+      )}
 
       {/* Admin Section */}
-      {NAV_SECTIONS.filter(section => section.title === "ADMIN").map((section, sectionIndex) => (
-        <div key={`admin-${sectionIndex}`} className="mt-8 pt-4 border-t border-border/50">
-          <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-amber-600/80 dark:text-amber-500/80 flex items-center gap-2">
-            {section.title} AREA
-          </h3>
-          <div className="space-y-1">
-            {section.items.map((item) => (
-              <NavLink
-                key={item.href}
-                item={item}
-                isActive={pathname === item.href}
-                onClick={onItemClick}
-              />
-            ))}
+      {NAV_SECTIONS.filter((section) => section.title === "ADMIN").map(
+        (section, sectionIndex) => (
+          <div
+            key={`admin-${sectionIndex}`}
+            className="mt-8 pt-4 border-t border-border/50"
+          >
+            <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-amber-600/80 dark:text-amber-500/80 flex items-center gap-2">
+              {section.title} AREA
+            </h3>
+            <div className="space-y-1">
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  isActive={pathname === item.href}
+                  onClick={onItemClick}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ),
+      )}
     </>
   );
 }
 
-function NavigationFooter({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
+function NavigationFooter({
+  pathname,
+  onItemClick,
+}: {
+  pathname: string;
+  onItemClick?: () => void;
+}) {
   return (
     <div className="border-t border-border bg-card pt-4">
       <div className="space-y-1 px-4">
@@ -97,7 +124,10 @@ export default function Sidebar() {
     <>
       {/* Mobile Header with Menu Button */}
       <div className="fixed top-0 left-0 right-0 z-20 flex h-[60px] items-center justify-between border-b border-border bg-card px-4 lg:hidden shadow-sm transition-colors duration-300">
-        <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 font-semibold group transition-colors"
+        >
           <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
           <span className="text-foreground font-serif">FinanceFlow</span>
         </Link>
@@ -109,7 +139,11 @@ export default function Sidebar() {
             aria-label="Toggle menu"
             className="lg:hidden transition-all hover:bg-accent active:scale-95"
           >
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </Button>
         </div>
       </div>
@@ -127,11 +161,14 @@ export default function Sidebar() {
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-20 w-64 flex-col border-r border-border bg-card shadow-xl transition-transform duration-300 ease-out lg:hidden",
-          isMobileMenuOpen ? "translate-x-0 flex" : "-translate-x-full"
+          isMobileMenuOpen ? "translate-x-0 flex" : "-translate-x-full",
         )}
       >
         <div className="flex h-[60px] items-center border-b border-border px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-semibold group transition-colors"
+          >
             <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
             <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
@@ -139,19 +176,31 @@ export default function Sidebar() {
 
         {/* Scrollable Navigation */}
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-          <nav className="px-4 text-sm font-medium" aria-label="Main navigation">
-            <NavigationSections pathname={pathname} onItemClick={() => setIsMobileMenuOpen(false)} />
+          <nav
+            className="px-4 text-sm font-medium"
+            aria-label="Main navigation"
+          >
+            <NavigationSections
+              pathname={pathname}
+              onItemClick={() => setIsMobileMenuOpen(false)}
+            />
           </nav>
         </div>
 
         {/* Sticky Footer */}
-        <NavigationFooter pathname={pathname} onItemClick={() => setIsMobileMenuOpen(false)} />
+        <NavigationFooter
+          pathname={pathname}
+          onItemClick={() => setIsMobileMenuOpen(false)}
+        />
       </div>
 
       {/* Desktop Sidebar */}
       <div className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r border-border bg-card lg:flex shadow-sm transition-colors duration-300">
         <div className="flex h-[60px] items-center border-b border-border px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold group transition-colors">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-semibold group transition-colors"
+          >
             <Package2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
             <span className="text-foreground font-serif">FinanceFlow</span>
           </Link>
@@ -159,7 +208,10 @@ export default function Sidebar() {
 
         {/* Scrollable Navigation */}
         <div className="flex-1 overflow-auto py-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-          <nav className="px-4 text-sm font-medium" aria-label="Main navigation">
+          <nav
+            className="px-4 text-sm font-medium"
+            aria-label="Main navigation"
+          >
             <NavigationSections pathname={pathname} />
           </nav>
         </div>

@@ -14,9 +14,12 @@ class RateLimiter {
 
   constructor() {
     // Clean up expired entries every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000,
+    );
   }
 
   /**
@@ -66,10 +69,10 @@ class RateLimiter {
   getResetTime(identifier: string): number | null {
     const entry = this.limits.get(identifier);
     if (!entry) return null;
-    
+
     const now = Date.now();
     if (now > entry.resetAt) return null;
-    
+
     return entry.resetAt - now;
   }
 
@@ -130,7 +133,7 @@ export function checkAIRateLimit(userId: string): boolean {
   return rateLimiter.check(
     `ai:${userId}`,
     RATE_LIMITS.AI_ENDPOINTS.limit,
-    RATE_LIMITS.AI_ENDPOINTS.window
+    RATE_LIMITS.AI_ENDPOINTS.window,
   );
 }
 
@@ -141,7 +144,7 @@ export function checkChatRateLimit(userId: string): boolean {
   return rateLimiter.check(
     `chat:${userId}`,
     RATE_LIMITS.CHAT_ENDPOINT.limit,
-    RATE_LIMITS.CHAT_ENDPOINT.window
+    RATE_LIMITS.CHAT_ENDPOINT.window,
   );
 }
 
@@ -152,21 +155,26 @@ export function checkAPIRateLimit(userId: string): boolean {
   return rateLimiter.check(
     `api:${userId}`,
     RATE_LIMITS.API_ENDPOINTS.limit,
-    RATE_LIMITS.API_ENDPOINTS.window
+    RATE_LIMITS.API_ENDPOINTS.window,
   );
 }
 
 /**
  * Get rate limit info for response headers
  */
-export function getRateLimitHeaders(userId: string, type: keyof typeof RATE_LIMITS) {
+export function getRateLimitHeaders(
+  userId: string,
+  type: keyof typeof RATE_LIMITS,
+) {
   const config = RATE_LIMITS[type];
   const identifier = `${type.toLowerCase()}:${userId}`;
-  
+
   return {
-    'X-RateLimit-Limit': config.limit.toString(),
-    'X-RateLimit-Remaining': rateLimiter.getRemaining(identifier, config.limit).toString(),
-    'X-RateLimit-Reset': rateLimiter.getResetTime(identifier)?.toString() || '',
+    "X-RateLimit-Limit": config.limit.toString(),
+    "X-RateLimit-Remaining": rateLimiter
+      .getRemaining(identifier, config.limit)
+      .toString(),
+    "X-RateLimit-Reset": rateLimiter.getResetTime(identifier)?.toString() || "",
   };
 }
 

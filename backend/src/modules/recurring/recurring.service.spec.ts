@@ -181,9 +181,7 @@ describe('RecurringService', () => {
     it('should throw NotFoundException if recurring transaction not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
         'Recurring transaction with ID nonexistent not found',
       );
@@ -243,9 +241,7 @@ describe('RecurringService', () => {
     it('should throw NotFoundException if recurring transaction not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       expect(repository.delete).not.toHaveBeenCalled();
     });
   });
@@ -275,9 +271,7 @@ describe('RecurringService', () => {
     it('should throw NotFoundException if recurring transaction not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.skipNext(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.skipNext(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       expect(repository.update).not.toHaveBeenCalled();
     });
   });

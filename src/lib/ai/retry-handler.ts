@@ -1,11 +1,11 @@
 /**
  * AI Service Retry Handler
- * 
+ *
  * Provides robust retry logic with exponential backoff for AI API calls.
  * Handles rate limiting, network errors, and transient failures.
  */
 
-import { logger } from '../logger';
+import { logger } from "../logger";
 
 export interface RetryOptions {
   maxRetries?: number;
@@ -22,15 +22,15 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxDelayMs: 10000,
   backoffMultiplier: 2,
   retryableErrors: [
-    'RATE_LIMIT_EXCEEDED',
-    'SERVICE_UNAVAILABLE',
-    'TIMEOUT',
-    'NETWORK_ERROR',
-    '429', // Too Many Requests
-    '500', // Internal Server Error
-    '502', // Bad Gateway
-    '503', // Service Unavailable
-    '504', // Gateway Timeout
+    "RATE_LIMIT_EXCEEDED",
+    "SERVICE_UNAVAILABLE",
+    "TIMEOUT",
+    "NETWORK_ERROR",
+    "429", // Too Many Requests
+    "500", // Internal Server Error
+    "502", // Bad Gateway
+    "503", // Service Unavailable
+    "504", // Gateway Timeout
   ],
   onRetry: () => {},
 };
@@ -46,9 +46,9 @@ const sleep = (ms: number): Promise<void> =>
  */
 function isRetryable(error: unknown, retryableErrors: string[]): boolean {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  
+
   return retryableErrors.some((retryableError) =>
-    errorMessage.includes(retryableError)
+    errorMessage.includes(retryableError),
   );
 }
 
@@ -59,7 +59,7 @@ function calculateDelay(
   attempt: number,
   initialDelay: number,
   maxDelay: number,
-  multiplier: number
+  multiplier: number,
 ): number {
   const delay = initialDelay * Math.pow(multiplier, attempt - 1);
   // Add jitter (±20%) to prevent thundering herd
@@ -69,11 +69,11 @@ function calculateDelay(
 
 /**
  * Execute function with retry logic
- * 
+ *
  * @param fn - Async function to execute
  * @param options - Retry configuration
  * @returns Promise with function result
- * 
+ *
  * @example
  * ```ts
  * const result = await withRetry(
@@ -84,7 +84,7 @@ function calculateDelay(
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   let lastError: unknown;
@@ -96,7 +96,10 @@ export async function withRetry<T>(
       lastError = error;
 
       // Don't retry on last attempt or non-retryable errors
-      if (attempt === opts.maxRetries || !isRetryable(error, opts.retryableErrors)) {
+      if (
+        attempt === opts.maxRetries ||
+        !isRetryable(error, opts.retryableErrors)
+      ) {
         throw error;
       }
 
@@ -105,17 +108,20 @@ export async function withRetry<T>(
         attempt,
         opts.initialDelayMs,
         opts.maxDelayMs,
-        opts.backoffMultiplier
+        opts.backoffMultiplier,
       );
 
-      logger.warn('AI service error, retrying...', {
+      logger.warn("AI service error, retrying...", {
         attempt,
         maxRetries: opts.maxRetries,
         delayMs: Math.round(delay),
         error: error instanceof Error ? error.message : String(error),
       });
 
-      opts.onRetry(error instanceof Error ? error : new Error(String(error)), attempt);
+      opts.onRetry(
+        error instanceof Error ? error : new Error(String(error)),
+        attempt,
+      );
 
       await sleep(delay);
     }
@@ -135,7 +141,7 @@ export class RateLimiter {
 
   constructor(
     private readonly maxTokens: number,
-    private readonly refillRatePerSecond: number
+    private readonly refillRatePerSecond: number,
   ) {
     this.tokens = maxTokens;
     this.lastRefill = Date.now();
@@ -156,7 +162,7 @@ export class RateLimiter {
     const tokensNeeded = 1 - this.tokens;
     const waitMs = (tokensNeeded / this.refillRatePerSecond) * 1000;
 
-    logger.debug('Rate limit reached, waiting...', {
+    logger.debug("Rate limit reached, waiting...", {
       waitMs: Math.round(waitMs),
       currentTokens: this.tokens.toFixed(2),
     });
@@ -194,29 +200,29 @@ export class RateLimiter {
 export class CircuitBreaker {
   private failures = 0;
   private lastFailureTime = 0;
-  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
+  private state: "CLOSED" | "OPEN" | "HALF_OPEN" = "CLOSED";
 
   constructor(
     private readonly failureThreshold: number = 5,
-    private readonly resetTimeoutMs: number = 60000 // 1 minute
+    private readonly resetTimeoutMs: number = 60000, // 1 minute
   ) {}
 
   /**
    * Execute function with circuit breaker protection
    */
   async execute<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.state === 'OPEN') {
+    if (this.state === "OPEN") {
       const timeSinceFailure = Date.now() - this.lastFailureTime;
-      
+
       if (timeSinceFailure < this.resetTimeoutMs) {
         throw new Error(
-          `Circuit breaker is OPEN. Try again in ${Math.ceil((this.resetTimeoutMs - timeSinceFailure) / 1000)}s`
+          `Circuit breaker is OPEN. Try again in ${Math.ceil((this.resetTimeoutMs - timeSinceFailure) / 1000)}s`,
         );
       }
-      
+
       // Attempt to half-open
-      this.state = 'HALF_OPEN';
-      logger.info('Circuit breaker attempting recovery (HALF_OPEN)');
+      this.state = "HALF_OPEN";
+      logger.info("Circuit breaker attempting recovery (HALF_OPEN)");
     }
 
     try {
@@ -231,9 +237,9 @@ export class CircuitBreaker {
 
   private onSuccess(): void {
     this.failures = 0;
-    if (this.state === 'HALF_OPEN') {
-      this.state = 'CLOSED';
-      logger.info('Circuit breaker recovered (CLOSED)');
+    if (this.state === "HALF_OPEN") {
+      this.state = "CLOSED";
+      logger.info("Circuit breaker recovered (CLOSED)");
     }
   }
 
@@ -242,15 +248,15 @@ export class CircuitBreaker {
     this.lastFailureTime = Date.now();
 
     if (this.failures >= this.failureThreshold) {
-      this.state = 'OPEN';
-      logger.error('Circuit breaker opened due to repeated failures', {
+      this.state = "OPEN";
+      logger.error("Circuit breaker opened due to repeated failures", {
         failures: this.failures,
         threshold: this.failureThreshold,
       });
     }
   }
 
-  getState(): 'CLOSED' | 'OPEN' | 'HALF_OPEN' {
+  getState(): "CLOSED" | "OPEN" | "HALF_OPEN" {
     return this.state;
   }
 }

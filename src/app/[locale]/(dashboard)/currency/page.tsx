@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { CurrencyPreference } from "@/components/currency/CurrencyPreference"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CoinsIcon } from "lucide-react"
+import { CurrencyPreference } from "@/components/currency/CurrencyPreference";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CoinsIcon } from "lucide-react";
 
 export default function CurrencyPage() {
   return (
@@ -27,13 +27,16 @@ export default function CurrencyPage() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            FinanceFlow allows you to view your financial data in your local currency symbol.
+            FinanceFlow allows you to view your financial data in your local
+            currency symbol.
           </p>
           <p>
-            Currently, this is a display-only preference. It updates the currency symbol shown throughout the application but does not convert historical transaction values.
+            Currently, this is a display-only preference. It updates the
+            currency symbol shown throughout the application but does not
+            convert historical transaction values.
           </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

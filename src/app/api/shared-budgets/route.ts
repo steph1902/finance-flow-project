@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const createSharedBudgetSchema = z.object({
   name: z.string().min(1).max(100),
@@ -17,12 +17,9 @@ const createSharedBudgetSchema = z.object({
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const sharedBudgets = await prisma.sharedBudget.findMany({
@@ -63,15 +60,15 @@ export async function GET() {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ sharedBudgets });
   } catch (error) {
-    logger.error('Failed to fetch shared budgets', error);
+    logger.error("Failed to fetch shared budgets", error);
     return NextResponse.json(
-      { error: 'Failed to fetch shared budgets' },
-      { status: 500 }
+      { error: "Failed to fetch shared budgets" },
+      { status: 500 },
     );
   }
 }
@@ -79,25 +76,23 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const validation = createSharedBudgetSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.issues },
-        { status: 400 }
+        { error: "Invalid request", details: validation.error.issues },
+        { status: 400 },
       );
     }
 
-    const { name, description, category, amount, month, year } = validation.data;
+    const { name, description, category, amount, month, year } =
+      validation.data;
 
     const sharedBudget = await prisma.sharedBudget.create({
       data: {
@@ -133,10 +128,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sharedBudget }, { status: 201 });
   } catch (error) {
-    logger.error('Failed to create shared budget', error);
+    logger.error("Failed to create shared budget", error);
     return NextResponse.json(
-      { error: 'Failed to create shared budget' },
-      { status: 500 }
+      { error: "Failed to create shared budget" },
+      { status: 500 },
     );
   }
 }

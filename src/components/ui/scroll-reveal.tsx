@@ -50,10 +50,10 @@ export function ScrollReveal({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ 
-        once: true, 
+      viewport={{
+        once: true,
         amount: threshold,
-        margin: "-50px"
+        margin: "-50px",
       }}
       transition={{
         duration: 0.6,

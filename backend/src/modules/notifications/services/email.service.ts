@@ -194,7 +194,7 @@ export class EmailService {
               <h1 style="margin: 0;">⚠️ Budget Alert</h1>
             </div>
             <div class="content">
-              <h2>${isOverBudget ? 'You\'ve exceeded your budget!' : 'Budget threshold reached'}</h2>
+              <h2>${isOverBudget ? "You've exceeded your budget!" : 'Budget threshold reached'}</h2>
               <p>Your <strong>${data.category}</strong> spending has reached <strong>${data.percentUsed.toFixed(1)}%</strong> of your budget.</p>
               
               <div class="stats">
@@ -216,9 +216,11 @@ export class EmailService {
                 <div class="progress-fill"></div>
               </div>
               
-              <p>${isOverBudget
-        ? 'Consider reviewing your spending in this category to get back on track.'
-        : 'Keep an eye on your spending to stay within budget.'}
+              <p>${
+                isOverBudget
+                  ? 'Consider reviewing your spending in this category to get back on track.'
+                  : 'Keep an eye on your spending to stay within budget.'
+              }
               </p>
             </div>
             <div class="footer">
@@ -234,9 +236,8 @@ export class EmailService {
    * Generate weekly report email template
    */
   private generateWeeklyReportTemplate(data: WeeklyReportData): string {
-    const savingsRate = data.totalIncome > 0
-      ? ((data.netSavings / data.totalIncome) * 100).toFixed(1)
-      : '0';
+    const savingsRate =
+      data.totalIncome > 0 ? ((data.netSavings / data.totalIncome) * 100).toFixed(1) : '0';
 
     return `
       <!DOCTYPE html>
@@ -285,19 +286,24 @@ export class EmailService {
               
               <div class="breakdown">
                 <h3>Top Spending Categories</h3>
-                ${data.categoryBreakdown.map(cat => `
+                ${data.categoryBreakdown
+                  .map(
+                    (cat) => `
                   <div class="breakdown-item">
                     <span>${cat.category}</span>
                     <strong>$${cat.total.toFixed(2)}</strong>
                   </div>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
               </div>
               
               <p style="margin-top: 30px; padding: 15px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
-                💡 <strong>Tip:</strong> ${data.netSavings >= 0
-        ? 'Great job staying on track this week! Keep up the good work.'
-        : 'Consider reviewing your spending to identify areas where you can cut back.'
-      }
+                💡 <strong>Tip:</strong> ${
+                  data.netSavings >= 0
+                    ? 'Great job staying on track this week! Keep up the good work.'
+                    : 'Consider reviewing your spending to identify areas where you can cut back.'
+                }
               </p>
             </div>
             <div class="footer">

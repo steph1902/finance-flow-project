@@ -1,13 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUpIcon, TrendingDownIcon, TargetIcon, AlertCircleIcon } from "lucide-react"
-import { formatCurrency } from "@/lib/formatters"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import {
+  TrendingUpIcon,
+  TrendingDownIcon,
+  TargetIcon,
+  AlertCircleIcon,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface BudgetCategory {
   name: string;
@@ -17,76 +37,76 @@ interface BudgetCategory {
 }
 
 const INITIAL_CATEGORIES: BudgetCategory[] = [
-  { name: 'Food & Dining', current: 600, min: 200, max: 1200 },
-  { name: 'Transportation', current: 300, min: 100, max: 800 },
-  { name: 'Shopping', current: 400, min: 100, max: 1000 },
-  { name: 'Entertainment', current: 200, min: 50, max: 500 },
-  { name: 'Bills & Utilities', current: 500, min: 300, max: 800 },
-]
+  { name: "Food & Dining", current: 600, min: 200, max: 1200 },
+  { name: "Transportation", current: 300, min: 100, max: 800 },
+  { name: "Shopping", current: 400, min: 100, max: 1000 },
+  { name: "Entertainment", current: 200, min: 50, max: 500 },
+  { name: "Bills & Utilities", current: 500, min: 300, max: 800 },
+];
 
 export function BudgetSimulator() {
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES)
-  const [monthlyIncome] = useState(5000)
+  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const [monthlyIncome] = useState(5000);
 
-  const totalBudget = categories.reduce((sum, cat) => sum + cat.current, 0)
-  const remaining = monthlyIncome - totalBudget
-  const savingsRate = (remaining / monthlyIncome) * 100
+  const totalBudget = categories.reduce((sum, cat) => sum + cat.current, 0);
+  const remaining = monthlyIncome - totalBudget;
+  const savingsRate = (remaining / monthlyIncome) * 100;
 
   const updateCategory = (index: number, value: number) => {
-    const newCategories = [...categories]
+    const newCategories = [...categories];
     if (newCategories[index]) {
-      newCategories[index].current = value
-      setCategories(newCategories)
+      newCategories[index].current = value;
+      setCategories(newCategories);
     }
-  }
+  };
 
-  const chartData = categories.map(cat => ({
-    name: cat.name.split(' ')[0],
+  const chartData = categories.map((cat) => ({
+    name: cat.name.split(" ")[0],
     amount: cat.current,
-  }))
+  }));
 
   const getRecommendations = () => {
-    const recommendations = []
+    const recommendations = [];
 
     // High spending warning
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       if (cat.current > cat.max * 0.8) {
         recommendations.push({
-          type: 'warning' as const,
+          type: "warning" as const,
           category: cat.name,
           message: `${cat.name} budget is near maximum limit`,
-        })
+        });
       }
-    })
+    });
 
     // Savings recommendation
     if (savingsRate < 20) {
       recommendations.push({
-        type: 'warning' as const,
-        category: 'Savings',
-        message: 'Try to save at least 20% of your income',
-      })
+        type: "warning" as const,
+        category: "Savings",
+        message: "Try to save at least 20% of your income",
+      });
     } else if (savingsRate >= 30) {
       recommendations.push({
-        type: 'success' as const,
-        category: 'Savings',
-        message: 'Great job! You\'re saving over 30% of your income',
-      })
+        type: "success" as const,
+        category: "Savings",
+        message: "Great job! You're saving over 30% of your income",
+      });
     }
 
     // Balanced budget
     if (remaining >= 0 && savingsRate >= 20) {
       recommendations.push({
-        type: 'success' as const,
-        category: 'Overall',
-        message: 'Your budget is well-balanced',
-      })
+        type: "success" as const,
+        category: "Overall",
+        message: "Your budget is well-balanced",
+      });
     }
 
-    return recommendations
-  }
+    return recommendations;
+  };
 
-  const recommendations = getRecommendations()
+  const recommendations = getRecommendations();
 
   return (
     <div className="space-y-6">
@@ -101,14 +121,22 @@ export function BudgetSimulator() {
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 rounded-lg border">
-              <div className="text-sm text-muted-foreground">Monthly Income</div>
-              <div className="text-2xl font-bold">{formatCurrency(monthlyIncome)}</div>
+              <div className="text-sm text-muted-foreground">
+                Monthly Income
+              </div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(monthlyIncome)}
+              </div>
             </div>
             <div className="p-4 rounded-lg border">
               <div className="text-sm text-muted-foreground">Total Budget</div>
-              <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(totalBudget)}
+              </div>
             </div>
-            <div className={`p-4 rounded-lg border ${remaining < 0 ? 'border-destructive' : 'border-green-500'}`}>
+            <div
+              className={`p-4 rounded-lg border ${remaining < 0 ? "border-destructive" : "border-green-500"}`}
+            >
               <div className="text-sm text-muted-foreground">Remaining</div>
               <div className="text-2xl font-bold flex items-center gap-2">
                 {formatCurrency(Math.abs(remaining))}
@@ -128,14 +156,15 @@ export function BudgetSimulator() {
                 <TargetIcon className="size-5" />
                 <span className="font-medium">Savings Rate</span>
               </div>
-              <Badge variant={savingsRate >= 20 ? 'default' : 'destructive'}>
+              <Badge variant={savingsRate >= 20 ? "default" : "destructive"}>
                 {savingsRate.toFixed(1)}%
               </Badge>
             </div>
             <div className="h-2 bg-background rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all ${savingsRate >= 20 ? 'bg-green-500' : 'bg-destructive'
-                  }`}
+                className={`h-full transition-all ${
+                  savingsRate >= 20 ? "bg-green-500" : "bg-destructive"
+                }`}
                 style={{ width: `${Math.min(savingsRate, 100)}%` }}
               />
             </div>
@@ -153,7 +182,9 @@ export function BudgetSimulator() {
                 </div>
                 <Slider
                   value={[category.current]}
-                  onValueChange={([value]) => value !== undefined && updateCategory(index, value)}
+                  onValueChange={([value]) =>
+                    value !== undefined && updateCategory(index, value)
+                  }
                   min={category.min}
                   max={category.max}
                   step={10}
@@ -200,10 +231,11 @@ export function BudgetSimulator() {
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              className={`p-3 rounded-lg border ${rec.type === 'success'
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-yellow-500 bg-yellow-50'
-                }`}
+              className={`p-3 rounded-lg border ${
+                rec.type === "success"
+                  ? "border-green-500 bg-green-50"
+                  : "border-yellow-500 bg-yellow-50"
+              }`}
             >
               <div className="font-medium text-sm">{rec.category}</div>
               <div className="text-sm text-muted-foreground mt-1">
@@ -219,5 +251,5 @@ export function BudgetSimulator() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

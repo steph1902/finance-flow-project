@@ -6,7 +6,9 @@ import { RecurringTransaction, Prisma } from '@prisma/client';
 export class RecurringRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: Prisma.RecurringTransactionUncheckedCreateInput): Promise<RecurringTransaction> {
+  async create(
+    data: Prisma.RecurringTransactionUncheckedCreateInput,
+  ): Promise<RecurringTransaction> {
     return this.prisma.recurringTransaction.create({ data });
   }
 
@@ -28,15 +30,15 @@ export class RecurringRepository {
       where: {
         isActive: true,
         nextDate: { lte: new Date() },
-        OR: [
-          { endDate: null },
-          { endDate: { gte: new Date() } },
-        ],
+        OR: [{ endDate: null }, { endDate: { gte: new Date() } }],
       },
     });
   }
 
-  async update(id: string, data: Prisma.RecurringTransactionUpdateInput): Promise<RecurringTransaction> {
+  async update(
+    id: string,
+    data: Prisma.RecurringTransactionUpdateInput,
+  ): Promise<RecurringTransaction> {
     return this.prisma.recurringTransaction.update({
       where: { id },
       data,

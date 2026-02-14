@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage } from "@/lib/utils/error";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,13 +10,13 @@ import { checkAIRateLimit } from "@/lib/rate-limiter";
 /**
  * AI Spending Forecast API
  * GET /api/ai/forecast?months=3
- * 
+ *
  * Generates predictive spending forecast based on:
  * - Historical transaction patterns (6 months)
  * - Active recurring transactions
  * - Category spending trends
  * - Seasonal patterns
- * 
+ *
  * Returns:
  * - Monthly forecast by category
  * - Confidence score
@@ -29,10 +29,7 @@ export async function GET(req: NextRequest) {
     // 1. Authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // 2. Rate limiting
@@ -41,7 +38,7 @@ export async function GET(req: NextRequest) {
       logInfo("AI forecast rate limit exceeded", { userId });
       return NextResponse.json(
         { error: "Rate limit exceeded. Please try again later." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -59,10 +56,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // 5. Get historical transactions (last 6 months)
@@ -94,10 +88,7 @@ export async function GET(req: NextRequest) {
       where: {
         userId: user.id,
         isActive: true,
-        OR: [
-          { endDate: null },
-          { endDate: { gte: new Date() } },
-        ],
+        OR: [{ endDate: null }, { endDate: { gte: new Date() } }],
       },
       select: {
         amount: true,
@@ -109,12 +100,12 @@ export async function GET(req: NextRequest) {
     });
 
     // 7. Convert Prisma Decimal to number for AI service
-    const convertedTransactions = transactions.map(t => ({
+    const convertedTransactions = transactions.map((t) => ({
       ...t,
       amount: t.amount.toNumber(),
     }));
 
-    const convertedRecurringTransactions = recurringTransactions.map(rt => ({
+    const convertedRecurringTransactions = recurringTransactions.map((rt) => ({
       ...rt,
       amount: rt.amount.toNumber(),
     }));
@@ -138,19 +129,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       data: forecast,
     });
-
   } catch (error) {
     logError("Forecast generation failed", error);
 
     // Provide more specific error messages
-    const errorMessage = error instanceof Error ? getErrorMessage(error) : "Failed to generate forecast";
+    const errorMessage =
+      error instanceof Error
+        ? getErrorMessage(error)
+        : "Failed to generate forecast";
 
     return NextResponse.json(
       {
         error: errorMessage,
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

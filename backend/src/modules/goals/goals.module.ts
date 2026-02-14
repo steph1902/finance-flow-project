@@ -3,12 +3,12 @@ import { Module } from '@nestjs/common';
 /**
  * Goals Module
  * Financial goal tracking and milestone management
- * 
+ *
  * TODO: Implement:
  * - goals.controller.ts
  * - goals.service.ts
  * - dto/ directory (create-goal.dto.ts, goal-contribution.dto.ts, etc.)
- * 
+ *
  * Key features:
  * - Goal CRUD operations
  * - Track progress (current vs target amount)

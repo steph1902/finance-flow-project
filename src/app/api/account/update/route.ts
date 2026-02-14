@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const updateAccountSchema = z.object({
   name: z.string().optional(),
@@ -16,7 +16,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -25,9 +25,12 @@ export async function PATCH(request: NextRequest) {
     // Filter out undefined values for exactOptionalPropertyTypes
     const updateData: Record<string, string> = {};
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
-    if (validatedData.preferredCurrency !== undefined) updateData.preferredCurrency = validatedData.preferredCurrency;
-    if (validatedData.timezone !== undefined) updateData.timezone = validatedData.timezone;
-    if (validatedData.language !== undefined) updateData.language = validatedData.language;
+    if (validatedData.preferredCurrency !== undefined)
+      updateData.preferredCurrency = validatedData.preferredCurrency;
+    if (validatedData.timezone !== undefined)
+      updateData.timezone = validatedData.timezone;
+    if (validatedData.language !== undefined)
+      updateData.language = validatedData.language;
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
@@ -44,18 +47,18 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(user);
   } catch (error) {
-    logger.error('Account update error', error);
-    
+    logger.error("Account update error", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.issues },
-        { status: 400 }
+        { error: "Invalid request data", details: error.issues },
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to update account' },
-      { status: 500 }
+      { error: "Failed to update account" },
+      { status: 500 },
     );
   }
 }

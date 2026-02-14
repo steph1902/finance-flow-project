@@ -4,10 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import {
-  budgetQuerySchema,
-  budgetSchema,
-} from "@/lib/validations";
+import { budgetQuerySchema, budgetSchema } from "@/lib/validations";
 import { createBudget, getBudgets } from "@/lib/services/budget-service";
 
 const serializeBudget = (budget: Prisma.BudgetGetPayload<true>) => ({
@@ -47,7 +44,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch budgets" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });
@@ -75,10 +72,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
     );
   } catch (error) {
     if (error instanceof Error && error.message.includes("already exists")) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: error.message }, { status: 409 });
     }
 
     return NextResponse.json(
@@ -87,4 +81,3 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
     );
   }
 });
-

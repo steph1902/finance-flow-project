@@ -1,20 +1,11 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { Prisma, TransactionType, Transaction } from '@prisma/client';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { PrismaService } from '@/database/prisma.service';
 import { TransactionsRepository } from './transactions.repository';
 import { BudgetRepository } from '../budgets/repositories/budget.repository';
-import {
-  CreateTransactionDto,
-  UpdateTransactionDto,
-  QueryTransactionDto,
-} from './dto';
+import { CreateTransactionDto, UpdateTransactionDto, QueryTransactionDto } from './dto';
 import { PaginatedResponse } from '@/common/interfaces/common.interface';
 import { CategorizationJobData } from './processors/ai-categorization.processor';
 import { KeywordLearningService } from './services/keyword-learning.service';
@@ -33,7 +24,7 @@ export class TransactionsService {
     private readonly budgetRepository: BudgetRepository,
     @InjectQueue('ai-categorization') private readonly aiQueue: Queue<CategorizationJobData>,
     private readonly keywordLearningService: KeywordLearningService,
-  ) { }
+  ) {}
 
   /**
    * Create a new transaction
@@ -103,9 +94,7 @@ export class TransactionsService {
    * Get AI suggestion for a transaction
    */
   async getAISuggestion(userId: string, transactionId: string) {
-    const transaction = await this.repository.findOne(
-      { where: { id: transactionId } },
-    );
+    const transaction = await this.repository.findOne({ where: { id: transactionId } });
 
     if (!transaction || transaction.userId !== userId) {
       throw new NotFoundException('Transaction not found');
@@ -186,14 +175,11 @@ export class TransactionsService {
 
       this.logger.log(
         `AI suggestion rejected for transaction ${transactionId}. ` +
-        `Suggested: ${suggestion.suggestedValue}, Correct: ${feedback.correctCategory}`,
+          `Suggested: ${suggestion.suggestedValue}, Correct: ${feedback.correctCategory}`,
       );
 
       // Learn from this feedback for future categorizations
-      await this.keywordLearningService.learnFromFeedback(
-        transactionId,
-        feedback.correctCategory,
-      );
+      await this.keywordLearningService.learnFromFeedback(transactionId, feedback.correctCategory);
     }
 
     return this.serializeTransaction(transaction);
@@ -243,10 +229,7 @@ export class TransactionsService {
   /**
    * Get all transactions with pagination and filters
    */
-  async findAll(
-    userId: string,
-    query: QueryTransactionDto,
-  ): Promise<PaginatedResponse<any>> {
+  async findAll(userId: string, query: QueryTransactionDto): Promise<PaginatedResponse<any>> {
     const {
       page = 1,
       limit = 10,
@@ -271,11 +254,11 @@ export class TransactionsService {
       ...(category && { category }),
       ...(startDate || endDate
         ? {
-          date: {
-            ...(startDate && { gte: startDate }),
-            ...(endDate && { lte: endDate }),
-          },
-        }
+            date: {
+              ...(startDate && { gte: startDate }),
+              ...(endDate && { lte: endDate }),
+            },
+          }
         : {}),
       ...(search && {
         OR: [
@@ -430,32 +413,31 @@ export class TransactionsService {
       deletedAt: null,
       ...(startDate || endDate
         ? {
-          date: {
-            ...(startDate && { gte: startDate }),
-            ...(endDate && { lte: endDate }),
-          },
-        }
+            date: {
+              ...(startDate && { gte: startDate }),
+              ...(endDate && { lte: endDate }),
+            },
+          }
         : {}),
     };
 
-    const [totalIncome, totalExpense, transactionCount, categoryBreakdown] =
-      await Promise.all([
-        this.repository.aggregate({
-          where: { ...where, type: TransactionType.INCOME },
-          _sum: { amount: true },
-        }),
-        this.repository.aggregate({
-          where: { ...where, type: TransactionType.EXPENSE },
-          _sum: { amount: true },
-        }),
-        this.repository.count(where),
-        this.repository.groupBy({
-          by: ['category', 'type'],
-          where,
-          _sum: { amount: true },
-          _count: true,
-        }),
-      ]);
+    const [totalIncome, totalExpense, transactionCount, categoryBreakdown] = await Promise.all([
+      this.repository.aggregate({
+        where: { ...where, type: TransactionType.INCOME },
+        _sum: { amount: true },
+      }),
+      this.repository.aggregate({
+        where: { ...where, type: TransactionType.EXPENSE },
+        _sum: { amount: true },
+      }),
+      this.repository.count(where),
+      this.repository.groupBy({
+        by: ['category', 'type'],
+        where,
+        _sum: { amount: true },
+        _count: true,
+      }),
+    ]);
 
     const income = Number(totalIncome._sum?.amount ?? 0);
     const expense = Number(totalExpense._sum?.amount ?? 0);
@@ -565,27 +547,18 @@ export class TransactionsService {
           `Updated budget ${budget.id} spent by ${amount.toString()} for category ${category}`,
         );
       } else {
-        this.logger.debug(
-          `No budget found for category ${category} in ${month}/${year}`,
-        );
+        this.logger.debug(`No budget found for category ${category} in ${month}/${year}`);
       }
     } catch (error) {
       // Don't fail transaction if budget update fails
-      this.logger.error(
-        `Failed to update budget spent: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to update budget spent: ${error.message}`, error.stack);
     }
   }
 
   /**
    * Check budget alerts and create notifications if thresholds exceeded
    */
-  private async checkBudgetAlerts(
-    userId: string,
-    category: string,
-    date: Date,
-  ): Promise<void> {
+  private async checkBudgetAlerts(userId: string, category: string, date: Date): Promise<void> {
     try {
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
@@ -611,9 +584,7 @@ export class TransactionsService {
           data: {
             userId,
             type: 'BUDGET_ALERT',
-            title: isOverBudget
-              ? `Budget Exceeded: ${category}`
-              : `Budget Alert: ${category}`,
+            title: isOverBudget ? `Budget Exceeded: ${category}` : `Budget Alert: ${category}`,
             message: isOverBudget
               ? `You have exceeded your ${category} budget by ${(percentUsed - 100).toFixed(1)}%. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`
               : `You have used ${percentUsed.toFixed(1)}% of your ${category} budget. Spent: $${budget.spent.toNumber()} of $${budget.amount.toNumber()}.`,
@@ -634,10 +605,7 @@ export class TransactionsService {
       }
     } catch (error) {
       // Don't fail transaction if alert creation fails
-      this.logger.error(
-        `Failed to check budget alerts: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to check budget alerts: ${error.message}`, error.stack);
     }
   }
 
@@ -660,9 +628,7 @@ export class TransactionsService {
       const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite-001' });
 
       // Extract base64 data (remove data:image/...;base64, prefix if present)
-      const base64Data = imageBase64.includes(',')
-        ? imageBase64.split(',')[1]
-        : imageBase64;
+      const base64Data = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
 
       // Prepare the prompt for receipt scanning
       const prompt = `Analyze this receipt image and extract the following information in JSON format:
@@ -717,7 +683,7 @@ Return ONLY valid JSON, no other text.`;
           responseText: text.substring(0, 500), // Log first 500 chars
         });
         throw new BadRequestException(
-          'Could not understand receipt image. Please try a clearer photo.'
+          'Could not understand receipt image. Please try a clearer photo.',
         );
       }
 
@@ -732,7 +698,9 @@ Return ONLY valid JSON, no other text.`;
         ocrText: text,
       };
 
-      this.logger.log(`Receipt scanned successfully: ${receiptData.merchant} - $${receiptData.amount}`);
+      this.logger.log(
+        `Receipt scanned successfully: ${receiptData.merchant} - $${receiptData.amount}`,
+      );
 
       return {
         success: true,

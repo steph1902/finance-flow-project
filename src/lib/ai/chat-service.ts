@@ -74,13 +74,20 @@ export async function chatWithAssistant({
       .filter((r) => r.type === "EXPENSE")
       .reduce((sum, r) => {
         const multiplier =
-          r.frequency === "DAILY" ? 30 :
-            r.frequency === "WEEKLY" ? 4 :
-              r.frequency === "BIWEEKLY" ? 2 :
-                r.frequency === "MONTHLY" ? 1 :
-                  r.frequency === "QUARTERLY" ? 0.33 :
-                    r.frequency === "YEARLY" ? 0.083 : 0;
-        return sum + (Number(r.amount) * multiplier);
+          r.frequency === "DAILY"
+            ? 30
+            : r.frequency === "WEEKLY"
+              ? 4
+              : r.frequency === "BIWEEKLY"
+                ? 2
+                : r.frequency === "MONTHLY"
+                  ? 1
+                  : r.frequency === "QUARTERLY"
+                    ? 0.33
+                    : r.frequency === "YEARLY"
+                      ? 0.083
+                      : 0;
+        return sum + Number(r.amount) * multiplier;
       }, 0);
 
     // Build context for AI
@@ -135,7 +142,10 @@ export async function chatWithAssistant({
 
     // Get AI response - build prompt with conversation
     const fullPrompt = `${systemPrompt}\n\nConversation:\n${conversationForAI
-      .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.parts[0]?.text ?? ''}`)
+      .map(
+        (msg) =>
+          `${msg.role === "user" ? "User" : "Assistant"}: ${msg.parts[0]?.text ?? ""}`,
+      )
       .join("\n")}`;
 
     let aiResponse: string;
@@ -145,10 +155,12 @@ export async function chatWithAssistant({
       aiResponse = await gemini.generateContent(fullPrompt);
     } catch (aiError) {
       logError("Gemini API error in chat service", aiError);
-      aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";
+      aiResponse =
+        "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.";
     }
 
-    const responseText = aiResponse || "I'm sorry, I couldn't process that request.";
+    const responseText =
+      aiResponse || "I'm sorry, I couldn't process that request.";
 
     // Store conversation in database - generate UUIDs for database
     const conversationId = randomUUID();
@@ -184,7 +196,7 @@ export async function chatWithAssistant({
 
 export async function getConversationHistory(
   userId: string,
-  conversationId: string
+  conversationId: string,
 ): Promise<ChatMessage[]> {
   const history = await prisma.aIChatHistory.findMany({
     where: {

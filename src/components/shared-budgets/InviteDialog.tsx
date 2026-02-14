@@ -1,15 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MailIcon, UserPlusIcon } from "lucide-react"
-import { inviteToSharedBudget } from "@/hooks/useSharedBudgets"
-import { toast } from "sonner"
-import { mutate } from "swr"
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MailIcon, UserPlusIcon } from "lucide-react";
+import { inviteToSharedBudget } from "@/hooks/useSharedBudgets";
+import { toast } from "sonner";
+import { mutate } from "swr";
 
 interface InviteDialogProps {
   budgetId: string;
@@ -18,32 +30,33 @@ interface InviteDialogProps {
 }
 
 export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
-  const [email, setEmail] = useState("")
-  const [role, setRole] = useState<'CONTRIBUTOR' | 'VIEWER'>('VIEWER')
-  const [isInviting, setIsInviting] = useState(false)
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<"CONTRIBUTOR" | "VIEWER">("VIEWER");
+  const [isInviting, setIsInviting] = useState(false);
 
   const handleInvite = async () => {
     if (!email) {
-      toast.error("Please enter an email address")
-      return
+      toast.error("Please enter an email address");
+      return;
     }
 
-    setIsInviting(true)
+    setIsInviting(true);
     try {
-      await inviteToSharedBudget(budgetId, email, role)
-      toast.success("User invited successfully!")
-      mutate(`/api/shared-budgets/${budgetId}`)
-      mutate('/api/shared-budgets')
-      setEmail("")
-      setRole('VIEWER')
-      onClose()
+      await inviteToSharedBudget(budgetId, email, role);
+      toast.success("User invited successfully!");
+      mutate(`/api/shared-budgets/${budgetId}`);
+      mutate("/api/shared-budgets");
+      setEmail("");
+      setRole("VIEWER");
+      onClose();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to invite user'
-      toast.error(message)
+      const message =
+        error instanceof Error ? error.message : "Failed to invite user";
+      toast.error(message);
     } finally {
-      setIsInviting(false)
+      setIsInviting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -75,13 +88,20 @@ export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
 
           <div className="space-y-2">
             <Label htmlFor="invite-role">Role</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as 'CONTRIBUTOR' | 'VIEWER')}>
+            <Select
+              value={role}
+              onValueChange={(value) =>
+                setRole(value as "CONTRIBUTOR" | "VIEWER")
+              }
+            >
               <SelectTrigger id="invite-role">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="VIEWER">Viewer - Can only view</SelectItem>
-                <SelectItem value="CONTRIBUTOR">Contributor - Can view and edit</SelectItem>
+                <SelectItem value="CONTRIBUTOR">
+                  Contributor - Can view and edit
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -89,9 +109,16 @@ export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
           <div className="rounded-md bg-muted p-3 text-sm space-y-1">
             <p className="font-medium">Permissions:</p>
             <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-              <li><strong>Viewer:</strong> Can see budget and transactions</li>
-              <li><strong>Contributor:</strong> Can add transactions and edit budget</li>
-              <li><strong>Admin:</strong> Full control including deleting</li>
+              <li>
+                <strong>Viewer:</strong> Can see budget and transactions
+              </li>
+              <li>
+                <strong>Contributor:</strong> Can add transactions and edit
+                budget
+              </li>
+              <li>
+                <strong>Admin:</strong> Full control including deleting
+              </li>
             </ul>
           </div>
         </div>
@@ -106,5 +133,5 @@ export function InviteDialog({ budgetId, isOpen, onClose }: InviteDialogProps) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

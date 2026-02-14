@@ -205,9 +205,7 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException if notification not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       expect(repository.delete).not.toHaveBeenCalled();
     });
   });

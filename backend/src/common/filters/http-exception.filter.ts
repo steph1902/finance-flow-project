@@ -7,7 +7,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
-import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/library';
 
 /**
  * Global exception filter
@@ -54,10 +57,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // Handle unknown errors
     else if (exception instanceof Error) {
       message = exception.message;
-      this.logger.error(
-        `Unhandled exception: ${exception.message}`,
-        exception.stack,
-      );
+      this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
     }
 
     // Log error details
@@ -83,9 +83,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Map Prisma error codes to HTTP status codes
    */
-  private handlePrismaError(
-    error: PrismaClientKnownRequestError,
-  ): number {
+  private handlePrismaError(error: PrismaClientKnownRequestError): number {
     switch (error.code) {
       case 'P2002': // Unique constraint violation
         return HttpStatus.CONFLICT;
@@ -103,9 +101,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Get user-friendly error messages for Prisma errors
    */
-  private getPrismaErrorMessage(
-    error: PrismaClientKnownRequestError,
-  ): string {
+  private getPrismaErrorMessage(error: PrismaClientKnownRequestError): string {
     switch (error.code) {
       case 'P2002':
         return 'A record with this value already exists';

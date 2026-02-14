@@ -167,9 +167,7 @@ describe('GoalsService', () => {
     it('should throw NotFoundException if goal not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
         'Goal with ID nonexistent not found',
       );
@@ -234,9 +232,9 @@ describe('GoalsService', () => {
     it('should throw NotFoundException if goal not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.update(mockUserId, 'nonexistent', { name: 'Test' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(mockUserId, 'nonexistent', { name: 'Test' })).rejects.toThrow(
+        NotFoundException,
+      );
       expect(repository.update).not.toHaveBeenCalled();
     });
   });
@@ -255,9 +253,7 @@ describe('GoalsService', () => {
     it('should throw NotFoundException if goal not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       expect(repository.delete).not.toHaveBeenCalled();
     });
   });
@@ -306,9 +302,9 @@ describe('GoalsService', () => {
     it('should throw NotFoundException if goal not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.addContribution(mockUserId, 'nonexistent', 1000),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.addContribution(mockUserId, 'nonexistent', 1000)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(repository.update).not.toHaveBeenCalled();
     });
   });

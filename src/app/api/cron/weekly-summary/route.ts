@@ -1,22 +1,25 @@
-import { NextResponse } from 'next/server';
-import { getErrorMessage } from '@/lib/utils/error';
-import { prisma } from '@/lib/prisma';
-import { logger } from '@/lib/logger';
-import { sendWeeklySummary, isEmailConfigured } from '@/lib/services/email-service';
+import { NextResponse } from "next/server";
+import { getErrorMessage } from "@/lib/utils/error";
+import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import {
+  sendWeeklySummary,
+  isEmailConfigured,
+} from "@/lib/services/email-service";
 
 /**
  * Weekly Summary Cron Job
  * Runs every Sunday at 8 AM UTC
  * Vercel Cron: 0 8 * * 0
- * 
+ *
  * Sends weekly financial summary to users
  */
 export async function GET(request: Request) {
   try {
     // Verify the request is from Vercel Cron
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get("authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const now = new Date();
@@ -44,11 +47,11 @@ export async function GET(request: Request) {
 
       // Calculate stats
       const totalIncome = transactions
-        .filter((t) => t.type === 'INCOME')
+        .filter((t) => t.type === "INCOME")
         .reduce((sum, t) => sum + Number(t.amount), 0);
 
       const totalExpenses = transactions
-        .filter((t) => t.type === 'EXPENSE')
+        .filter((t) => t.type === "EXPENSE")
         .reduce((sum, t) => sum + Number(t.amount), 0);
 
       const netSavings = totalIncome - totalExpenses;
@@ -56,9 +59,10 @@ export async function GET(request: Request) {
       // Top spending categories
       const categoryTotals: Record<string, number> = {};
       transactions
-        .filter((t) => t.type === 'EXPENSE')
+        .filter((t) => t.type === "EXPENSE")
         .forEach((t) => {
-          categoryTotals[t.category] = (categoryTotals[t.category] || 0) + Number(t.amount);
+          categoryTotals[t.category] =
+            (categoryTotals[t.category] || 0) + Number(t.amount);
         });
 
       const topCategories = Object.entries(categoryTotals)
@@ -67,7 +71,7 @@ export async function GET(request: Request) {
 
       // Create weekly summary notification
       let summaryMessage = `This week: `;
-      summaryMessage += `${transactions.length} transaction${transactions.length !== 1 ? 's' : ''}, `;
+      summaryMessage += `${transactions.length} transaction${transactions.length !== 1 ? "s" : ""}, `;
       summaryMessage += `$${totalExpenses.toFixed(2)} spent`;
 
       if (totalIncome > 0) {
@@ -90,13 +94,13 @@ export async function GET(request: Request) {
       await prisma.notification.create({
         data: {
           userId: user.id,
-          type: 'SYSTEM',
-          title: 'Weekly Financial Summary',
+          type: "SYSTEM",
+          title: "Weekly Financial Summary",
           message: summaryMessage,
           priority: 0, // Low priority
-          status: 'UNREAD',
+          status: "UNREAD",
           metadata: {},
-          actionUrl: '/dashboard',
+          actionUrl: "/dashboard",
         },
       });
 
@@ -113,7 +117,10 @@ export async function GET(request: Request) {
             transactionCount: transactions.length,
           });
         } catch (emailError) {
-          logger.warn('Failed to send weekly summary email', { userId: user.id, error: emailError });
+          logger.warn("Failed to send weekly summary email", {
+            userId: user.id,
+            error: emailError,
+          });
           // Continue processing other users even if email fails
         }
       }
@@ -132,10 +139,14 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    logger.error('Weekly summary cron job failed', error);
+    logger.error("Weekly summary cron job failed", error);
     return NextResponse.json(
-      { error: 'Cron job failed', details: error instanceof Error ? getErrorMessage(error) : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Cron job failed",
+        details:
+          error instanceof Error ? getErrorMessage(error) : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

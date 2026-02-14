@@ -5,7 +5,7 @@ import { TransactionsService } from '../../transactions/transactions.service';
 
 /**
  * Recurring Transaction Processor
- * 
+ *
  * Runs daily to process due recurring transactions
  */
 @Injectable()
@@ -15,7 +15,7 @@ export class RecurringProcessor {
   constructor(
     private readonly recurringRepository: RecurringRepository,
     private readonly transactionsService: TransactionsService,
-  ) { }
+  ) {}
 
   /**
    * Process recurring transactions daily at 1 AM

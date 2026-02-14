@@ -27,7 +27,11 @@ export class CreateBudgetDto {
   @IsOptional()
   rollover?: boolean;
 
-  @ApiProperty({ example: 80, required: false, description: 'Alert when spending reaches this percentage' })
+  @ApiProperty({
+    example: 80,
+    required: false,
+    description: 'Alert when spending reaches this percentage',
+  })
   @IsNumber()
   @IsOptional()
   @Min(0)

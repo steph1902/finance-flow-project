@@ -27,7 +27,7 @@ export const createTestTransaction = (overrides = {}) => {
   return {
     id: 'test-transaction-id',
     userId: 'test-user-id',
-    amount: 100.00,
+    amount: 100.0,
     type: TransactionType.EXPENSE,
     category: 'Food',
     description: 'Test transaction',
@@ -46,7 +46,7 @@ export const createTestBudget = (overrides = {}) => {
     id: 'test-budget-id',
     userId: 'test-user-id',
     category: 'Food',
-    amount: 500.00,
+    amount: 500.0,
     month: now.getMonth() + 1,
     year: now.getFullYear(),
     createdAt: now,
@@ -61,11 +61,11 @@ export const createTestGoal = (overrides = {}) => {
     userId: 'test-user-id',
     name: 'Test Goal',
     description: 'Test goal description',
-    targetAmount: 1000.00,
+    targetAmount: 1000.0,
     currentAmount: 0,
     targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     category: 'Savings',
-    status: GoalStatus.ACTIVE,  // Changed from IN_PROGRESS
+    status: GoalStatus.ACTIVE, // Changed from IN_PROGRESS
     priority: 1,
     reminderEnabled: true,
     createdAt: new Date(),

@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { CameraIcon, UploadIcon, ScanIcon } from "lucide-react"
-import { toast } from "sonner"
+import { useState, useRef } from "react";
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CameraIcon, UploadIcon, ScanIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface ReceiptScannerProps {
   onScanComplete?: (data: ReceiptData) => void;
@@ -20,48 +26,48 @@ interface ReceiptData {
 }
 
 export function ReceiptScanner({ onScanComplete }: ReceiptScannerProps) {
-  const [isScanning, setIsScanning] = useState(false)
-  const [preview, setPreview] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isScanning, setIsScanning] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     // Show preview
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
 
     // Scan receipt
-    await scanReceipt(file)
-  }
+    await scanReceipt(file);
+  };
 
   const scanReceipt = async (file: File) => {
-    setIsScanning(true)
+    setIsScanning(true);
     try {
-      const formData = new FormData()
-      formData.append('receipt', file)
+      const formData = new FormData();
+      formData.append("receipt", file);
 
-      const response = await fetch('/api/ai/receipt-scan', {
-        method: 'POST',
+      const response = await fetch("/api/ai/receipt-scan", {
+        method: "POST",
         body: formData,
-      })
+      });
 
-      if (!response.ok) throw new Error('Scan failed')
+      if (!response.ok) throw new Error("Scan failed");
 
-      const data = await response.json()
-      toast.success("Receipt scanned successfully!")
-      onScanComplete?.(data)
+      const data = await response.json();
+      toast.success("Receipt scanned successfully!");
+      onScanComplete?.(data);
     } catch (error) {
-      console.error('Failed to scan receipt:', error)
-      toast.error("Failed to scan receipt. Please try again.")
+      console.error("Failed to scan receipt:", error);
+      toast.error("Failed to scan receipt. Please try again.");
     } finally {
-      setIsScanning(false)
+      setIsScanning(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -97,8 +103,8 @@ export function ReceiptScanner({ onScanComplete }: ReceiptScannerProps) {
             <Button
               variant="outline"
               onClick={() => {
-                setPreview(null)
-                if (fileInputRef.current) fileInputRef.current.value = ''
+                setPreview(null);
+                if (fileInputRef.current) fileInputRef.current.value = "";
               }}
               className="w-full"
             >
@@ -120,8 +126,8 @@ export function ReceiptScanner({ onScanComplete }: ReceiptScannerProps) {
               variant="outline"
               onClick={() => {
                 if (fileInputRef.current) {
-                  fileInputRef.current.removeAttribute('capture')
-                  fileInputRef.current.click()
+                  fileInputRef.current.removeAttribute("capture");
+                  fileInputRef.current.click();
                 }
               }}
               disabled={isScanning}
@@ -136,10 +142,12 @@ export function ReceiptScanner({ onScanComplete }: ReceiptScannerProps) {
         {isScanning && (
           <div className="text-center py-4">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-            <p className="text-sm text-muted-foreground mt-2">Scanning receipt...</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Scanning receipt...
+            </p>
           </div>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -16,7 +16,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Calendar, Repeat, DollarSign, Info, AlertCircle } from "lucide-react";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/constants/categories";
 import { logError } from "@/lib/logger";
@@ -27,7 +33,14 @@ const recurringTransactionSchema = z.object({
   category: z.string().min(1, "Category is required"),
   description: z.string().optional(),
   notes: z.string().optional(),
-  frequency: z.enum(["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"]),
+  frequency: z.enum([
+    "DAILY",
+    "WEEKLY",
+    "BIWEEKLY",
+    "MONTHLY",
+    "QUARTERLY",
+    "YEARLY",
+  ]),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
   isActive: z.boolean(),
@@ -59,7 +72,8 @@ export function RecurringTransactionForm({
   const [error, setError] = useState<string | null>(null);
   const [nextOccurrence, setNextOccurrence] = useState<Date | null>(null);
 
-  const defaultStartDate = (initialData?.startDate || new Date().toISOString().split("T")[0]) as string;
+  const defaultStartDate = (initialData?.startDate ||
+    new Date().toISOString().split("T")[0]) as string;
 
   const {
     register,
@@ -75,10 +89,16 @@ export function RecurringTransactionForm({
       isActive: initialData?.isActive ?? true,
       startDate: defaultStartDate,
       ...(initialData?.amount !== undefined && { amount: initialData.amount }),
-      ...(initialData?.category !== undefined && { category: initialData.category }),
-      ...(initialData?.description !== undefined && { description: initialData.description }),
+      ...(initialData?.category !== undefined && {
+        category: initialData.category,
+      }),
+      ...(initialData?.description !== undefined && {
+        description: initialData.description,
+      }),
       ...(initialData?.notes !== undefined && { notes: initialData.notes }),
-      ...(initialData?.endDate !== undefined && { endDate: initialData.endDate }),
+      ...(initialData?.endDate !== undefined && {
+        endDate: initialData.endDate,
+      }),
     },
   });
 
@@ -137,26 +157,37 @@ export function RecurringTransactionForm({
           ...data,
           amount: parseFloat(data.amount),
           startDate: new Date(data.startDate).toISOString(),
-          endDate: data.endDate ? new Date(data.endDate).toISOString() : undefined,
+          endDate: data.endDate
+            ? new Date(data.endDate).toISOString()
+            : undefined,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create recurring transaction");
+        throw new Error(
+          errorData.error || "Failed to create recurring transaction",
+        );
       }
 
       onSuccess?.();
     } catch (err) {
       logError("Submit error for recurring transaction", err);
-      setError(err instanceof Error ? err.message : "Failed to create recurring transaction");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create recurring transaction",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const categories = watchType === "INCOME" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-  const selectedFrequency = FREQUENCY_OPTIONS.find(opt => opt.value === watchFrequency);
+  const categories =
+    watchType === "INCOME" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const selectedFrequency = FREQUENCY_OPTIONS.find(
+    (opt) => opt.value === watchFrequency,
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -172,7 +203,9 @@ export function RecurringTransactionForm({
         <Label htmlFor="type">Transaction Type *</Label>
         <Select
           value={watchType}
-          onValueChange={(value) => setValue("type", value as "INCOME" | "EXPENSE")}
+          onValueChange={(value) =>
+            setValue("type", value as "INCOME" | "EXPENSE")
+          }
         >
           <SelectTrigger id="type" aria-label="Select transaction type">
             <SelectValue />
@@ -202,7 +235,9 @@ export function RecurringTransactionForm({
             />
           </div>
           {errors.amount && (
-            <p className="text-sm text-destructive" role="alert">{errors.amount.message}</p>
+            <p className="text-sm text-destructive" role="alert">
+              {errors.amount.message}
+            </p>
           )}
         </div>
 
@@ -224,7 +259,9 @@ export function RecurringTransactionForm({
             </SelectContent>
           </Select>
           {errors.category && (
-            <p className="text-sm text-destructive" role="alert">{errors.category.message}</p>
+            <p className="text-sm text-destructive" role="alert">
+              {errors.category.message}
+            </p>
           )}
         </div>
       </div>
@@ -251,13 +288,24 @@ export function RecurringTransactionForm({
             <Repeat className="h-4 w-4" />
             Recurrence Pattern *
           </CardTitle>
-          <CardDescription>How often should this transaction repeat?</CardDescription>
+          <CardDescription>
+            How often should this transaction repeat?
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Select
             value={watchFrequency}
             onValueChange={(value) => {
-              setValue("frequency", value as "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY");
+              setValue(
+                "frequency",
+                value as
+                  | "DAILY"
+                  | "WEEKLY"
+                  | "BIWEEKLY"
+                  | "MONTHLY"
+                  | "QUARTERLY"
+                  | "YEARLY",
+              );
               if (watchStartDate) {
                 const next = calculateNextOccurrence(watchStartDate, value);
                 setNextOccurrence(next);
@@ -272,7 +320,9 @@ export function RecurringTransactionForm({
                 <SelectItem key={option.value} value={option.value}>
                   <div className="flex flex-col">
                     <span className="font-medium">{option.label}</span>
-                    <span className="text-xs text-muted-foreground">{option.description}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {option.description}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
@@ -283,7 +333,8 @@ export function RecurringTransactionForm({
             <div className="flex items-start gap-2 p-3 bg-background rounded-md border">
               <Info className="h-4 w-4 mt-0.5 text-blue-500" />
               <p className="text-sm text-muted-foreground">
-                Transactions will be created <strong>{selectedFrequency.description.toLowerCase()}</strong>
+                Transactions will be created{" "}
+                <strong>{selectedFrequency.description.toLowerCase()}</strong>
               </p>
             </div>
           )}
@@ -309,35 +360,39 @@ export function RecurringTransactionForm({
                 onChange={(e) => {
                   register("startDate").onChange(e);
                   if (e.target.value && watchFrequency) {
-                    const next = calculateNextOccurrence(e.target.value, watchFrequency);
+                    const next = calculateNextOccurrence(
+                      e.target.value,
+                      watchFrequency,
+                    );
                     setNextOccurrence(next);
                   }
                 }}
               />
               {errors.startDate && (
-                <p className="text-sm text-destructive">{errors.startDate.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.startDate.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date (Optional)</Label>
-              <Input
-                id="endDate"
-                type="date"
-                {...register("endDate")}
-              />
-              <p className="text-xs text-muted-foreground">Leave empty for indefinite recurrence</p>
+              <Input id="endDate" type="date" {...register("endDate")} />
+              <p className="text-xs text-muted-foreground">
+                Leave empty for indefinite recurrence
+              </p>
             </div>
           </div>
 
           {nextOccurrence && (
             <div className="p-3 bg-green-50 rounded-md border border-green-200">
               <p className="text-sm text-green-700">
-                <strong>Next occurrence:</strong> {nextOccurrence.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
+                <strong>Next occurrence:</strong>{" "}
+                {nextOccurrence.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </p>
             </div>
@@ -359,7 +414,12 @@ export function RecurringTransactionForm({
       {/* Form Actions */}
       <div className="flex gap-3 pt-4">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
         )}

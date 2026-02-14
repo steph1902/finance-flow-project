@@ -1,17 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { BudgetRepository } from './repositories/budget.repository';
-import {
-  CreateBudgetDto,
-  UpdateBudgetDto,
-  BudgetQueryDto,
-} from './dto';
+import { CreateBudgetDto, UpdateBudgetDto, BudgetQueryDto } from './dto';
 import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import { Budget } from '@prisma/client';
 
 @Injectable()
 export class BudgetsService {
-  constructor(private readonly budgetRepository: BudgetRepository) { }
+  constructor(private readonly budgetRepository: BudgetRepository) {}
 
   /**
    * Create a new budget

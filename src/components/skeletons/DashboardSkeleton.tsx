@@ -16,7 +16,10 @@ export function DashboardSkeleton() {
       {/* Stats Cards Skeleton */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="rounded-xl border border-border/50 bg-card p-6 shadow-card">
+          <div
+            key={i}
+            className="rounded-xl border border-border/50 bg-card p-6 shadow-card"
+          >
             <Skeleton className="h-4 w-24 mb-3" />
             <Skeleton className="h-8 w-32 mb-2" />
             <Skeleton className="h-3 w-20" />
@@ -40,7 +43,10 @@ export function DashboardSkeleton() {
       {/* Charts Skeleton */}
       <div className="grid gap-6 lg:grid-cols-2">
         {[...Array(2)].map((_, i) => (
-          <div key={i} className="rounded-xl border border-border/50 bg-card p-6 shadow-card">
+          <div
+            key={i}
+            className="rounded-xl border border-border/50 bg-card p-6 shadow-card"
+          >
             <Skeleton className="h-6 w-40 mb-6" />
             <Skeleton className="h-64 w-full" />
           </div>

@@ -1,18 +1,23 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { DownloadIcon, FileTextIcon, CalendarIcon, CheckCircle2Icon } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DownloadIcon,
+  FileTextIcon,
+  CalendarIcon,
+  CheckCircle2Icon,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface ExportRecord {
   id: string;
-  type: 'transactions' | 'budgets' | 'goals' | 'report';
-  format: 'csv' | 'pdf' | 'json';
+  type: "transactions" | "budgets" | "goals" | "report";
+  format: "csv" | "pdf" | "json";
   fileName: string;
   createdAt: string;
-  status: 'completed' | 'pending' | 'failed';
+  status: "completed" | "pending" | "failed";
   size?: number;
   downloadUrl?: string;
   expiresAt?: string;
@@ -31,29 +36,29 @@ const formatFileSize = (bytes: number) => {
 
 const getTypeIcon = (type: string) => {
   switch (type) {
-    case 'transactions':
-      return '💳';
-    case 'budgets':
-      return '💰';
-    case 'goals':
-      return '🎯';
-    case 'report':
-      return '📊';
+    case "transactions":
+      return "💳";
+    case "budgets":
+      return "💰";
+    case "goals":
+      return "🎯";
+    case "report":
+      return "📊";
     default:
-      return '📄';
+      return "📄";
   }
 };
 
 const getFormatColor = (format: string) => {
   switch (format) {
-    case 'pdf':
-      return 'bg-red-100 text-red-800';
-    case 'csv':
-      return 'bg-green-100 text-green-800';
-    case 'json':
-      return 'bg-blue-100 text-blue-800';
+    case "pdf":
+      return "bg-red-100 text-red-800";
+    case "csv":
+      return "bg-green-100 text-green-800";
+    case "json":
+      return "bg-blue-100 text-blue-800";
     default:
-      return 'bg-gray-100 text-gray-800';
+      return "bg-gray-100 text-gray-800";
   }
 };
 
@@ -86,11 +91,15 @@ export function ExportHistory({ exports, onDownload }: ExportHistoryProps) {
               <div className="flex items-start justify-between gap-4">
                 {/* Left Section - File Info */}
                 <div className="flex items-start gap-3 flex-1">
-                  <div className="text-2xl">{getTypeIcon(exportRecord.type)}</div>
+                  <div className="text-2xl">
+                    {getTypeIcon(exportRecord.type)}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="font-medium truncate">{exportRecord.fileName}</p>
-                      {exportRecord.status === 'completed' && (
+                      <p className="font-medium truncate">
+                        {exportRecord.fileName}
+                      </p>
+                      {exportRecord.status === "completed" && (
                         <CheckCircle2Icon className="size-4 text-green-500 shrink-0" />
                       )}
                     </div>
@@ -115,9 +124,13 @@ export function ExportHistory({ exports, onDownload }: ExportHistoryProps) {
                       </span>
                       {exportRecord.expiresAt && (
                         <span className="text-orange-600">
-                          Expires {formatDistanceToNow(new Date(exportRecord.expiresAt), {
-                            addSuffix: true,
-                          })}
+                          Expires{" "}
+                          {formatDistanceToNow(
+                            new Date(exportRecord.expiresAt),
+                            {
+                              addSuffix: true,
+                            },
+                          )}
                         </span>
                       )}
                     </div>
@@ -126,7 +139,7 @@ export function ExportHistory({ exports, onDownload }: ExportHistoryProps) {
 
                 {/* Right Section - Actions */}
                 <div className="flex items-center gap-2">
-                  {exportRecord.status === 'completed' && onDownload && (
+                  {exportRecord.status === "completed" && onDownload && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -135,10 +148,10 @@ export function ExportHistory({ exports, onDownload }: ExportHistoryProps) {
                       <DownloadIcon className="size-4" />
                     </Button>
                   )}
-                  {exportRecord.status === 'pending' && (
+                  {exportRecord.status === "pending" && (
                     <Badge variant="secondary">Processing...</Badge>
                   )}
-                  {exportRecord.status === 'failed' && (
+                  {exportRecord.status === "failed" && (
                     <Badge variant="destructive">Failed</Badge>
                   )}
                 </div>

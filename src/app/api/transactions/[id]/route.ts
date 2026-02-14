@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage } from "@/lib/utils/error";
 import { NextRequest, NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth-helpers";
@@ -20,7 +20,9 @@ const transactionSelect = {
 } satisfies Prisma.TransactionSelect;
 
 const serialize = (
-  transaction: Prisma.TransactionGetPayload<{ select: typeof transactionSelect }>,
+  transaction: Prisma.TransactionGetPayload<{
+    select: typeof transactionSelect;
+  }>,
 ) => ({
   ...transaction,
   amount: Number(transaction.amount),
@@ -72,10 +74,7 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json(
-      { error: "No updates provided" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "No updates provided" }, { status: 400 });
   }
 
   const { amount, date, ...rest } = parsed.data;
@@ -108,7 +107,8 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
 
       if (rest.type !== undefined) updateData.type = rest.type;
       if (rest.category !== undefined) updateData.category = rest.category;
-      if (rest.description !== undefined) updateData.description = rest.description;
+      if (rest.description !== undefined)
+        updateData.description = rest.description;
       if (rest.notes !== undefined) updateData.notes = rest.notes;
       if (amount !== undefined) updateData.amount = new Prisma.Decimal(amount);
       if (date !== undefined) updateData.date = date;
@@ -158,7 +158,10 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
       });
     });
 
-    return NextResponse.json({ message: "Transaction deleted" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Transaction deleted" },
+      { status: 200 },
+    );
   } catch (error) {
     if (error instanceof Error && getErrorMessage(error) === "NOT_FOUND") {
       return NextResponse.json({ error: "Not Found" }, { status: 404 });
@@ -167,4 +170,3 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
     throw error;
   }
 });
-

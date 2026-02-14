@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage } from "@/lib/utils/error";
 import { NextRequest, NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth-helpers";
@@ -71,9 +71,15 @@ export const PATCH = withApiAuth(async (req: NextRequest, userId) => {
       return NextResponse.json({ error: "Not Found" }, { status: 404 });
     }
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
       return NextResponse.json(
-        { error: "Budget for this category already exists for the selected month" },
+        {
+          error:
+            "Budget for this category already exists for the selected month",
+        },
         { status: 409 },
       );
     }
@@ -108,4 +114,3 @@ export const DELETE = withApiAuth(async (req: NextRequest, userId) => {
     throw error;
   }
 });
-

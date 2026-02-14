@@ -5,22 +5,30 @@
 
 import { getGeminiClient } from "./gemini-client";
 import { logInfo, logError } from "@/lib/logger";
-import { createReceiptParserPrompt, RECEIPT_PARSER_SCHEMA, parsedReceiptSchema, ParsedReceipt } from "./prompts/receipt-parser";
+import {
+  createReceiptParserPrompt,
+  RECEIPT_PARSER_SCHEMA,
+  parsedReceiptSchema,
+  ParsedReceipt,
+} from "./prompts/receipt-parser";
 
 // Re-export type for consumers
 export type { ParsedReceipt };
 
 export class ReceiptParserService {
-  constructor(private clientFactory = getGeminiClient) { }
+  constructor(private clientFactory = getGeminiClient) {}
 
   /**
    * Parse receipt text using Gemini AI
    */
-  async parseReceiptText(ocrText: string, userId: string): Promise<ParsedReceipt> {
+  async parseReceiptText(
+    ocrText: string,
+    userId: string,
+  ): Promise<ParsedReceipt> {
     try {
       logInfo("Parsing receipt with Gemini AI", {
         textLength: ocrText.length,
-        userId
+        userId,
       });
 
       const prompt = createReceiptParserPrompt(ocrText);
@@ -29,7 +37,7 @@ export class ReceiptParserService {
       const parsed = await gemini.generateObject<ParsedReceipt>(
         prompt,
         RECEIPT_PARSER_SCHEMA,
-        parsedReceiptSchema
+        parsedReceiptSchema,
       );
 
       logInfo("Receipt parsed successfully", {
@@ -40,7 +48,6 @@ export class ReceiptParserService {
       });
 
       return parsed;
-
     } catch (error) {
       logError("Receipt parsing failed", error);
 
@@ -59,7 +66,10 @@ export class ReceiptParserService {
   /**
    * Combine OCR + Parsing + Categorization
    */
-  async processReceipt(ocrText: string, userId: string): Promise<ParsedReceipt & { suggestedCategory?: string | undefined }> {
+  async processReceipt(
+    ocrText: string,
+    userId: string,
+  ): Promise<ParsedReceipt & { suggestedCategory?: string | undefined }> {
     // Parse receipt data
     const parsed = await this.parseReceiptText(ocrText, userId);
 
@@ -68,14 +78,18 @@ export class ReceiptParserService {
 
     try {
       // Dynamic import to avoid circular dependencies
-      const { categorizationService } = await import("./categorization-service");
+      const { categorizationService } =
+        await import("./categorization-service");
 
       // Use real userId for categorization (allows it to learn from history)
-      const categoryResult = await categorizationService.categorizeTransaction({
-        description: `${parsed.merchant} ${parsed.items?.map(i => i.name).join(", ") || ""}`,
-        amount: parsed.amount,
-        type: "expense", // Receipts are typically expenses
-      }, userId);
+      const categoryResult = await categorizationService.categorizeTransaction(
+        {
+          description: `${parsed.merchant} ${parsed.items?.map((i) => i.name).join(", ") || ""}`,
+          amount: parsed.amount,
+          type: "expense", // Receipts are typically expenses
+        },
+        userId,
+      );
 
       suggestedCategory = categoryResult.category;
     } catch (error) {
@@ -92,5 +106,7 @@ export class ReceiptParserService {
 export const receiptParserService = new ReceiptParserService();
 
 // Backward compatibility wrapper (deprecated)
-export const processReceipt = (ocrText: string, userId: string) => receiptParserService.processReceipt(ocrText, userId);
-export const parseReceiptText = (ocrText: string, userId: string) => receiptParserService.parseReceiptText(ocrText, userId);
+export const processReceipt = (ocrText: string, userId: string) =>
+  receiptParserService.processReceipt(ocrText, userId);
+export const parseReceiptText = (ocrText: string, userId: string) =>
+  receiptParserService.parseReceiptText(ocrText, userId);

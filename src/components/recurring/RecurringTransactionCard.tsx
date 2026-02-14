@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/formatters";
@@ -14,7 +20,7 @@ import {
   Edit,
   Clock,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -35,7 +41,13 @@ interface RecurringTransactionCardProps {
   type: "INCOME" | "EXPENSE";
   category: string;
   description?: string;
-  frequency: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
+  frequency:
+    | "DAILY"
+    | "WEEKLY"
+    | "BIWEEKLY"
+    | "MONTHLY"
+    | "QUARTERLY"
+    | "YEARLY";
   nextDate: Date;
   isActive: boolean;
   lastGenerated?: Date | null;
@@ -105,12 +117,15 @@ export function RecurringTransactionCard({
     if (diffDays === 1) return "Tomorrow";
     if (diffDays === -1) return "Yesterday";
     if (diffDays > 1 && diffDays <= 7) return `In ${diffDays} days`;
-    if (diffDays < -1 && diffDays >= -7) return `${Math.abs(diffDays)} days ago`;
+    if (diffDays < -1 && diffDays >= -7)
+      return `${Math.abs(diffDays)} days ago`;
     return formatDate(date);
   };
 
   return (
-    <Card className={`relative transition-all hover:shadow-mist ${!isActive ? "opacity-60" : ""} ${isOverdue ? "border-orange-500/50 shadow-sm shadow-orange-500/20" : "shadow-card"}`}>
+    <Card
+      className={`relative transition-all hover:shadow-mist ${!isActive ? "opacity-60" : ""} ${isOverdue ? "border-orange-500/50 shadow-sm shadow-orange-500/20" : "shadow-card"}`}
+    >
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
@@ -118,7 +133,10 @@ export function RecurringTransactionCard({
               <CardTitle className="type-h4 truncate">
                 {description || category}
               </CardTitle>
-              <Badge variant={type === "INCOME" ? "default" : "secondary"} className="shrink-0 font-medium">
+              <Badge
+                variant={type === "INCOME" ? "default" : "secondary"}
+                className="shrink-0 font-medium"
+              >
                 {category}
               </Badge>
             </div>
@@ -138,8 +156,11 @@ export function RecurringTransactionCard({
                 <TrendingDown className="h-5 w-5 text-destructive" />
               </div>
             )}
-            <div className={`text-2xl font-bold ${type === "INCOME" ? "text-success" : "text-destructive"}`}>
-              {type === "INCOME" ? "+" : "-"}{formatCurrency(amount)}
+            <div
+              className={`text-2xl font-bold ${type === "INCOME" ? "text-success" : "text-destructive"}`}
+            >
+              {type === "INCOME" ? "+" : "-"}
+              {formatCurrency(amount)}
             </div>
           </div>
         </div>
@@ -149,26 +170,38 @@ export function RecurringTransactionCard({
         {/* Status Badges */}
         <div className="flex flex-wrap gap-2">
           {isActive ? (
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
+            <Badge
+              variant="outline"
+              className="bg-green-50 text-green-700 border-green-200 font-medium"
+            >
               <Play className="h-3 w-3 mr-1.5" />
               Active
             </Badge>
           ) : (
-            <Badge variant="outline" className="bg-muted text-muted-foreground border-border/50 font-medium">
+            <Badge
+              variant="outline"
+              className="bg-muted text-muted-foreground border-border/50 font-medium"
+            >
               <Pause className="h-3 w-3 mr-1.5" />
               Paused
             </Badge>
           )}
 
           {isOverdue && (
-            <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/30 font-medium">
+            <Badge
+              variant="outline"
+              className="bg-orange-500/10 text-orange-600 border-orange-500/30 font-medium"
+            >
               <Clock className="h-3 w-3 mr-1.5" />
               Due
             </Badge>
           )}
 
           {hasEnded && (
-            <Badge variant="outline" className="bg-muted text-muted-foreground border-border/50 font-medium">
+            <Badge
+              variant="outline"
+              className="bg-muted text-muted-foreground border-border/50 font-medium"
+            >
               Ended
             </Badge>
           )}
@@ -180,7 +213,9 @@ export function RecurringTransactionCard({
             <Calendar className="h-4 w-4" />
             <span className="font-medium">Next occurrence:</span>
           </div>
-          <div className={`font-semibold ${isOverdue ? "text-orange-600" : "text-foreground"}`}>
+          <div
+            className={`font-semibold ${isOverdue ? "text-orange-600" : "text-foreground"}`}
+          >
             {formatRelativeDate(nextDate)}
           </div>
         </div>
@@ -259,14 +294,19 @@ export function RecurringTransactionCard({
             </AlertDialogTrigger>
             <AlertDialogContent className="rounded-xl shadow-lg">
               <AlertDialogHeader className="space-y-3">
-                <AlertDialogTitle className="type-h3">Delete Recurring Transaction?</AlertDialogTitle>
+                <AlertDialogTitle className="type-h3">
+                  Delete Recurring Transaction?
+                </AlertDialogTitle>
                 <AlertDialogDescription className="type-body">
-                  This will permanently delete this recurring transaction. Any transactions already
-                  created from this pattern will remain in your history.
+                  This will permanently delete this recurring transaction. Any
+                  transactions already created from this pattern will remain in
+                  your history.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="font-medium">Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="font-medium">
+                  Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-medium shadow-sm"

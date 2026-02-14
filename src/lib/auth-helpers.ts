@@ -50,4 +50,3 @@ export function withApiAuth(
     return handler(req, userId);
   };
 }
-

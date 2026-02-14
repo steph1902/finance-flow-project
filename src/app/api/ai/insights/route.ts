@@ -14,13 +14,13 @@ export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
     // Check rate limit
     if (!checkAIRateLimit(userId)) {
-      const headers = getRateLimitHeaders(userId, 'AI_ENDPOINTS');
+      const headers = getRateLimitHeaders(userId, "AI_ENDPOINTS");
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { 
+        { error: "Too many requests. Please try again later." },
+        {
           status: 429,
           headers,
-        }
+        },
       );
     }
 
@@ -43,14 +43,14 @@ export const GET = withApiAuth(async (req: NextRequest, userId: string) => {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request", details: error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     logError("Insights API error", error, { userId });
     return NextResponse.json(
       { error: "Failed to generate insights" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });

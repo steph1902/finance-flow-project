@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { formatCurrency } from "@/lib/formatters"
-import { TrendingUpIcon, TargetIcon, CalendarIcon, CheckCircle2Icon } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
+import { useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/formatters";
+import {
+  TrendingUpIcon,
+  TargetIcon,
+  CalendarIcon,
+  CheckCircle2Icon,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface GoalProgressProps {
   goal: {
@@ -27,20 +32,19 @@ export function GoalProgress({ goal, compact = false }: GoalProgressProps) {
   const daysUntilTarget = useMemo(() => {
     const now = new Date();
     return Math.ceil(
-      (new Date(goal.targetDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      (new Date(goal.targetDate).getTime() - now.getTime()) /
+        (1000 * 60 * 60 * 24),
     );
   }, [goal.targetDate]);
   const isPastDue = daysUntilTarget < 0;
-  const isCompleted = goal.status === 'COMPLETED';
+  const isCompleted = goal.status === "COMPLETED";
 
   if (compact) {
     return (
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span className="font-medium">{goal.name}</span>
-          <span className="text-muted-foreground">
-            {Math.round(progress)}%
-          </span>
+          <span className="text-muted-foreground">{Math.round(progress)}%</span>
         </div>
         <Progress value={Math.min(progress, 100)} className="h-2" />
         <div className="flex justify-between text-xs text-muted-foreground">
@@ -89,19 +93,20 @@ export function GoalProgress({ goal, compact = false }: GoalProgressProps) {
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">Progress</span>
             <span className="font-medium">
-              {formatCurrency(goal.currentAmount)} of {formatCurrency(goal.targetAmount)}
+              {formatCurrency(goal.currentAmount)} of{" "}
+              {formatCurrency(goal.targetAmount)}
             </span>
           </div>
           <Progress
             value={Math.min(progress, 100)}
             className={`h-3 ${
               isCompleted
-                ? '[&>div]:bg-green-500'
+                ? "[&>div]:bg-green-500"
                 : progress >= 75
-                ? '[&>div]:bg-primary'
-                : progress >= 50
-                ? '[&>div]:bg-blue-500'
-                : '[&>div]:bg-orange-500'
+                  ? "[&>div]:bg-primary"
+                  : progress >= 50
+                    ? "[&>div]:bg-blue-500"
+                    : "[&>div]:bg-orange-500"
             }`}
           />
         </div>
@@ -130,14 +135,17 @@ export function GoalProgress({ goal, compact = false }: GoalProgressProps) {
         <div className="flex items-center justify-between pt-2 border-t text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <TrendingUpIcon className="size-4" />
-            <span>Started {formatDistanceToNow(new Date(goal.createdAt), { addSuffix: true })}</span>
+            <span>
+              Started{" "}
+              {formatDistanceToNow(new Date(goal.createdAt), {
+                addSuffix: true,
+              })}
+            </span>
           </div>
           {!isCompleted && (
             <div className="flex items-center gap-1">
               <CalendarIcon className="size-4" />
-              <span>
-                Due {new Date(goal.targetDate).toLocaleDateString()}
-              </span>
+              <span>Due {new Date(goal.targetDate).toLocaleDateString()}</span>
             </div>
           )}
         </div>

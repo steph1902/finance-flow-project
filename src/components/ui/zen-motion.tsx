@@ -10,11 +10,11 @@
 import { HTMLMotionProps, motion } from "framer-motion";
 import { forwardRef } from "react";
 
-export type ZenMotionVariant = 
-  | "fadeIn" 
-  | "fadeInUp" 
-  | "fadeInDown" 
-  | "scaleIn" 
+export type ZenMotionVariant =
+  | "fadeIn"
+  | "fadeInUp"
+  | "fadeInDown"
+  | "scaleIn"
   | "slideInRight"
   | "slideInLeft"
   | "revealMask"
@@ -24,9 +24,18 @@ export type ZenMotionVariant =
   | "blur"
   | "none";
 
-export type EasingCurve = "apple" | "zen" | "luxury" | "material" | "bounce" | "spring";
+export type EasingCurve =
+  | "apple"
+  | "zen"
+  | "luxury"
+  | "material"
+  | "bounce"
+  | "spring";
 
-export interface ZenMotionProps extends Omit<HTMLMotionProps<"div">, "initial" | "animate" | "exit"> {
+export interface ZenMotionProps extends Omit<
+  HTMLMotionProps<"div">,
+  "initial" | "animate" | "exit"
+> {
   variant?: ZenMotionVariant;
   delay?: number;
   duration?: number;
@@ -77,22 +86,22 @@ const motionVariants = {
     visible: { clipPath: "inset(0 0% 0 0)" },
   },
   shimmer: {
-    hidden: { 
+    hidden: {
       opacity: 0.6,
       backgroundPosition: "-200% 0",
     },
-    visible: { 
+    visible: {
       opacity: 1,
       backgroundPosition: "200% 0",
-      transition: { duration: 1.5, repeat: Infinity, ease: "linear" }
+      transition: { duration: 1.5, repeat: Infinity, ease: "linear" },
     },
   },
   lift: {
     hidden: { y: 0, scale: 1 },
-    visible: { 
+    visible: {
       y: -8,
       scale: 1.02,
-      transition: { duration: 0.3 }
+      transition: { duration: 0.3 },
     },
   },
   rotate: {
@@ -110,17 +119,20 @@ const motionVariants = {
 };
 
 export const ZenMotion = forwardRef<HTMLDivElement, ZenMotionProps>(
-  ({ 
-    variant = "fadeIn", 
-    delay = 0, 
-    duration = 0.5, 
-    once = true, 
-    easing = "zen",
-    stagger = false,
-    staggerDelay = 0.1,
-    children, 
-    ...props 
-  }, ref) => {
+  (
+    {
+      variant = "fadeIn",
+      delay = 0,
+      duration = 0.5,
+      once = true,
+      easing = "zen",
+      stagger = false,
+      staggerDelay = 0.1,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const selectedVariant = motionVariants[variant];
     const easingFunction = easingCurves[easing];
 
@@ -144,7 +156,7 @@ export const ZenMotion = forwardRef<HTMLDivElement, ZenMotionProps>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 
 ZenMotion.displayName = "ZenMotion";

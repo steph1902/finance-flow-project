@@ -16,18 +16,20 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         <div className="w-full max-w-lg">
           {/* Brand Header */}
           <div className="mb-12 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-sumi mb-2">FinanceFlow</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-sumi mb-2">
+              FinanceFlow
+            </h1>
             <div className="h-1 w-12 bg-apricot mx-auto rounded-full"></div>
           </div>
 
           {/* Content Card (Forms) */}
-          <div className="relative">
-            {children}
-          </div>
+          <div className="relative">{children}</div>
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-sumi-500">
-            <p>&copy; {new Date().getFullYear()} FinanceFlow. Secure & Private.</p>
+            <p>
+              &copy; {new Date().getFullYear()} FinanceFlow. Secure & Private.
+            </p>
           </div>
         </div>
       </div>

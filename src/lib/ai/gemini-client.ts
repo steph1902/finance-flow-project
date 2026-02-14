@@ -1,16 +1,20 @@
-import { GoogleGenerativeAI, GenerativeModel, Part } from '@google/generative-ai';
-import { AI_CONFIG } from './config';
-import { logError, logWarn } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
-import { withRetry } from './retry-handler';
-import { ZodType, ZodError } from 'zod';
+import {
+  GoogleGenerativeAI,
+  GenerativeModel,
+  Part,
+} from "@google/generative-ai";
+import { AI_CONFIG } from "./config";
+import { logError, logWarn } from "@/lib/logger";
+import { prisma } from "@/lib/prisma";
+import { withRetry } from "./retry-handler";
+import { ZodType, ZodError } from "zod";
 
 /**
  * ⚠️ VERCEL BUILD FIX:
  * GeminiClient now uses lazy initialization to prevent build-time crashes
  * when GEMINI_API_KEY is missing. The client is only initialized when
  * actually used (runtime), not when the module loads (build-time).
- * 
+ *
  * 🔄 DYNAMIC KEY UPDATE:
  * Now supports per-user API keys fetched from the database.
  */
@@ -39,8 +43,8 @@ export class GeminiClient {
 
     if (!keyToUse) {
       throw new Error(
-        'GEMINI_API_KEY not configured. ' +
-        'Please set GEMINI_API_KEY in your Vercel environment variables or in Settings > API Keys.'
+        "GEMINI_API_KEY not configured. " +
+          "Please set GEMINI_API_KEY in your Vercel environment variables or in Settings > API Keys.",
       );
     }
 
@@ -50,21 +54,23 @@ export class GeminiClient {
     });
   }
 
-  async generateContent(prompt: string | Array<string | Part>): Promise<string> {
+  async generateContent(
+    prompt: string | Array<string | Part>,
+  ): Promise<string> {
     this.initialize(); // Lazy init
 
     return withRetry(async () => {
       // Normalize input to Part[]
       let parts: Part[];
 
-      if (typeof prompt === 'string') {
+      if (typeof prompt === "string") {
         parts = [{ text: prompt }];
       } else {
-        parts = prompt.map(p => typeof p === 'string' ? { text: p } : p);
+        parts = prompt.map((p) => (typeof p === "string" ? { text: p } : p));
       }
 
       const result = await this.model!.generateContent({
-        contents: [{ role: 'user', parts }],
+        contents: [{ role: "user", parts }],
         generationConfig: {
           temperature: AI_CONFIG.temperature,
           maxOutputTokens: AI_CONFIG.maxTokens,
@@ -87,7 +93,7 @@ export class GeminiClient {
   async generateObject<T>(
     prompt: string,
     schemaDescription: string,
-    validationSchema: ZodType<T>
+    validationSchema: ZodType<T>,
   ): Promise<T> {
     const fullPrompt = `${prompt}\n\nRespond with valid JSON matching this structure:\n${schemaDescription}\n\nReturn JSON only.`;
 
@@ -95,7 +101,8 @@ export class GeminiClient {
 
     try {
       // Extract JSON from markdown code blocks if present
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) ||
+      const jsonMatch =
+        responseText.match(/```json\n([\s\S]*?)\n```/) ||
         responseText.match(/```\n([\s\S]*?)\n```/);
 
       const jsonString = jsonMatch?.[1] ?? responseText;
@@ -105,12 +112,14 @@ export class GeminiClient {
       return validationSchema.parse(parsed);
     } catch (error) {
       if (error instanceof ZodError) {
-        logError('AI Response Validation Failed', error, { responseText });
-        throw new Error('AI response did not match expected schema: ' + error.message);
+        logError("AI Response Validation Failed", error, { responseText });
+        throw new Error(
+          "AI response did not match expected schema: " + error.message,
+        );
       }
       if (error instanceof SyntaxError) {
-        logError('AI Response JSON Parse Failed', error, { responseText });
-        throw new Error('Invalid JSON response from AI');
+        logError("AI Response JSON Parse Failed", error, { responseText });
+        throw new Error("Invalid JSON response from AI");
       }
       throw error;
     }
@@ -121,7 +130,7 @@ export class GeminiClient {
    */
   async generateStructuredContent<T>(
     prompt: string,
-    schema?: string
+    schema?: string,
   ): Promise<T> {
     // Wrapper for backward compatibility if needed, strict validtion not possible without schema
     // We will fallback to basic parsing
@@ -132,14 +141,15 @@ export class GeminiClient {
     const response = await this.generateContent(fullPrompt);
 
     try {
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) ||
+      const jsonMatch =
+        response.match(/```json\n([\s\S]*?)\n```/) ||
         response.match(/```\n([\s\S]*?)\n```/);
 
       const jsonString = jsonMatch?.[1] ?? response;
       return JSON.parse(jsonString.trim()) as T;
     } catch (parseError) {
-      logError('Failed to parse AI response as JSON', parseError, { response });
-      throw new Error('Invalid JSON response from AI');
+      logError("Failed to parse AI response as JSON", parseError, { response });
+      throw new Error("Invalid JSON response from AI");
     }
   }
 }
@@ -159,11 +169,14 @@ export async function getGeminiClient(userId?: string): Promise<GeminiClient> {
       });
 
       const keys = user?.apiKeys as Record<string, string> | null;
-      if (keys && keys['gemini-ai']) {
-        userKey = keys['gemini-ai'];
+      if (keys && keys["gemini-ai"]) {
+        userKey = keys["gemini-ai"];
       }
     } catch (error) {
-      logWarn('Failed to fetch user API key, falling back to env', { userId, error });
+      logWarn("Failed to fetch user API key, falling back to env", {
+        userId,
+        error,
+      });
     }
   }
 

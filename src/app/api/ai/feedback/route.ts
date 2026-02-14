@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withApiAuth } from '@/lib/auth-helpers';
-import { categorizationService } from '@/lib/ai/categorization-service';
-import { prisma } from '@/lib/prisma';
-import { logError } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { withApiAuth } from "@/lib/auth-helpers";
+import { categorizationService } from "@/lib/ai/categorization-service";
+import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/logger";
 
 export const POST = withApiAuth(async (req: NextRequest, userId) => {
   try {
@@ -11,8 +11,8 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
 
     if (!suggestionId || accepted === undefined) {
       return NextResponse.json(
-        { error: 'Missing required fields: suggestionId, accepted' },
-        { status: 400 }
+        { error: "Missing required fields: suggestionId, accepted" },
+        { status: 400 },
       );
     }
 
@@ -24,23 +24,23 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
 
     if (!suggestion || suggestion.userId !== userId) {
       return NextResponse.json(
-        { error: 'Suggestion not found' },
-        { status: 404 }
+        { error: "Suggestion not found" },
+        { status: 404 },
       );
     }
 
     await categorizationService.recordFeedback(
       suggestionId,
       accepted,
-      actualCategory
+      actualCategory,
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logError('Feedback API error', error, { userId });
+    logError("Feedback API error", error, { userId });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 });

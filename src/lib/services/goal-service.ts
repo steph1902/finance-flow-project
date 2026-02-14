@@ -1,14 +1,14 @@
 /**
  * Goal & Savings Tracking Service
- * 
+ *
  * Handles financial goal management with milestone tracking,
  * progress monitoring, and achievement celebrations.
  */
 
-import { prisma } from '@/lib/prisma';
-import { logger } from '@/lib/logger';
-import { Prisma } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
+import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export interface CreateGoalInput {
   userId: string;
@@ -27,7 +27,7 @@ export interface UpdateGoalInput {
   targetDate?: Date;
   category?: string;
   priority?: number;
-  status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'PAUSED';
+  status?: "ACTIVE" | "COMPLETED" | "CANCELLED" | "PAUSED";
 }
 
 export interface AddContributionInput {
@@ -63,14 +63,14 @@ export async function createGoal(input: CreateGoalInput) {
       user: { connect: { id: input.userId } },
       name: input.name,
       targetAmount: new Decimal(input.targetAmount),
-      category: input.category || 'General',
+      category: input.category || "General",
       priority: input.priority || 0,
       currentAmount: new Decimal(0),
-      status: 'ACTIVE',
-    }
+      status: "ACTIVE",
+    };
 
-    if (input.description) goalData.description = input.description
-    if (input.targetDate) goalData.targetDate = input.targetDate
+    if (input.description) goalData.description = input.description;
+    if (input.targetDate) goalData.targetDate = input.targetDate;
 
     const goal = await prisma.goal.create({
       data: goalData,
@@ -92,28 +92,35 @@ export async function createGoal(input: CreateGoalInput) {
       });
     }
 
-    logger.info('Goal created', { goalId: goal.id, userId: input.userId });
+    logger.info("Goal created", { goalId: goal.id, userId: input.userId });
     return goal;
   } catch (error) {
-    logger.error('Failed to create goal', error);
-    throw new Error('Failed to create goal');
+    logger.error("Failed to create goal", error);
+    throw new Error("Failed to create goal");
   }
 }
 
 /**
  * Update an existing goal
  */
-export async function updateGoal(goalId: string, userId: string, input: UpdateGoalInput) {
+export async function updateGoal(
+  goalId: string,
+  userId: string,
+  input: UpdateGoalInput,
+) {
   try {
-    const updateData: Prisma.GoalUpdateInput = {}
+    const updateData: Prisma.GoalUpdateInput = {};
 
-    if (input.name !== undefined) updateData.name = input.name
-    if (input.description !== undefined) updateData.description = input.description
-    if (input.targetDate !== undefined) updateData.targetDate = input.targetDate
-    if (input.category !== undefined) updateData.category = input.category
-    if (input.priority !== undefined) updateData.priority = input.priority
-    if (input.status !== undefined) updateData.status = input.status
-    if (input.targetAmount !== undefined) updateData.targetAmount = new Decimal(input.targetAmount)
+    if (input.name !== undefined) updateData.name = input.name;
+    if (input.description !== undefined)
+      updateData.description = input.description;
+    if (input.targetDate !== undefined)
+      updateData.targetDate = input.targetDate;
+    if (input.category !== undefined) updateData.category = input.category;
+    if (input.priority !== undefined) updateData.priority = input.priority;
+    if (input.status !== undefined) updateData.status = input.status;
+    if (input.targetAmount !== undefined)
+      updateData.targetAmount = new Decimal(input.targetAmount);
 
     const goal = await prisma.goal.updateMany({
       where: { id: goalId, userId },
@@ -121,21 +128,24 @@ export async function updateGoal(goalId: string, userId: string, input: UpdateGo
     });
 
     if (goal.count === 0) {
-      throw new Error('Goal not found');
+      throw new Error("Goal not found");
     }
 
-    logger.info('Goal updated', { goalId, userId });
+    logger.info("Goal updated", { goalId, userId });
     return goal;
   } catch (error) {
-    logger.error('Failed to update goal', error);
-    throw new Error('Failed to update goal');
+    logger.error("Failed to update goal", error);
+    throw new Error("Failed to update goal");
   }
 }
 
 /**
  * Add contribution to a goal
  */
-export async function addContribution(input: AddContributionInput, userId: string) {
+export async function addContribution(
+  input: AddContributionInput,
+  userId: string,
+) {
   try {
     const goal = await prisma.goal.findFirst({
       where: { id: input.goalId, userId },
@@ -143,7 +153,7 @@ export async function addContribution(input: AddContributionInput, userId: strin
     });
 
     if (!goal) {
-      throw new Error('Goal not found');
+      throw new Error("Goal not found");
     }
 
     // Create contribution
@@ -151,9 +161,9 @@ export async function addContribution(input: AddContributionInput, userId: strin
     const contributionData: Prisma.GoalContributionCreateInput = {
       goal: { connect: { id: input.goalId } },
       amount: new Decimal(input.amount),
-    }
+    };
 
-    if (input.notes) contributionData.notes = input.notes
+    if (input.notes) contributionData.notes = input.notes;
 
     const contribution = await prisma.goalContribution.create({
       data: contributionData,
@@ -166,7 +176,7 @@ export async function addContribution(input: AddContributionInput, userId: strin
       data: {
         currentAmount: new Decimal(newAmount),
         ...(newAmount >= Number(goal.targetAmount) && {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           completedAt: new Date(),
         }),
       },
@@ -184,8 +194,8 @@ export async function addContribution(input: AddContributionInput, userId: strin
         await prisma.notification.create({
           data: {
             userId,
-            type: 'GOAL_MILESTONE',
-            title: 'Goal Milestone Achieved! 🎉',
+            type: "GOAL_MILESTONE",
+            title: "Goal Milestone Achieved! 🎉",
             message: `You've reached a milestone for "${goal.name}"! ${milestone.description}`,
             priority: 1,
             metadata: { goalId: goal.id, milestoneId: milestone.id },
@@ -194,30 +204,36 @@ export async function addContribution(input: AddContributionInput, userId: strin
       }
     }
 
-    logger.info('Contribution added', { goalId: input.goalId, amount: input.amount });
+    logger.info("Contribution added", {
+      goalId: input.goalId,
+      amount: input.amount,
+    });
     return contribution;
   } catch (error) {
-    logger.error('Failed to add contribution', error);
-    throw new Error('Failed to add contribution');
+    logger.error("Failed to add contribution", error);
+    throw new Error("Failed to add contribution");
   }
 }
 
 /**
  * Get goal progress with analytics
  */
-export async function getGoalProgress(goalId: string, userId: string): Promise<GoalProgress> {
+export async function getGoalProgress(
+  goalId: string,
+  userId: string,
+): Promise<GoalProgress> {
   try {
     const goal = await prisma.goal.findFirst({
       where: { id: goalId, userId },
       include: {
         milestones: {
-          orderBy: { amount: 'asc' },
+          orderBy: { amount: "asc" },
         },
       },
     });
 
     if (!goal) {
-      throw new Error('Goal not found');
+      throw new Error("Goal not found");
     }
 
     const currentAmount = Number(goal.currentAmount);
@@ -231,11 +247,15 @@ export async function getGoalProgress(goalId: string, userId: string): Promise<G
     if (goal.targetDate) {
       const now = new Date();
       const target = new Date(goal.targetDate);
-      daysRemaining = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      daysRemaining = Math.ceil(
+        (target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+      );
 
       // Check if on track (simple linear projection)
       if (daysRemaining > 0) {
-        const daysSinceStart = Math.ceil((now.getTime() - goal.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+        const daysSinceStart = Math.ceil(
+          (now.getTime() - goal.createdAt.getTime()) / (1000 * 60 * 60 * 24),
+        );
         const totalDays = daysSinceStart + daysRemaining;
         const expectedProgress = (daysSinceStart / totalDays) * 100;
         isOnTrack = progressPercentage >= expectedProgress * 0.9; // 10% tolerance
@@ -260,15 +280,18 @@ export async function getGoalProgress(goalId: string, userId: string): Promise<G
       })),
     };
   } catch (error) {
-    logger.error('Failed to get goal progress', error);
-    throw new Error('Failed to get goal progress');
+    logger.error("Failed to get goal progress", error);
+    throw new Error("Failed to get goal progress");
   }
 }
 
 /**
  * Get all goals for a user
  */
-export async function getUserGoals(userId: string, status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'PAUSED') {
+export async function getUserGoals(
+  userId: string,
+  status?: "ACTIVE" | "COMPLETED" | "CANCELLED" | "PAUSED",
+) {
   try {
     const goals = await prisma.goal.findMany({
       where: {
@@ -278,20 +301,17 @@ export async function getUserGoals(userId: string, status?: 'ACTIVE' | 'COMPLETE
       include: {
         milestones: true,
         contributions: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 5,
         },
       },
-      orderBy: [
-        { priority: 'desc' },
-        { targetDate: 'asc' },
-      ],
+      orderBy: [{ priority: "desc" }, { targetDate: "asc" }],
     });
 
     return goals;
   } catch (error) {
-    logger.error('Failed to get user goals', error);
-    throw new Error('Failed to get user goals');
+    logger.error("Failed to get user goals", error);
+    throw new Error("Failed to get user goals");
   }
 }
 
@@ -305,13 +325,13 @@ export async function deleteGoal(goalId: string, userId: string) {
     });
 
     if (result.count === 0) {
-      throw new Error('Goal not found');
+      throw new Error("Goal not found");
     }
 
-    logger.info('Goal deleted', { goalId, userId });
+    logger.info("Goal deleted", { goalId, userId });
     return { success: true };
   } catch (error) {
-    logger.error('Failed to delete goal', error);
-    throw new Error('Failed to delete goal');
+    logger.error("Failed to delete goal", error);
+    throw new Error("Failed to delete goal");
   }
 }

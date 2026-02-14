@@ -98,9 +98,7 @@ describe('AuthService', () => {
     it('should throw ConflictException if user already exists', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
-      await expect(service.signup(signupDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.signup(signupDto)).rejects.toThrow(ConflictException);
       expect(prisma.user.create).not.toHaveBeenCalled();
     });
 
@@ -108,9 +106,7 @@ describe('AuthService', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
       mockBcrypt.hash.mockRejectedValue(new Error('Hashing failed') as never);
 
-      await expect(service.signup(signupDto)).rejects.toThrow(
-        'Hashing failed',
-      );
+      await expect(service.signup(signupDto)).rejects.toThrow('Hashing failed');
       expect(prisma.user.create).not.toHaveBeenCalled();
     });
   });
@@ -132,10 +128,7 @@ describe('AuthService', () => {
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: signinDto.email },
       });
-      expect(mockBcrypt.compare).toHaveBeenCalledWith(
-        signinDto.password,
-        mockUser.password,
-      );
+      expect(mockBcrypt.compare).toHaveBeenCalledWith(signinDto.password, mockUser.password);
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('refreshToken');
     });
@@ -143,9 +136,7 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException if user not found', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.signin(signinDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.signin(signinDto)).rejects.toThrow(UnauthorizedException);
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
 
@@ -153,18 +144,14 @@ describe('AuthService', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       mockBcrypt.compare.mockResolvedValue(false as never);
 
-      await expect(service.signin(signinDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.signin(signinDto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if user has no password (OAuth user)', async () => {
       const oauthUser = { ...mockUser, password: null };
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(oauthUser);
 
-      await expect(service.signin(signinDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.signin(signinDto)).rejects.toThrow(UnauthorizedException);
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
   });
@@ -218,9 +205,7 @@ describe('AuthService', () => {
         throw new Error('Invalid token');
       });
 
-      await expect(service.refreshToken(refreshToken)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
@@ -228,9 +213,7 @@ describe('AuthService', () => {
       jwtService.verify.mockReturnValue(decoded);
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.refreshToken(refreshToken)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });
   });
 });

@@ -4,7 +4,13 @@ import { Send } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AILoading } from "./AILoading";
@@ -22,7 +28,8 @@ export function AIChat() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm your AI financial assistant. Ask me about your spending, budgets, or financial insights!",
+      content:
+        "Hi! I'm your AI financial assistant. Ask me about your spending, budgets, or financial insights!",
       timestamp: new Date(),
     },
   ]);
@@ -111,7 +118,9 @@ export function AIChat() {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {message.content}
+                  </p>
                   <p className="text-xs opacity-70 mt-1">
                     {message.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",

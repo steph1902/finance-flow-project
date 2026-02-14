@@ -2,7 +2,7 @@ import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { ZenContainer } from "@/components/ui/zen-container";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
   return (

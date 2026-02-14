@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageSquareIcon, ClockIcon } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageSquareIcon, ClockIcon } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: string;
 }
@@ -25,7 +25,10 @@ interface ChatHistoryProps {
   onSelectConversation?: (conversation: Conversation) => void;
 }
 
-export function ChatHistory({ conversations, onSelectConversation }: ChatHistoryProps) {
+export function ChatHistory({
+  conversations,
+  onSelectConversation,
+}: ChatHistoryProps) {
   if (conversations.length === 0) {
     return (
       <Card>
@@ -41,7 +44,7 @@ export function ChatHistory({ conversations, onSelectConversation }: ChatHistory
           </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -62,7 +65,7 @@ export function ChatHistory({ conversations, onSelectConversation }: ChatHistory
                 className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
               >
                 <div className="font-medium text-sm truncate">
-                  {conversation.title || 'Untitled Conversation'}
+                  {conversation.title || "Untitled Conversation"}
                 </div>
                 <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                   <ClockIcon className="size-3" />
@@ -80,5 +83,5 @@ export function ChatHistory({ conversations, onSelectConversation }: ChatHistory
         </ScrollArea>
       </CardContent>
     </Card>
-  )
+  );
 }

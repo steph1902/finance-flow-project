@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
 declare global {
-   
   var prisma: PrismaClient | undefined;
 }
 
@@ -13,21 +12,25 @@ declare global {
 function getPrismaClient(): PrismaClient {
   if (!global.prisma) {
     // Only validate DATABASE_URL at runtime, not build time
-    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildTime = process.env.NEXT_PHASE === "phase-production-build";
     const databaseUrl = process.env.DATABASE_URL;
-    
+
     if (!isBuildTime && !databaseUrl) {
       throw new Error(
         "DATABASE_URL is not configured. Please set it in your environment variables.\n" +
-        "See .env.example for the correct format."
+          "See .env.example for the correct format.",
       );
     }
-    
+
     global.prisma = new PrismaClient({
-      log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-      errorFormat: process.env.NODE_ENV === "development" ? "pretty" : "minimal",
+      log:
+        process.env.NODE_ENV === "development"
+          ? ["query", "error", "warn"]
+          : ["error"],
+      errorFormat:
+        process.env.NODE_ENV === "development" ? "pretty" : "minimal",
     });
-    
+
     // Graceful shutdown - disconnect Prisma on process termination
     if (typeof window === "undefined" && !isBuildTime) {
       process.on("beforeExit", async () => {
@@ -35,7 +38,7 @@ function getPrismaClient(): PrismaClient {
       });
     }
   }
-  
+
   return global.prisma;
 }
 
@@ -48,4 +51,3 @@ export const prisma = new Proxy({} as PrismaClient, {
     return client[prop as keyof PrismaClient];
   },
 });
-

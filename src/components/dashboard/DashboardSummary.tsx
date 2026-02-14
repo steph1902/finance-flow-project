@@ -11,14 +11,17 @@ type DashboardSummaryProps = {
   isLoading?: boolean;
 };
 
-const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSummaryProps) => {
+const DashboardSummaryComponent = ({
+  summary,
+  isLoading = false,
+}: DashboardSummaryProps) => {
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div 
-            key={index} 
-            className="h-36 animate-pulse rounded-xl bg-linear-to-br from-muted/50 to-muted shadow-md" 
+          <div
+            key={index}
+            className="h-36 animate-pulse rounded-xl bg-linear-to-br from-muted/50 to-muted shadow-md"
           />
         ))}
       </div>
@@ -30,7 +33,8 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
   }
 
   // Calculate mock trends (in a real app, get this from API comparing to previous period)
-  const balanceTrend = summary.totalBalance > 0 ? { value: 12.5, isPositive: true } : undefined;
+  const balanceTrend =
+    summary.totalBalance > 0 ? { value: 12.5, isPositive: true } : undefined;
   const incomeTrend = { value: 8.2, isPositive: true };
   const expensesTrend = { value: 3.1, isPositive: false }; // Lower expenses is good
   const transactionsTrend = { value: 15.3, isPositive: true };
@@ -74,15 +78,18 @@ const DashboardSummaryComponent = ({ summary, isLoading = false }: DashboardSumm
 };
 
 // Memoize to prevent re-renders when parent state changes
-export const DashboardSummary = memo(DashboardSummaryComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.isLoading === nextProps.isLoading &&
-    prevProps.summary?.totalBalance === nextProps.summary?.totalBalance &&
-    prevProps.summary?.totalIncome === nextProps.summary?.totalIncome &&
-    prevProps.summary?.totalExpenses === nextProps.summary?.totalExpenses &&
-    prevProps.summary?.transactionCount === nextProps.summary?.transactionCount
-  );
-});
+export const DashboardSummary = memo(
+  DashboardSummaryComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.summary?.totalBalance === nextProps.summary?.totalBalance &&
+      prevProps.summary?.totalIncome === nextProps.summary?.totalIncome &&
+      prevProps.summary?.totalExpenses === nextProps.summary?.totalExpenses &&
+      prevProps.summary?.transactionCount ===
+        nextProps.summary?.transactionCount
+    );
+  },
+);
 
-DashboardSummary.displayName = 'DashboardSummary';
-
+DashboardSummary.displayName = "DashboardSummary";

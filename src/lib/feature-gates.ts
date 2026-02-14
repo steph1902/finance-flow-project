@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'FREE' | 'BASIC' | 'PREMIUM' | 'ENTERPRISE';
+export type SubscriptionTier = "FREE" | "BASIC" | "PREMIUM" | "ENTERPRISE";
 
 export interface FeatureLimits {
   transactions: number;
@@ -51,41 +51,41 @@ export function getFeatureLimits(tier: SubscriptionTier): FeatureLimits {
 export function canUseFeature(
   tier: SubscriptionTier,
   feature: keyof FeatureLimits,
-  currentUsage: number
+  currentUsage: number,
 ): boolean {
   const limits = FEATURE_LIMITS[tier];
   const limit = limits[feature];
-  
+
   // -1 means unlimited
   if (limit === -1) return true;
-  
+
   return currentUsage < limit;
 }
 
 export function getRemainingUsage(
   tier: SubscriptionTier,
   feature: keyof FeatureLimits,
-  currentUsage: number
+  currentUsage: number,
 ): number | null {
   const limits = FEATURE_LIMITS[tier];
   const limit = limits[feature];
-  
+
   // -1 means unlimited
   if (limit === -1) return null;
-  
+
   return Math.max(0, limit - currentUsage);
 }
 
 export function getUsagePercentage(
   tier: SubscriptionTier,
   feature: keyof FeatureLimits,
-  currentUsage: number
+  currentUsage: number,
 ): number | null {
   const limits = FEATURE_LIMITS[tier];
   const limit = limits[feature];
-  
+
   // -1 means unlimited
   if (limit === -1) return null;
-  
+
   return Math.min(100, (currentUsage / limit) * 100);
 }

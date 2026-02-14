@@ -12,17 +12,17 @@ interface ScrollProgressProps {
   height?: number;
 }
 
-export function ScrollProgress({ 
-  color = "hsl(var(--primary))", 
-  height = 3 
+export function ScrollProgress({
+  color = "hsl(var(--primary))",
+  height = 3,
 }: ScrollProgressProps) {
   const { scrollYProgress } = useScroll();
-  
+
   // Add spring physics for smooth, natural motion
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   return (

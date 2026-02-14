@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DownloadIcon, CalendarIcon, FilterIcon } from "lucide-react"
+import { useState } from "react";
+import { DownloadIcon, CalendarIcon, FilterIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,48 +10,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface ExportDialogProps {
   onExport: (options: {
-    startDate?: string
-    endDate?: string
-    category?: string
-    format: "csv" | "json"
-  }) => Promise<void>
+    startDate?: string;
+    endDate?: string;
+    category?: string;
+    format: "csv" | "json";
+  }) => Promise<void>;
 }
 
 export function ExportDialog({ onExport }: ExportDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-  const [format, setFormat] = useState<"csv" | "json">("csv")
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
-  const [category, setCategory] = useState("")
+  const [open, setOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [format, setFormat] = useState<"csv" | "json">("csv");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [category, setCategory] = useState("");
 
   const handleExport = async () => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
       await onExport({
         ...(startDate && { startDate }),
         ...(endDate && { endDate }),
         ...(category && { category }),
         format,
-      })
-      setOpen(false)
+      });
+      setOpen(false);
       // Reset form
-      setStartDate("")
-      setEndDate("")
-      setCategory("")
+      setStartDate("");
+      setEndDate("");
+      setCategory("");
     } catch (error) {
-      console.error("Export failed:", error)
+      console.error("Export failed:", error);
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -160,5 +160,5 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

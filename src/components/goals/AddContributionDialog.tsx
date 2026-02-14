@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DollarSignIcon } from "lucide-react"
+import { useState } from "react";
+import { DollarSignIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useGoals } from "@/hooks/useGoals"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useGoals } from "@/hooks/useGoals";
 
 interface AddContributionDialogProps {
-  goalId: string
-  goalName: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  goalId: string;
+  goalName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function AddContributionDialog({
@@ -28,31 +28,31 @@ export function AddContributionDialog({
   open,
   onOpenChange,
 }: AddContributionDialogProps) {
-  const { addContribution } = useGoals()
-  const [amount, setAmount] = useState("")
-  const [notes, setNotes] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { addContribution } = useGoals();
+  const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       await addContribution(goalId, {
         amount: parseFloat(amount),
         ...(notes && { notes }),
-      })
+      });
 
       // Reset form
-      setAmount("")
-      setNotes("")
-      onOpenChange(false)
+      setAmount("");
+      setNotes("");
+      onOpenChange(false);
     } catch (error) {
-      console.error("Failed to add contribution:", error)
+      console.error("Failed to add contribution:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,5 +114,5 @@ export function AddContributionDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

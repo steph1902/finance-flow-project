@@ -158,9 +158,7 @@ describe('Budgets (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/budgets')
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).get('/budgets').expect(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -286,9 +284,7 @@ describe('Budgets (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .post('/budgets/rollover')
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).post('/budgets/rollover').expect(HttpStatus.UNAUTHORIZED);
     });
   });
 

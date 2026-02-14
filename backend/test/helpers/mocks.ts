@@ -81,7 +81,9 @@ export const mockJwtService: Partial<JwtService> = {
   sign: jest.fn((_payload: any): string => 'mock-jwt-token'),
   signAsync: jest.fn((_payload: any): Promise<string> => Promise.resolve('mock-jwt-token')),
   verify: jest.fn((_token: any): any => ({ sub: 'user-123', email: 'test@example.com' })),
-  verifyAsync: jest.fn((_token: any): Promise<any> => Promise.resolve({ sub: 'user-123', email: 'test@example.com' })),
+  verifyAsync: jest.fn(
+    (_token: any): Promise<any> => Promise.resolve({ sub: 'user-123', email: 'test@example.com' }),
+  ),
   decode: jest.fn((_token: any): any => ({ sub: 'user-123', email: 'test@example.com' })),
 };
 

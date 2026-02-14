@@ -9,10 +9,10 @@ interface AILoadingProps {
   className?: string;
 }
 
-export function AILoading({ 
-  message = "AI is analyzing...", 
+export function AILoading({
+  message = "AI is analyzing...",
   size = "md",
-  className 
+  className,
 }: AILoadingProps) {
   const sizeClasses = {
     sm: "h-4 w-4",
@@ -29,8 +29,15 @@ export function AILoading({
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <div className="relative">
-        <Sparkles className={cn(sizeClasses[size], "text-primary animate-pulse")} />
-        <Loader2 className={cn(sizeClasses[size], "absolute inset-0 animate-spin text-primary/30")} />
+        <Sparkles
+          className={cn(sizeClasses[size], "text-primary animate-pulse")}
+        />
+        <Loader2
+          className={cn(
+            sizeClasses[size],
+            "absolute inset-0 animate-spin text-primary/30",
+          )}
+        />
       </div>
       <span className={cn("text-muted-foreground", textSizeClasses[size])}>
         {message}

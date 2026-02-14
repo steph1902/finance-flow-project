@@ -1,11 +1,11 @@
-import { Metadata } from "next"
-import { CreateGoalDialog } from "@/components/goals/CreateGoalDialog"
-import { GoalList } from "@/components/goals/GoalList"
+import { Metadata } from "next";
+import { CreateGoalDialog } from "@/components/goals/CreateGoalDialog";
+import { GoalList } from "@/components/goals/GoalList";
 
 export const metadata: Metadata = {
   title: "Goals | FinanceFlow",
   description: "Track your financial goals and progress",
-}
+};
 
 export default function GoalsPage() {
   return (
@@ -30,5 +30,5 @@ export default function GoalsPage() {
         <GoalList status="COMPLETED" />
       </div>
     </div>
-  )
+  );
 }

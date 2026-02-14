@@ -1,10 +1,21 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { DownloadIcon, FileTextIcon, CalendarIcon, TrendingUpIcon } from "lucide-react"
-import { formatCurrency } from "@/lib/formatters"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DownloadIcon,
+  FileTextIcon,
+  CalendarIcon,
+  TrendingUpIcon,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 import {
   BarChart,
   Bar,
@@ -16,7 +27,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts"
+} from "recharts";
 
 interface ReportData {
   id: string;
@@ -49,10 +60,18 @@ interface ReportData {
 
 interface ReportPreviewProps {
   report: ReportData;
-  onDownload?: (format: 'pdf' | 'csv') => void;
+  onDownload?: (format: "pdf" | "csv") => void;
 }
 
-const COLORS = ['#4F46E5', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+const COLORS = [
+  "#4F46E5",
+  "#06B6D4",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#EC4899",
+];
 
 export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
   const dateRange = `${new Date(report.dateRange.from).toLocaleDateString()} - ${new Date(report.dateRange.to).toLocaleDateString()}`;
@@ -81,7 +100,7 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onDownload('pdf')}
+                  onClick={() => onDownload("pdf")}
                 >
                   <DownloadIcon className="size-4 mr-2" />
                   PDF
@@ -89,7 +108,7 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onDownload('csv')}
+                  onClick={() => onDownload("csv")}
                 >
                   <DownloadIcon className="size-4 mr-2" />
                   CSV
@@ -129,7 +148,9 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
             <CardDescription>Net Savings</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className={`text-2xl font-bold ${report.summary.netSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`text-2xl font-bold ${report.summary.netSavings >= 0 ? "text-green-600" : "text-red-600"}`}
+            >
               {formatCurrency(report.summary.netSavings)}
             </p>
           </CardContent>
@@ -164,10 +185,15 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={(entry) => `${entry.name} (${Math.round((entry.percent || 0) * 100)}%)`}
+                  label={(entry) =>
+                    `${entry.name} (${Math.round((entry.percent || 0) * 100)}%)`
+                  }
                 >
                   {report.categoryBreakdown.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
@@ -213,13 +239,20 @@ export function ReportPreview({ report, onDownload }: ReportPreviewProps) {
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">Category</th>
                   <th className="text-right py-3 px-4 font-medium">Amount</th>
-                  <th className="text-right py-3 px-4 font-medium">Transactions</th>
-                  <th className="text-right py-3 px-4 font-medium">% of Total</th>
+                  <th className="text-right py-3 px-4 font-medium">
+                    Transactions
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium">
+                    % of Total
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {report.categoryBreakdown.map((category) => (
-                  <tr key={category.category} className="border-b hover:bg-gray-100">
+                  <tr
+                    key={category.category}
+                    className="border-b hover:bg-gray-100"
+                  >
                     <td className="py-3 px-4">{category.category}</td>
                     <td className="py-3 px-4 text-right font-medium">
                       {formatCurrency(category.amount)}

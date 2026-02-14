@@ -126,7 +126,7 @@ export async function GET() {
     logError("Data export failed", error);
     return NextResponse.json(
       { error: "Failed to export data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -6,7 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { EXPENSE_CATEGORIES, getCategoriesForType, TRANSACTION_TYPE_OPTIONS } from "@/constants/categories";
+import {
+  EXPENSE_CATEGORIES,
+  getCategoriesForType,
+  TRANSACTION_TYPE_OPTIONS,
+} from "@/constants/categories";
 import { AILoading } from "@/components/ai/AILoading";
 import { CategorySuggestionCard } from "@/components/ai/CategorySuggestionCard";
 import { Button } from "@/components/ui/button";
@@ -20,21 +24,38 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { LiveRegion } from "@/components/ui/live-region";
 import type { CategorySuggestion, Transaction, TransactionType } from "@/types";
 import { logError } from "@/lib/logger";
 
 const formSchema = z.object({
-  amount: z.string().min(1, "Amount is required").refine(
-    (val) => !isNaN(Number(val)) && Number(val) > 0,
-    "Amount must be greater than 0"
-  ),
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) > 0,
+      "Amount must be greater than 0",
+    ),
   type: z.enum(["INCOME", "EXPENSE"]),
   category: z.string().min(1, "Category is required"),
-  description: z.string().max(191, "Description must be 191 characters or less").optional().or(z.literal("")),
-  notes: z.string().max(2000, "Notes must be 2000 characters or less").optional().or(z.literal("")),
+  description: z
+    .string()
+    .max(191, "Description must be 191 characters or less")
+    .optional()
+    .or(z.literal("")),
+  notes: z
+    .string()
+    .max(2000, "Notes must be 2000 characters or less")
+    .optional()
+    .or(z.literal("")),
   date: z.string().min(1, "Date is required"),
 });
 
@@ -70,7 +91,9 @@ export function TransactionForm({
     category: transaction?.category ?? EXPENSE_CATEGORIES[0],
     description: transaction?.description ?? "",
     notes: transaction?.notes ?? "",
-    date: transaction?.date ? format(new Date(transaction.date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+    date: transaction?.date
+      ? format(new Date(transaction.date), "yyyy-MM-dd")
+      : format(new Date(), "yyyy-MM-dd"),
   };
 
   const form = useForm<TransactionFormValues>({
@@ -82,14 +105,21 @@ export function TransactionForm({
   const currentDescription = form.watch("description");
   const currentAmount = form.watch("amount");
 
-  const [aiSuggestion, setAiSuggestion] = useState<CategorySuggestion | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<CategorySuggestion | null>(
+    null,
+  );
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [liveMessage, setLiveMessage] = useState("");
 
   // Trigger AI categorization when description changes (for new transactions)
   useEffect(() => {
-    if (!transaction && currentDescription && currentDescription.length > 3 && Number(currentAmount) > 0) {
+    if (
+      !transaction &&
+      currentDescription &&
+      currentDescription.length > 3 &&
+      Number(currentAmount) > 0
+    ) {
       const timer = setTimeout(async () => {
         setIsLoadingAI(true);
         setAiError(null);
@@ -110,7 +140,9 @@ export function TransactionForm({
           } else {
             // Only show error for non-auth errors (auth errors are expected when not logged in)
             if (response.status !== 401) {
-              const errorData = await response.json().catch(() => ({ error: "Failed to get AI suggestion" }));
+              const errorData = await response
+                .json()
+                .catch(() => ({ error: "Failed to get AI suggestion" }));
               setAiError(errorData.error || "AI categorization unavailable");
             }
           }
@@ -141,7 +173,10 @@ export function TransactionForm({
 
   const categories = useMemo(() => {
     const base = getCategoriesForType(selectedType as TransactionType);
-    if (transaction?.category && !(base as readonly string[]).includes(transaction.category)) {
+    if (
+      transaction?.category &&
+      !(base as readonly string[]).includes(transaction.category)
+    ) {
       return [transaction.category, ...base];
     }
     return base;
@@ -181,7 +216,9 @@ export function TransactionForm({
                     className="transition-all focus:shadow-md"
                     aria-required
                     aria-invalid={!!fieldState.error}
-                    aria-describedby={fieldState.error ? "amount-error" : undefined}
+                    aria-describedby={
+                      fieldState.error ? "amount-error" : undefined
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -203,7 +240,9 @@ export function TransactionForm({
                     className="transition-all focus:shadow-md"
                     aria-required
                     aria-invalid={!!fieldState.error}
-                    aria-describedby={fieldState.error ? "date-error" : undefined}
+                    aria-describedby={
+                      fieldState.error ? "date-error" : undefined
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -285,7 +324,11 @@ export function TransactionForm({
         />
 
         {/* Live region for screen reader announcements */}
-        <LiveRegion message={liveMessage} politeness="polite" clearAfter={3000} />
+        <LiveRegion
+          message={liveMessage}
+          politeness="polite"
+          clearAfter={3000}
+        />
 
         {/* AI Category Suggestion - Loading State */}
         {isLoadingAI && !aiSuggestion && (
@@ -302,7 +345,9 @@ export function TransactionForm({
               suggestion={aiSuggestion}
               onAccept={() => {
                 handleAcceptSuggestion();
-                setLiveMessage(`Category suggestion applied: ${aiSuggestion.category}`);
+                setLiveMessage(
+                  `Category suggestion applied: ${aiSuggestion.category}`,
+                );
               }}
               onReject={() => {
                 setAiSuggestion(null);
@@ -310,13 +355,19 @@ export function TransactionForm({
               }}
               isLoading={false}
             />
-            {setLiveMessage(`AI suggests category: ${aiSuggestion.category}. ${aiSuggestion.reasoning}`)}
+            {setLiveMessage(
+              `AI suggests category: ${aiSuggestion.category}. ${aiSuggestion.reasoning}`,
+            )}
           </>
         )}
 
         {/* AI Category Suggestion - Error State */}
         {aiError && !isLoadingAI && !aiSuggestion && (
-          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800" role="alert" aria-live="polite">
+          <div
+            className="rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800"
+            role="alert"
+            aria-live="polite"
+          >
             <p className="font-medium">AI Suggestion Unavailable</p>
             <p className="mt-1 text-xs">{aiError}</p>
           </div>
@@ -389,4 +440,3 @@ export function TransactionForm({
     </Form>
   );
 }
-

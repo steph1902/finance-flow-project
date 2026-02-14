@@ -16,7 +16,9 @@ type BudgetPayload = {
 };
 
 type BudgetsResponse = {
-  data: Array<Budget & { spent?: number; remaining?: number; progress?: number }>;
+  data: Array<
+    Budget & { spent?: number; remaining?: number; progress?: number }
+  >;
   period: {
     month: number;
     year: number;
@@ -29,7 +31,10 @@ const fetcher = (url: string) => apiFetch<BudgetsResponse>(url);
 
 export function useBudgets(filters: BudgetFilters = {}) {
   const queryString = buildQueryString(filters);
-  const { data, error, isLoading, mutate } = useSWR(`/api/budgets${queryString}`, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/budgets${queryString}`,
+    fetcher,
+  );
 
   const createBudget = useCallback(
     async (payload: BudgetPayload) => {
@@ -59,7 +64,11 @@ export function useBudgets(filters: BudgetFilters = {}) {
               }
 
               // Create optimistic budget
-              const optimisticBudget: Budget & { spent?: number; remaining?: number; progress?: number } = {
+              const optimisticBudget: Budget & {
+                spent?: number;
+                remaining?: number;
+                progress?: number;
+              } = {
                 id: `temp-${Date.now()}`,
                 userId: "",
                 category: payload.category,
@@ -80,12 +89,14 @@ export function useBudgets(filters: BudgetFilters = {}) {
             },
             rollbackOnError: true,
             revalidate: true, // Revalidate to get accurate spent/remaining from server
-          }
+          },
         );
         toast.success("Budget created successfully");
       } catch (err) {
         logError("Create budget error", err);
-        toast.error(err instanceof Error ? err.message : "Failed to create budget");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to create budget",
+        );
         throw err;
       }
     },
@@ -97,10 +108,13 @@ export function useBudgets(filters: BudgetFilters = {}) {
       try {
         await mutate(
           async (currentData) => {
-            await apiFetch<{ message: string; data: Budget }>(`/api/budgets/${id}`, {
-              method: "PATCH",
-              body: payload,
-            });
+            await apiFetch<{ message: string; data: Budget }>(
+              `/api/budgets/${id}`,
+              {
+                method: "PATCH",
+                body: payload,
+              },
+            );
 
             // Return updated data
             if (!currentData) {
@@ -126,7 +140,7 @@ export function useBudgets(filters: BudgetFilters = {}) {
                         : {}),
                       updatedAt: new Date().toISOString(),
                     }
-                  : budget
+                  : budget,
               ),
             };
           },
@@ -155,18 +169,20 @@ export function useBudgets(filters: BudgetFilters = {}) {
                           : {}),
                         updatedAt: new Date().toISOString(),
                       }
-                    : budget
+                    : budget,
                 ),
               };
             },
             rollbackOnError: true,
             revalidate: false,
-          }
+          },
         );
         toast.success("Budget updated successfully");
       } catch (err) {
         logError("Update budget error", err, { id });
-        toast.error(err instanceof Error ? err.message : "Failed to update budget");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to update budget",
+        );
         throw err;
       }
     },
@@ -211,12 +227,14 @@ export function useBudgets(filters: BudgetFilters = {}) {
             },
             rollbackOnError: true,
             revalidate: false,
-          }
+          },
         );
         toast.success("Budget deleted successfully");
       } catch (err) {
         logError("Delete budget error", err, { id });
-        toast.error(err instanceof Error ? err.message : "Failed to delete budget");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to delete budget",
+        );
         throw err;
       }
     },
@@ -235,4 +253,3 @@ export function useBudgets(filters: BudgetFilters = {}) {
     refresh: mutate,
   };
 }
-

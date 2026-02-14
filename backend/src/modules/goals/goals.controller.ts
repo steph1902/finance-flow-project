@@ -26,10 +26,7 @@ export class GoalsController {
   @Post()
   @ApiOperation({ summary: 'Create a new financial goal' })
   @ApiResponse({ status: HttpStatus.CREATED })
-  async create(
-    @CurrentUser('id') userId: string,
-    @Body() createGoalDto: CreateGoalDto,
-  ) {
+  async create(@CurrentUser('id') userId: string, @Body() createGoalDto: CreateGoalDto) {
     return this.goalsService.create(userId, createGoalDto);
   }
 
@@ -43,10 +40,7 @@ export class GoalsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get goal by ID' })
   @ApiResponse({ status: HttpStatus.OK })
-  async findOne(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async findOne(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.goalsService.findOne(userId, id);
   }
 
@@ -65,10 +59,7 @@ export class GoalsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete goal' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  async remove(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async remove(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<void> {
     return this.goalsService.remove(userId, id);
   }
 

@@ -1,9 +1,15 @@
-import LoginForm from '@/components/auth/LoginForm';
-import AuthLayout from '@/components/auth/AuthLayout';
-import AuthNavbar from '@/components/auth/AuthNavbar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import LoginForm from "@/components/auth/LoginForm";
+import AuthLayout from "@/components/auth/AuthLayout";
+import AuthNavbar from "@/components/auth/AuthNavbar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -29,12 +35,14 @@ export default function LoginPage() {
                 <span className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-400">Or Sign in with</span>
+                <span className="bg-white px-2 text-gray-400">
+                  Or Sign in with
+                </span>
               </div>
             </div>
             {/* Placeholder for social login icons if needed, or just the link */}
             <p className="mt-4">
-              Don&apos;t have an account?{' '}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
                 className="font-bold text-sumi hover:text-apricot transition-colors duration-200"

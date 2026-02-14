@@ -1,16 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { WelcomeStep } from "@/components/onboarding/WelcomeStep"
-import { ProfileStep, type ProfileData } from "@/components/onboarding/ProfileStep"
-import { BudgetSetupStep, type BudgetData } from "@/components/onboarding/BudgetSetupStep"
-import { GoalSetupStep, type GoalData } from "@/components/onboarding/GoalSetupStep"
-import { CompletionStep } from "@/components/onboarding/CompletionStep"
-import { Progress } from "@/components/ui/progress"
-import { toast } from "sonner"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { WelcomeStep } from "@/components/onboarding/WelcomeStep";
+import {
+  ProfileStep,
+  type ProfileData,
+} from "@/components/onboarding/ProfileStep";
+import {
+  BudgetSetupStep,
+  type BudgetData,
+} from "@/components/onboarding/BudgetSetupStep";
+import {
+  GoalSetupStep,
+  type GoalData,
+} from "@/components/onboarding/GoalSetupStep";
+import { CompletionStep } from "@/components/onboarding/CompletionStep";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
-type OnboardingStep = 'welcome' | 'profile' | 'budgets' | 'goals' | 'completion';
+type OnboardingStep =
+  | "welcome"
+  | "profile"
+  | "budgets"
+  | "goals"
+  | "completion";
 
 interface OnboardingData {
   profile?: ProfileData;
@@ -20,29 +34,35 @@ interface OnboardingData {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome');
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>("welcome");
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     budgets: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const steps: OnboardingStep[] = ['welcome', 'profile', 'budgets', 'goals', 'completion'];
+  const steps: OnboardingStep[] = [
+    "welcome",
+    "profile",
+    "budgets",
+    "goals",
+    "completion",
+  ];
   const currentStepIndex = steps.indexOf(currentStep);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   const handleProfileNext = (data: ProfileData) => {
     setOnboardingData({ ...onboardingData, profile: data });
-    setCurrentStep('budgets');
+    setCurrentStep("budgets");
   };
 
   const handleBudgetsNext = (data: BudgetData[]) => {
     setOnboardingData({ ...onboardingData, budgets: data });
-    setCurrentStep('goals');
+    setCurrentStep("goals");
   };
 
   const handleGoalsNext = (data: GoalData | null) => {
     setOnboardingData({ ...onboardingData, goal: data });
-    setCurrentStep('completion');
+    setCurrentStep("completion");
   };
 
   const handleComplete = async () => {
@@ -50,9 +70,9 @@ export default function OnboardingPage() {
     try {
       // Update user profile
       if (onboardingData.profile) {
-        await fetch('/api/account/update', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/account/update", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: onboardingData.profile.name,
             preferredCurrency: onboardingData.profile.currency,
@@ -70,25 +90,25 @@ export default function OnboardingPage() {
 
         await Promise.all(
           onboardingData.budgets.map((budget) =>
-            fetch('/api/budgets', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            fetch("/api/budgets", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 category: budget.category,
                 amount: budget.amount,
                 month,
                 year,
               }),
-            })
-          )
+            }),
+          ),
         );
       }
 
       // Create goal
       if (onboardingData.goal) {
-        await fetch('/api/goals', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/goals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: onboardingData.goal.name,
             targetAmount: onboardingData.goal.targetAmount,
@@ -99,17 +119,17 @@ export default function OnboardingPage() {
       }
 
       // Mark onboarding as complete
-      await fetch('/api/account/onboarding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/account/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: true }),
       });
 
-      toast.success('Welcome to FinanceFlow! 🎉');
-      router.push('/dashboard');
+      toast.success("Welcome to FinanceFlow! 🎉");
+      router.push("/dashboard");
     } catch (error) {
-      console.error('Onboarding error:', error);
-      toast.error('Something went wrong. Please try again.');
+      console.error("Onboarding error:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -119,10 +139,12 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Progress Bar */}
-        {currentStep !== 'welcome' && (
+        {currentStep !== "welcome" && (
           <div className="mb-8">
             <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>Step {currentStepIndex + 1} of {steps.length}</span>
+              <span>
+                Step {currentStepIndex + 1} of {steps.length}
+              </span>
               <span>{Math.round(progress)}% Complete</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -130,55 +152,62 @@ export default function OnboardingPage() {
         )}
 
         {/* Step Content */}
-        {currentStep === 'welcome' && (
-          <WelcomeStep onNext={() => setCurrentStep('profile')} />
+        {currentStep === "welcome" && (
+          <WelcomeStep onNext={() => setCurrentStep("profile")} />
         )}
 
-        {currentStep === 'profile' && onboardingData.profile !== undefined && (
+        {currentStep === "profile" && onboardingData.profile !== undefined && (
           <ProfileStep
             onNext={handleProfileNext}
-            onBack={() => setCurrentStep('welcome')}
+            onBack={() => setCurrentStep("welcome")}
             initialData={onboardingData.profile}
           />
         )}
 
-        {currentStep === 'profile' && onboardingData.profile === undefined && (
+        {currentStep === "profile" && onboardingData.profile === undefined && (
           <ProfileStep
             onNext={handleProfileNext}
-            onBack={() => setCurrentStep('welcome')}
+            onBack={() => setCurrentStep("welcome")}
           />
         )}
 
-        {currentStep === 'budgets' && (
+        {currentStep === "budgets" && (
           <BudgetSetupStep
             onNext={handleBudgetsNext}
-            onBack={() => setCurrentStep('profile')}
+            onBack={() => setCurrentStep("profile")}
             initialData={onboardingData.budgets}
           />
         )}
 
-        {currentStep === 'goals' && onboardingData.goal !== undefined && onboardingData.goal !== null && (
-          <GoalSetupStep
-            onNext={handleGoalsNext}
-            onBack={() => setCurrentStep('budgets')}
-            initialData={onboardingData.goal}
-          />
-        )}
+        {currentStep === "goals" &&
+          onboardingData.goal !== undefined &&
+          onboardingData.goal !== null && (
+            <GoalSetupStep
+              onNext={handleGoalsNext}
+              onBack={() => setCurrentStep("budgets")}
+              initialData={onboardingData.goal}
+            />
+          )}
 
-        {currentStep === 'goals' && (onboardingData.goal === undefined || onboardingData.goal === null) && (
-          <GoalSetupStep
-            onNext={handleGoalsNext}
-            onBack={() => setCurrentStep('budgets')}
-          />
-        )}
+        {currentStep === "goals" &&
+          (onboardingData.goal === undefined ||
+            onboardingData.goal === null) && (
+            <GoalSetupStep
+              onNext={handleGoalsNext}
+              onBack={() => setCurrentStep("budgets")}
+            />
+          )}
 
-        {currentStep === 'completion' && (
+        {currentStep === "completion" && (
           <CompletionStep
             onComplete={handleComplete}
             summary={{
               budgetCount: onboardingData.budgets.length,
               hasGoal: !!onboardingData.goal,
-              totalBudget: onboardingData.budgets.reduce((sum, b) => sum + b.amount, 0),
+              totalBudget: onboardingData.budgets.reduce(
+                (sum, b) => sum + b.amount,
+                0,
+              ),
             }}
           />
         )}

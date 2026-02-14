@@ -15,7 +15,7 @@ const chatRequestSchema = z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string(),
         timestamp: z.coerce.date(),
-      })
+      }),
     )
     .optional()
     .default([]),
@@ -25,13 +25,13 @@ export const POST = withApiAuth(async (req: NextRequest, userId: string) => {
   try {
     // Check rate limit
     if (!checkChatRateLimit(userId)) {
-      const headers = getRateLimitHeaders(userId, 'CHAT_ENDPOINT');
+      const headers = getRateLimitHeaders(userId, "CHAT_ENDPOINT");
       return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { 
+        { error: "Too many requests. Please try again later." },
+        {
           status: 429,
           headers,
-        }
+        },
       );
     }
 
@@ -55,14 +55,14 @@ export const POST = withApiAuth(async (req: NextRequest, userId: string) => {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request", details: error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     logError("Chat API error", error, { userId });
     return NextResponse.json(
       { error: "Failed to process chat message" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });

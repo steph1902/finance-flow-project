@@ -1,6 +1,6 @@
 /**
  * Reporting Engine
- * 
+ *
  * Generates comprehensive financial reports:
  * - Monthly summaries
  * - Yearly summaries
@@ -9,13 +9,13 @@
  * - Custom date range reports
  */
 
-import { prisma } from '@/lib/prisma';
-import { logInfo, logError } from '@/lib/logger';
-import { Decimal } from '@prisma/client/runtime/library';
-import { Prisma, Transaction } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { logInfo, logError } from "@/lib/logger";
+import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma, Transaction } from "@prisma/client";
 
-export type ReportType = 'MONTHLY' | 'YEARLY' | 'CATEGORY' | 'TAX' | 'CUSTOM';
-export type ReportFormat = 'JSON' | 'CSV' | 'PDF';
+export type ReportType = "MONTHLY" | "YEARLY" | "CATEGORY" | "TAX" | "CUSTOM";
+export type ReportFormat = "JSON" | "CSV" | "PDF";
 
 export interface GenerateReportInput {
   userId: string;
@@ -24,7 +24,7 @@ export interface GenerateReportInput {
   endDate: Date;
   filters?: {
     categories?: string[];
-    types?: ('INCOME' | 'EXPENSE')[];
+    types?: ("INCOME" | "EXPENSE")[];
     minAmount?: number;
     maxAmount?: number;
   };
@@ -49,7 +49,7 @@ export interface ReportSummary {
 
 export interface CategoryBreakdown {
   category: string;
-  type: 'INCOME' | 'EXPENSE';
+  type: "INCOME" | "EXPENSE";
   total: number;
   count: number;
   average: number;
@@ -65,7 +65,7 @@ export async function generateReport(input: GenerateReportInput) {
   try {
     const { userId, type, startDate, endDate, filters } = input;
 
-    logInfo('Generating report', { userId, type, startDate, endDate });
+    logInfo("Generating report", { userId, type, startDate, endDate });
 
     // Fetch transactions
     const transactions = await prisma.transaction.findMany({
@@ -76,12 +76,14 @@ export async function generateReport(input: GenerateReportInput) {
           gte: startDate,
           lte: endDate,
         },
-        ...(filters?.categories && filters.categories.length > 0 && {
-          category: { in: filters.categories },
-        }),
-        ...(filters?.types && filters.types.length > 0 && {
-          type: { in: filters.types },
-        }),
+        ...(filters?.categories &&
+          filters.categories.length > 0 && {
+            category: { in: filters.categories },
+          }),
+        ...(filters?.types &&
+          filters.types.length > 0 && {
+            type: { in: filters.types },
+          }),
         ...(filters?.minAmount && {
           amount: { gte: new Decimal(filters.minAmount) },
         }),
@@ -89,7 +91,7 @@ export async function generateReport(input: GenerateReportInput) {
           amount: { lte: new Decimal(filters.maxAmount) },
         }),
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
 
     // Calculate summary
@@ -102,7 +104,7 @@ export async function generateReport(input: GenerateReportInput) {
     const reportData = {
       summary,
       categoryBreakdown,
-      transactions: transactions.map(tx => ({
+      transactions: transactions.map((tx) => ({
         id: tx.id,
         date: tx.date,
         amount: Number(tx.amount),
@@ -113,7 +115,9 @@ export async function generateReport(input: GenerateReportInput) {
       period: {
         startDate,
         endDate,
-        days: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)),
+        days: Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        ),
       },
     };
 
@@ -122,7 +126,7 @@ export async function generateReport(input: GenerateReportInput) {
       data: {
         userId,
         type,
-        format: input.format || 'JSON',
+        format: input.format || "JSON",
         name: generateReportName(type, startDate, endDate),
         description: `Financial report from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
         startDate,
@@ -132,12 +136,12 @@ export async function generateReport(input: GenerateReportInput) {
       },
     });
 
-    logInfo('Report generated successfully', { reportId: report.id, userId });
+    logInfo("Report generated successfully", { reportId: report.id, userId });
 
     return report;
   } catch (error) {
-    logError('Report generation failed', error);
-    throw new Error('Failed to generate report');
+    logError("Report generation failed", error);
+    throw new Error("Failed to generate report");
   }
 }
 
@@ -147,22 +151,25 @@ export async function generateReport(input: GenerateReportInput) {
 function calculateSummary(
   transactions: Transaction[],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): ReportSummary {
   const income = transactions
-    .filter(tx => tx.type === 'INCOME')
+    .filter((tx) => tx.type === "INCOME")
     .reduce((sum, tx) => sum + Number(tx.amount), 0);
 
   const expense = transactions
-    .filter(tx => tx.type === 'EXPENSE')
+    .filter((tx) => tx.type === "EXPENSE")
     .reduce((sum, tx) => sum + Number(tx.amount), 0);
 
   const netBalance = income - expense;
   const transactionCount = transactions.length;
-  const averageTransaction = transactionCount > 0 ? (income + expense) / transactionCount : 0;
+  const averageTransaction =
+    transactionCount > 0 ? (income + expense) / transactionCount : 0;
 
   // Calculate daily average
-  const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const days = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+  );
   const dailyAverage = days > 0 ? expense / days : 0;
 
   // Monthly projection
@@ -172,7 +179,7 @@ function calculateSummary(
   const categoryTotals = new Map<string, number>();
   const categoryCounts = new Map<string, number>();
 
-  for (const tx of transactions.filter(tx => tx.type === 'EXPENSE')) {
+  for (const tx of transactions.filter((tx) => tx.type === "EXPENSE")) {
     const current = categoryTotals.get(tx.category) || 0;
     const count = categoryCounts.get(tx.category) || 0;
     categoryTotals.set(tx.category, current + Number(tx.amount));
@@ -204,11 +211,16 @@ function calculateSummary(
 /**
  * Calculate category breakdown
  */
-function calculateCategoryBreakdown(transactions: Transaction[]): CategoryBreakdown[] {
-  const categoryData = new Map<string, {
-    type: 'INCOME' | 'EXPENSE';
-    amounts: number[];
-  }>();
+function calculateCategoryBreakdown(
+  transactions: Transaction[],
+): CategoryBreakdown[] {
+  const categoryData = new Map<
+    string,
+    {
+      type: "INCOME" | "EXPENSE";
+      amounts: number[];
+    }
+  >();
 
   for (const tx of transactions) {
     if (!categoryData.has(tx.category)) {
@@ -242,20 +254,30 @@ function calculateCategoryBreakdown(transactions: Transaction[]): CategoryBreakd
 /**
  * Generate report name
  */
-function generateReportName(type: ReportType, startDate: Date, endDate: Date): string {
-  const start = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  const end = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+function generateReportName(
+  type: ReportType,
+  startDate: Date,
+  endDate: Date,
+): string {
+  const start = startDate.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+  const end = endDate.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
 
   switch (type) {
-    case 'MONTHLY':
+    case "MONTHLY":
       return `Monthly Report - ${start}`;
-    case 'YEARLY':
+    case "YEARLY":
       return `Yearly Report - ${startDate.getFullYear()}`;
-    case 'CATEGORY':
+    case "CATEGORY":
       return `Category Analysis - ${start} to ${end}`;
-    case 'TAX':
+    case "TAX":
       return `Tax Report - ${startDate.getFullYear()}`;
-    case 'CUSTOM':
+    case "CUSTOM":
       return `Custom Report - ${start} to ${end}`;
     default:
       return `Financial Report - ${start} to ${end}`;
@@ -269,7 +291,7 @@ export async function getUserReports(userId: string, limit = 20) {
   try {
     const reports = await prisma.report.findMany({
       where: { userId },
-      orderBy: { generatedAt: 'desc' },
+      orderBy: { generatedAt: "desc" },
       take: limit,
       select: {
         id: true,
@@ -286,8 +308,8 @@ export async function getUserReports(userId: string, limit = 20) {
 
     return reports;
   } catch (error) {
-    logError('Failed to get user reports', error);
-    throw new Error('Failed to get reports');
+    logError("Failed to get user reports", error);
+    throw new Error("Failed to get reports");
   }
 }
 
@@ -301,13 +323,13 @@ export async function getReportById(reportId: string, userId: string) {
     });
 
     if (!report) {
-      throw new Error('Report not found');
+      throw new Error("Report not found");
     }
 
     return report;
   } catch (error) {
-    logError('Failed to get report', error);
-    throw new Error('Failed to get report');
+    logError("Failed to get report", error);
+    throw new Error("Failed to get report");
   }
 }
 
@@ -321,14 +343,14 @@ export async function deleteReport(reportId: string, userId: string) {
     });
 
     if (result.count === 0) {
-      throw new Error('Report not found');
+      throw new Error("Report not found");
     }
 
-    logInfo('Report deleted', { reportId, userId });
+    logInfo("Report deleted", { reportId, userId });
     return { success: true };
   } catch (error) {
-    logError('Failed to delete report', error);
-    throw new Error('Failed to delete report');
+    logError("Failed to delete report", error);
+    throw new Error("Failed to delete report");
   }
 }
 
@@ -341,9 +363,9 @@ export async function generateTaxReport(userId: string, year: number) {
 
   return await generateReport({
     userId,
-    type: 'TAX',
+    type: "TAX",
     startDate,
     endDate,
-    format: 'JSON',
+    format: "JSON",
   });
 }

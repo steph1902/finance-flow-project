@@ -14,7 +14,8 @@ export default function AIAssistantPage() {
           <h1 className="type-h2">AI Financial Assistant</h1>
         </div>
         <p className="type-body text-muted-foreground max-w-2xl">
-          Get personalized financial insights and advice powered by AI. Ask questions about your spending, budgets, or get smart recommendations.
+          Get personalized financial insights and advice powered by AI. Ask
+          questions about your spending, budgets, or get smart recommendations.
         </p>
       </div>
       <AIChat />

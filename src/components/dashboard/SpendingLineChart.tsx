@@ -13,7 +13,13 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DailyTrendPoint } from "@/types";
 import { motion } from "framer-motion";
@@ -24,35 +30,42 @@ type SpendingLineChartProps = {
   isLoading?: boolean;
 };
 
-const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineChartProps) => {
-  const [activeChart, setActiveChart] = useState<'line' | 'area'>('area');
+const SpendingLineChartComponent = ({
+  data,
+  isLoading = false,
+}: SpendingLineChartProps) => {
+  const [activeChart, setActiveChart] = useState<"line" | "area">("area");
 
   return (
     <Card className="h-full border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground">Income vs. Expenses</CardTitle>
+            <CardTitle className="text-foreground">
+              Income vs. Expenses
+            </CardTitle>
             <CardDescription className="text-muted-foreground">
               Track how your spending compares to income over time
             </CardDescription>
           </div>
           <div className="flex gap-1 bg-muted p-1 rounded-lg">
             <button
-              onClick={() => setActiveChart('area')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${activeChart === 'area'
-                  ? 'bg-background text-primary shadow-sm scale-105'
-                  : 'text-muted-foreground hover:text-foreground active:scale-95'
-                }`}
+              onClick={() => setActiveChart("area")}
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
+                activeChart === "area"
+                  ? "bg-background text-primary shadow-sm scale-105"
+                  : "text-muted-foreground hover:text-foreground active:scale-95"
+              }`}
             >
               Area
             </button>
             <button
-              onClick={() => setActiveChart('line')}
-              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${activeChart === 'line'
-                  ? 'bg-background text-primary shadow-sm scale-105'
-                  : 'text-muted-foreground hover:text-foreground active:scale-95'
-                }`}
+              onClick={() => setActiveChart("line")}
+              className={`px-3 py-1 text-xs font-medium rounded transition-all duration-200 ${
+                activeChart === "line"
+                  ? "bg-background text-primary shadow-sm scale-105"
+                  : "text-muted-foreground hover:text-foreground active:scale-95"
+              }`}
             >
               Line
             </button>
@@ -95,11 +108,23 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
           </div>
         ) : data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-            <svg className="h-16 w-16 mb-4 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            <svg
+              className="h-16 w-16 mb-4 text-muted-foreground/50"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+              />
             </svg>
             <p className="text-sm">Not enough data yet</p>
-            <p className="text-xs text-neutral-400 mt-1">Add more transactions to see trends</p>
+            <p className="text-xs text-neutral-400 mt-1">
+              Add more transactions to see trends
+            </p>
           </div>
         ) : (
           <motion.div
@@ -110,47 +135,89 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
             className="h-full"
           >
             <ResponsiveContainer width="100%" height="100%">
-              {activeChart === 'area' ? (
-                <AreaChart data={data} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
+              {activeChart === "area" ? (
+                <AreaChart
+                  data={data}
+                  margin={{ top: 10, right: 20, bottom: 10, left: 0 }}
+                >
                   <defs>
-                    <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={CHART_COLORS[1]} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={CHART_COLORS[1]} stopOpacity={0} />
+                    <linearGradient
+                      id="incomeGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor={CHART_COLORS[1]}
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={CHART_COLORS[1]}
+                        stopOpacity={0}
+                      />
                     </linearGradient>
-                    <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={CHART_COLORS[3]} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={CHART_COLORS[3]} stopOpacity={0} />
+                    <linearGradient
+                      id="expensesGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor={CHART_COLORS[3]}
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={CHART_COLORS[3]}
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="#94A3B8" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    opacity={0.2}
+                    stroke="#94A3B8"
+                  />
                   <XAxis
                     dataKey="date"
                     tickFormatter={(value) => {
                       const date = new Date(value);
-                      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                      return date.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      });
                     }}
                     stroke="#64748B"
-                    style={{ fontSize: '12px' }}
+                    style={{ fontSize: "12px" }}
                   />
                   <YAxis
                     tickFormatter={(value) => `$${value}`}
                     width={80}
                     stroke="#64748B"
-                    style={{ fontSize: '12px' }}
+                    style={{ fontSize: "12px" }}
                   />
                   <Tooltip
-                    formatter={(value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                    formatter={(value: number) =>
+                      `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                    }
+                    labelFormatter={(label) =>
+                      new Date(label).toLocaleDateString()
+                    }
                     contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      border: "1px solid #E5E7EB",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     }}
                   />
                   <Legend
                     iconType="circle"
-                    wrapperStyle={{ fontSize: '14px' }}
+                    wrapperStyle={{ fontSize: "14px" }}
                   />
                   <Area
                     type="monotone"
@@ -174,43 +241,57 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                   />
                 </AreaChart>
               ) : (
-                <LineChart data={data} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} stroke="#94A3B8" />
+                <LineChart
+                  data={data}
+                  margin={{ top: 10, right: 20, bottom: 10, left: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    opacity={0.2}
+                    stroke="#94A3B8"
+                  />
                   <XAxis
                     dataKey="date"
                     tickFormatter={(value) => {
                       const date = new Date(value);
-                      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                      return date.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      });
                     }}
                     stroke="#64748B"
-                    style={{ fontSize: '12px' }}
+                    style={{ fontSize: "12px" }}
                   />
                   <YAxis
                     tickFormatter={(value) => `$${value}`}
                     width={80}
                     stroke="#64748B"
-                    style={{ fontSize: '12px' }}
+                    style={{ fontSize: "12px" }}
                   />
                   <Tooltip
-                    formatter={(value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                    formatter={(value: number) =>
+                      `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                    }
+                    labelFormatter={(label) =>
+                      new Date(label).toLocaleDateString()
+                    }
                     contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      border: "1px solid #E5E7EB",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     }}
                   />
                   <Legend
                     iconType="circle"
-                    wrapperStyle={{ fontSize: '14px' }}
+                    wrapperStyle={{ fontSize: "14px" }}
                   />
                   <Line
                     type="monotone"
                     dataKey="income"
                     stroke="#10B981"
                     strokeWidth={2.5}
-                    dot={{ fill: '#10B981', r: 4 }}
+                    dot={{ fill: "#10B981", r: 4 }}
                     activeDot={{ r: 6 }}
                     name="Income"
                   />
@@ -219,7 +300,7 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
                     dataKey="expenses"
                     stroke="#EF4444"
                     strokeWidth={2.5}
-                    dot={{ fill: '#EF4444', r: 4 }}
+                    dot={{ fill: "#EF4444", r: 4 }}
                     activeDot={{ r: 6 }}
                     name="Expenses"
                   />
@@ -234,13 +315,15 @@ const SpendingLineChartComponent = ({ data, isLoading = false }: SpendingLineCha
 };
 
 // Memoize to prevent unnecessary re-renders
-export const SpendingLineChart = memo(SpendingLineChartComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.isLoading === nextProps.isLoading &&
-    prevProps.data.length === nextProps.data.length &&
-    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
-  );
-});
+export const SpendingLineChart = memo(
+  SpendingLineChartComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.data.length === nextProps.data.length &&
+      JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+    );
+  },
+);
 
-SpendingLineChart.displayName = 'SpendingLineChart';
-
+SpendingLineChart.displayName = "SpendingLineChart";

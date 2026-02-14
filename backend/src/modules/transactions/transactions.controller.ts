@@ -10,13 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiResponse,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import {
   CreateTransactionDto,
@@ -34,7 +28,7 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 @ApiBearerAuth('JWT-auth')
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) { }
+  constructor(private readonly transactionsService: TransactionsService) {}
 
   /**
    * Create a new transaction
@@ -63,10 +57,7 @@ export class TransactionsController {
   @ApiQuery({ name: 'endDate', required: false, type: Date })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Transactions retrieved successfully' })
-  async findAll(
-    @CurrentUser('id') userId: string,
-    @Query() query: QueryTransactionDto,
-  ) {
+  async findAll(@CurrentUser('id') userId: string, @Query() query: QueryTransactionDto) {
     return this.transactionsService.findAll(userId, query);
   }
 
@@ -82,10 +73,7 @@ export class TransactionsController {
   @ApiResponse({ status: 200, description: 'Receipt scanned successfully' })
   @ApiResponse({ status: 400, description: 'Invalid image data' })
   @HttpCode(HttpStatus.OK)
-  async scanReceipt(
-    @CurrentUser('id') userId: string,
-    @Body() body: { image: string },
-  ) {
+  async scanReceipt(@CurrentUser('id') userId: string, @Body() body: { image: string }) {
     return this.transactionsService.scanReceipt(userId, body.image);
   }
 
@@ -96,10 +84,7 @@ export class TransactionsController {
   @ApiOperation({ summary: 'Get transaction by ID' })
   @ApiResponse({ status: 200, description: 'Transaction found' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async findOne(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async findOne(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.transactionsService.findOne(userId, id);
   }
 
@@ -126,10 +111,7 @@ export class TransactionsController {
   @ApiOperation({ summary: 'Delete transaction' })
   @ApiResponse({ status: 204, description: 'Transaction deleted successfully' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async remove(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.transactionsService.softDelete(userId, id);
   }
 
@@ -168,10 +150,7 @@ export class TransactionsController {
   @Get('export/csv')
   @ApiOperation({ summary: 'Export transactions to CSV' })
   @ApiResponse({ status: 200, description: 'CSV generated successfully' })
-  async exportCsv(
-    @CurrentUser('id') userId: string,
-    @Query() query: QueryTransactionDto,
-  ) {
+  async exportCsv(@CurrentUser('id') userId: string, @Query() query: QueryTransactionDto) {
     return this.transactionsService.exportToCsv(userId, query);
   }
 
@@ -182,10 +161,7 @@ export class TransactionsController {
   @ApiOperation({ summary: 'Get AI categorization suggestion for a transaction' })
   @ApiResponse({ status: 200, description: 'AI suggestion retrieved' })
   @ApiResponse({ status: 404, description: 'Transaction or suggestion not found' })
-  async getAISuggestion(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async getAISuggestion(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.transactionsService.getAISuggestion(userId, id);
   }
 
@@ -196,10 +172,7 @@ export class TransactionsController {
   @ApiOperation({ summary: 'Accept AI categorization suggestion' })
   @ApiResponse({ status: 200, description: 'AI suggestion accepted' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async acceptAISuggestion(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async acceptAISuggestion(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.transactionsService.acceptAISuggestion(userId, id);
   }
 
@@ -219,10 +192,6 @@ export class TransactionsController {
     @Param('id') transactionId: string,
     @Body() rejectDto: RejectAISuggestionDto,
   ) {
-    return this.transactionsService.rejectAISuggestion(
-      transactionId,
-      userId,
-      rejectDto,
-    );
+    return this.transactionsService.rejectAISuggestion(transactionId, userId, rejectDto);
   }
 }

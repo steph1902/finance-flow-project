@@ -12,7 +12,7 @@ import { PrismaService } from '@/database/prisma.service';
 export class HealthController {
   private readonly logger = new Logger(HealthController.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Basic health check endpoint

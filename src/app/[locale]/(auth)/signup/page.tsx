@@ -1,9 +1,15 @@
-import SignupForm from '@/components/auth/SignupForm';
-import AuthLayout from '@/components/auth/AuthLayout';
-import AuthNavbar from '@/components/auth/AuthNavbar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import { Rocket } from 'lucide-react';
+import SignupForm from "@/components/auth/SignupForm";
+import AuthLayout from "@/components/auth/AuthLayout";
+import AuthNavbar from "@/components/auth/AuthNavbar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { Rocket } from "lucide-react";
 
 export default function SignupPage() {
   return (
@@ -25,7 +31,7 @@ export default function SignupPage() {
           <CardContent>
             <SignupForm />
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 href="/login"
                 className="font-semibold text-primary underline-offset-4 hover:underline transition-colors duration-200"

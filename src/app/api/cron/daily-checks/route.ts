@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getErrorMessage } from '@/lib/utils/error';
-import { prisma } from '@/lib/prisma';
-import { createNotification } from '@/lib/services/notification-service';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { getErrorMessage } from "@/lib/utils/error";
+import { prisma } from "@/lib/prisma";
+import { createNotification } from "@/lib/services/notification-service";
+import { logger } from "@/lib/logger";
 
 /**
  * Daily Cron Job - Budget Alerts & Bill Reminders
@@ -12,9 +12,9 @@ import { logger } from '@/lib/logger';
 export async function GET(request: Request) {
   try {
     // Verify the request is from Vercel Cron
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get("authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const now = new Date();
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
           where: {
             userId: user.id,
             category: budget.category,
-            type: 'EXPENSE',
+            type: "EXPENSE",
             deletedAt: null,
             date: {
               gte: new Date(currentYear, currentMonth - 1, 1),
@@ -66,21 +66,21 @@ export async function GET(request: Request) {
         if (percentage >= 90 && percentage < 100) {
           await createNotification({
             userId: user.id,
-            type: 'BUDGET_ALERT',
+            type: "BUDGET_ALERT",
             title: `Budget Alert: ${budget.category}`,
             message: `You've used ${Math.round(percentage)}% of your ${budget.category} budget ($${totalSpent.toFixed(2)} of $${budgetAmount.toFixed(2)})`,
             priority: 2, // High priority
-            actionUrl: '/budgets',
+            actionUrl: "/budgets",
           });
           budgetAlertsCreated++;
         } else if (percentage >= 100) {
           await createNotification({
             userId: user.id,
-            type: 'BUDGET_ALERT',
+            type: "BUDGET_ALERT",
             title: `Budget Exceeded: ${budget.category}`,
             message: `You've exceeded your ${budget.category} budget by $${(totalSpent - budgetAmount).toFixed(2)}`,
             priority: 2, // High priority
-            actionUrl: '/budgets',
+            actionUrl: "/budgets",
           });
           budgetAlertsCreated++;
         }
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
       const upcomingBills = await prisma.recurringTransaction.findMany({
         where: {
           userId: user.id,
-          type: 'EXPENSE',
+          type: "EXPENSE",
           isActive: true,
           nextDate: {
             gte: now,
@@ -107,9 +107,9 @@ export async function GET(request: Request) {
         const recentNotifications = await prisma.notification.count({
           where: {
             userId: user.id,
-            type: 'BILL_REMINDER',
+            type: "BILL_REMINDER",
             message: {
-              contains: bill.description || '',
+              contains: bill.description || "",
             },
             createdAt: {
               gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
@@ -119,16 +119,17 @@ export async function GET(request: Request) {
 
         if (recentNotifications === 0) {
           const daysUntil = Math.ceil(
-            (new Date(bill.nextDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+            (new Date(bill.nextDate).getTime() - now.getTime()) /
+              (1000 * 60 * 60 * 24),
           );
 
           await createNotification({
             userId: user.id,
-            type: 'BILL_REMINDER',
+            type: "BILL_REMINDER",
             title: `Upcoming Bill: ${bill.description}`,
-            message: `${bill.description || 'Bill'} of $${Number(bill.amount).toFixed(2)} is due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
+            message: `${bill.description || "Bill"} of $${Number(bill.amount).toFixed(2)} is due in ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`,
             priority: 1, // Medium priority
-            actionUrl: '/recurring',
+            actionUrl: "/recurring",
           });
           billRemindersCreated++;
         }
@@ -145,10 +146,14 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    logger.error('Daily cron job failed', error);
+    logger.error("Daily cron job failed", error);
     return NextResponse.json(
-      { error: 'Cron job failed', details: error instanceof Error ? getErrorMessage(error) : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Cron job failed",
+        details:
+          error instanceof Error ? getErrorMessage(error) : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

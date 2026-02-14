@@ -1,145 +1,145 @@
 {
-    "nav": {
-        "aiGuide": "AI Guide",
-        "docs": "Docs",
-        "login": "Login",
-        "getStarted": "Get Started",
-        "dashboard": "Dashboard",
-        "transactions": "Transactions",
-        "budgets": "Budgets",
-        "goals": "Goals",
-        "recurring": "Recurring",
-        "currency": "Currency",
-        "reports": "Reports",
-        "aiAssistant": "AI Assistant",
-        "importReport": "Import Report",
-        "big4Insights": "Big 4 Insights",
-        "experiments": "Experiments",
-        "settings": "Settings",
-        "feedback": "Feedback"
+  "nav": {
+    "aiGuide": "AI Guide",
+    "docs": "Docs",
+    "login": "Login",
+    "getStarted": "Get Started",
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "goals": "Goals",
+    "recurring": "Recurring",
+    "currency": "Currency",
+    "reports": "Reports",
+    "aiAssistant": "AI Assistant",
+    "importReport": "Import Report",
+    "big4Insights": "Big 4 Insights",
+    "experiments": "Experiments",
+    "settings": "Settings",
+    "feedback": "Feedback"
+  },
+  "home": {
+    "tagline": "AI-Powered Financial Clarity",
+    "hero": {
+      "title": "Your Financial Life,",
+      "titleHighlight": "Powered by AI",
+      "description": "Transform complex financial data into crystal-clear insights. Get executive-grade analysis, predictive risk alerts, and personalized action plans—all automated by advanced AI.",
+      "ctaPrimary": "Start Free Trial",
+      "ctaSecondary": "Learn How It Works"
     },
-    "home": {
-        "tagline": "AI-Powered Financial Clarity",
-        "hero": {
-            "title": "Your Financial Life,",
-            "titleHighlight": "Powered by AI",
-            "description": "Transform complex financial data into crystal-clear insights. Get executive-grade analysis, predictive risk alerts, and personalized action plans—all automated by advanced AI.",
-            "ctaPrimary": "Start Free Trial",
-            "ctaSecondary": "Learn How It Works"
-        },
-        "features": {
-            "sectionTitle": "Intelligent Features That Work for You",
-            "big4": {
-                "title": "Big 4 Decision Intelligence",
-                "description": "Get comprehensive financial analysis in seconds. Our AI examines your cashflow health, identifies weak points, forecasts risks, and delivers 3 prioritized action items—like having a CFO in your pocket."
-            },
-            "categorization": {
-                "title": "Smart Categorization",
-                "description": "Stop manually tagging transactions. Our AI learns your spending patterns and automatically categorizes purchases with 95% accuracy. It even improves over time based on your corrections."
-            },
-            "riskProjection": {
-                "title": "Risk Projection",
-                "description": "See what's coming before it hits. Our predictive engine analyzes 30/60/90-day horizons and warns you about potential cash crunches, unusual spending, or budget overruns."
-            }
-        }
-    },
-    "aiGuide": {
-        "badge": "Beginner's Guide",
-        "title": "How AI Makes Your Finances",
-        "titleHighlight": "Effortless",
-        "subtitle": "You don't need to be a financial expert. Our AI does the heavy lifting, giving you simple, actionable advice in plain English.",
-        "what": {
-            "title": "What is AI in FinanceFlow?",
-            "description": "Think of it as a smart assistant that reads all your transactions and tells you:",
-            "cashflow": "Are you making more than you spend?",
-            "problems": "What problems do you need to fix?",
-            "risks": "What financial risks are coming up?",
-            "actions": "Exactly what to do about it (in order of priority)"
-        },
-        "features": {
-            "title": "3 Ways AI Helps You Save Money",
-            "big4": {
-                "title": "Big 4 Insights (Your Financial Report Card)",
-                "subtitle": "Get a complete financial check-up in seconds",
-                "description": "Click one button and the AI analyzes all your transactions. In about 20 seconds, it gives you:",
-                "cashflowTitle": "Cashflow Diagnosis",
-                "cashflowDesc": "Are you making more than you spend? Is it consistent?",
-                "risksTitle": "Risks",
-                "risksDesc": "Any red flags about running out of money soon?",
-                "weaknessesTitle": "Weak Points",
-                "weaknessesDesc": "What categories are draining your wallet?",
-                "actionsTitle": "Top 3 Actions",
-                "actionsDesc": "Specific steps to improve (like \"reduce dining out by $200/month\")",
-                "howTo": "How to Use It:",
-                "howToDesc": "Go to AI → Big 4 Insights in the sidebar and click Refresh Analysis. Wait 20 seconds. Read your report. That's it!"
-            },
-            "categorization": {
-                "title": "Smart Categorization (Your Financial Organizer)",
-                "subtitle": "Stop manually sorting your spending",
-                "description": "Every time you add a transaction, the AI reads the description and automatically sorts it. No more guessing if that coffee shop charge was \"Dining\" or \"Entertainment.\"",
-                "accurateTitle": "It's Accurate",
-                "accurateDesc": "95% of the time, it gets it right.",
-                "fastTitle": "It's Fast",
-                "fastDesc": "Works in the background. You don't wait.",
-                "smartTitle": "It Gets Smarter",
-                "smartDesc": "If you correct a category, AI remembers for similar purchases.",
-                "editableTitle": "You Can Edit",
-                "editableDesc": "If it's wrong, just change it. The AI remembers for next time.",
-                "howTo": "How to Use It:",
-                "howToDesc": "Just add transactions normally. The AI does the rest in the background. Check the category, and if it's wrong, click to change it."
-            },
-            "risk": {
-                "title": "Risk Warnings (Your Financial Weather Forecast)",
-                "subtitle": "Know about problems BEFORE they happen",
-                "description": "This is where the AI looks ahead. It checks if you're about to:",
-                "runOutTitle": "Run out of money soon",
-                "runOutDesc": "Based on your burn rate and upcoming bills",
-                "overspendTitle": "Overspend in a category",
-                "overspendDesc": "\"You've spent 90% of your dining budget with 15 days left\"",
-                "unusualTitle": "Hit an unusual expense pattern",
-                "unusualDesc": "Large upcoming expenses detected (holiday season)",
-                "howTo": "How to Use It:",
-                "howToDesc": "The risk warnings appear automatically in your Big 4 Insights report. Green = you're safe, Yellow = watch out, Red = take action now."
-            }
-        },
-        "faq": {
-            "title": "Common Questions",
-            "privacy": {
-                "q": "Is my financial data safe?",
-                "a": "Yes. Your data is encrypted and never shared. The AI runs on Google's secure servers and only you can see your analysis."
-            },
-            "accuracy": {
-                "q": "How accurate is the AI?",
-                "a": "Transaction categorization is 95% accurate. For insights, the AI shows you a confidence score so you know when to double-check."
-            },
-            "cost": {
-                "q": "Does this cost extra?",
-                "a": "No. AI features are included in your FinanceFlow subscription. No hidden fees."
-            },
-            "control": {
-                "q": "Can I turn it off?",
-                "a": "Yes. You can disable AI categorization anytime in Settings. The AI insights are optional—use them when you want."
-            }
-        }
-    },
-    "common": {
-        "loading": "Loading...",
-        "error": "An error occurred",
-        "success": "Success!",
-        "close": "Close",
-        "cancel": "Cancel",
-        "save": "Save",
-        "delete": "Delete",
-        "edit": "Edit",
-        "add": "Add",
-        "back": "Back",
-        "next": "Next",
-        "previous": "Previous",
-        "search": "Search",
-        "filter": "Filter",
-        "sort": "Sort",
-        "export": "Export",
-        "import": "Import",
-        "refresh": "Refresh"
+    "features": {
+      "sectionTitle": "Intelligent Features That Work for You",
+      "big4": {
+        "title": "Big 4 Decision Intelligence",
+        "description": "Get comprehensive financial analysis in seconds. Our AI examines your cashflow health, identifies weak points, forecasts risks, and delivers 3 prioritized action items—like having a CFO in your pocket."
+      },
+      "categorization": {
+        "title": "Smart Categorization",
+        "description": "Stop manually tagging transactions. Our AI learns your spending patterns and automatically categorizes purchases with 95% accuracy. It even improves over time based on your corrections."
+      },
+      "riskProjection": {
+        "title": "Risk Projection",
+        "description": "See what's coming before it hits. Our predictive engine analyzes 30/60/90-day horizons and warns you about potential cash crunches, unusual spending, or budget overruns."
+      }
     }
+  },
+  "aiGuide": {
+    "badge": "Beginner's Guide",
+    "title": "How AI Makes Your Finances",
+    "titleHighlight": "Effortless",
+    "subtitle": "You don't need to be a financial expert. Our AI does the heavy lifting, giving you simple, actionable advice in plain English.",
+    "what": {
+      "title": "What is AI in FinanceFlow?",
+      "description": "Think of it as a smart assistant that reads all your transactions and tells you:",
+      "cashflow": "Are you making more than you spend?",
+      "problems": "What problems do you need to fix?",
+      "risks": "What financial risks are coming up?",
+      "actions": "Exactly what to do about it (in order of priority)"
+    },
+    "features": {
+      "title": "3 Ways AI Helps You Save Money",
+      "big4": {
+        "title": "Big 4 Insights (Your Financial Report Card)",
+        "subtitle": "Get a complete financial check-up in seconds",
+        "description": "Click one button and the AI analyzes all your transactions. In about 20 seconds, it gives you:",
+        "cashflowTitle": "Cashflow Diagnosis",
+        "cashflowDesc": "Are you making more than you spend? Is it consistent?",
+        "risksTitle": "Risks",
+        "risksDesc": "Any red flags about running out of money soon?",
+        "weaknessesTitle": "Weak Points",
+        "weaknessesDesc": "What categories are draining your wallet?",
+        "actionsTitle": "Top 3 Actions",
+        "actionsDesc": "Specific steps to improve (like \"reduce dining out by $200/month\")",
+        "howTo": "How to Use It:",
+        "howToDesc": "Go to AI → Big 4 Insights in the sidebar and click Refresh Analysis. Wait 20 seconds. Read your report. That's it!"
+      },
+      "categorization": {
+        "title": "Smart Categorization (Your Financial Organizer)",
+        "subtitle": "Stop manually sorting your spending",
+        "description": "Every time you add a transaction, the AI reads the description and automatically sorts it. No more guessing if that coffee shop charge was \"Dining\" or \"Entertainment.\"",
+        "accurateTitle": "It's Accurate",
+        "accurateDesc": "95% of the time, it gets it right.",
+        "fastTitle": "It's Fast",
+        "fastDesc": "Works in the background. You don't wait.",
+        "smartTitle": "It Gets Smarter",
+        "smartDesc": "If you correct a category, AI remembers for similar purchases.",
+        "editableTitle": "You Can Edit",
+        "editableDesc": "If it's wrong, just change it. The AI remembers for next time.",
+        "howTo": "How to Use It:",
+        "howToDesc": "Just add transactions normally. The AI does the rest in the background. Check the category, and if it's wrong, click to change it."
+      },
+      "risk": {
+        "title": "Risk Warnings (Your Financial Weather Forecast)",
+        "subtitle": "Know about problems BEFORE they happen",
+        "description": "This is where the AI looks ahead. It checks if you're about to:",
+        "runOutTitle": "Run out of money soon",
+        "runOutDesc": "Based on your burn rate and upcoming bills",
+        "overspendTitle": "Overspend in a category",
+        "overspendDesc": "\"You've spent 90% of your dining budget with 15 days left\"",
+        "unusualTitle": "Hit an unusual expense pattern",
+        "unusualDesc": "Large upcoming expenses detected (holiday season)",
+        "howTo": "How to Use It:",
+        "howToDesc": "The risk warnings appear automatically in your Big 4 Insights report. Green = you're safe, Yellow = watch out, Red = take action now."
+      }
+    },
+    "faq": {
+      "title": "Common Questions",
+      "privacy": {
+        "q": "Is my financial data safe?",
+        "a": "Yes. Your data is encrypted and never shared. The AI runs on Google's secure servers and only you can see your analysis."
+      },
+      "accuracy": {
+        "q": "How accurate is the AI?",
+        "a": "Transaction categorization is 95% accurate. For insights, the AI shows you a confidence score so you know when to double-check."
+      },
+      "cost": {
+        "q": "Does this cost extra?",
+        "a": "No. AI features are included in your FinanceFlow subscription. No hidden fees."
+      },
+      "control": {
+        "q": "Can I turn it off?",
+        "a": "Yes. You can disable AI categorization anytime in Settings. The AI insights are optional—use them when you want."
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh"
+  }
 }

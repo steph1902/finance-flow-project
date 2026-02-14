@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import useSWR from 'swr';
+import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -8,7 +8,7 @@ export interface Report {
   id: string;
   userId: string;
   name: string;
-  type: 'MONTHLY' | 'YEARLY' | 'CATEGORY' | 'TAX' | 'CUSTOM';
+  type: "MONTHLY" | "YEARLY" | "CATEGORY" | "TAX" | "CUSTOM";
   startDate: string;
   endDate: string;
   data: Record<string, unknown>;
@@ -23,7 +23,7 @@ interface ReportsResponse {
 export function useReports(limit = 20, offset = 0) {
   const { data, error, isLoading, mutate } = useSWR<ReportsResponse>(
     `/api/reports?limit=${limit}&offset=${offset}`,
-    fetcher
+    fetcher,
   );
 
   return {
@@ -37,7 +37,7 @@ export function useReports(limit = 20, offset = 0) {
 export function useReport(id: string | null) {
   const { data, error, isLoading, mutate } = useSWR<{ report: Report }>(
     id ? `/api/reports/${id}` : null,
-    fetcher
+    fetcher,
   );
 
   return {
@@ -50,14 +50,14 @@ export function useReport(id: string | null) {
 
 export async function createReport(
   name: string,
-  type: Report['type'],
+  type: Report["type"],
   startDate: Date,
   endDate: Date,
-  filters?: Record<string, unknown>
+  filters?: Record<string, unknown>,
 ): Promise<Report> {
-  const response = await fetch('/api/reports', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch("/api/reports", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name,
       type,
@@ -68,7 +68,7 @@ export async function createReport(
   });
 
   if (!response.ok) {
-    throw new Error('Failed to create report');
+    throw new Error("Failed to create report");
   }
 
   const { report } = await response.json();
@@ -77,14 +77,14 @@ export async function createReport(
 
 export async function deleteReport(id: string): Promise<void> {
   const response = await fetch(`/api/reports/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 
   if (!response.ok) {
-    throw new Error('Failed to delete report');
+    throw new Error("Failed to delete report");
   }
 }
 
-export function downloadReport(id: string, format: 'csv' | 'json' = 'csv') {
-  window.open(`/api/reports/${id}/download?format=${format}`, '_blank');
+export function downloadReport(id: string, format: "csv" | "json" = "csv") {
+  window.open(`/api/reports/${id}/download?format=${format}`, "_blank");
 }

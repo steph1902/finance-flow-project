@@ -1,6 +1,6 @@
 /**
  * Chart Configuration
- * 
+ *
  * Centralized chart settings including colors, dimensions, and default options.
  * Uses Tailwind color palette for theme consistency.
  */

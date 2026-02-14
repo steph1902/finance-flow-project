@@ -1,7 +1,7 @@
 /**
  * Centralized number and date formatting utilities
  * Using singleton instances for optimal performance
- * 
+ *
  * Performance Impact:
  * - Creating Intl.NumberFormat is expensive (~1-2ms per instance)
  * - These singletons are created once and reused across all components

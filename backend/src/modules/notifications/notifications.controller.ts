@@ -27,10 +27,7 @@ export class NotificationsController {
   @Get()
   @ApiOperation({ summary: 'Get all notifications for user' })
   @ApiResponse({ status: HttpStatus.OK })
-  async findAll(
-    @CurrentUser('id') userId: string,
-    @Query() query: NotificationQueryDto,
-  ) {
+  async findAll(@CurrentUser('id') userId: string, @Query() query: NotificationQueryDto) {
     return this.notificationsService.findAll(userId, query);
   }
 
@@ -44,10 +41,7 @@ export class NotificationsController {
   @Put(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiResponse({ status: HttpStatus.OK })
-  async markAsRead(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ) {
+  async markAsRead(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.notificationsService.markAsRead(userId, id);
   }
 
@@ -62,10 +56,7 @@ export class NotificationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete notification' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  async remove(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async remove(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<void> {
     return this.notificationsService.remove(userId, id);
   }
 }

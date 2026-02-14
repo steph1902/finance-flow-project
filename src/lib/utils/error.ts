@@ -4,13 +4,13 @@
  * @returns A string error message
  */
 export function getErrorMessage(error: unknown): string {
-    if (error instanceof Error) {
-        return error.message;
-    }
-    if (typeof error === 'string') {
-        return error;
-    }
-    return 'An unknown error occurred';
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  return "An unknown error occurred";
 }
 
 /**
@@ -19,5 +19,5 @@ export function getErrorMessage(error: unknown): string {
  * @returns True if error message is "NOT_FOUND"
  */
 export function isNotFoundError(error: unknown): boolean {
-    return error instanceof Error && error.message === 'NOT_FOUND';
+  return error instanceof Error && error.message === "NOT_FOUND";
 }

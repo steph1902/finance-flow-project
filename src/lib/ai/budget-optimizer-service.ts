@@ -1,6 +1,6 @@
 /**
  * AI Budget Optimizer Service
- * 
+ *
  * Analyzes budget vs actual spending variance and suggests
  * optimal budget reallocation using statistical analysis and Gemini AI.
  */
@@ -12,7 +12,7 @@ import {
   optimizationResultSchema,
   OptimizationResponse,
   Budget,
-  Transaction
+  Transaction,
 } from "./prompts/optimization";
 
 export interface OptimizationInput {
@@ -25,8 +25,18 @@ export interface OptimizationInput {
 export interface OptimizationResult extends OptimizationResponse {
   totalSavings: number;
   analysis: {
-    overBudget: Array<{ category: string; budget: number; actual: number; variance: number }>;
-    underBudget: Array<{ category: string; budget: number; actual: number; variance: number }>;
+    overBudget: Array<{
+      category: string;
+      budget: number;
+      actual: number;
+      variance: number;
+    }>;
+    underBudget: Array<{
+      category: string;
+      budget: number;
+      actual: number;
+      variance: number;
+    }>;
     balanced: Array<{ category: string; budget: number; actual: number }>;
   };
   generatedAt: string;
@@ -45,7 +55,7 @@ function toNumber(value: number | { toNumber: () => number }): number {
  */
 export function calculateActualSpending(
   transactions: Transaction[],
-  months: number
+  months: number,
 ): Map<string, number> {
   const spending = new Map<string, number>();
 
@@ -69,18 +79,34 @@ export function calculateActualSpending(
  */
 export function analyzeVariance(
   budgets: Budget[],
-  actualSpending: Map<string, number>
+  actualSpending: Map<string, number>,
 ) {
-  const overBudget: Array<{ category: string; budget: number; actual: number; variance: number }> = [];
-  const underBudget: Array<{ category: string; budget: number; actual: number; variance: number }> = [];
-  const balanced: Array<{ category: string; budget: number; actual: number }> = [];
+  const overBudget: Array<{
+    category: string;
+    budget: number;
+    actual: number;
+    variance: number;
+  }> = [];
+  const underBudget: Array<{
+    category: string;
+    budget: number;
+    actual: number;
+    variance: number;
+  }> = [];
+  const balanced: Array<{ category: string; budget: number; actual: number }> =
+    [];
 
   for (const budget of budgets) {
     const budgetAmount = toNumber(budget.amount);
     const actualAmount = actualSpending.get(budget.category) || 0;
     const variance = actualAmount - budgetAmount;
     // Handle division by zero
-    const variancePercent = budgetAmount > 0 ? (variance / budgetAmount) * 100 : (actualAmount > 0 ? 100 : 0);
+    const variancePercent =
+      budgetAmount > 0
+        ? (variance / budgetAmount) * 100
+        : actualAmount > 0
+          ? 100
+          : 0;
 
     if (variancePercent > 10) {
       // Over budget by >10%
@@ -116,7 +142,7 @@ export function analyzeVariance(
 }
 
 export class BudgetOptimizerService {
-  constructor(private client: GeminiClient = geminiClient) { }
+  constructor(private client: GeminiClient = geminiClient) {}
 
   /**
    * Generate budget optimization suggestions using Gemini AI
@@ -125,7 +151,11 @@ export class BudgetOptimizerService {
     try {
       const { budgets, transactions, months, userId } = input;
 
-      logInfo("Optimizing budgets", { userId, months, budgetsCount: budgets.length });
+      logInfo("Optimizing budgets", {
+        userId,
+        months,
+        budgetsCount: budgets.length,
+      });
 
       // 1. Calculate actual spending
       const actualSpending = calculateActualSpending(transactions, months);
@@ -139,13 +169,13 @@ export class BudgetOptimizerService {
       const geminiData = await this.client.generateObject<OptimizationResponse>(
         prompt,
         "Budget Optimization Schema",
-        optimizationResultSchema
+        optimizationResultSchema,
       );
 
       // 4. Calculate total savings (sum of amounts being reallocated)
       const totalSavings = geminiData.suggestions.reduce(
         (sum, s) => sum + s.amount,
-        0
+        0,
       );
 
       logInfo("Budget optimization completed", {
@@ -160,7 +190,6 @@ export class BudgetOptimizerService {
         analysis,
         generatedAt: new Date().toISOString(),
       };
-
     } catch (error) {
       logError("Budget optimization failed", error);
       throw new Error("Failed to optimize budgets");
@@ -169,4 +198,3 @@ export class BudgetOptimizerService {
 }
 
 export const budgetOptimizerService = new BudgetOptimizerService();
-

@@ -1,8 +1,27 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { TrendingUpIcon, AlertTriangleIcon, CheckCircleIcon } from "lucide-react"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  TrendingUpIcon,
+  AlertTriangleIcon,
+  CheckCircleIcon,
+} from "lucide-react";
+import {
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface ForecastData {
   month: string;
@@ -23,7 +42,7 @@ export function ForecastChart({ data, category }: ForecastChartProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUpIcon className="size-5" />
-          {category ? `${category} Forecast` : 'Spending Forecast'}
+          {category ? `${category} Forecast` : "Spending Forecast"}
         </CardTitle>
         <CardDescription>
           AI-powered prediction for the next 3 months
@@ -72,11 +91,11 @@ export function ForecastChart({ data, category }: ForecastChartProps) {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface Insight {
-  type: 'warning' | 'success' | 'info';
+  type: "warning" | "success" | "info";
   title: string;
   message: string;
 }
@@ -86,16 +105,16 @@ interface ForecastInsightsProps {
 }
 
 export function ForecastInsights({ insights }: ForecastInsightsProps) {
-  const getIcon = (type: Insight['type']) => {
+  const getIcon = (type: Insight["type"]) => {
     switch (type) {
-      case 'warning':
-        return <AlertTriangleIcon className="size-5 text-yellow-500" />
-      case 'success':
-        return <CheckCircleIcon className="size-5 text-green-500" />
+      case "warning":
+        return <AlertTriangleIcon className="size-5 text-yellow-500" />;
+      case "success":
+        return <CheckCircleIcon className="size-5 text-green-500" />;
       default:
-        return <TrendingUpIcon className="size-5 text-blue-500" />
+        return <TrendingUpIcon className="size-5 text-blue-500" />;
     }
-  }
+  };
 
   return (
     <Card>
@@ -107,13 +126,8 @@ export function ForecastInsights({ insights }: ForecastInsightsProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         {insights.map((insight, index) => (
-          <div
-            key={index}
-            className="flex gap-3 p-3 rounded-lg border"
-          >
-            <div className="shrink-0 mt-0.5">
-              {getIcon(insight.type)}
-            </div>
+          <div key={index} className="flex gap-3 p-3 rounded-lg border">
+            <div className="shrink-0 mt-0.5">{getIcon(insight.type)}</div>
             <div>
               <p className="font-medium text-sm">{insight.title}</p>
               <p className="text-sm text-muted-foreground mt-1">
@@ -129,5 +143,5 @@ export function ForecastInsights({ insights }: ForecastInsightsProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

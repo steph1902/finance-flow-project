@@ -16,7 +16,7 @@ import { TransactionType } from '@prisma/client';
  * Create Transaction DTO
  */
 export class CreateTransactionDto {
-  @ApiProperty({ example: 100.50, description: 'Transaction amount' })
+  @ApiProperty({ example: 100.5, description: 'Transaction amount' })
   @IsNumber()
   @IsPositive()
   @Max(999999.99)

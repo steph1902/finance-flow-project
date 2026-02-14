@@ -1,18 +1,22 @@
 /**
  * Image Optimization Configuration
- * 
+ *
  * Centralized image optimization settings and helpers
  */
 
-import type { ImageLoaderProps } from 'next/image';
+import type { ImageLoaderProps } from "next/image";
 
 /**
  * Custom image loader for optimization
  */
-export function customImageLoader({ src, width, quality }: ImageLoaderProps): string {
+export function customImageLoader({
+  src,
+  width,
+  quality,
+}: ImageLoaderProps): string {
   // If using a CDN, configure it here
   // Example: return `https://cdn.example.com/${src}?w=${width}&q=${quality || 75}`
-  
+
   return `${src}?w=${width}&q=${quality || 75}`;
 }
 
@@ -20,11 +24,11 @@ export function customImageLoader({ src, width, quality }: ImageLoaderProps): st
  * Supported image formats
  */
 export const SUPPORTED_IMAGE_FORMATS = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/avif',
-  'image/gif',
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
 ] as const;
 
 /**
@@ -51,12 +55,17 @@ export const IMAGE_DIMENSIONS = {
  */
 export function validateImage(
   file: File,
-  maxSize: number = MAX_IMAGE_SIZE.ATTACHMENT
+  maxSize: number = MAX_IMAGE_SIZE.ATTACHMENT,
 ): { valid: boolean; error?: string } {
-  if (!SUPPORTED_IMAGE_FORMATS.includes(file.type as typeof SUPPORTED_IMAGE_FORMATS[number])) {
+  if (
+    !SUPPORTED_IMAGE_FORMATS.includes(
+      file.type as (typeof SUPPORTED_IMAGE_FORMATS)[number],
+    )
+  ) {
     return {
       valid: false,
-      error: 'Unsupported image format. Please use JPEG, PNG, WebP, AVIF, or GIF.',
+      error:
+        "Unsupported image format. Please use JPEG, PNG, WebP, AVIF, or GIF.",
     };
   }
 
@@ -74,43 +83,46 @@ export function validateImage(
 /**
  * Convert image to WebP format (client-side)
  */
-export async function convertToWebP(file: File, quality: number = 0.8): Promise<Blob> {
+export async function convertToWebP(
+  file: File,
+  quality: number = 0.8,
+): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
-        
-        const ctx = canvas.getContext('2d');
+
+        const ctx = canvas.getContext("2d");
         if (!ctx) {
-          reject(new Error('Failed to get canvas context'));
+          reject(new Error("Failed to get canvas context"));
           return;
         }
-        
+
         ctx.drawImage(img, 0, 0);
-        
+
         canvas.toBlob(
           (blob) => {
             if (blob) {
               resolve(blob);
             } else {
-              reject(new Error('Failed to convert image'));
+              reject(new Error("Failed to convert image"));
             }
           },
-          'image/webp',
-          quality
+          "image/webp",
+          quality,
         );
       };
-      
-      img.onerror = () => reject(new Error('Failed to load image'));
+
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = e.target?.result as string;
     };
-    
-    reader.onerror = () => reject(new Error('Failed to read file'));
+
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.readAsDataURL(file);
   });
 }
@@ -122,58 +134,58 @@ export async function compressImage(
   file: File,
   maxWidth: number = 1920,
   maxHeight: number = 1080,
-  quality: number = 0.8
+  quality: number = 0.8,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
         let width = img.width;
         let height = img.height;
-        
+
         // Calculate new dimensions
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
         }
-        
+
         if (height > maxHeight) {
           width = (width * maxHeight) / height;
           height = maxHeight;
         }
-        
-        const canvas = document.createElement('canvas');
+
+        const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
-        
-        const ctx = canvas.getContext('2d');
+
+        const ctx = canvas.getContext("2d");
         if (!ctx) {
-          reject(new Error('Failed to get canvas context'));
+          reject(new Error("Failed to get canvas context"));
           return;
         }
-        
+
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         canvas.toBlob(
           (blob) => {
             if (blob) {
               resolve(blob);
             } else {
-              reject(new Error('Failed to compress image'));
+              reject(new Error("Failed to compress image"));
             }
           },
           file.type,
-          quality
+          quality,
         );
       };
-      
-      img.onerror = () => reject(new Error('Failed to load image'));
+
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = e.target?.result as string;
     };
-    
-    reader.onerror = () => reject(new Error('Failed to read file'));
+
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.readAsDataURL(file);
   });
 }

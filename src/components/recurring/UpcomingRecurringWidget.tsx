@@ -2,11 +2,23 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/formatters";
-import { Repeat, Calendar, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import {
+  Repeat,
+  Calendar,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { logError } from "@/lib/logger";
 
 interface RecurringTransactionResponse {
@@ -31,7 +43,9 @@ interface UpcomingRecurring {
 }
 
 export function UpcomingRecurringWidget() {
-  const [upcomingTransactions, setUpcomingTransactions] = useState<UpcomingRecurring[]>([]);
+  const [upcomingTransactions, setUpcomingTransactions] = useState<
+    UpcomingRecurring[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +67,9 @@ export function UpcomingRecurringWidget() {
 
       // Filter for active transactions coming up in the next 7 days
       const now = new Date();
-      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const sevenDaysFromNow = new Date(
+        now.getTime() + 7 * 24 * 60 * 60 * 1000,
+      );
 
       const upcoming: UpcomingRecurring[] = data.recurringTransactions
         .filter((t: RecurringTransactionResponse) => {
@@ -69,7 +85,10 @@ export function UpcomingRecurringWidget() {
           frequency: t.frequency,
           nextDate: new Date(t.nextDate),
         }))
-        .sort((a: UpcomingRecurring, b: UpcomingRecurring) => a.nextDate.getTime() - b.nextDate.getTime())
+        .sort(
+          (a: UpcomingRecurring, b: UpcomingRecurring) =>
+            a.nextDate.getTime() - b.nextDate.getTime(),
+        )
         .slice(0, 5); // Show only the next 5
 
       setUpcomingTransactions(upcoming);
@@ -146,7 +165,9 @@ export function UpcomingRecurringWidget() {
             </Button>
           </Link>
         </div>
-        <CardDescription>Transactions scheduled in the next 7 days</CardDescription>
+        <CardDescription>
+          Transactions scheduled in the next 7 days
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {upcomingTransactions.length === 0 ? (
@@ -176,8 +197,11 @@ export function UpcomingRecurringWidget() {
                   </div>
                 </div>
                 <div
-                  className={`text-sm font-semibold shrink-0 ml-3 ${transaction.type === "INCOME" ? "text-success" : "text-destructive"
-                    }`}
+                  className={`text-sm font-semibold shrink-0 ml-3 ${
+                    transaction.type === "INCOME"
+                      ? "text-success"
+                      : "text-destructive"
+                  }`}
                 >
                   {transaction.type === "INCOME" ? "+" : "-"}
                   {formatCurrency(transaction.amount)}

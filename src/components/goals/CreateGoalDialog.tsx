@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PlusIcon } from "lucide-react"
+import { useState } from "react";
+import { PlusIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useGoals, CreateGoalData } from "@/hooks/useGoals"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useGoals, CreateGoalData } from "@/hooks/useGoals";
 
 export function CreateGoalDialog() {
-  const [open, setOpen] = useState(false)
-  const { createGoal, isCreating } = useGoals()
+  const [open, setOpen] = useState(false);
+  const { createGoal, isCreating } = useGoals();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,23 +27,23 @@ export function CreateGoalDialog() {
     targetDate: "",
     category: "",
     priority: "1",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const goalData: CreateGoalData = {
         name: formData.name,
         targetAmount: parseFloat(formData.targetAmount),
         priority: parseInt(formData.priority),
-      }
+      };
 
-      if (formData.description) goalData.description = formData.description
-      if (formData.targetDate) goalData.targetDate = formData.targetDate
-      if (formData.category) goalData.category = formData.category
+      if (formData.description) goalData.description = formData.description;
+      if (formData.targetDate) goalData.targetDate = formData.targetDate;
+      if (formData.category) goalData.category = formData.category;
 
-      await createGoal(goalData)
+      await createGoal(goalData);
 
       // Reset form
       setFormData({
@@ -53,13 +53,12 @@ export function CreateGoalDialog() {
         targetDate: "",
         category: "",
         priority: "1",
-      })
-      setOpen(false)
+      });
+      setOpen(false);
     } catch (error) {
-      console.error("Failed to create goal:", error)
+      console.error("Failed to create goal:", error);
     }
-  }
-
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -185,5 +184,5 @@ export function CreateGoalDialog() {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

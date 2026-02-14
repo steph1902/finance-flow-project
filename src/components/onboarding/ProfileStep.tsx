@@ -1,18 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { UserIcon } from "lucide-react"
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { UserIcon } from "lucide-react";
 
 interface ProfileStepProps {
   onNext: (data: ProfileData) => void;
@@ -28,47 +34,48 @@ export interface ProfileData {
 }
 
 const CURRENCIES = [
-  { value: 'USD', label: '$ USD - US Dollar' },
-  { value: 'EUR', label: '€ EUR - Euro' },
-  { value: 'GBP', label: '£ GBP - British Pound' },
-  { value: 'JPY', label: '¥ JPY - Japanese Yen' },
-  { value: 'AUD', label: 'A$ AUD - Australian Dollar' },
-  { value: 'CAD', label: 'C$ CAD - Canadian Dollar' },
-  { value: 'CHF', label: 'CHF - Swiss Franc' },
-  { value: 'CNY', label: '¥ CNY - Chinese Yuan' },
-  { value: 'INR', label: '₹ INR - Indian Rupee' },
-  { value: 'SGD', label: 'S$ SGD - Singapore Dollar' },
+  { value: "USD", label: "$ USD - US Dollar" },
+  { value: "EUR", label: "€ EUR - Euro" },
+  { value: "GBP", label: "£ GBP - British Pound" },
+  { value: "JPY", label: "¥ JPY - Japanese Yen" },
+  { value: "AUD", label: "A$ AUD - Australian Dollar" },
+  { value: "CAD", label: "C$ CAD - Canadian Dollar" },
+  { value: "CHF", label: "CHF - Swiss Franc" },
+  { value: "CNY", label: "¥ CNY - Chinese Yuan" },
+  { value: "INR", label: "₹ INR - Indian Rupee" },
+  { value: "SGD", label: "S$ SGD - Singapore Dollar" },
 ];
 
 const TIMEZONES = [
-  { value: 'America/New_York', label: 'Eastern Time (US)' },
-  { value: 'America/Chicago', label: 'Central Time (US)' },
-  { value: 'America/Denver', label: 'Mountain Time (US)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (US)' },
-  { value: 'Europe/London', label: 'London (GMT)' },
-  { value: 'Europe/Paris', label: 'Paris (CET)' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-  { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
-  { value: 'Australia/Sydney', label: 'Sydney (AEDT)' },
+  { value: "America/New_York", label: "Eastern Time (US)" },
+  { value: "America/Chicago", label: "Central Time (US)" },
+  { value: "America/Denver", label: "Mountain Time (US)" },
+  { value: "America/Los_Angeles", label: "Pacific Time (US)" },
+  { value: "Europe/London", label: "London (GMT)" },
+  { value: "Europe/Paris", label: "Paris (CET)" },
+  { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+  { value: "Asia/Singapore", label: "Singapore (SGT)" },
+  { value: "Australia/Sydney", label: "Sydney (AEDT)" },
 ];
 
 const LANGUAGES = [
-  { value: 'en', label: 'English' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'ja', label: '日本語' },
-  { value: 'zh', label: '中文' },
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+  { value: "fr", label: "Français" },
+  { value: "de", label: "Deutsch" },
+  { value: "ja", label: "日本語" },
+  { value: "zh", label: "中文" },
 ];
 
 export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
   const [formData, setFormData] = useState<ProfileData>(
     initialData || {
-      name: '',
-      currency: 'USD',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York',
-      language: 'en',
-    }
+      name: "",
+      currency: "USD",
+      timezone:
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York",
+      language: "en",
+    },
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,7 +106,9 @@ export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
               id="name"
               placeholder="John Doe"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
             />
           </div>
@@ -108,7 +117,9 @@ export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
             <Label htmlFor="currency">Preferred Currency</Label>
             <Select
               value={formData.currency}
-              onValueChange={(value) => setFormData({ ...formData, currency: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, currency: value })
+              }
             >
               <SelectTrigger id="currency">
                 <SelectValue />
@@ -127,7 +138,9 @@ export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
             <Label htmlFor="timezone">Timezone</Label>
             <Select
               value={formData.timezone}
-              onValueChange={(value) => setFormData({ ...formData, timezone: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, timezone: value })
+              }
             >
               <SelectTrigger id="timezone">
                 <SelectValue />
@@ -146,7 +159,9 @@ export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
             <Label htmlFor="language">Language</Label>
             <Select
               value={formData.language}
-              onValueChange={(value) => setFormData({ ...formData, language: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, language: value })
+              }
             >
               <SelectTrigger id="language">
                 <SelectValue />
@@ -165,9 +180,7 @@ export function ProfileStep({ onNext, onBack, initialData }: ProfileStepProps) {
             <Button type="button" variant="outline" onClick={onBack}>
               Back
             </Button>
-            <Button type="submit">
-              Continue
-            </Button>
+            <Button type="submit">Continue</Button>
           </div>
         </form>
       </CardContent>

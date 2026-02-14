@@ -1,13 +1,13 @@
 /**
  * Data Import/Export Service
- * 
+ *
  * Handles CSV import/export of transactions with validation,
  * error handling, and progress tracking.
  */
 
-import { prisma } from '@/lib/prisma';
-import { logInfo, logError } from '@/lib/logger';
-import { Decimal } from '@prisma/client/runtime/library';
+import { prisma } from "@/lib/prisma";
+import { logInfo, logError } from "@/lib/logger";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export interface TransactionCSVRow {
   date: string;
@@ -30,35 +30,35 @@ export interface ExportOptions {
   startDate?: Date;
   endDate?: Date;
   categories?: string[];
-  type?: 'INCOME' | 'EXPENSE' | 'ALL';
-  format?: 'CSV' | 'JSON';
+  type?: "INCOME" | "EXPENSE" | "ALL";
+  format?: "CSV" | "JSON";
 }
 
 /**
  * Parse CSV string to array of rows
  */
 function parseCSV(csvContent: string): TransactionCSVRow[] {
-  const lines = csvContent.trim().split('\n');
+  const lines = csvContent.trim().split("\n");
   if (lines.length < 2) {
-    throw new Error('CSV file must contain headers and at least one data row');
+    throw new Error("CSV file must contain headers and at least one data row");
   }
 
   if (!lines[0]) {
-    throw new Error('CSV file must contain header row');
+    throw new Error("CSV file must contain header row");
   }
 
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
   const rows: TransactionCSVRow[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i]
-    if (!line) continue
+    const line = lines[i];
+    if (!line) continue;
 
-    const values = line.split(',').map(v => v.trim());
+    const values = line.split(",").map((v) => v.trim());
     const row: Record<string, string> = {};
 
     headers.forEach((header, index) => {
-      row[header] = values[index] || '';
+      row[header] = values[index] || "";
     });
 
     rows.push(row as unknown as TransactionCSVRow);
@@ -70,36 +70,39 @@ function parseCSV(csvContent: string): TransactionCSVRow[] {
 /**
  * Validate a CSV row
  */
-function validateRow(row: TransactionCSVRow): { valid: boolean; error?: string } {
+function validateRow(row: TransactionCSVRow): {
+  valid: boolean;
+  error?: string;
+} {
   // Check required fields
   if (!row.date) {
-    return { valid: false, error: 'Date is required' };
+    return { valid: false, error: "Date is required" };
   }
   if (!row.amount) {
-    return { valid: false, error: 'Amount is required' };
+    return { valid: false, error: "Amount is required" };
   }
   if (!row.type) {
-    return { valid: false, error: 'Type is required' };
+    return { valid: false, error: "Type is required" };
   }
   if (!row.category) {
-    return { valid: false, error: 'Category is required' };
+    return { valid: false, error: "Category is required" };
   }
 
   // Validate date format
   const date = new Date(row.date);
   if (isNaN(date.getTime())) {
-    return { valid: false, error: 'Invalid date format. Use YYYY-MM-DD' };
+    return { valid: false, error: "Invalid date format. Use YYYY-MM-DD" };
   }
 
   // Validate amount
   const amount = parseFloat(row.amount);
   if (isNaN(amount) || amount <= 0) {
-    return { valid: false, error: 'Amount must be a positive number' };
+    return { valid: false, error: "Amount must be a positive number" };
   }
 
   // Validate type
-  if (row.type !== 'INCOME' && row.type !== 'EXPENSE') {
-    return { valid: false, error: 'Type must be INCOME or EXPENSE' };
+  if (row.type !== "INCOME" && row.type !== "EXPENSE") {
+    return { valid: false, error: "Type must be INCOME or EXPENSE" };
   }
 
   return { valid: true };
@@ -110,7 +113,7 @@ function validateRow(row: TransactionCSVRow): { valid: boolean; error?: string }
  */
 export async function importTransactionsFromCSV(
   userId: string,
-  csvContent: string
+  csvContent: string,
 ): Promise<ImportResult> {
   const result: ImportResult = {
     total: 0,
@@ -123,11 +126,11 @@ export async function importTransactionsFromCSV(
     const rows = parseCSV(csvContent);
     result.total = rows.length;
 
-    logInfo('Starting CSV import', { userId, rowCount: rows.length });
+    logInfo("Starting CSV import", { userId, rowCount: rows.length });
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (!row) continue
+      if (!row) continue;
 
       const validation = validateRow(row);
 
@@ -146,7 +149,7 @@ export async function importTransactionsFromCSV(
           data: {
             userId,
             amount: new Decimal(parseFloat(row.amount)),
-            type: row.type as 'INCOME' | 'EXPENSE',
+            type: row.type as "INCOME" | "EXPENSE",
             category: row.category,
             description: row.description || null,
             notes: row.notes || null,
@@ -159,13 +162,13 @@ export async function importTransactionsFromCSV(
         result.failed++;
         result.errors.push({
           row: i + 2,
-          error: error instanceof Error ? error.message : 'Database error',
+          error: error instanceof Error ? error.message : "Database error",
           data: row,
         });
       }
     }
 
-    logInfo('CSV import completed', {
+    logInfo("CSV import completed", {
       userId,
       total: result.total,
       successful: result.successful,
@@ -174,15 +177,17 @@ export async function importTransactionsFromCSV(
 
     return result;
   } catch (error: unknown) {
-    logError('CSV import failed', error);
-    throw new Error('Failed to import CSV');
+    logError("CSV import failed", error);
+    throw new Error("Failed to import CSV");
   }
 }
 
 /**
  * Export transactions to CSV format
  */
-export async function exportTransactionsToCSV(options: ExportOptions): Promise<string> {
+export async function exportTransactionsToCSV(
+  options: ExportOptions,
+): Promise<string> {
   try {
     const { userId, startDate, endDate, categories, type } = options;
 
@@ -192,87 +197,101 @@ export async function exportTransactionsToCSV(options: ExportOptions): Promise<s
         deletedAt: null,
         ...(startDate && { date: { gte: startDate } }),
         ...(endDate && { date: { lte: endDate } }),
-        ...(categories && categories.length > 0 && { category: { in: categories } }),
-        ...(type && type !== 'ALL' && { type }),
+        ...(categories &&
+          categories.length > 0 && { category: { in: categories } }),
+        ...(type && type !== "ALL" && { type }),
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
 
-    logInfo('Exporting transactions to CSV', { userId, count: transactions.length });
+    logInfo("Exporting transactions to CSV", {
+      userId,
+      count: transactions.length,
+    });
 
     // Build CSV content
-    const headers = ['Date', 'Amount', 'Type', 'Category', 'Description', 'Notes'];
-    const rows = transactions.map(tx => [
-      tx.date.toISOString().split('T')[0],
+    const headers = [
+      "Date",
+      "Amount",
+      "Type",
+      "Category",
+      "Description",
+      "Notes",
+    ];
+    const rows = transactions.map((tx) => [
+      tx.date.toISOString().split("T")[0],
       tx.amount.toString(),
       tx.type,
       tx.category,
-      tx.description || '',
-      tx.notes || '',
+      tx.description || "",
+      tx.notes || "",
     ]);
 
     const csv = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
-    ].join('\n');
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
 
     return csv;
   } catch (error: unknown) {
-    logError('CSV export failed', error);
-    throw new Error('Failed to export CSV');
+    logError("CSV export failed", error);
+    throw new Error("Failed to export CSV");
   }
 }
 
 /**
  * Export all user data to JSON
  */
-export async function exportAllUserData(userId: string): Promise<Record<string, unknown>> {
+export async function exportAllUserData(
+  userId: string,
+): Promise<Record<string, unknown>> {
   try {
-    logInfo('Exporting all user data', { userId });
+    logInfo("Exporting all user data", { userId });
 
-    const [user, transactions, budgets, recurringTransactions, aiChatHistory] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          createdAt: true,
-          preferredCurrency: true,
-          timezone: true,
-          language: true,
-        },
-      }),
-      prisma.transaction.findMany({
-        where: { userId, deletedAt: null },
-        orderBy: { date: 'desc' },
-      }),
-      prisma.budget.findMany({
-        where: { userId },
-        orderBy: [{ year: 'desc' }, { month: 'desc' }],
-      }),
-      prisma.recurringTransaction.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.aIChatHistory.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 100, // Limit to last 100 messages
-      }),
-    ]);
+    const [user, transactions, budgets, recurringTransactions, aiChatHistory] =
+      await Promise.all([
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            preferredCurrency: true,
+            timezone: true,
+            language: true,
+          },
+        }),
+        prisma.transaction.findMany({
+          where: { userId, deletedAt: null },
+          orderBy: { date: "desc" },
+        }),
+        prisma.budget.findMany({
+          where: { userId },
+          orderBy: [{ year: "desc" }, { month: "desc" }],
+        }),
+        prisma.recurringTransaction.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.aIChatHistory.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          take: 100, // Limit to last 100 messages
+        }),
+      ]);
 
     return {
       user,
-      transactions: transactions.map(tx => ({
+      transactions: transactions.map((tx) => ({
         ...tx,
         amount: tx.amount.toString(),
       })),
-      budgets: budgets.map(b => ({
+      budgets: budgets.map((b) => ({
         ...b,
         amount: b.amount.toString(),
       })),
-      recurringTransactions: recurringTransactions.map(rt => ({
+      recurringTransactions: recurringTransactions.map((rt) => ({
         ...rt,
         amount: rt.amount.toString(),
       })),
@@ -280,8 +299,8 @@ export async function exportAllUserData(userId: string): Promise<Record<string, 
       exportedAt: new Date().toISOString(),
     };
   } catch (error: unknown) {
-    logError('Data export failed', error);
-    throw new Error('Failed to export user data');
+    logError("Data export failed", error);
+    throw new Error("Failed to export user data");
   }
 }
 
@@ -289,18 +308,22 @@ export async function exportAllUserData(userId: string): Promise<Record<string, 
  * Generate CSV template for import
  */
 export function generateCSVTemplate(): string {
-  const headers = ['date', 'amount', 'type', 'category', 'description', 'notes'];
+  const headers = [
+    "date",
+    "amount",
+    "type",
+    "category",
+    "description",
+    "notes",
+  ];
   const example = [
-    '2025-01-15',
-    '50.00',
-    'EXPENSE',
-    'Food',
-    'Grocery shopping',
-    'Weekly groceries',
+    "2025-01-15",
+    "50.00",
+    "EXPENSE",
+    "Food",
+    "Grocery shopping",
+    "Weekly groceries",
   ];
 
-  return [
-    headers.join(','),
-    example.join(','),
-  ].join('\n');
+  return [headers.join(","), example.join(",")].join("\n");
 }

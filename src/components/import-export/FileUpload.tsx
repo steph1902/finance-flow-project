@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useCallback, useState } from "react"
-import { useDropzone, FileRejection } from "react-dropzone"
-import { UploadCloudIcon, FileTextIcon, XIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useCallback, useState } from "react";
+import { useDropzone, FileRejection } from "react-dropzone";
+import { UploadCloudIcon, FileTextIcon, XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FileUploadProps {
-  onFileSelect: (file: File) => void
-  accept?: Record<string, string[]>
-  maxSize?: number
-  disabled?: boolean
+  onFileSelect: (file: File) => void;
+  accept?: Record<string, string[]>;
+  maxSize?: number;
+  disabled?: boolean;
 }
 
 export function FileUpload({
@@ -18,35 +18,40 @@ export function FileUpload({
   maxSize = 5 * 1024 * 1024, // 5MB default
   disabled = false,
 }: FileUploadProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      setError(null)
+      setError(null);
 
       if (rejectedFiles.length > 0) {
-        const rejection = rejectedFiles[0]
+        const rejection = rejectedFiles[0];
         if (rejection && rejection.errors[0]?.code === "file-too-large") {
-          setError(`File is too large. Maximum size is ${maxSize / 1024 / 1024}MB`)
-        } else if (rejection && rejection.errors[0]?.code === "file-invalid-type") {
-          setError("Invalid file type. Please upload a CSV file")
+          setError(
+            `File is too large. Maximum size is ${maxSize / 1024 / 1024}MB`,
+          );
+        } else if (
+          rejection &&
+          rejection.errors[0]?.code === "file-invalid-type"
+        ) {
+          setError("Invalid file type. Please upload a CSV file");
         } else {
-          setError("Error uploading file")
+          setError("Error uploading file");
         }
-        return
+        return;
       }
 
       if (acceptedFiles.length > 0) {
-        const file = acceptedFiles[0]
+        const file = acceptedFiles[0];
         if (file) {
-          setSelectedFile(file)
-          onFileSelect(file)
+          setSelectedFile(file);
+          onFileSelect(file);
         }
       }
     },
-    [onFileSelect, maxSize]
-  )
+    [onFileSelect, maxSize],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -54,12 +59,12 @@ export function FileUpload({
     maxSize,
     multiple: false,
     disabled,
-  })
+  });
 
   const removeFile = () => {
-    setSelectedFile(null)
-    setError(null)
-  }
+    setSelectedFile(null);
+    setError(null);
+  };
 
   return (
     <div className="space-y-4">
@@ -70,7 +75,7 @@ export function FileUpload({
           isDragActive && "border-primary bg-primary/5",
           !isDragActive && "border-muted-foreground/25 hover:border-primary/50",
           disabled && "opacity-50 cursor-not-allowed",
-          error && "border-destructive bg-destructive/5"
+          error && "border-destructive bg-destructive/5",
         )}
       >
         <input {...getInputProps()} />
@@ -116,5 +121,5 @@ export function FileUpload({
         </div>
       )}
     </div>
-  )
+  );
 }

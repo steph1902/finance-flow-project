@@ -27,4 +27,4 @@ import { KeywordLearningService } from './services/keyword-learning.service';
   ],
   exports: [TransactionsService, TransactionsRepository, KeywordLearningService],
 })
-export class TransactionsModule { }
+export class TransactionsModule {}

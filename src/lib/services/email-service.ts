@@ -3,19 +3,19 @@
  * Sends email notifications via Resend API
  */
 
-import { Resend } from 'resend';
-import { logger } from '@/lib/logger';
-import { formatCurrency } from '@/lib/formatters';
-import { format } from 'date-fns';
+import { Resend } from "resend";
+import { logger } from "@/lib/logger";
+import { formatCurrency } from "@/lib/formatters";
+import { format } from "date-fns";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@financeflow.app';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@financeflow.app";
 
 let resendClient: Resend | null = null;
 
 function getResendClient(): Resend {
   if (!RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY not configured');
+    throw new Error("RESEND_API_KEY not configured");
   }
 
   if (!resendClient) {
@@ -38,7 +38,7 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<void> {
   try {
     if (!RESEND_API_KEY) {
-      logger.warn('Email skipped: RESEND_API_KEY not configured');
+      logger.warn("Email skipped: RESEND_API_KEY not configured");
       return;
     }
 
@@ -57,10 +57,10 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 
     await client.emails.send(emailData);
 
-    logger.info('Email sent', { to: options.to, subject: options.subject });
+    logger.info("Email sent", { to: options.to, subject: options.subject });
   } catch (error) {
-    logger.error('Failed to send email', error);
-    throw new Error('Failed to send email');
+    logger.error("Failed to send email", error);
+    throw new Error("Failed to send email");
   }
 }
 
@@ -73,9 +73,9 @@ export async function sendBudgetAlert(
   category: string,
   spent: number,
   budget: number,
-  percentage: number
+  percentage: number,
 ) {
-  const displayName = userName || 'there';
+  const displayName = userName || "there";
 
   const html = `
     <!DOCTYPE html>
@@ -86,7 +86,7 @@ export async function sendBudgetAlert(
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
           .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
           .content { background: #f9fafb; padding: 30px; }
-          .alert-box { background: ${percentage >= 100 ? '#fee2e2' : '#fef3c7'}; border-left: 4px solid ${percentage >= 100 ? '#dc2626' : '#f59e0b'}; padding: 20px; margin: 20px 0; border-radius: 4px; }
+          .alert-box { background: ${percentage >= 100 ? "#fee2e2" : "#fef3c7"}; border-left: 4px solid ${percentage >= 100 ? "#dc2626" : "#f59e0b"}; padding: 20px; margin: 20px 0; border-radius: 4px; }
           .stats { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
           .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
           .stat-label { font-weight: 600; color: #6b7280; }
@@ -104,8 +104,8 @@ export async function sendBudgetAlert(
             <p>Hi ${displayName},</p>
             
             <div class="alert-box">
-              <h2 style="margin-top: 0; color: ${percentage >= 100 ? '#dc2626' : '#f59e0b'};">
-                ${percentage >= 100 ? '⚠️ Budget Exceeded!' : '⚡ Budget Alert!'}
+              <h2 style="margin-top: 0; color: ${percentage >= 100 ? "#dc2626" : "#f59e0b"};">
+                ${percentage >= 100 ? "⚠️ Budget Exceeded!" : "⚡ Budget Alert!"}
               </h2>
               <p>You've spent <strong>${percentage.toFixed(0)}%</strong> of your <strong>${category}</strong> budget for this month.</p>
             </div>
@@ -117,17 +117,19 @@ export async function sendBudgetAlert(
               </div>
               <div class="stat-row">
                 <span class="stat-label">Spent</span>
-                <span class="stat-value" style="color: ${percentage >= 100 ? '#dc2626' : '#f59e0b'};">${formatCurrency(spent)}</span>
+                <span class="stat-value" style="color: ${percentage >= 100 ? "#dc2626" : "#f59e0b"};">${formatCurrency(spent)}</span>
               </div>
               <div class="stat-row" style="border-bottom: none;">
                 <span class="stat-label">Remaining</span>
-                <span class="stat-value" style="color: ${budget - spent > 0 ? '#10b981' : '#dc2626'};">${formatCurrency(Math.max(0, budget - spent))}</span>
+                <span class="stat-value" style="color: ${budget - spent > 0 ? "#10b981" : "#dc2626"};">${formatCurrency(Math.max(0, budget - spent))}</span>
               </div>
             </div>
 
-            <p>${percentage >= 100
-      ? 'Consider reviewing your spending in this category or adjusting your budget.'
-      : 'You\'re approaching your budget limit. Keep an eye on your spending!'}</p>
+            <p>${
+              percentage >= 100
+                ? "Consider reviewing your spending in this category or adjusting your budget."
+                : "You're approaching your budget limit. Keep an eye on your spending!"
+            }</p>
 
             <center>
               <a href="${process.env.NEXTAUTH_URL}/budgets" class="button">View Budget Details</a>
@@ -153,16 +155,18 @@ Budget: ${formatCurrency(budget)}
 Spent: ${formatCurrency(spent)}
 Remaining: ${formatCurrency(Math.max(0, budget - spent))}
 
-${percentage >= 100
-      ? 'Your budget has been exceeded. Consider reviewing your spending or adjusting your budget.'
-      : 'You\'re approaching your budget limit. Keep an eye on your spending!'}
+${
+  percentage >= 100
+    ? "Your budget has been exceeded. Consider reviewing your spending or adjusting your budget."
+    : "You're approaching your budget limit. Keep an eye on your spending!"
+}
 
 View your budget details: ${process.env.NEXTAUTH_URL}/budgets
   `;
 
   await sendEmail({
     to: userEmail,
-    subject: `${percentage >= 100 ? '⚠️ Budget Exceeded' : '⚡ Budget Alert'}: ${category}`,
+    subject: `${percentage >= 100 ? "⚠️ Budget Exceeded" : "⚡ Budget Alert"}: ${category}`,
     html,
     text,
   });
@@ -176,10 +180,10 @@ export async function sendBillReminder(
   userName: string | null,
   description: string,
   amount: number,
-  dueDate: Date
+  dueDate: Date,
 ) {
-  const displayName = userName || 'there';
-  const dueDateStr = format(dueDate, 'MMMM d, yyyy');
+  const displayName = userName || "there";
+  const dueDateStr = format(dueDate, "MMMM d, yyyy");
 
   const html = `
     <!DOCTYPE html>
@@ -257,9 +261,9 @@ export async function sendGoalMilestone(
   goalName: string,
   currentAmount: number,
   targetAmount: number,
-  percentage: number
+  percentage: number,
 ) {
-  const displayName = userName || 'there';
+  const displayName = userName || "there";
 
   const html = `
     <!DOCTYPE html>
@@ -298,9 +302,11 @@ export async function sendGoalMilestone(
 
             <p>Current: <strong>${formatCurrency(currentAmount)}</strong> / Target: <strong>${formatCurrency(targetAmount)}</strong></p>
 
-            ${percentage >= 100
-      ? '<p>🎊 You\'ve achieved your goal! Time to celebrate and set a new target!</p>'
-      : '<p>Keep up the great work! You\'re making excellent progress!</p>'}
+            ${
+              percentage >= 100
+                ? "<p>🎊 You've achieved your goal! Time to celebrate and set a new target!</p>"
+                : "<p>Keep up the great work! You're making excellent progress!</p>"
+            }
 
             <center>
               <a href="${process.env.NEXTAUTH_URL}/goals" class="button">View Goals</a>
@@ -325,9 +331,11 @@ Progress: ${percentage.toFixed(0)}%
 Current: ${formatCurrency(currentAmount)}
 Target: ${formatCurrency(targetAmount)}
 
-${percentage >= 100
-      ? 'You\'ve achieved your goal! Time to celebrate!'
-      : 'Keep up the great work!'}
+${
+  percentage >= 100
+    ? "You've achieved your goal! Time to celebrate!"
+    : "Keep up the great work!"
+}
 
 View your goals: ${process.env.NEXTAUTH_URL}/goals
   `;
@@ -354,13 +362,15 @@ export interface WeeklySummaryData {
 export async function sendWeeklySummary(
   userEmail: string,
   userName: string | null,
-  data: WeeklySummaryData
+  data: WeeklySummaryData,
 ) {
-  const displayName = userName || 'there';
+  const displayName = userName || "there";
 
   const topCategoriesHtml = data.topCategories
-    .map(([category, amount]) => `<li>${category}: ${formatCurrency(amount)}</li>`)
-    .join('');
+    .map(
+      ([category, amount]) => `<li>${category}: ${formatCurrency(amount)}</li>`,
+    )
+    .join("");
 
   const html = `
     <!DOCTYPE html>
@@ -377,7 +387,7 @@ export async function sendWeeklySummary(
           .stat-label { font-size: 12px; color: #6b7280; text-transform: uppercase; }
           .income { color: #10b981; }
           .expense { color: #ef4444; }
-          .savings { color: ${data.netSavings >= 0 ? '#10b981' : '#ef4444'}; }
+          .savings { color: ${data.netSavings >= 0 ? "#10b981" : "#ef4444"}; }
           .categories { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
           .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
           .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
@@ -403,7 +413,7 @@ export async function sendWeeklySummary(
               </div>
               <div class="stat-card">
                 <div class="stat-value savings">${formatCurrency(data.netSavings)}</div>
-                <div class="stat-label">Net ${data.netSavings >= 0 ? 'Savings' : 'Deficit'}</div>
+                <div class="stat-label">Net ${data.netSavings >= 0 ? "Savings" : "Deficit"}</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value">${data.transactionCount}</div>
@@ -411,12 +421,16 @@ export async function sendWeeklySummary(
               </div>
             </div>
 
-            ${data.topCategories.length > 0 ? `
+            ${
+              data.topCategories.length > 0
+                ? `
             <div class="categories">
               <h3 style="margin-top: 0;">Top Spending Categories</h3>
               <ol>${topCategoriesHtml}</ol>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
 
             <center>
               <a href="${process.env.NEXTAUTH_URL}/dashboard" class="button">View Dashboard</a>
@@ -439,10 +453,10 @@ Here's your financial summary for the past week:
 
 Income: ${formatCurrency(data.totalIncome)}
 Expenses: ${formatCurrency(data.totalExpenses)}
-Net ${data.netSavings >= 0 ? 'Savings' : 'Deficit'}: ${formatCurrency(data.netSavings)}
+Net ${data.netSavings >= 0 ? "Savings" : "Deficit"}: ${formatCurrency(data.netSavings)}
 Transactions: ${data.transactionCount}
 
-${data.topCategories.length > 0 ? `Top Categories:\n${data.topCategories.map(([cat, amt]) => `- ${cat}: ${formatCurrency(amt)}`).join('\n')}` : ''}
+${data.topCategories.length > 0 ? `Top Categories:\n${data.topCategories.map(([cat, amt]) => `- ${cat}: ${formatCurrency(amt)}`).join("\n")}` : ""}
 
 View dashboard: ${process.env.NEXTAUTH_URL}/dashboard
   `;
@@ -461,4 +475,3 @@ View dashboard: ${process.env.NEXTAUTH_URL}/dashboard
 export function isEmailConfigured(): boolean {
   return !!RESEND_API_KEY;
 }
-

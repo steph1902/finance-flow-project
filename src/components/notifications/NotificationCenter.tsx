@@ -3,13 +3,19 @@
  * Displays user notifications with real-time updates
  */
 
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import {
   Bell,
   AlertCircle,
@@ -20,10 +26,10 @@ import {
   Check,
   Archive,
   Loader2,
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
-import useSWR from 'swr';
+} from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -32,7 +38,7 @@ interface Notification {
   type: string;
   title: string;
   message: string;
-  status: 'UNREAD' | 'READ' | 'ARCHIVED';
+  status: "UNREAD" | "READ" | "ARCHIVED";
   priority: number;
   actionUrl: string | null;
   sentAt: string;
@@ -40,31 +46,31 @@ interface Notification {
 }
 
 export function NotificationCenter() {
-  const { data, error, mutate, isLoading } = useSWR<{ notifications: Notification[] }>(
-    '/api/notifications',
-    fetcher
-  );
+  const { data, error, mutate, isLoading } = useSWR<{
+    notifications: Notification[];
+  }>("/api/notifications", fetcher);
 
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const [filter, setFilter] = useState<"all" | "unread">("all");
 
   const notifications = data?.notifications || [];
-  const filteredNotifications = filter === 'unread'
-    ? notifications.filter((n) => n.status === 'UNREAD')
-    : notifications;
+  const filteredNotifications =
+    filter === "unread"
+      ? notifications.filter((n) => n.status === "UNREAD")
+      : notifications;
 
-  const unreadCount = notifications.filter((n) => n.status === 'UNREAD').length;
+  const unreadCount = notifications.filter((n) => n.status === "UNREAD").length;
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'BUDGET_ALERT':
+      case "BUDGET_ALERT":
         return <AlertCircle className="h-5 w-5 text-orange-500" />;
-      case 'BILL_REMINDER':
+      case "BILL_REMINDER":
         return <CreditCard className="h-5 w-5 text-blue-500" />;
-      case 'GOAL_MILESTONE':
+      case "GOAL_MILESTONE":
         return <Target className="h-5 w-5 text-green-500" />;
-      case 'ANOMALY_DETECTION':
+      case "ANOMALY_DETECTION":
         return <TrendingUp className="h-5 w-5 text-red-500" />;
-      case 'SUBSCRIPTION_RENEWAL':
+      case "SUBSCRIPTION_RENEWAL":
         return <CreditCard className="h-5 w-5 text-purple-500" />;
       default:
         return <Info className="h-5 w-5 text-gray-500" />;
@@ -74,48 +80,48 @@ export function NotificationCenter() {
   const markAsRead = async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'READ' }),
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "READ" }),
       });
 
       if (!response.ok) throw new Error();
 
       mutate();
     } catch {
-      toast.error('Failed to mark as read');
+      toast.error("Failed to mark as read");
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('/api/notifications/mark-all-read', {
-        method: 'POST',
+      const response = await fetch("/api/notifications/mark-all-read", {
+        method: "POST",
       });
 
       if (!response.ok) throw new Error();
 
       mutate();
-      toast.success('All notifications marked as read');
+      toast.success("All notifications marked as read");
     } catch {
-      toast.error('Failed to mark all as read');
+      toast.error("Failed to mark all as read");
     }
   };
 
   const archiveNotification = async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'ARCHIVED' }),
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "ARCHIVED" }),
       });
 
       if (!response.ok) throw new Error();
 
       mutate();
-      toast.success('Notification archived');
+      toast.success("Notification archived");
     } catch {
-      toast.error('Failed to archive notification');
+      toast.error("Failed to archive notification");
     }
   };
 
@@ -136,7 +142,9 @@ export function NotificationCenter() {
       <Card>
         <CardContent className="py-12">
           <div className="text-center">
-            <p className="text-muted-foreground">Failed to load notifications</p>
+            <p className="text-muted-foreground">
+              Failed to load notifications
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -157,7 +165,9 @@ export function NotificationCenter() {
                 </Badge>
               )}
             </CardTitle>
-            <CardDescription>Stay updated with important alerts</CardDescription>
+            <CardDescription>
+              Stay updated with important alerts
+            </CardDescription>
           </div>
 
           {unreadCount > 0 && (
@@ -170,16 +180,16 @@ export function NotificationCenter() {
 
         <div className="flex gap-2 pt-4">
           <Button
-            variant={filter === 'all' ? 'default' : 'ghost'}
+            variant={filter === "all" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setFilter('all')}
+            onClick={() => setFilter("all")}
           >
             All
           </Button>
           <Button
-            variant={filter === 'unread' ? 'default' : 'ghost'}
+            variant={filter === "unread" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setFilter('unread')}
+            onClick={() => setFilter("unread")}
           >
             Unread ({unreadCount})
           </Button>
@@ -192,7 +202,9 @@ export function NotificationCenter() {
             <div className="py-12 text-center">
               <Bell className="mx-auto h-12 w-12 text-muted-foreground/50" />
               <p className="mt-4 text-sm text-muted-foreground">
-                {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                {filter === "unread"
+                  ? "No unread notifications"
+                  : "No notifications yet"}
               </p>
             </div>
           ) : (
@@ -200,20 +212,23 @@ export function NotificationCenter() {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`group relative rounded-lg border p-4 transition-colors ${notification.status === 'UNREAD'
-                    ? 'bg-blue-50/50 border-blue-200'
-                    : 'hover:bg-gray-100'
-                    }`}
+                  className={`group relative rounded-lg border p-4 transition-colors ${
+                    notification.status === "UNREAD"
+                      ? "bg-blue-50/50 border-blue-200"
+                      : "hover:bg-gray-100"
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">{getIcon(notification.type)}</div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-semibold text-sm">{notification.title}</h4>
+                        <h4 className="font-semibold text-sm">
+                          {notification.title}
+                        </h4>
 
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {notification.status === 'UNREAD' && (
+                          {notification.status === "UNREAD" && (
                             <Button
                               variant="ghost"
                               size="icon"
@@ -243,12 +258,17 @@ export function NotificationCenter() {
 
                       <div className="flex items-center gap-2 mt-2">
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(notification.sentAt), 'MMM d, h:mm a')}
+                          {format(
+                            new Date(notification.sentAt),
+                            "MMM d, h:mm a",
+                          )}
                         </span>
 
                         {notification.actionUrl && (
                           <>
-                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground">
+                              •
+                            </span>
                             <a
                               href={notification.actionUrl}
                               className="text-xs text-primary hover:underline"

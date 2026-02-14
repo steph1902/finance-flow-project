@@ -1,36 +1,36 @@
-"use client"
+"use client";
 
-import { CheckCircle2Icon } from "lucide-react"
+import { CheckCircle2Icon } from "lucide-react";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Transaction {
-  date: string
-  amount: string
-  type: string
-  category: string
-  description?: string
+  date: string;
+  amount: string;
+  type: string;
+  category: string;
+  description?: string;
 }
 
 interface ImportPreviewProps {
-  transactions: Transaction[]
-  maxRows?: number
+  transactions: Transaction[];
+  maxRows?: number;
 }
 
 export function ImportPreview({
   transactions,
   maxRows = 10,
 }: ImportPreviewProps) {
-  if (transactions.length === 0) return null
+  if (transactions.length === 0) return null;
 
-  const displayTransactions = transactions.slice(0, maxRows)
-  const hasMore = transactions.length > maxRows
+  const displayTransactions = transactions.slice(0, maxRows);
+  const hasMore = transactions.length > maxRows;
 
   return (
     <Card>
@@ -72,17 +72,13 @@ export function ImportPreview({
             <tbody>
               {displayTransactions.map((tx, index) => (
                 <tr key={index} className="border-b last:border-0">
-                  <td className="py-2 px-3 font-mono text-xs">
-                    {tx.date}
-                  </td>
+                  <td className="py-2 px-3 font-mono text-xs">{tx.date}</td>
                   <td className="py-2 px-3 text-right font-mono">
                     ${parseFloat(tx.amount).toFixed(2)}
                   </td>
                   <td className="py-2 px-3">
                     <Badge
-                      variant={
-                        tx.type === "INCOME" ? "default" : "secondary"
-                      }
+                      variant={tx.type === "INCOME" ? "default" : "secondary"}
                       className="text-xs"
                     >
                       {tx.type}
@@ -108,5 +104,5 @@ export function ImportPreview({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

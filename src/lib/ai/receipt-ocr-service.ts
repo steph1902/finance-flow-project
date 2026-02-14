@@ -14,14 +14,14 @@ export interface OCRResult {
 }
 
 export class ReceiptOCRService {
-  constructor(private clientFactory = getGeminiClient) { }
+  constructor(private clientFactory = getGeminiClient) {}
 
   /**
    * Extract text from receipt image using Gemini Vision API
    */
   async extractTextFromReceipt(
     imageBase64: string,
-    userId?: string // Made optional to support non-authenticated flows if needed, but optimally passed
+    userId?: string, // Made optional to support non-authenticated flows if needed, but optimally passed
   ): Promise<OCRResult> {
     try {
       logInfo("Starting receipt OCR with Gemini Vision API");
@@ -31,7 +31,8 @@ export class ReceiptOCRService {
 
       // Extract mime type
       const mimeMatch = imageBase64.match(/^data:(image\/\w+);base64,/);
-      const mimeType: string = (mimeMatch && mimeMatch[1]) ? mimeMatch[1] : "image/jpeg";
+      const mimeType: string =
+        mimeMatch && mimeMatch[1] ? mimeMatch[1] : "image/jpeg";
 
       const prompt = `Extract ALL text visible in this receipt image. 
 Return the text exactly as it appears, line by line, preserving the order and spacing.
@@ -74,7 +75,6 @@ Do not summarize or interpret - just extract the raw text.`;
         lines,
         confidence: responseText.length > 0 ? 0.9 : 0,
       };
-
     } catch (error) {
       logError("Receipt OCR failed", error);
       throw error;
@@ -120,5 +120,7 @@ Do not summarize or interpret - just extract the raw text.`;
 export const receiptOCRService = new ReceiptOCRService();
 
 // Backward compatibility wrappers
-export const extractTextFromReceipt = (imageBase64: string) => receiptOCRService.extractTextFromReceipt(imageBase64);
-export const validateReceiptImage = (imageBase64: string) => receiptOCRService.validateReceiptImage(imageBase64);
+export const extractTextFromReceipt = (imageBase64: string) =>
+  receiptOCRService.extractTextFromReceipt(imageBase64);
+export const validateReceiptImage = (imageBase64: string) =>
+  receiptOCRService.validateReceiptImage(imageBase64);

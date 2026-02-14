@@ -109,9 +109,7 @@ describe('BudgetsService', () => {
         alertThreshold: 80,
       };
 
-      await expect(service.create(mockUserId, createDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(mockUserId, createDto)).rejects.toThrow(BadRequestException);
       await expect(service.create(mockUserId, createDto)).rejects.toThrow(
         'End date must be after start date',
       );
@@ -130,9 +128,7 @@ describe('BudgetsService', () => {
 
       repository.findOverlapping.mockResolvedValue([mockBudget]);
 
-      await expect(service.create(mockUserId, createDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(mockUserId, createDto)).rejects.toThrow(BadRequestException);
       await expect(service.create(mockUserId, createDto)).rejects.toThrow(
         'Budget for category "GROCERIES" already exists for this period',
       );
@@ -177,9 +173,7 @@ describe('BudgetsService', () => {
     it('should throw NotFoundException if budget not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       await expect(service.findOne(mockUserId, 'nonexistent')).rejects.toThrow(
         'Budget with ID nonexistent not found',
       );
@@ -213,9 +207,9 @@ describe('BudgetsService', () => {
     it('should throw NotFoundException if budget not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.update(mockUserId, 'nonexistent', { amount: 600 }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(mockUserId, 'nonexistent', { amount: 600 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -233,9 +227,7 @@ describe('BudgetsService', () => {
     it('should throw NotFoundException if budget not found', async () => {
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove(mockUserId, 'nonexistent')).rejects.toThrow(NotFoundException);
       expect(repository.delete).not.toHaveBeenCalled();
     });
   });
@@ -374,9 +366,9 @@ describe('BudgetsService', () => {
 
   describe('optimizeBudgets', () => {
     it('should throw error for unimplemented feature', async () => {
-      await expect(
-        service.optimizeBudgets(mockUserId, { totalIncome: 5000 }),
-      ).rejects.toThrow('Budget optimization not yet implemented');
+      await expect(service.optimizeBudgets(mockUserId, { totalIncome: 5000 })).rejects.toThrow(
+        'Budget optimization not yet implemented',
+      );
     });
   });
 

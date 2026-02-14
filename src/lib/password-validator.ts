@@ -21,7 +21,7 @@ const SPECIAL_CHARS = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
 
 export function validatePasswordStrength(password: string): PasswordStrength {
   const feedback: string[] = [];
-  
+
   // Check requirements
   const requiredMet = {
     minLength: password.length >= MIN_LENGTH,
@@ -36,16 +36,16 @@ export function validatePasswordStrength(password: string): PasswordStrength {
     feedback.push(`At least ${MIN_LENGTH} characters`);
   }
   if (!requiredMet.hasUppercase) {
-    feedback.push('Include uppercase letter');
+    feedback.push("Include uppercase letter");
   }
   if (!requiredMet.hasLowercase) {
-    feedback.push('Include lowercase letter');
+    feedback.push("Include lowercase letter");
   }
   if (!requiredMet.hasNumber) {
-    feedback.push('Include number');
+    feedback.push("Include number");
   }
   if (!requiredMet.hasSpecial) {
-    feedback.push('Include special character');
+    feedback.push("Include special character");
   }
 
   // Calculate score
@@ -85,7 +85,7 @@ export function validatePasswordStrength(password: string): PasswordStrength {
 }
 
 export function getStrengthLabel(score: 0 | 1 | 2 | 3): string {
-  const labels = ['Weak', 'Medium', 'Strong', 'Very Strong'] as const;
+  const labels = ["Weak", "Medium", "Strong", "Very Strong"] as const;
   return labels[score];
 }
 
@@ -96,24 +96,24 @@ export function getStrengthColor(score: 0 | 1 | 2 | 3): {
 } {
   const colors = [
     {
-      bg: 'bg-destructive/10',
-      text: 'text-destructive',
-      border: 'border-destructive/30',
+      bg: "bg-destructive/10",
+      text: "text-destructive",
+      border: "border-destructive/30",
     },
     {
-      bg: 'bg-warning/10',
-      text: 'text-warning',
-      border: 'border-warning/30',
+      bg: "bg-warning/10",
+      text: "text-warning",
+      border: "border-warning/30",
     },
     {
-      bg: 'bg-success/10',
-      text: 'text-success',
-      border: 'border-success/30',
+      bg: "bg-success/10",
+      text: "text-success",
+      border: "border-success/30",
     },
     {
-      bg: 'bg-success/20',
-      text: 'text-success',
-      border: 'border-success/50',
+      bg: "bg-success/20",
+      text: "text-success",
+      border: "border-success/50",
     },
   ] as const;
   return colors[score];

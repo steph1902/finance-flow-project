@@ -38,7 +38,7 @@ export const ZenCard = forwardRef<HTMLDivElement, ZenCardProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <div
@@ -49,14 +49,14 @@ export const ZenCard = forwardRef<HTMLDivElement, ZenCardProps>(
           paddingClasses[padding],
           hoverable &&
             "hover:shadow-mist hover:scale-[1.02] hover:border-primary/20",
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 
 ZenCard.displayName = "ZenCard";

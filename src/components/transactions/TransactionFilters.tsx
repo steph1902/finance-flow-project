@@ -1,11 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, TRANSACTION_TYPE_OPTIONS } from "@/constants/categories";
+import {
+  EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
+  TRANSACTION_TYPE_OPTIONS,
+} from "@/constants/categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { TransactionFilters, TransactionType } from "@/types";
 import { Search, X, Calendar, Filter } from "lucide-react";
 import { motion } from "framer-motion";
@@ -24,7 +34,11 @@ type TransactionFiltersProps = {
   onReset: () => void;
 };
 
-export function TransactionFilters({ value, onChange, onReset }: TransactionFiltersProps) {
+export function TransactionFilters({
+  value,
+  onChange,
+  onReset,
+}: TransactionFiltersProps) {
   const categoryOptions = useMemo(() => {
     if (value.type === "INCOME") {
       return INCOME_CATEGORIES;
@@ -37,7 +51,10 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
     return [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
   }, [value.type]);
 
-  const handleChange = (key: keyof FilterState, newValue: string | undefined) => {
+  const handleChange = (
+    key: keyof FilterState,
+    newValue: string | undefined,
+  ) => {
     onChange({
       ...value,
       [key]: newValue,
@@ -70,7 +87,12 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
           )}
         </div>
         {activeFiltersCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={onReset} className="h-8 text-muted-foreground hover:text-destructive transition-colors">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onReset}
+            className="h-8 text-muted-foreground hover:text-destructive transition-colors"
+          >
             <X className="h-4 w-4 mr-1" />
             Clear all
           </Button>
@@ -79,7 +101,9 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
-          <Label htmlFor="search" className="text-foreground font-medium">Search</Label>
+          <Label htmlFor="search" className="text-foreground font-medium">
+            Search
+          </Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -96,7 +120,9 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
           <Label className="text-foreground font-medium">Type</Label>
           <Select
             value={value.type ?? "ALL"}
-            onValueChange={(newValue) => handleChange("type", newValue as TransactionType | "ALL")}
+            onValueChange={(newValue) =>
+              handleChange("type", newValue as TransactionType | "ALL")
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="All" />
@@ -116,7 +142,12 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
           <Label className="text-foreground font-medium">Category</Label>
           <Select
             value={value.category ?? "ALL"}
-            onValueChange={(newValue) => handleChange("category", newValue === "ALL" ? undefined : newValue)}
+            onValueChange={(newValue) =>
+              handleChange(
+                "category",
+                newValue === "ALL" ? undefined : newValue,
+              )
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="All categories" />
@@ -141,7 +172,9 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
             <Input
               type="date"
               value={value.startDate ?? ""}
-              onChange={(event) => handleChange("startDate", event.target.value)}
+              onChange={(event) =>
+                handleChange("startDate", event.target.value)
+              }
               className="border-neutral-300 focus:ring-2 focus:ring-primary-500 text-sm"
               placeholder="Start"
             />
@@ -158,4 +191,3 @@ export function TransactionFilters({ value, onChange, onReset }: TransactionFilt
     </motion.div>
   );
 }
-

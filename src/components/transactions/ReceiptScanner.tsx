@@ -1,11 +1,23 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Camera, Upload, X, Check, Loader2 } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { EXPENSE_CATEGORIES } from "@/constants/categories";
@@ -123,7 +135,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
     } catch (error) {
       console.error("Receipt scan error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to scan receipt"
+        error instanceof Error ? error.message : "Failed to scan receipt",
       );
       setImagePreview(null);
     } finally {
@@ -222,7 +234,8 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
           Scan Receipt
         </CardTitle>
         <CardDescription>
-          Take a photo or upload a receipt image to automatically create a transaction
+          Take a photo or upload a receipt image to automatically create a
+          transaction
         </CardDescription>
       </CardHeader>
 
@@ -258,7 +271,9 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
               accept="image/*"
               capture="environment"
               className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+              onChange={(e) =>
+                e.target.files?.[0] && handleFileSelect(e.target.files[0])
+              }
             />
 
             <input
@@ -266,7 +281,9 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+              onChange={(e) =>
+                e.target.files?.[0] && handleFileSelect(e.target.files[0])
+              }
             />
           </div>
         )}
@@ -377,7 +394,10 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
                   <div className="border rounded-lg p-3 max-h-32 overflow-y-auto">
                     <div className="space-y-1 text-sm">
                       {scannedData.items.slice(0, 10).map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between">
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between"
+                        >
                           <span className="text-muted-foreground">
                             {item.quantity && `${item.quantity}x `}
                             {item.name}
@@ -420,11 +440,7 @@ export function ReceiptScanner({ onTransactionCreated }: ReceiptScannerProps) {
                 )}
               </Button>
 
-              <Button
-                variant="outline"
-                onClick={handleClear}
-                disabled={saving}
-              >
+              <Button variant="outline" onClick={handleClear} disabled={saving}>
                 <X className="mr-2 h-4 w-4" />
                 Cancel
               </Button>

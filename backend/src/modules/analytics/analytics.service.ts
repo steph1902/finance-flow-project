@@ -5,7 +5,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Get financial overview
@@ -136,7 +136,10 @@ export class AnalyticsService {
 
     for (const transaction of transactions) {
       const monthKey = `${transaction.date.getFullYear()}-${String(transaction.date.getMonth() + 1).padStart(2, '0')}`;
-      const current = monthlyData.get(monthKey) || { income: new Decimal(0), expenses: new Decimal(0) };
+      const current = monthlyData.get(monthKey) || {
+        income: new Decimal(0),
+        expenses: new Decimal(0),
+      };
 
       if (transaction.type === 'INCOME') {
         current.income = current.income.plus(transaction.amount);
@@ -183,9 +186,14 @@ export class AnalyticsService {
       current: currentData,
       previous: previousData,
       changes: {
-        income: ((currentData.totalIncome - previousData.totalIncome) / previousData.totalIncome) * 100,
-        expenses: ((currentData.totalExpenses - previousData.totalExpenses) / previousData.totalExpenses) * 100,
-        savings: ((currentData.netSavings - previousData.netSavings) / Math.abs(previousData.netSavings)) * 100,
+        income:
+          ((currentData.totalIncome - previousData.totalIncome) / previousData.totalIncome) * 100,
+        expenses:
+          ((currentData.totalExpenses - previousData.totalExpenses) / previousData.totalExpenses) *
+          100,
+        savings:
+          ((currentData.netSavings - previousData.netSavings) / Math.abs(previousData.netSavings)) *
+          100,
       },
     };
   }

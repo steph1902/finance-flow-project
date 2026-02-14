@@ -45,23 +45,34 @@ export function getChatPrompt(context: FinancialContext): string {
   // Calculate budget utilization
   const budgetUtilization = context.budgets.map((budget) => {
     const spent = context.spendingByCategory[budget.category] || 0;
-    const percentage = budget.amount > 0 ? ((spent / budget.amount) * 100).toFixed(1) : '0';
-    const status = Number(percentage) > 100 ? 'OVER BUDGET ⚠️' : Number(percentage) > 80 ? 'NEAR LIMIT 📊' : 'ON TRACK ✅';
+    const percentage =
+      budget.amount > 0 ? ((spent / budget.amount) * 100).toFixed(1) : "0";
+    const status =
+      Number(percentage) > 100
+        ? "OVER BUDGET ⚠️"
+        : Number(percentage) > 80
+          ? "NEAR LIMIT 📊"
+          : "ON TRACK ✅";
     return `${budget.category}: $${spent.toFixed(2)}/$${budget.amount.toFixed(2)} (${percentage}%) ${status}`;
   });
 
   // Calculate net position
   const netAmount = context.totalIncome - context.totalSpending;
-  const netStatus = netAmount > 0 ? 'POSITIVE 📈' : netAmount < 0 ? 'DEFICIT 📉' : 'BREAK-EVEN ⚖️';
+  const netStatus =
+    netAmount > 0
+      ? "POSITIVE 📈"
+      : netAmount < 0
+        ? "DEFICIT 📉"
+        : "BREAK-EVEN ⚖️";
 
   // Analyze spending velocity (transactions per category)
   const categoryFrequency = context.recentTransactions
-    .filter((t) => t.type === 'EXPENSE')
+    .filter((t) => t.type === "EXPENSE")
     .reduce((acc: Record<string, number>, t) => {
       acc[t.category] = (acc[t.category] || 0) + 1;
       return acc;
     }, {});
-  
+
   const frequentCategories = Object.entries(categoryFrequency)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3)
@@ -84,28 +95,35 @@ USER'S COMPREHENSIVE FINANCIAL SNAPSHOT
 💰 SPENDING BREAKDOWN:
 • Top 5 Categories: ${topCategories || "No spending data yet"}
 • Most Active Categories: ${frequentCategories || "No activity yet"}
-• Average Transaction: $${context.totalTransactions > 0 ? (context.totalSpending / context.totalTransactions).toFixed(2) : '0'}
+• Average Transaction: $${context.totalTransactions > 0 ? (context.totalSpending / context.totalTransactions).toFixed(2) : "0"}
 
 📋 BUDGET TRACKING (${context.budgets.length} active):
-${budgetUtilization.length > 0 ? budgetUtilization.map(b => `• ${b}`).join('\n') : '• No budgets set yet'}
+${budgetUtilization.length > 0 ? budgetUtilization.map((b) => `• ${b}`).join("\n") : "• No budgets set yet"}
 
 � RECURRING OBLIGATIONS (${context.recurringObligations?.count || 0} active):
-${context.recurringObligations && context.recurringObligations.count > 0
-  ? `• Monthly Commitment: $${context.recurringObligations.monthlyTotal.toFixed(2)}
-${context.recurringObligations.breakdown.map(r => 
-  `• ${r.category}: $${r.amount.toFixed(2)} ${r.frequency.toLowerCase()} (next: ${new Date(r.nextDate).toLocaleDateString()})`
-).join('\n')}`
-  : '• No recurring transactions set up'}
+${
+  context.recurringObligations && context.recurringObligations.count > 0
+    ? `• Monthly Commitment: $${context.recurringObligations.monthlyTotal.toFixed(2)}
+${context.recurringObligations.breakdown
+  .map(
+    (r) =>
+      `• ${r.category}: $${r.amount.toFixed(2)} ${r.frequency.toLowerCase()} (next: ${new Date(r.nextDate).toLocaleDateString()})`,
+  )
+  .join("\n")}`
+    : "• No recurring transactions set up"
+}
 
 �📌 RECENT ACTIVITY (Last 10 Transactions):
-${context.recentTransactions.length > 0
-  ? context.recentTransactions
-      .map(
-        (t, i) =>
-          `${i + 1}. ${new Date(t.date).toLocaleDateString()} - ${t.type} | ${t.category} | $${t.amount.toFixed(2)}${t.description ? ` | "${t.description}"` : ''}`
-      )
-      .join("\n")
-  : '• No recent transactions'}
+${
+  context.recentTransactions.length > 0
+    ? context.recentTransactions
+        .map(
+          (t, i) =>
+            `${i + 1}. ${new Date(t.date).toLocaleDateString()} - ${t.type} | ${t.category} | $${t.amount.toFixed(2)}${t.description ? ` | "${t.description}"` : ""}`,
+        )
+        .join("\n")
+    : "• No recent transactions"
+}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 YOUR CAPABILITIES AS AI ASSISTANT
@@ -161,7 +179,7 @@ Respond naturally, specifically, and helpfully. Use the user's actual data to pr
 
 export function createAssistantPrompt(
   userMessage: string,
-  context: ChatContext
+  context: ChatContext,
 ): string {
   return `You are a helpful financial assistant for Finance Flow app. You help users understand their spending, income, and financial habits through natural conversation.
 
@@ -176,8 +194,8 @@ Guidelines:
 - Always use currency symbols ($) for monetary values
 
 User Context:
-${context.totalBalance !== undefined ? `- Current Balance: $${context.totalBalance}` : ''}
-${context.monthlyBudget !== undefined ? `- Monthly Budget: $${context.monthlyBudget}` : ''}
+${context.totalBalance !== undefined ? `- Current Balance: $${context.totalBalance}` : ""}
+${context.monthlyBudget !== undefined ? `- Monthly Budget: $${context.monthlyBudget}` : ""}
 
 User's Question: ${userMessage}
 
@@ -186,7 +204,7 @@ Respond naturally and helpfully. If you need to perform calculations or query sp
 
 export interface InsightPromptInput {
   transactions: unknown[];
-  period: 'week' | 'month' | 'quarter';
+  period: "week" | "month" | "quarter";
   previousPeriodData?: unknown;
 }
 
@@ -199,7 +217,7 @@ Number of Transactions: ${input.transactions.length}
 Transaction Summary:
 ${JSON.stringify(input.transactions.slice(0, 50), null, 2)}
 
-${input.previousPeriodData ? `Previous Period Comparison:\n${JSON.stringify(input.previousPeriodData, null, 2)}` : ''}
+${input.previousPeriodData ? `Previous Period Comparison:\n${JSON.stringify(input.previousPeriodData, null, 2)}` : ""}
 
 Generate 3-5 key insights focusing on:
 1. Spending patterns and trends

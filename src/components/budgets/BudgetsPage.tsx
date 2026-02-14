@@ -7,16 +7,31 @@ import { BudgetList } from "@/components/budgets/BudgetList";
 import { BudgetOptimizer } from "@/components/budgets/BudgetOptimizer";
 import { BudgetsSkeleton } from "@/components/skeletons/BudgetsSkeleton";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { useBudgets } from "@/hooks/useBudgets";
 import type { Budget } from "@/types";
 
 const now = new Date();
 const monthOptions = Array.from({ length: 12 }, (_, index) => index + 1);
-const yearOptions = Array.from({ length: 5 }, (_, index) => now.getFullYear() - 2 + index);
+const yearOptions = Array.from(
+  { length: 5 },
+  (_, index) => now.getFullYear() - 2 + index,
+);
 
 export function BudgetsPage() {
   const [filters, setFilters] = useState<{ month?: number; year?: number }>({
@@ -26,7 +41,16 @@ export function BudgetsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { budgets, period, isLoading, isError, error, createBudget, updateBudget, deleteBudget } = useBudgets(filters);
+  const {
+    budgets,
+    period,
+    isLoading,
+    isError,
+    error,
+    createBudget,
+    updateBudget,
+    deleteBudget,
+  } = useBudgets(filters);
   const { toast } = useToast();
 
   const handleOpen = () => {
@@ -43,8 +67,6 @@ export function BudgetsPage() {
     setIsDialogOpen(false);
     setEditingBudget(null);
   };
-
-
 
   const handleSubmit = async (values: {
     category: string;
@@ -70,7 +92,10 @@ export function BudgetsPage() {
       handleClose();
     } catch (submitError) {
       toast.error("Unable to save budget", {
-        description: submitError instanceof Error ? submitError.message : "An error occurred",
+        description:
+          submitError instanceof Error
+            ? submitError.message
+            : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -89,7 +114,10 @@ export function BudgetsPage() {
       });
     } catch (deleteError) {
       toast.error("Unable to delete budget", {
-        description: deleteError instanceof Error ? deleteError.message : "An error occurred",
+        description:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "An error occurred",
       });
     }
   };
@@ -105,7 +133,10 @@ export function BudgetsPage() {
           </p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? handleClose() : handleOpen())}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => (!open ? handleClose() : handleOpen())}
+        >
           <DialogTrigger asChild>
             <Button className="shadow-sm hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
               Add budget
@@ -121,7 +152,9 @@ export function BudgetsPage() {
               budget={editingBudget ?? undefined}
               onSubmit={handleSubmit}
               onCancel={handleClose}
-              onDelete={editingBudget ? () => handleDelete(editingBudget) : undefined}
+              onDelete={
+                editingBudget ? () => handleDelete(editingBudget) : undefined
+              }
               isSubmitting={isSubmitting}
               submitLabel={editingBudget ? "Update" : "Create"}
             />
@@ -138,7 +171,9 @@ export function BudgetsPage() {
             <Label className="type-body font-medium">Month</Label>
             <Select
               value={String(filters.month ?? "")}
-              onValueChange={(value) => setFilters((prev) => ({ ...prev, month: Number(value) }))}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, month: Number(value) }))
+              }
             >
               <SelectTrigger className="transition-all hover:shadow-sm focus:shadow-md">
                 <SelectValue placeholder="Select month" />
@@ -146,7 +181,9 @@ export function BudgetsPage() {
               <SelectContent>
                 {monthOptions.map((month) => (
                   <SelectItem key={month} value={String(month)}>
-                    {new Date(0, month - 1).toLocaleString(undefined, { month: "long" })}
+                    {new Date(0, month - 1).toLocaleString(undefined, {
+                      month: "long",
+                    })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -157,7 +194,9 @@ export function BudgetsPage() {
             <Label>Year</Label>
             <Select
               value={String(filters.year ?? "")}
-              onValueChange={(value) => setFilters((prev) => ({ ...prev, year: Number(value) }))}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, year: Number(value) }))
+              }
             >
               <SelectTrigger className="transition-all hover:shadow-sm focus:shadow-md">
                 <SelectValue placeholder="Select year" />
@@ -175,7 +214,8 @@ export function BudgetsPage() {
           <div className="space-y-1">
             <Label>Total budgets</Label>
             <div className="rounded-md border bg-gray-50 p-3 text-sm text-muted-foreground">
-              Track budgets for each expense category to keep spending on target.
+              Track budgets for each expense category to keep spending on
+              target.
             </div>
           </div>
         </div>
@@ -191,16 +231,23 @@ export function BudgetsPage() {
         <BudgetsSkeleton />
       ) : (
         <div className="rounded-lg border bg-card p-4 shadow-sm">
-          <BudgetList budgets={budgets} onEdit={handleEdit} onDelete={handleDelete} />
+          <BudgetList
+            budgets={budgets}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </div>
       )}
 
       {period ? (
         <p className="text-sm text-muted-foreground">
-          Showing budgets for {new Date(period.start).toLocaleString(undefined, { month: "long", year: "numeric" })}
+          Showing budgets for{" "}
+          {new Date(period.start).toLocaleString(undefined, {
+            month: "long",
+            year: "numeric",
+          })}
         </p>
       ) : null}
     </div>
   );
 }
-

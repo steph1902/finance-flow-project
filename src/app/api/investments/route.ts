@@ -4,22 +4,31 @@
  * POST /api/investments - Create new investment
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
-import { InvestmentType } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
+import { InvestmentType } from "@prisma/client";
 import {
   createInvestment,
   getUserInvestments,
   getPortfolioSummary,
-} from '@/lib/services/investment-service';
+} from "@/lib/services/investment-service";
 
 const createInvestmentSchema = z.object({
   symbol: z.string().min(1).max(10),
   name: z.string().min(1).max(200),
-  type: z.enum(['STOCK', 'BOND', 'MUTUAL_FUND', 'ETF', 'CRYPTO', 'REAL_ESTATE', 'COMMODITY', 'OTHER']),
+  type: z.enum([
+    "STOCK",
+    "BOND",
+    "MUTUAL_FUND",
+    "ETF",
+    "CRYPTO",
+    "REAL_ESTATE",
+    "COMMODITY",
+    "OTHER",
+  ]),
   quantity: z.number().positive(),
   costBasis: z.number().positive(),
   currentValue: z.number().positive().optional(),
@@ -33,14 +42,11 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const summary = searchParams.get('summary') === 'true';
+    const summary = searchParams.get("summary") === "true";
 
     if (summary) {
       const portfolioSummary = await getPortfolioSummary(session.user.id);
@@ -50,10 +56,10 @@ export async function GET(request: NextRequest) {
     const investments = await getUserInvestments(session.user.id);
     return NextResponse.json({ investments });
   } catch (error) {
-    logger.error('Failed to fetch investments', error);
+    logger.error("Failed to fetch investments", error);
     return NextResponse.json(
-      { error: 'Failed to fetch investments' },
-      { status: 500 }
+      { error: "Failed to fetch investments" },
+      { status: 500 },
     );
   }
 }
@@ -63,10 +69,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -74,8 +77,8 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.issues },
-        { status: 400 }
+        { error: "Invalid request", details: validation.error.issues },
+        { status: 400 },
       );
     }
 
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest) {
       quantity: validation.data.quantity,
       costBasis: validation.data.costBasis,
       currentValue: validation.data.currentValue ?? validation.data.costBasis,
-      currency: validation.data.currency ?? 'USD',
+      currency: validation.data.currency ?? "USD",
       purchaseDate: validation.data.purchaseDate,
     };
 
@@ -108,10 +111,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ investment }, { status: 201 });
   } catch (error) {
-    logger.error('Failed to create investment', error);
+    logger.error("Failed to create investment", error);
     return NextResponse.json(
-      { error: 'Failed to create investment' },
-      { status: 500 }
+      { error: "Failed to create investment" },
+      { status: 500 },
     );
   }
 }

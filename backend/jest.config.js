@@ -5,15 +5,18 @@ module.exports = {
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
-    '^.+\\.(t|j)s$': ['ts-jest', {
-      isolatedModules: true,
-      tsconfig: {
-        // Override tsconfig for tests
-        strict: true,
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
+    '^.+\\.(t|j)s$': [
+      'ts-jest',
+      {
+        isolatedModules: true,
+        tsconfig: {
+          // Override tsconfig for tests
+          strict: true,
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
       },
-    }],
+    ],
   },
   collectCoverageFrom: [
     'src/**/*.ts',

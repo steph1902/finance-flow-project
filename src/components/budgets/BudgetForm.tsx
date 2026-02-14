@@ -15,15 +15,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Budget } from "@/types";
 
 const schema = z.object({
   category: z.string().min(1, "Category is required"),
-  amount: z.string().min(1, "Amount is required").refine(
-    (val) => !isNaN(Number(val)) && Number(val) > 0,
-    "Amount must be greater than 0"
-  ),
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) > 0,
+      "Amount must be greater than 0",
+    ),
   month: z.string().min(1, "Month is required"),
   year: z.string().min(1, "Year is required"),
 });
@@ -46,7 +55,10 @@ type BudgetFormProps = {
 
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
-const yearOptions = Array.from({ length: 5 }, (_, index) => currentYear - 2 + index);
+const yearOptions = Array.from(
+  { length: 5 },
+  (_, index) => currentYear - 2 + index,
+);
 
 export function BudgetForm({
   budget,
@@ -61,7 +73,8 @@ export function BudgetForm({
     defaultValues: {
       category: budget?.category ?? EXPENSE_CATEGORIES[0],
       amount: budget?.amount?.toString() ?? "",
-      month: budget?.month?.toString() ?? (currentDate.getMonth() + 1).toString(),
+      month:
+        budget?.month?.toString() ?? (currentDate.getMonth() + 1).toString(),
       year: budget?.year?.toString() ?? currentYear.toString(),
     },
   });
@@ -111,7 +124,13 @@ export function BudgetForm({
             <FormItem>
               <FormLabel>Monthly budget amount</FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" min="0" aria-label="Budget amount" {...field} />
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  aria-label="Budget amount"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,11 +151,15 @@ export function BudgetForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
-                      <SelectItem key={month} value={month.toString()}>
-                        {new Date(0, month - 1).toLocaleString(undefined, { month: "long" })}
-                      </SelectItem>
-                    ))}
+                    {Array.from({ length: 12 }, (_, index) => index + 1).map(
+                      (month) => (
+                        <SelectItem key={month} value={month.toString()}>
+                          {new Date(0, month - 1).toLocaleString(undefined, {
+                            month: "long",
+                          })}
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -173,7 +196,12 @@ export function BudgetForm({
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
           <div>
             {onDelete ? (
-              <Button type="button" variant="destructive" disabled={isSubmitting} onClick={() => onDelete()}>
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isSubmitting}
+                onClick={() => onDelete()}
+              >
                 Delete
               </Button>
             ) : null}
@@ -181,7 +209,12 @@ export function BudgetForm({
 
           <div className="flex flex-col gap-2 sm:flex-row">
             {onCancel ? (
-              <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={onCancel}
+              >
                 Cancel
               </Button>
             ) : null}
@@ -194,4 +227,3 @@ export function BudgetForm({
     </Form>
   );
 }
-

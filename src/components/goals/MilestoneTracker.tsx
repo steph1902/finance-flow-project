@@ -1,9 +1,14 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle2Icon, TrophyIcon, StarIcon, RocketIcon } from "lucide-react"
-import { formatCurrency } from "@/lib/formatters"
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  CheckCircle2Icon,
+  TrophyIcon,
+  StarIcon,
+  RocketIcon,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 
 interface Milestone {
   id: string;
@@ -20,13 +25,37 @@ interface MilestoneTrackerProps {
 }
 
 const DEFAULT_MILESTONES = [
-  { percentage: 25, label: "Great Start!", icon: StarIcon, color: "text-blue-500" },
-  { percentage: 50, label: "Halfway There!", icon: RocketIcon, color: "text-purple-500" },
-  { percentage: 75, label: "Almost Done!", icon: TrophyIcon, color: "text-orange-500" },
-  { percentage: 100, label: "Goal Achieved!", icon: CheckCircle2Icon, color: "text-green-500" },
+  {
+    percentage: 25,
+    label: "Great Start!",
+    icon: StarIcon,
+    color: "text-blue-500",
+  },
+  {
+    percentage: 50,
+    label: "Halfway There!",
+    icon: RocketIcon,
+    color: "text-purple-500",
+  },
+  {
+    percentage: 75,
+    label: "Almost Done!",
+    icon: TrophyIcon,
+    color: "text-orange-500",
+  },
+  {
+    percentage: 100,
+    label: "Goal Achieved!",
+    icon: CheckCircle2Icon,
+    color: "text-green-500",
+  },
 ];
 
-export function MilestoneTracker({ targetAmount, currentAmount, milestones = [] }: MilestoneTrackerProps) {
+export function MilestoneTracker({
+  targetAmount,
+  currentAmount,
+  milestones = [],
+}: MilestoneTrackerProps) {
   const progress = (currentAmount / targetAmount) * 100;
 
   // Generate milestone data
@@ -58,7 +87,7 @@ export function MilestoneTracker({ targetAmount, currentAmount, milestones = [] 
                 className="bg-primary transition-all duration-500"
                 style={{
                   height: `${Math.min(progress, 100)}%`,
-                  width: '100%',
+                  width: "100%",
                 }}
               />
             </div>
@@ -71,17 +100,19 @@ export function MilestoneTracker({ targetAmount, currentAmount, milestones = [] 
                   <div
                     key={index}
                     className={`flex items-start gap-4 relative transition-opacity ${
-                      milestone.isAchieved || milestone.isCurrent ? 'opacity-100' : 'opacity-40'
+                      milestone.isAchieved || milestone.isCurrent
+                        ? "opacity-100"
+                        : "opacity-40"
                     }`}
                   >
                     {/* Icon */}
                     <div
                       className={`relative z-10 flex items-center justify-center size-12 rounded-full border-2 ${
                         milestone.isAchieved
-                          ? 'bg-primary border-primary text-primary-foreground'
+                          ? "bg-primary border-primary text-primary-foreground"
                           : milestone.isCurrent
-                          ? 'bg-background border-primary text-primary animate-pulse'
-                          : 'bg-background border-muted text-muted-foreground'
+                            ? "bg-background border-primary text-primary animate-pulse"
+                            : "bg-background border-muted text-muted-foreground"
                       }`}
                     >
                       <Icon className="size-6" />
@@ -136,9 +167,11 @@ export function MilestoneTracker({ targetAmount, currentAmount, milestones = [] 
                       ) : (
                         <div className="size-4 rounded-full border-2 border-muted" />
                       )}
-                      <span>{milestone.description || 'Milestone'}</span>
+                      <span>{milestone.description || "Milestone"}</span>
                     </div>
-                    <span className="font-medium">{formatCurrency(milestone.amount)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(milestone.amount)}
+                    </span>
                   </div>
                 ))}
               </div>

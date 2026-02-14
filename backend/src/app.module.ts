@@ -37,9 +37,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
       isGlobal: true,
       envFilePath: '.env',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string()
-          .valid('development', 'production', 'test')
-          .default('development'),
+        NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
         PORT: Joi.number().default(3001),
         DATABASE_URL: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
@@ -110,4 +108,4 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

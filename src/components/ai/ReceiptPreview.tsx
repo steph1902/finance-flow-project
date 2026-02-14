@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CheckIcon, EditIcon } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CheckIcon, EditIcon } from "lucide-react";
+import { useState } from "react";
 
 interface ReceiptData {
   amount: number;
@@ -22,9 +28,13 @@ interface ReceiptPreviewProps {
   onCancel?: () => void;
 }
 
-export function ReceiptPreview({ data: initialData, onConfirm, onCancel }: ReceiptPreviewProps) {
-  const [data, setData] = useState(initialData)
-  const [isEditing, setIsEditing] = useState(false)
+export function ReceiptPreview({
+  data: initialData,
+  onConfirm,
+  onCancel,
+}: ReceiptPreviewProps) {
+  const [data, setData] = useState(initialData);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <Card>
@@ -58,7 +68,9 @@ export function ReceiptPreview({ data: initialData, onConfirm, onCancel }: Recei
             type="number"
             step="0.01"
             value={data.amount}
-            onChange={(e) => setData({ ...data, amount: parseFloat(e.target.value) })}
+            onChange={(e) =>
+              setData({ ...data, amount: parseFloat(e.target.value) })
+            }
             disabled={!isEditing}
           />
         </div>
@@ -78,7 +90,9 @@ export function ReceiptPreview({ data: initialData, onConfirm, onCancel }: Recei
               <SelectItem value="Shopping">Shopping</SelectItem>
               <SelectItem value="Transportation">Transportation</SelectItem>
               <SelectItem value="Entertainment">Entertainment</SelectItem>
-              <SelectItem value="Bills & Utilities">Bills & Utilities</SelectItem>
+              <SelectItem value="Bills & Utilities">
+                Bills & Utilities
+              </SelectItem>
               <SelectItem value="Health">Health</SelectItem>
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
@@ -121,5 +135,5 @@ export function ReceiptPreview({ data: initialData, onConfirm, onCancel }: Recei
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

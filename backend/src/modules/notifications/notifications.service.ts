@@ -20,7 +20,7 @@ export class NotificationsService {
     private readonly notificationRepository: NotificationRepository,
     private readonly emailService: EmailService,
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   /**
    * Create a new notification
@@ -105,7 +105,7 @@ export class NotificationsService {
    */
   async sendBudgetAlert(
     userId: string,
-    budgetData: { category: string; budgeted: number; spent: number; percentUsed: number }
+    budgetData: { category: string; budgeted: number; spent: number; percentUsed: number },
   ) {
     // Create in-app notification
     await this.create({
@@ -140,4 +140,3 @@ export class NotificationsService {
     });
   }
 }
-

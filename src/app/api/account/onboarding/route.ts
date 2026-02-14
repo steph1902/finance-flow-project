@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const onboardingSchema = z.object({
   completed: z.boolean(),
@@ -14,16 +14,19 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const { completed, step } = onboardingSchema.parse(body);
 
-    const updateData: { onboardingCompleted: boolean; onboardingStep?: number } = {
+    const updateData: {
+      onboardingCompleted: boolean;
+      onboardingStep?: number;
+    } = {
       onboardingCompleted: completed,
     };
-    
+
     if (step !== undefined) {
       updateData.onboardingStep = step;
     }
@@ -33,24 +36,24 @@ export async function POST(request: NextRequest) {
       data: updateData,
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       onboardingCompleted: user.onboardingCompleted,
       onboardingStep: user.onboardingStep,
     });
   } catch (error) {
-    logger.error('Onboarding update error', error);
-    
+    logger.error("Onboarding update error", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.issues },
-        { status: 400 }
+        { error: "Invalid request data", details: error.issues },
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to update onboarding status' },
-      { status: 500 }
+      { error: "Failed to update onboarding status" },
+      { status: 500 },
     );
   }
 }
@@ -59,7 +62,7 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -71,7 +74,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -79,10 +82,10 @@ export async function GET() {
       onboardingStep: user.onboardingStep,
     });
   } catch (error) {
-    logger.error('Onboarding status error', error);
+    logger.error("Onboarding status error", error);
     return NextResponse.json(
-      { error: 'Failed to fetch onboarding status' },
-      { status: 500 }
+      { error: "Failed to fetch onboarding status" },
+      { status: 500 },
     );
   }
 }

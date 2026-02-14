@@ -13,9 +13,15 @@ import {
   Shield,
   Database,
   Download,
-  Key
+  Key,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -33,12 +39,16 @@ export default function SettingsPage() {
 
   // Show loading state while session is being fetched
   if (status === "loading") {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   // Redirect if not authenticated
   if (!session) {
-    router.push('/login');
+    router.push("/login");
     return null;
   }
 
@@ -106,7 +116,11 @@ export default function SettingsPage() {
               {session?.user?.email || "Not set"}
             </p>
           </div>
-          <Button variant="outline" onClick={() => router.push("/profile")} className="font-medium shadow-soft">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/profile")}
+            className="font-medium shadow-soft"
+          >
             Edit Profile
           </Button>
         </CardContent>
@@ -127,15 +141,18 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-5">
           <p className="type-small text-muted-foreground">
-            Configure API keys for Google OAuth, Gemini AI, Resend Email, and other services.
+            Configure API keys for Google OAuth, Gemini AI, Resend Email, and
+            other services.
           </p>
-          <Button variant="outline" onClick={() => router.push("/settings/api-keys")} className="font-medium shadow-soft">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/settings/api-keys")}
+            className="font-medium shadow-soft"
+          >
             Manage API Keys
           </Button>
         </CardContent>
       </Card>
-
-
 
       {/* Notifications Section */}
       <Card className="shadow-card border-border/30 rounded-xl transition-shadow hover:shadow-mist">
@@ -161,7 +178,9 @@ export default function SettingsPage() {
             <Button
               variant={notifications.email ? "default" : "outline"}
               size="sm"
-              onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
+              onClick={() =>
+                setNotifications((prev) => ({ ...prev, email: !prev.email }))
+              }
               className="font-medium shadow-soft"
             >
               {notifications.email ? "Enabled" : "Disabled"}
@@ -183,7 +202,9 @@ export default function SettingsPage() {
             <Button
               variant={notifications.push ? "default" : "outline"}
               size="sm"
-              onClick={() => setNotifications(prev => ({ ...prev, push: !prev.push }))}
+              onClick={() =>
+                setNotifications((prev) => ({ ...prev, push: !prev.push }))
+              }
               className="font-medium shadow-soft"
             >
               {notifications.push ? "Enabled" : "Disabled"}
@@ -202,7 +223,12 @@ export default function SettingsPage() {
             <Button
               variant={notifications.budgetAlerts ? "default" : "outline"}
               size="sm"
-              onClick={() => setNotifications(prev => ({ ...prev, budgetAlerts: !prev.budgetAlerts }))}
+              onClick={() =>
+                setNotifications((prev) => ({
+                  ...prev,
+                  budgetAlerts: !prev.budgetAlerts,
+                }))
+              }
               className="font-medium shadow-soft"
             >
               {notifications.budgetAlerts ? "Enabled" : "Disabled"}
@@ -213,7 +239,9 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-2">
             <div className="space-y-1">
-              <Label className="font-medium">Recurring Transaction Reminders</Label>
+              <Label className="font-medium">
+                Recurring Transaction Reminders
+              </Label>
               <p className="type-small text-muted-foreground">
                 Reminders for upcoming recurring transactions
               </p>
@@ -221,7 +249,12 @@ export default function SettingsPage() {
             <Button
               variant={notifications.recurringReminders ? "default" : "outline"}
               size="sm"
-              onClick={() => setNotifications(prev => ({ ...prev, recurringReminders: !prev.recurringReminders }))}
+              onClick={() =>
+                setNotifications((prev) => ({
+                  ...prev,
+                  recurringReminders: !prev.recurringReminders,
+                }))
+              }
               className="font-medium shadow-soft"
             >
               {notifications.recurringReminders ? "Enabled" : "Disabled"}
@@ -253,7 +286,9 @@ export default function SettingsPage() {
               Last changed: Never
             </p>
           </div>
-          <Button variant="outline" className="font-medium shadow-soft">Change Password</Button>
+          <Button variant="outline" className="font-medium shadow-soft">
+            Change Password
+          </Button>
         </CardContent>
       </Card>
 
@@ -279,7 +314,11 @@ export default function SettingsPage() {
             <p className="type-small text-muted-foreground">
               Download all your transactions, budgets, and account data
             </p>
-            <Button variant="outline" onClick={handleExportData} className="font-medium shadow-soft">
+            <Button
+              variant="outline"
+              onClick={handleExportData}
+              className="font-medium shadow-soft"
+            >
               Export Data
             </Button>
           </div>

@@ -5,6 +5,7 @@
 This is a production-grade, enterprise-level NestJS backend for the Finance Flow SaaS platform. Built with scalability, maintainability, and financial accuracy as top priorities.
 
 ### Tech Stack
+
 - **Framework**: NestJS 10+ with Fastify
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache & Queues**: Redis + BullMQ
@@ -240,6 +241,7 @@ backend/
 ## 📊 Data Flow
 
 ### Transaction Creation Flow
+
 ```
 1. Client → POST /api/v1/transactions
 2. ValidationPipe validates DTO
@@ -253,6 +255,7 @@ backend/
 ```
 
 ### Budget Alert Flow
+
 ```
 1. Cron job (daily at 9 AM UTC)
 2. Fetch all budgets for current month
@@ -268,6 +271,7 @@ backend/
 ## 🎯 API Endpoints
 
 ### Authentication
+
 - `POST /auth/signup` - Register new user
 - `POST /auth/signin` - Login
 - `POST /auth/refresh` - Refresh token
@@ -275,6 +279,7 @@ backend/
 - `POST /auth/logout` - Logout
 
 ### Transactions
+
 - `GET /transactions` - List transactions (paginated, filtered)
 - `POST /transactions` - Create transaction
 - `GET /transactions/:id` - Get transaction
@@ -282,6 +287,7 @@ backend/
 - `DELETE /transactions/:id` - Soft delete
 
 ### Budgets
+
 - `GET /budgets` - List budgets
 - `POST /budgets` - Create budget
 - `PATCH /budgets/:id` - Update budget
@@ -290,12 +296,14 @@ backend/
 - `POST /budgets/shared` - Create shared budget
 
 ### Recurring Transactions
+
 - `GET /recurring` - List recurring transactions
 - `POST /recurring` - Create recurring
 - `PATCH /recurring/:id` - Update recurring
 - `DELETE /recurring/:id` - Delete recurring
 
 ### Goals
+
 - `GET /goals` - List goals
 - `POST /goals` - Create goal
 - `POST /goals/:id/contribute` - Add contribution
@@ -303,23 +311,27 @@ backend/
 - `DELETE /goals/:id` - Delete goal
 
 ### Investments
+
 - `GET /investments` - List investments
 - `POST /investments` - Create investment
 - `GET /investments/portfolio` - Portfolio summary
 - `POST /investments/:id/transaction` - Record transaction
 
 ### Analytics
+
 - `GET /analytics/dashboard` - Dashboard stats
 - `GET /analytics/trends` - Spending trends
 - `GET /analytics/categories` - Category breakdown
 
 ### Reports
+
 - `GET /reports` - List reports
 - `POST /reports/generate` - Generate report (PDF/CSV/Excel)
 - `GET /reports/:id` - Get report
 - `GET /reports/:id/download` - Download report
 
 ### AI Features
+
 - `POST /ai/categorize` - Categorize transaction
 - `POST /ai/chat` - AI assistant chat
 - `GET /ai/insights` - Get insights
@@ -327,10 +339,12 @@ backend/
 - `GET /ai/optimize-budgets` - Budget optimization
 
 ### Currency
+
 - `GET /currency/rates` - Get exchange rates
 - `POST /currency/convert` - Convert amount
 
 ### Integrations
+
 - `POST /integrations/plaid/link-token` - Create Plaid link token
 - `POST /integrations/plaid/exchange` - Exchange public token
 - `POST /integrations/plaid/sync` - Sync transactions
@@ -343,10 +357,10 @@ backend/
 ## 🔄 Background Jobs
 
 ### Cron Jobs
+
 1. **Daily Checks** (9 AM UTC)
    - Budget alerts (90%, 100% thresholds)
    - Bill reminders (3 days before)
-   
 2. **Weekly Summary** (Sunday 8 AM UTC)
    - Weekly financial summary
    - Email to all users
@@ -360,6 +374,7 @@ backend/
    - Create transactions automatically
 
 ### Queue Processors
+
 1. **Email Queue**
    - Welcome emails
    - Budget alerts
@@ -378,6 +393,7 @@ backend/
 ## 🧪 Testing
 
 ### Unit Tests
+
 ```bash
 npm run test
 npm run test:watch
@@ -385,11 +401,13 @@ npm run test:cov
 ```
 
 ### Integration Tests
+
 ```bash
 npm run test:e2e
 ```
 
 ### Test Structure
+
 - Each service has corresponding `.spec.ts`
 - Mock Prisma for database operations
 - Mock external APIs (Stripe, Plaid, AI)
@@ -400,14 +418,17 @@ npm run test:e2e
 ## 🚀 Deployment
 
 ### Environment Variables
+
 See `.env.example` for all required variables.
 
 ### Database Migrations
+
 ```bash
 npx prisma migrate deploy
 ```
 
 ### Build & Run
+
 ```bash
 # Development
 npm run start:dev
@@ -418,6 +439,7 @@ npm run start:prod
 ```
 
 ### Docker (Optional)
+
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app

@@ -18,21 +18,19 @@ describe('TransactionsController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    
+
     prisma = app.get<PrismaService>(PrismaService);
     await TestDatabase.cleanup();
 
     // Create test user and get auth token
-    const signupResponse = await request(app.getHttpServer())
-      .post('/auth/signup')
-      .send({
-        email: 'transactions-test@example.com',
-        password: 'Password123!',
-        name: 'Transactions Test User',
-      });
+    const signupResponse = await request(app.getHttpServer()).post('/auth/signup').send({
+      email: 'transactions-test@example.com',
+      password: 'Password123!',
+      name: 'Transactions Test User',
+    });
 
     accessToken = signupResponse.body.accessToken;
-    
+
     const user = await prisma.user.findUnique({
       where: { email: 'transactions-test@example.com' },
     });
@@ -177,9 +175,7 @@ describe('TransactionsController (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/transactions')
-        .expect(401);
+      await request(app.getHttpServer()).get('/transactions').expect(401);
     });
   });
 

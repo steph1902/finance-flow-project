@@ -111,7 +111,7 @@ export type ChatMessage = {
   id: string;
   userId: string;
   sessionId: string;
-  role: 'user' | 'assistant'; // mapped from message_type
+  role: "user" | "assistant"; // mapped from message_type
   message: string; // mapped from content? No, content in Prisma is message
   metadata?: Record<string, unknown>;
   createdAt: string;
@@ -124,8 +124,12 @@ export type CategorySuggestion = {
   reasoning: string;
 };
 
-export type InsightType = 'spending_alert' | 'trend' | 'recommendation' | 'achievement';
-export type InsightSeverity = 'info' | 'warning' | 'critical';
+export type InsightType =
+  | "spending_alert"
+  | "trend"
+  | "recommendation"
+  | "achievement";
+export type InsightSeverity = "info" | "warning" | "critical";
 
 export type Insight = {
   type: InsightType;
@@ -136,4 +140,3 @@ export type Insight = {
   amount?: number;
   recommendation?: string;
 };
-

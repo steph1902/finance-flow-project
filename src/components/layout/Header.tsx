@@ -4,8 +4,24 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, Settings, HelpCircle, Search, TrendingUp, BookOpen, Rocket } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Menu,
+  LogOut,
+  Settings,
+  HelpCircle,
+  Search,
+  TrendingUp,
+  BookOpen,
+  Rocket,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/config/navigation";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -24,7 +40,11 @@ export default function Header() {
       {/* Mobile Menu */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="shrink-0 lg:hidden hover:bg-accent transition-colors">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 lg:hidden hover:bg-accent transition-colors"
+          >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
@@ -38,9 +58,7 @@ export default function Header() {
               <div className="relative">
                 <TrendingUp className="h-7 w-7 text-primary relative z-10" />
               </div>
-              <span className="text-foreground font-serif">
-                FinanceFlow
-              </span>
+              <span className="text-foreground font-serif">FinanceFlow</span>
             </Link>
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
@@ -52,7 +70,7 @@ export default function Header() {
                     "flex items-center gap-4 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200",
                     isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent",
                   )}
                   aria-current={isActive ? "page" : undefined}
                 >
@@ -81,13 +99,23 @@ export default function Header() {
       <div className="flex items-center gap-1 md:gap-2 ml-auto">
         {/* Help & Updates (Desktop Only) */}
         <div className="hidden md:flex items-center gap-1 mr-2">
-          <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-muted-foreground hover:text-foreground"
+          >
             <Link href="/how-to-use" title="How to Use">
               <BookOpen className="h-4 w-4 mr-2" />
               <span className="text-xs font-medium">Guide</span>
             </Link>
           </Button>
-          <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-muted-foreground hover:text-foreground"
+          >
             <Link href="/whats-new" title="What's New">
               <Rocket className="h-4 w-4 mr-2" />
               <span className="text-xs font-medium">Updates</span>
@@ -113,11 +141,21 @@ export default function Header() {
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 border-border shadow-lg" style={{ backgroundColor: '#ffffff', opacity: 1, backdropFilter: 'none' }}>
+          <DropdownMenuContent
+            align="end"
+            className="w-56 border-border shadow-lg"
+            style={{
+              backgroundColor: "#ffffff",
+              opacity: 1,
+              backdropFilter: "none",
+            }}
+          >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">Demo User</p>
-                <p className="text-xs leading-none text-muted-foreground">demo@financeflow.com</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  demo@financeflow.com
+                </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-border" />

@@ -1,6 +1,11 @@
-"use client"
+"use client";
 
-import { MoreVerticalIcon, TrophyIcon, CalendarIcon, TargetIcon } from "lucide-react"
+import {
+  MoreVerticalIcon,
+  TrophyIcon,
+  CalendarIcon,
+  TargetIcon,
+} from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -9,36 +14,36 @@ import {
   CardContent,
   CardFooter,
   CardAction,
-} from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { formatCurrency } from "@/lib/formatters"
+} from "@/components/ui/dropdown-menu";
+import { formatCurrency } from "@/lib/formatters";
 
 interface GoalCardProps {
   goal: {
-    id: string
-    name: string
-    description: string | null
-    targetAmount: number
-    currentAmount: number
-    targetDate: Date | null
-    category: string
-    status: "ACTIVE" | "COMPLETED" | "CANCELLED" | "PAUSED"
-    priority: number
-    createdAt: Date
-  }
-  onEdit?: () => void
-  onDelete?: () => void
-  onAddContribution?: () => void
-  onPause?: () => void
+    id: string;
+    name: string;
+    description: string | null;
+    targetAmount: number;
+    currentAmount: number;
+    targetDate: Date | null;
+    category: string;
+    status: "ACTIVE" | "COMPLETED" | "CANCELLED" | "PAUSED";
+    priority: number;
+    createdAt: Date;
+  };
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onAddContribution?: () => void;
+  onPause?: () => void;
 }
 
 export function GoalCard({
@@ -48,43 +53,49 @@ export function GoalCard({
   onAddContribution,
   onPause,
 }: GoalCardProps) {
-  const progress = (goal.currentAmount / goal.targetAmount) * 100
-  const isCompleted = goal.status === "COMPLETED" || progress >= 100
-  const isPaused = goal.status === "PAUSED"
-  const isCancelled = goal.status === "CANCELLED"
+  const progress = (goal.currentAmount / goal.targetAmount) * 100;
+  const isCompleted = goal.status === "COMPLETED" || progress >= 100;
+  const isPaused = goal.status === "PAUSED";
+  const isCancelled = goal.status === "CANCELLED";
 
   const daysRemaining = goal.targetDate
     ? Math.ceil(
         (new Date(goal.targetDate).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       )
-    : null
+    : null;
 
   const priorityColors = {
     0: "bg-gray-500",
     1: "bg-blue-500",
     2: "bg-red-500",
-  }
+  };
 
   const statusVariant = {
     ACTIVE: "default",
     COMPLETED: "success",
     CANCELLED: "destructive",
     PAUSED: "warning",
-  } as const
+  } as const;
 
   return (
-    <Card className={cn(
-      "transition-all hover:shadow-md",
-      isPaused && "opacity-70",
-      isCancelled && "opacity-50"
-    )}>
+    <Card
+      className={cn(
+        "transition-all hover:shadow-md",
+        isPaused && "opacity-70",
+        isCancelled && "opacity-50",
+      )}
+    >
       <CardHeader>
         <div className="flex items-start gap-3">
-          <div className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-lg",
-            isCompleted ? "bg-green-100 text-green-600" : "bg-primary/10 text-primary"
-          )}>
+          <div
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-lg",
+              isCompleted
+                ? "bg-green-100 text-green-600"
+                : "bg-primary/10 text-primary",
+            )}
+          >
             {isCompleted ? (
               <TrophyIcon className="size-6" />
             ) : (
@@ -114,7 +125,9 @@ export function GoalCard({
                   <DropdownMenuItem onClick={onAddContribution}>
                     Add Contribution
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onEdit}>Edit Goal</DropdownMenuItem>
+                  <DropdownMenuItem onClick={onEdit}>
+                    Edit Goal
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={onPause}>
                     {isPaused ? "Resume" : "Pause"}
                   </DropdownMenuItem>
@@ -137,7 +150,9 @@ export function GoalCard({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Progress</span>
-            <span className="font-semibold">{Math.min(progress, 100).toFixed(0)}%</span>
+            <span className="font-semibold">
+              {Math.min(progress, 100).toFixed(0)}%
+            </span>
           </div>
           <Progress value={Math.min(progress, 100)} />
         </div>
@@ -145,7 +160,9 @@ export function GoalCard({
         {/* Amount */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold">{formatCurrency(goal.currentAmount)}</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(goal.currentAmount)}
+            </p>
             <p className="text-sm text-muted-foreground">
               of {formatCurrency(goal.targetAmount)}
             </p>
@@ -158,8 +175,8 @@ export function GoalCard({
                   {daysRemaining > 0
                     ? `${daysRemaining} days left`
                     : daysRemaining === 0
-                    ? "Due today"
-                    : `${Math.abs(daysRemaining)} days overdue`}
+                      ? "Due today"
+                      : `${Math.abs(daysRemaining)} days overdue`}
                 </span>
               </div>
             </div>
@@ -184,19 +201,13 @@ export function GoalCard({
                 ⭐ 75%
               </Badge>
             )}
-            {progress >= 100 && (
-              <Badge variant="success">
-                🏆 Complete!
-              </Badge>
-            )}
+            {progress >= 100 && <Badge variant="success">🏆 Complete!</Badge>}
           </div>
         )}
       </CardContent>
 
       <CardFooter className="justify-between">
-        <Badge variant={statusVariant[goal.status]}>
-          {goal.status}
-        </Badge>
+        <Badge variant={statusVariant[goal.status]}>{goal.status}</Badge>
         <div className="flex items-center gap-2">
           {goal.category && (
             <Badge variant="outline" className="text-xs">
@@ -206,16 +217,16 @@ export function GoalCard({
           <div
             className={cn(
               "size-2 rounded-full",
-              priorityColors[goal.priority as keyof typeof priorityColors]
+              priorityColors[goal.priority as keyof typeof priorityColors],
             )}
             title={`Priority: ${goal.priority === 0 ? "Low" : goal.priority === 1 ? "Medium" : "High"}`}
           />
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ")
+  return classes.filter(Boolean).join(" ");
 }

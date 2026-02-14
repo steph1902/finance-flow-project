@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getErrorMessage } from '@/lib/utils/error';
+import { getErrorMessage } from "@/lib/utils/error";
 import { receiptOCRService } from "@/lib/ai/receipt-ocr-service";
 import { receiptParserService } from "@/lib/ai/receipt-parser-service";
 import { checkAIRateLimit } from "@/lib/rate-limiter";
@@ -20,10 +20,7 @@ export async function POST(req: NextRequest) {
     // 1. Authentication
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Capture user ID for dynamic API key lookup
@@ -32,7 +29,10 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       logError("User ID missing from session", { user: session.user });
-      return NextResponse.json({ error: "Unauthorized: User ID missing" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized: User ID missing" },
+        { status: 401 },
+      );
     }
 
     // 2. Rate limiting (AI operations are expensive)
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         {
           error: "Rate limit exceeded. Please try again later.",
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -53,17 +53,14 @@ export async function POST(req: NextRequest) {
     if (!image || typeof image !== "string") {
       return NextResponse.json(
         { error: "Image is required (base64 encoded)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // 4. Validate image
     const validation = receiptOCRService.validateReceiptImage(image);
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: validation.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     logInfo("Processing receipt", {
@@ -72,7 +69,10 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Extract text using OCR
-    const ocrResult = await receiptOCRService.extractTextFromReceipt(image, userId);
+    const ocrResult = await receiptOCRService.extractTextFromReceipt(
+      image,
+      userId,
+    );
 
     if (!ocrResult.fullText || ocrResult.fullText.length === 0) {
       return NextResponse.json(
@@ -80,12 +80,15 @@ export async function POST(req: NextRequest) {
           error: "No text detected in image",
           suggestion: "Please ensure the receipt is clear and well-lit",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // 6. Parse receipt data with Gemini (passing userId for dynamic key)
-    const parsedData = await receiptParserService.processReceipt(ocrResult.fullText, userId);
+    const parsedData = await receiptParserService.processReceipt(
+      ocrResult.fullText,
+      userId,
+    );
 
     // 7. Return parsed transaction data
     return NextResponse.json({
@@ -100,7 +103,6 @@ export async function POST(req: NextRequest) {
         ocrText: ocrResult.fullText, // For debugging/review
       },
     });
-
   } catch (error) {
     logError("Receipt scan failed", error);
 
@@ -109,21 +111,24 @@ export async function POST(req: NextRequest) {
       if (getErrorMessage(error).includes("GOOGLE_GENERATIVE_AI_API_KEY")) {
         return NextResponse.json(
           { error: "Receipt scanning not configured. Please contact support." },
-          { status: 503 }
+          { status: 503 },
         );
       }
 
-      if (getErrorMessage(error).includes("Vision") || getErrorMessage(error).includes("Gemini")) {
+      if (
+        getErrorMessage(error).includes("Vision") ||
+        getErrorMessage(error).includes("Gemini")
+      ) {
         return NextResponse.json(
           { error: "OCR service unavailable. Please try again later." },
-          { status: 503 }
+          { status: 503 },
         );
       }
     }
 
     return NextResponse.json(
       { error: "Failed to process receipt" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

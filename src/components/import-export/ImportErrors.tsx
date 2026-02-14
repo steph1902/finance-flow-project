@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { AlertCircleIcon } from "lucide-react"
+import { AlertCircleIcon } from "lucide-react";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface ImportError {
-  row: number
-  error: string
+  row: number;
+  error: string;
   data: {
-    date?: string
-    amount?: string
-    type?: string
-    category?: string
-    description?: string
-  }
+    date?: string;
+    amount?: string;
+    type?: string;
+    category?: string;
+    description?: string;
+  };
 }
 
 interface ImportErrorsProps {
-  errors: ImportError[]
+  errors: ImportError[];
 }
 
 export function ImportErrors({ errors }: ImportErrorsProps) {
-  if (errors.length === 0) return null
+  if (errors.length === 0) return null;
 
   return (
     <Card className="border-destructive">
@@ -90,5 +90,5 @@ export function ImportErrors({ errors }: ImportErrorsProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

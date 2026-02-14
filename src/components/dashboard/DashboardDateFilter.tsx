@@ -20,7 +20,11 @@ const presets: Array<{ label: string; value: PresetRange }> = [
   { label: "Last 3 months", value: "LAST_3_MONTHS" },
 ];
 
-export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardDateFilterProps) {
+export function DashboardDateFilter({
+  startDate,
+  endDate,
+  onChange,
+}: DashboardDateFilterProps) {
   const activePreset = useMemo<PresetRange>(() => {
     if (!startDate || !endDate) {
       return "THIS_MONTH";
@@ -33,19 +37,28 @@ export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardD
     const thisMonthStart = startOfMonth(now);
     const thisMonthEnd = endOfMonth(now);
 
-    if (start.getTime() === thisMonthStart.getTime() && end.getTime() === thisMonthEnd.getTime()) {
+    if (
+      start.getTime() === thisMonthStart.getTime() &&
+      end.getTime() === thisMonthEnd.getTime()
+    ) {
       return "THIS_MONTH";
     }
 
     const lastMonthStart = startOfMonth(subMonths(now, 1));
     const lastMonthEnd = endOfMonth(subMonths(now, 1));
 
-    if (start.getTime() === lastMonthStart.getTime() && end.getTime() === lastMonthEnd.getTime()) {
+    if (
+      start.getTime() === lastMonthStart.getTime() &&
+      end.getTime() === lastMonthEnd.getTime()
+    ) {
       return "LAST_MONTH";
     }
 
     const lastThreeStart = startOfMonth(subMonths(now, 2));
-    if (start.getTime() === lastThreeStart.getTime() && end.getTime() === thisMonthEnd.getTime()) {
+    if (
+      start.getTime() === lastThreeStart.getTime() &&
+      end.getTime() === thisMonthEnd.getTime()
+    ) {
       return "LAST_3_MONTHS";
     }
 
@@ -57,18 +70,27 @@ export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardD
 
     switch (preset) {
       case "THIS_MONTH":
-        onChange({ startDate: format(startOfMonth(now), "yyyy-MM-dd"), endDate: format(endOfMonth(now), "yyyy-MM-dd") });
+        onChange({
+          startDate: format(startOfMonth(now), "yyyy-MM-dd"),
+          endDate: format(endOfMonth(now), "yyyy-MM-dd"),
+        });
         break;
       case "LAST_MONTH": {
         const start = startOfMonth(subMonths(now, 1));
         const end = endOfMonth(subMonths(now, 1));
-        onChange({ startDate: format(start, "yyyy-MM-dd"), endDate: format(end, "yyyy-MM-dd") });
+        onChange({
+          startDate: format(start, "yyyy-MM-dd"),
+          endDate: format(end, "yyyy-MM-dd"),
+        });
         break;
       }
       case "LAST_3_MONTHS": {
         const start = startOfMonth(subMonths(now, 2));
         const end = endOfMonth(now);
-        onChange({ startDate: format(start, "yyyy-MM-dd"), endDate: format(end, "yyyy-MM-dd") });
+        onChange({
+          startDate: format(start, "yyyy-MM-dd"),
+          endDate: format(end, "yyyy-MM-dd"),
+        });
         break;
       }
       default:
@@ -102,7 +124,8 @@ export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardD
             onChange={(event) =>
               onChange({
                 startDate: event.target.value,
-                endDate: endDate ?? format(endOfMonth(new Date()), "yyyy-MM-dd"),
+                endDate:
+                  endDate ?? format(endOfMonth(new Date()), "yyyy-MM-dd"),
               })
             }
           />
@@ -117,7 +140,8 @@ export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardD
             value={endDate ?? ""}
             onChange={(event) =>
               onChange({
-                startDate: startDate ?? format(startOfMonth(new Date()), "yyyy-MM-dd"),
+                startDate:
+                  startDate ?? format(startOfMonth(new Date()), "yyyy-MM-dd"),
                 endDate: event.target.value,
               })
             }
@@ -127,4 +151,3 @@ export function DashboardDateFilter({ startDate, endDate, onChange }: DashboardD
     </div>
   );
 }
-

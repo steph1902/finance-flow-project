@@ -3,11 +3,11 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 /**
  * CurrentUser decorator
  * Extracts the current user from the request object
- * 
+ *
  * @example
  * @Get('profile')
  * getProfile(@CurrentUser() user: JwtPayload) { ... }
- * 
+ *
  * @example
  * @Get('profile')
  * getProfile(@CurrentUser('id') userId: string) { ... }

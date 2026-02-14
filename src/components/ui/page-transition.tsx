@@ -37,7 +37,10 @@ const transitionVariants = {
   },
 };
 
-export function PageTransition({ children, mode = "fade" }: PageTransitionProps) {
+export function PageTransition({
+  children,
+  mode = "fade",
+}: PageTransitionProps) {
   const pathname = usePathname();
   const variant = transitionVariants[mode];
 

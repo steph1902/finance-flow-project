@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TargetIcon } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { TargetIcon } from "lucide-react";
 
 interface GoalSetupStepProps {
   onNext: (data: GoalData | null) => void;
@@ -21,27 +27,35 @@ export interface GoalData {
   description?: string;
 }
 
-export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProps) {
+export function GoalSetupStep({
+  onNext,
+  onBack,
+  initialData,
+}: GoalSetupStepProps) {
   const [skipGoal, setSkipGoal] = useState(false);
   const [formData, setFormData] = useState<GoalData>(
     initialData || {
-      name: '',
+      name: "",
       targetAmount: 0,
-      targetDate: '',
-      description: '',
-    }
+      targetDate: "",
+      description: "",
+    },
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (skipGoal) {
       onNext(null);
-    } else if (formData.name.trim() && formData.targetAmount > 0 && formData.targetDate) {
+    } else if (
+      formData.name.trim() &&
+      formData.targetAmount > 0 &&
+      formData.targetDate
+    ) {
       onNext(formData);
     }
   };
 
-  const minDate = new Date().toISOString().split('T')[0];
+  const minDate = new Date().toISOString().split("T")[0];
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -68,7 +82,9 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
                   id="goal-name"
                   placeholder="e.g., Emergency Fund, Vacation, New Car"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required={!skipGoal}
                 />
               </div>
@@ -76,7 +92,9 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
               <div className="space-y-2">
                 <Label htmlFor="target-amount">Target Amount *</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                  <span className="absolute left-3 top-2.5 text-muted-foreground">
+                    $
+                  </span>
                   <Input
                     id="target-amount"
                     type="number"
@@ -84,9 +102,12 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
                     step="0.01"
                     placeholder="5000.00"
                     className="pl-7"
-                    value={formData.targetAmount || ''}
+                    value={formData.targetAmount || ""}
                     onChange={(e) =>
-                      setFormData({ ...formData, targetAmount: parseFloat(e.target.value) || 0 })
+                      setFormData({
+                        ...formData,
+                        targetAmount: parseFloat(e.target.value) || 0,
+                      })
                     }
                     required={!skipGoal}
                   />
@@ -100,7 +121,9 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
                   type="date"
                   min={minDate}
                   value={formData.targetDate}
-                  onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, targetDate: e.target.value })
+                  }
                   required={!skipGoal}
                 />
               </div>
@@ -111,7 +134,9 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
                   id="description"
                   placeholder="Why is this goal important to you?"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   rows={3}
                 />
               </div>
@@ -136,7 +161,10 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
               onChange={(e) => setSkipGoal(e.target.checked)}
               className="rounded border-gray-300"
             />
-            <Label htmlFor="skip-goal" className="text-sm font-normal cursor-pointer">
+            <Label
+              htmlFor="skip-goal"
+              className="text-sm font-normal cursor-pointer"
+            >
               Skip for now (I&apos;ll set goals later)
             </Label>
           </div>
@@ -145,9 +173,7 @@ export function GoalSetupStep({ onNext, onBack, initialData }: GoalSetupStepProp
             <Button type="button" variant="outline" onClick={onBack}>
               Back
             </Button>
-            <Button type="submit">
-              {skipGoal ? 'Skip' : 'Continue'}
-            </Button>
+            <Button type="submit">{skipGoal ? "Skip" : "Continue"}</Button>
           </div>
         </form>
       </CardContent>

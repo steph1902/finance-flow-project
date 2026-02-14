@@ -39,7 +39,13 @@ export default function SignupForm() {
   const { toast } = useToast();
 
   const validateForm = () => {
-    const newErrors: { name?: string; email?: string; password?: string; confirmPassword?: string; terms?: string } = {};
+    const newErrors: {
+      name?: string;
+      email?: string;
+      password?: string;
+      confirmPassword?: string;
+      terms?: string;
+    } = {};
 
     if (!name || name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
@@ -118,7 +124,8 @@ export default function SignupForm() {
       }
     } catch (error) {
       toast.error("Signup Failed", {
-        description: error instanceof Error ? error.message : "An error occurred",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
       });
     } finally {
       setIsLoading(false);
@@ -146,14 +153,17 @@ export default function SignupForm() {
               setErrors(restErrors);
             }
           }}
-          onBlur={() => setTouchedFields(prev => ({ ...prev, name: true }))}
-          className={`${errors.name && touchedFields.name
+          onBlur={() => setTouchedFields((prev) => ({ ...prev, name: true }))}
+          className={`${
+            errors.name && touchedFields.name
               ? "border-destructive focus-visible:ring-destructive/20"
               : "focus-visible:ring-[var(--ring)]/20"
-            } shadow-soft transition-all duration-medium`}
+          } shadow-soft transition-all duration-medium`}
         />
         {errors.name && touchedFields.name && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.name}</p>
+          <p className="text-sm text-destructive animate-fade-in">
+            {errors.name}
+          </p>
         )}
       </div>
 
@@ -176,14 +186,17 @@ export default function SignupForm() {
               setErrors(restErrors);
             }
           }}
-          onBlur={() => setTouchedFields(prev => ({ ...prev, email: true }))}
-          className={`${errors.email && touchedFields.email
+          onBlur={() => setTouchedFields((prev) => ({ ...prev, email: true }))}
+          className={`${
+            errors.email && touchedFields.email
               ? "border-destructive focus-visible:ring-destructive/20"
               : "focus-visible:ring-[var(--ring)]/20"
-            } shadow-soft transition-all duration-medium`}
+          } shadow-soft transition-all duration-medium`}
         />
         {errors.email && touchedFields.email && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.email}</p>
+          <p className="text-sm text-destructive animate-fade-in">
+            {errors.email}
+          </p>
         )}
       </div>
 
@@ -206,11 +219,14 @@ export default function SignupForm() {
                 setErrors(restErrors);
               }
             }}
-            onBlur={() => setTouchedFields(prev => ({ ...prev, password: true }))}
-            className={`${errors.password && touchedFields.password
+            onBlur={() =>
+              setTouchedFields((prev) => ({ ...prev, password: true }))
+            }
+            className={`${
+              errors.password && touchedFields.password
                 ? "border-destructive focus-visible:ring-destructive/20"
                 : "focus-visible:ring-[var(--ring)]/20"
-              } shadow-soft pr-10 transition-all duration-medium`}
+            } shadow-soft pr-10 transition-all duration-medium`}
           />
           <button
             type="button"
@@ -226,7 +242,9 @@ export default function SignupForm() {
           </button>
         </div>
         {errors.password && touchedFields.password && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.password}</p>
+          <p className="text-sm text-destructive animate-fade-in">
+            {errors.password}
+          </p>
         )}
 
         {/* Password Strength Meter */}
@@ -235,7 +253,10 @@ export default function SignupForm() {
 
       {/* Confirm Password Field */}
       <div className="grid gap-3">
-        <Label htmlFor="confirmPassword" className="font-medium text-foreground">
+        <Label
+          htmlFor="confirmPassword"
+          className="font-medium text-foreground"
+        >
           Confirm Password
         </Label>
         <div className="relative">
@@ -252,13 +273,16 @@ export default function SignupForm() {
                 setErrors(restErrors);
               }
             }}
-            onBlur={() => setTouchedFields(prev => ({ ...prev, confirmPassword: true }))}
-            className={`${errors.confirmPassword && touchedFields.confirmPassword
+            onBlur={() =>
+              setTouchedFields((prev) => ({ ...prev, confirmPassword: true }))
+            }
+            className={`${
+              errors.confirmPassword && touchedFields.confirmPassword
                 ? "border-destructive focus-visible:ring-destructive/20"
                 : confirmPassword && password === confirmPassword
                   ? "border-success focus-visible:ring-success/20"
                   : "focus-visible:ring-[var(--ring)]/20"
-              } shadow-soft pr-10 transition-all duration-medium`}
+            } shadow-soft pr-10 transition-all duration-medium`}
           />
           <button
             type="button"
@@ -274,7 +298,9 @@ export default function SignupForm() {
           </button>
         </div>
         {errors.confirmPassword && touchedFields.confirmPassword ? (
-          <p className="text-sm text-destructive animate-fade-in">{errors.confirmPassword}</p>
+          <p className="text-sm text-destructive animate-fade-in">
+            {errors.confirmPassword}
+          </p>
         ) : confirmPassword && password === confirmPassword ? (
           <p className="text-sm text-success flex items-center gap-1 animate-fade-in">
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -303,17 +329,25 @@ export default function SignupForm() {
           className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
         >
           I agree to the{" "}
-          <Link href="/terms" className="text-primary hover:underline underline-offset-4">
+          <Link
+            href="/terms"
+            className="text-primary hover:underline underline-offset-4"
+          >
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-primary hover:underline underline-offset-4">
+          <Link
+            href="/privacy"
+            className="text-primary hover:underline underline-offset-4"
+          >
             Privacy Policy
           </Link>
         </label>
       </div>
       {errors.terms && (
-        <p className="text-sm text-destructive animate-fade-in -mt-4">{errors.terms}</p>
+        <p className="text-sm text-destructive animate-fade-in -mt-4">
+          {errors.terms}
+        </p>
       )}
 
       {/* Submit Button */}

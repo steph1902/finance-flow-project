@@ -31,14 +31,14 @@ export const ZenContainer = forwardRef<HTMLDivElement, ZenContainerProps>(
           "w-full px-4 sm:px-6 lg:px-8",
           sizeClasses[size],
           centered && "mx-auto",
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 
 ZenContainer.displayName = "ZenContainer";

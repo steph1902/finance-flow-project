@@ -22,10 +22,7 @@ export class TimeoutInterceptor implements NestInterceptor {
       catchError((err) => {
         if (err instanceof TimeoutError) {
           return throwError(
-            () =>
-              new RequestTimeoutException(
-                'Request timeout - operation took too long',
-              ),
+            () => new RequestTimeoutException('Request timeout - operation took too long'),
           );
         }
         return throwError(() => err);

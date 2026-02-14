@@ -131,11 +131,11 @@ export async function generateInsights({
     // Calculate totals
     const currentTotal = Object.values(currentSpending).reduce(
       (sum: number, amt) => sum + amt,
-      0
+      0,
     );
     const previousTotal = Object.values(previousSpending).reduce(
       (sum: number, amt) => sum + amt,
-      0
+      0,
     );
 
     // Prepare data for AI analysis
@@ -144,8 +144,9 @@ export async function generateInsights({
       currentPeriod: {
         total: currentTotal,
         byCategory: currentSpending,
-        transactionCount: currentTransactions.filter((t) => t.type === "EXPENSE")
-          .length,
+        transactionCount: currentTransactions.filter(
+          (t) => t.type === "EXPENSE",
+        ).length,
         topTransactions: currentTransactions
           .filter((t) => t.type === "EXPENSE")
           .slice(0, 10)
@@ -187,7 +188,9 @@ export async function generateInsights({
       const gemini = await getGeminiClient(userId);
       aiResponse = await gemini.generateContent(prompt);
     } catch (aiError) {
-      logError("AI insights generation failed, using fallback", aiError, { userId });
+      logError("AI insights generation failed, using fallback", aiError, {
+        userId,
+      });
       // Return fallback insights if AI fails
       return generateFallbackInsights(analysisData, budgets);
     }
@@ -216,10 +219,7 @@ export async function generateInsights({
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function generateFallbackInsights(
-  data: any,
-  budgets: any[]
-): Insight[] {
+function generateFallbackInsights(data: any, budgets: any[]): Insight[] {
   /* eslint-enable @typescript-eslint/no-explicit-any */
   const insights: Insight[] = [];
 
@@ -230,9 +230,9 @@ function generateFallbackInsights(
       severity: "warning",
       title: "Spending Increased",
       message: `Your spending is up ${data.comparison.percentageChange.toFixed(
-        1
+        1,
       )}% compared to last ${data.period}. You spent $${data.currentPeriod.total.toFixed(
-        2
+        2,
       )} vs $${data.previousPeriod.total.toFixed(2)} previously.`,
       category: null,
       amount: data.comparison.absoluteChange,
@@ -245,9 +245,9 @@ function generateFallbackInsights(
       severity: "info",
       title: "Spending Decreased",
       message: `Great job! Your spending is down ${Math.abs(
-        data.comparison.percentageChange
+        data.comparison.percentageChange,
       ).toFixed(1)}% compared to last ${data.period}. You saved $${Math.abs(
-        data.comparison.absoluteChange
+        data.comparison.absoluteChange,
       ).toFixed(2)}.`,
       category: null,
       amount: Math.abs(data.comparison.absoluteChange),
@@ -271,9 +271,9 @@ function generateFallbackInsights(
           severity: percentUsed > 100 ? "critical" : "warning",
           title: `${budget.category} Budget Alert`,
           message: `You've used ${percentUsed.toFixed(
-            0
+            0,
           )}% of your ${budget.category} budget ($${spent.toFixed(
-            2
+            2,
           )} of $${budgetAmount.toFixed(2)}).`,
           category: budget.category,
           amount: spent,
@@ -288,7 +288,7 @@ function generateFallbackInsights(
 
   // Top category insight
   const topCategory = Object.entries(data.currentPeriod.byCategory).sort(
-    ([, a], [, b]) => (b as number) - (a as number)
+    ([, a], [, b]) => (b as number) - (a as number),
   )[0];
 
   if (topCategory) {

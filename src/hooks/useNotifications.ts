@@ -3,12 +3,18 @@
  * Uses SWR for data fetching with automatic revalidation
  */
 
-import useSWR from 'swr';
-import { useState } from 'react';
+import useSWR from "swr";
+import { useState } from "react";
 
 export interface Notification {
   id: string;
-  type: 'BUDGET_ALERT' | 'BILL_REMINDER' | 'GOAL_MILESTONE' | 'GOAL_ACHIEVED' | 'SHARED_BUDGET_INVITE' | 'SYSTEM_ANNOUNCEMENT';
+  type:
+    | "BUDGET_ALERT"
+    | "BILL_REMINDER"
+    | "GOAL_MILESTONE"
+    | "GOAL_ACHIEVED"
+    | "SHARED_BUDGET_INVITE"
+    | "SYSTEM_ANNOUNCEMENT";
   title: string;
   message: string;
   priority: number;
@@ -20,14 +26,20 @@ export interface Notification {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useNotifications(unreadOnly = false) {
-  const url = unreadOnly ? '/api/notifications?unreadOnly=true' : '/api/notifications';
+  const url = unreadOnly
+    ? "/api/notifications?unreadOnly=true"
+    : "/api/notifications";
   const { data, error, mutate } = useSWR(url, fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds
   });
 
-  const { data: countData, mutate: mutateCount } = useSWR('/api/notifications/unread-count', fetcher, {
-    refreshInterval: 30000,
-  });
+  const { data: countData, mutate: mutateCount } = useSWR(
+    "/api/notifications/unread-count",
+    fetcher,
+    {
+      refreshInterval: 30000,
+    },
+  );
 
   const [isMarking, setIsMarking] = useState(false);
 
@@ -37,19 +49,19 @@ export function useNotifications(unreadOnly = false) {
   const markAsRead = async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'PATCH',
+        method: "PATCH",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to mark as read');
+        throw new Error(error.error || "Failed to mark as read");
       }
 
       // Revalidate data
       mutate();
       mutateCount();
     } catch (error) {
-      console.error('Failed to mark as read:', error);
+      console.error("Failed to mark as read:", error);
       throw error;
     }
   };
@@ -60,20 +72,20 @@ export function useNotifications(unreadOnly = false) {
   const markAllAsRead = async () => {
     setIsMarking(true);
     try {
-      const response = await fetch('/api/notifications/mark-all-read', {
-        method: 'POST',
+      const response = await fetch("/api/notifications/mark-all-read", {
+        method: "POST",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to mark all as read');
+        throw new Error(error.error || "Failed to mark all as read");
       }
 
       // Revalidate data
       mutate();
       mutateCount();
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      console.error("Failed to mark all as read:", error);
       throw error;
     } finally {
       setIsMarking(false);
@@ -86,19 +98,19 @@ export function useNotifications(unreadOnly = false) {
   const deleteNotification = async (notificationId: string) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to delete notification');
+        throw new Error(error.error || "Failed to delete notification");
       }
 
       // Revalidate data
       mutate();
       mutateCount();
     } catch (error) {
-      console.error('Failed to delete notification:', error);
+      console.error("Failed to delete notification:", error);
       throw error;
     }
   };

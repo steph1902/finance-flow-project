@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { transactionQuerySchema, transactionSchema } from "@/lib/validations";
 import {
-  transactionQuerySchema,
-  transactionSchema,
-} from "@/lib/validations";
-import { createTransaction, getTransactions } from "@/lib/services/transaction-service";
+  createTransaction,
+  getTransactions,
+} from "@/lib/services/transaction-service";
 
 const transactionSelect = {
   id: true,
@@ -22,7 +22,11 @@ const transactionSelect = {
   updatedAt: true,
 } satisfies Prisma.TransactionSelect;
 
-const serializeTransaction = (transaction: Prisma.TransactionGetPayload<{ select: typeof transactionSelect }>) => ({
+const serializeTransaction = (
+  transaction: Prisma.TransactionGetPayload<{
+    select: typeof transactionSelect;
+  }>,
+) => ({
   ...transaction,
   amount: Number(transaction.amount),
   date: transaction.date.toISOString(),
@@ -42,7 +46,10 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
   }
 
   try {
-    const { data: transactions, meta } = await getTransactions(userId, parsed.data);
+    const { data: transactions, meta } = await getTransactions(
+      userId,
+      parsed.data,
+    );
 
     return NextResponse.json({
       data: transactions.map(serializeTransaction),
@@ -51,7 +58,7 @@ export const GET = withApiAuth(async (req: NextRequest, userId) => {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch transactions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });
@@ -80,8 +87,7 @@ export const POST = withApiAuth(async (req: NextRequest, userId) => {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to create transaction" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });
-

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2Icon, SparklesIcon } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2Icon, SparklesIcon } from "lucide-react";
 
 interface CompletionStepProps {
   onComplete: () => void;
@@ -24,7 +24,8 @@ export function CompletionStep({ onComplete, summary }: CompletionStepProps) {
 
       <div>
         <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
-          You&apos;re All Set! <SparklesIcon className="size-8 text-yellow-500" />
+          You&apos;re All Set!{" "}
+          <SparklesIcon className="size-8 text-yellow-500" />
         </h1>
         <p className="text-lg text-muted-foreground">
           Your FinanceFlow account is ready to go
@@ -38,15 +39,21 @@ export function CompletionStep({ onComplete, summary }: CompletionStepProps) {
         <CardContent className="space-y-3 text-left">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Monthly Budgets</span>
-            <span className="font-semibold">{summary.budgetCount} categories</span>
+            <span className="font-semibold">
+              {summary.budgetCount} categories
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Total Budget</span>
-            <span className="font-semibold">${summary.totalBudget.toLocaleString()}</span>
+            <span className="font-semibold">
+              ${summary.totalBudget.toLocaleString()}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Financial Goals</span>
-            <span className="font-semibold">{summary.hasGoal ? '1 goal' : 'None yet'}</span>
+            <span className="font-semibold">
+              {summary.hasGoal ? "1 goal" : "None yet"}
+            </span>
           </div>
         </CardContent>
       </Card>

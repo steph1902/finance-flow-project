@@ -34,18 +34,12 @@ export class BudgetRepository {
       where.AND = [];
       if (startYear && startMonth) {
         where.AND.push({
-          OR: [
-            { year: { gt: startYear } },
-            { year: startYear, month: { gte: startMonth } }
-          ]
+          OR: [{ year: { gt: startYear } }, { year: startYear, month: { gte: startMonth } }],
         });
       }
       if (endYear && endMonth) {
         where.AND.push({
-          OR: [
-            { year: { lt: endYear } },
-            { year: endYear, month: { lte: endMonth } }
-          ]
+          OR: [{ year: { lt: endYear } }, { year: endYear, month: { lte: endMonth } }],
         });
       }
     }
@@ -76,22 +70,22 @@ export class BudgetRepository {
           {
             AND: [
               { year: startYear, month: { gte: startMonth } },
-              { year: startYear, month: { lte: endMonth } }
-            ]
+              { year: startYear, month: { lte: endMonth } },
+            ],
           },
           // Budget ends in the given range
           {
             AND: [
               { year: endYear, month: { gte: startMonth } },
-              { year: endYear, month: { lte: endMonth } }
-            ]
+              { year: endYear, month: { lte: endMonth } },
+            ],
           },
           // Budget spans the entire range
           {
             AND: [
               { year: startYear, month: { lte: startMonth } },
-              { year: endYear, month: { gte: endMonth } }
-            ]
+              { year: endYear, month: { gte: endMonth } },
+            ],
           },
         ],
       },
@@ -122,7 +116,7 @@ export class BudgetRepository {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
-    
+
     // Find budgets from previous month with rollover enabled
     let prevMonth = currentMonth - 1;
     let prevYear = currentYear;

@@ -1,48 +1,49 @@
-"use client"
+"use client";
 
-import { ExportDialog } from "./ExportDialog"
-import { Button } from "@/components/ui/button"
-import { DownloadIcon } from "lucide-react"
+import { ExportDialog } from "./ExportDialog";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon } from "lucide-react";
 
 export function ExportSection() {
   const handleExport = async (options: {
-    startDate?: string
-    endDate?: string
-    category?: string
-    format: "csv" | "json"
+    startDate?: string;
+    endDate?: string;
+    category?: string;
+    format: "csv" | "json";
   }) => {
     try {
-      let url = ""
-      
+      let url = "";
+
       if (options.format === "json") {
-        url = "/api/import-export/export-all"
+        url = "/api/import-export/export-all";
       } else {
-        const params = new URLSearchParams()
-        if (options.startDate) params.append("startDate", options.startDate)
-        if (options.endDate) params.append("endDate", options.endDate)
-        if (options.category) params.append("category", options.category)
-        url = `/api/import-export/export?${params.toString()}`
+        const params = new URLSearchParams();
+        if (options.startDate) params.append("startDate", options.startDate);
+        if (options.endDate) params.append("endDate", options.endDate);
+        if (options.category) params.append("category", options.category);
+        url = `/api/import-export/export?${params.toString()}`;
       }
 
-      const response = await fetch(url)
-      if (!response.ok) throw new Error("Export failed")
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Export failed");
 
-      const blob = await response.blob()
-      const downloadUrl = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = downloadUrl
-      a.download = options.format === "json"
-        ? `financeflow-data-${new Date().toISOString().split("T")[0]}.json`
-        : `transactions-${new Date().toISOString().split("T")[0]}.csv`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(downloadUrl)
-      document.body.removeChild(a)
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download =
+        options.format === "json"
+          ? `financeflow-data-${new Date().toISOString().split("T")[0]}.json`
+          : `transactions-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error("Export failed:", error)
-      alert("Export failed. Please try again.")
+      console.error("Export failed:", error);
+      alert("Export failed. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -67,16 +68,12 @@ export function ExportSection() {
           <p className="text-sm text-muted-foreground mb-4">
             Download all your data including transactions, budgets, and goals
           </p>
-          <Button
-            onClick={() =>
-              handleExport({ format: "json" })
-            }
-          >
+          <Button onClick={() => handleExport({ format: "json" })}>
             <DownloadIcon />
             Export All Data
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

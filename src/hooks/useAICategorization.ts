@@ -62,7 +62,8 @@ export function useAICategorization({
       const data: CategorySuggestion = await response.json();
       setSuggestion(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
       toast.error(`AI categorization failed: ${errorMessage}`);
       logError("AI categorization error", err, { description, amount, type });

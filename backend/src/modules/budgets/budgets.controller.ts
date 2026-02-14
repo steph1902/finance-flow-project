@@ -15,11 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { BudgetsService } from './budgets.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import {
-  CreateBudgetDto,
-  UpdateBudgetDto,
-  BudgetQueryDto,
-} from './dto';
+import { CreateBudgetDto, UpdateBudgetDto, BudgetQueryDto } from './dto';
 import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 
 @ApiTags('Budgets')
@@ -27,7 +23,7 @@ import { BudgetResponseDto, BudgetSummaryDto } from './dto/budget-response.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('budgets')
 export class BudgetsController {
-  constructor(private readonly budgetsService: BudgetsService) { }
+  constructor(private readonly budgetsService: BudgetsService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new budget' })
@@ -84,11 +80,7 @@ export class BudgetsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete budget' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
-  async remove(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<void> {
+  async remove(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<void> {
     return this.budgetsService.remove(userId, id);
   }
 }
-

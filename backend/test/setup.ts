@@ -9,7 +9,8 @@ Object.defineProperty(process.env, 'NODE_ENV', {
   configurable: true,
 });
 
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/financeflow_test';
+process.env.DATABASE_URL =
+  process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/financeflow_test';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
 process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-key-for-testing-only';
 process.env.REDIS_HOST = 'localhost';
@@ -21,5 +22,5 @@ jest.setTimeout(30000);
 // Global test teardown
 afterAll(async () => {
   // Allow time for async cleanup
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 });

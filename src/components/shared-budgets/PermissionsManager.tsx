@@ -1,14 +1,26 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ShieldIcon, CrownIcon, Edit2Icon, EyeIcon } from "lucide-react"
-import { type BudgetPermission } from "@/hooks/useSharedBudgets"
-import { updateMemberPermissions } from "@/hooks/useSharedBudgets"
-import { toast } from "sonner"
-import { mutate } from "swr"
-import { useState } from "react"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ShieldIcon, CrownIcon, Edit2Icon, EyeIcon } from "lucide-react";
+import { type BudgetPermission } from "@/hooks/useSharedBudgets";
+import { updateMemberPermissions } from "@/hooks/useSharedBudgets";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { useState } from "react";
 
 interface PermissionsManagerProps {
   budgetId: string;
@@ -21,31 +33,39 @@ const ROLE_ICONS = {
   ADMIN: CrownIcon,
   CONTRIBUTOR: Edit2Icon,
   VIEWER: EyeIcon,
-}
+};
 
 const ROLE_COLORS = {
-  ADMIN: 'default',
-  CONTRIBUTOR: 'secondary',
-  VIEWER: 'outline',
+  ADMIN: "default",
+  CONTRIBUTOR: "secondary",
+  VIEWER: "outline",
 } as const;
 
-export function PermissionsManager({ budgetId, members, currentUserId, isOwner }: PermissionsManagerProps) {
-  const [updating, setUpdating] = useState<string | null>(null)
+export function PermissionsManager({
+  budgetId,
+  members,
+  currentUserId,
+  isOwner,
+}: PermissionsManagerProps) {
+  const [updating, setUpdating] = useState<string | null>(null);
 
-  const handleRoleChange = async (memberId: string, newRole: 'ADMIN' | 'CONTRIBUTOR' | 'VIEWER') => {
-    setUpdating(memberId)
+  const handleRoleChange = async (
+    memberId: string,
+    newRole: "ADMIN" | "CONTRIBUTOR" | "VIEWER",
+  ) => {
+    setUpdating(memberId);
     try {
-      await updateMemberPermissions(budgetId, memberId, newRole)
-      toast.success("Permissions updated")
-      mutate(`/api/shared-budgets/${budgetId}`)
-      mutate('/api/shared-budgets')
+      await updateMemberPermissions(budgetId, memberId, newRole);
+      toast.success("Permissions updated");
+      mutate(`/api/shared-budgets/${budgetId}`);
+      mutate("/api/shared-budgets");
     } catch (error) {
-      console.error("Failed to update permissions:", error)
-      toast.error("Failed to update permissions")
+      console.error("Failed to update permissions:", error);
+      toast.error("Failed to update permissions");
     } finally {
-      setUpdating(null)
+      setUpdating(null);
     }
-  }
+  };
 
   return (
     <Card>
@@ -60,9 +80,9 @@ export function PermissionsManager({ budgetId, members, currentUserId, isOwner }
       </CardHeader>
       <CardContent className="space-y-3">
         {members.map((member) => {
-          const RoleIcon = ROLE_ICONS[member.role]
-          const isCurrentUser = member.userId === currentUserId
-          const canEdit = isOwner && !isCurrentUser
+          const RoleIcon = ROLE_ICONS[member.role];
+          const isCurrentUser = member.userId === currentUserId;
+          const canEdit = isOwner && !isCurrentUser;
 
           return (
             <div
@@ -77,17 +97,23 @@ export function PermissionsManager({ budgetId, members, currentUserId, isOwner }
                   <p className="font-medium">
                     {member.user.name || member.user.email}
                     {isCurrentUser && (
-                      <span className="text-xs text-muted-foreground ml-2">(You)</span>
+                      <span className="text-xs text-muted-foreground ml-2">
+                        (You)
+                      </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">{member.user.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {member.user.email}
+                  </p>
                 </div>
               </div>
 
               {canEdit ? (
                 <Select
                   value={member.role}
-                  onValueChange={(value) => handleRoleChange(member.id, value as typeof member.role)}
+                  onValueChange={(value) =>
+                    handleRoleChange(member.id, value as typeof member.role)
+                  }
                   disabled={updating === member.id}
                 >
                   <SelectTrigger className="w-32">
@@ -100,13 +126,16 @@ export function PermissionsManager({ budgetId, members, currentUserId, isOwner }
                   </SelectContent>
                 </Select>
               ) : (
-                <Badge variant={ROLE_COLORS[member.role]} className="flex items-center gap-1">
+                <Badge
+                  variant={ROLE_COLORS[member.role]}
+                  className="flex items-center gap-1"
+                >
                   <RoleIcon className="size-3" />
                   {member.role}
                 </Badge>
               )}
             </div>
-          )
+          );
         })}
 
         {members.length === 0 && (
@@ -116,5 +145,5 @@ export function PermissionsManager({ budgetId, members, currentUserId, isOwner }
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

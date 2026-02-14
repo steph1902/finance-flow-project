@@ -157,9 +157,7 @@ describe('Goals (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/goals')
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).get('/goals').expect(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -192,9 +190,7 @@ describe('Goals (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .get(`/goals/${goalId}`)
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).get(`/goals/${goalId}`).expect(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -345,9 +341,7 @@ describe('Goals (e2e)', () => {
     });
 
     it('should fail without authentication', async () => {
-      await request(app.getHttpServer())
-        .delete(`/goals/${goalId}`)
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).delete(`/goals/${goalId}`).expect(HttpStatus.UNAUTHORIZED);
     });
   });
 

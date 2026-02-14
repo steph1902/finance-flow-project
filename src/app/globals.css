@@ -11,43 +11,43 @@
       Sumi: #1A1A1A (Ink Black / Sumi)
     */
 
-    --background: #F9F7F2;
-    --foreground: #1A1A1A;
+    --background: #f9f7f2;
+    --foreground: #1a1a1a;
 
-    --card: #FFFFFF;
-    --card-foreground: #1A1A1A;
+    --card: #ffffff;
+    --card-foreground: #1a1a1a;
 
-    --popover: #FFFFFF;
-    --popover-foreground: #1A1A1A;
+    --popover: #ffffff;
+    --popover-foreground: #1a1a1a;
 
     /* Warm apricot accent */
-    --primary: #F4B979;
-    --primary-foreground: #1A1A1A;
+    --primary: #f4b979;
+    --primary-foreground: #1a1a1a;
 
-    --secondary: #F5F2EB;
-    --secondary-foreground: #1A1A1A;
+    --secondary: #f5f2eb;
+    --secondary-foreground: #1a1a1a;
 
-    --muted: #F5F2EB;
+    --muted: #f5f2eb;
     --muted-foreground: #666666;
 
-    --accent: #EBE5DA;
-    --accent-foreground: #1A1A1A;
+    --accent: #ebe5da;
+    --accent-foreground: #1a1a1a;
 
-    --destructive: #DC2626;
-    --destructive-foreground: #FFFFFF;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
 
-    --border: #E5E2DC;
-    --input: #E5E2DC;
-    --ring: #F4B979;
+    --border: #e5e2dc;
+    --input: #e5e2dc;
+    --ring: #f4b979;
 
     --radius: 0.75rem;
 
     /* Chart Colors - Warm Earthy */
-    --chart-1: #F4B979;
-    --chart-2: #E5AB6D;
-    --chart-3: #D69B5C;
-    --chart-4: #C78B4B;
-    --chart-5: #B87B3A;
+    --chart-1: #f4b979;
+    --chart-2: #e5ab6d;
+    --chart-3: #d69b5c;
+    --chart-4: #c78b4b;
+    --chart-5: #b87b3a;
   }
 
   * {
@@ -57,7 +57,9 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 
   html {
@@ -100,7 +102,7 @@
 
   /* Zen decorative patterns */
   .zen-dots {
-    background-image: radial-gradient(circle, #E5E2DC 1px, transparent 1px);
+    background-image: radial-gradient(circle, #e5e2dc 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
@@ -119,7 +121,9 @@
 
   /* Hover lift effect */
   .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   .hover-lift:hover {
@@ -135,19 +139,19 @@
   }
 
   .underline-apricot::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -4px;
     left: 0;
     right: 0;
     height: 3px;
-    background: #F4B979;
+    background: #f4b979;
     border-radius: 2px;
   }
 
   /* Gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, #1A1A1A, #666666);
+    background: linear-gradient(135deg, #1a1a1a, #666666);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

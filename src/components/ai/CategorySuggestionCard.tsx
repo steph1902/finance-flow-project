@@ -2,7 +2,14 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CheckCircle2, Sparkles, XCircle } from "lucide-react";
 import type { CategorySuggestion } from "@/types";
 
@@ -28,7 +35,11 @@ export function CategorySuggestionCard({
     return "text-orange-600";
   };
 
-  const getConfidenceVariant = (): "default" | "secondary" | "destructive" | "outline" => {
+  const getConfidenceVariant = ():
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline" => {
     if (suggestion.confidence >= 0.8) return "default";
     if (suggestion.confidence >= 0.6) return "secondary";
     return "outline";
@@ -42,7 +53,10 @@ export function CategorySuggestionCard({
             <Sparkles className="h-5 w-5 text-primary" />
             AI Suggestion
           </CardTitle>
-          <Badge variant={getConfidenceVariant()} className={getConfidenceColor()}>
+          <Badge
+            variant={getConfidenceVariant()}
+            className={getConfidenceColor()}
+          >
             {confidencePercent}% confident
           </Badge>
         </div>
@@ -59,13 +73,17 @@ export function CategorySuggestionCard({
 
         {suggestion.subcategory && (
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Subcategory</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Subcategory
+            </p>
             <p className="text-lg">{suggestion.subcategory}</p>
           </div>
         )}
 
         <div className="rounded-lg bg-muted/50 p-3">
-          <p className="text-sm font-medium text-muted-foreground mb-1">Why this category?</p>
+          <p className="text-sm font-medium text-muted-foreground mb-1">
+            Why this category?
+          </p>
           <p className="text-sm">{suggestion.reasoning}</p>
         </div>
       </CardContent>

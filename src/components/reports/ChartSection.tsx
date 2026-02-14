@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   LineChart,
   Line,
@@ -14,8 +20,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts"
-import { formatCurrency } from "@/lib/formatters"
+} from "recharts";
+import { formatCurrency } from "@/lib/formatters";
 
 interface ChartData {
   date: string;
@@ -27,7 +33,7 @@ interface ChartData {
 interface ChartSectionProps {
   title: string;
   description?: string;
-  type: 'line' | 'area' | 'bar';
+  type: "line" | "area" | "bar";
   data: ChartData[];
   showIncome?: boolean;
   showExpenses?: boolean;
@@ -52,13 +58,18 @@ export function ChartSection({
     };
 
     switch (type) {
-      case 'line':
+      case "line":
         return (
           <LineChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              tickFormatter={(value) =>
+                new Date(value).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              }
             />
             <YAxis tickFormatter={(value) => `$${value}`} />
             <Tooltip
@@ -71,7 +82,7 @@ export function ChartSection({
                 dataKey="income"
                 stroke="#10B981"
                 strokeWidth={2}
-                dot={{ fill: '#10B981' }}
+                dot={{ fill: "#10B981" }}
                 name="Income"
               />
             )}
@@ -81,7 +92,7 @@ export function ChartSection({
                 dataKey="expenses"
                 stroke="#EF4444"
                 strokeWidth={2}
-                dot={{ fill: '#EF4444' }}
+                dot={{ fill: "#EF4444" }}
                 name="Expenses"
               />
             )}
@@ -91,20 +102,25 @@ export function ChartSection({
                 dataKey="balance"
                 stroke="#4F46E5"
                 strokeWidth={2}
-                dot={{ fill: '#4F46E5' }}
+                dot={{ fill: "#4F46E5" }}
                 name="Balance"
               />
             )}
           </LineChart>
         );
 
-      case 'area':
+      case "area":
         return (
           <AreaChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              tickFormatter={(value) =>
+                new Date(value).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              }
             />
             <YAxis tickFormatter={(value) => `$${value}`} />
             <Tooltip
@@ -147,22 +163,33 @@ export function ChartSection({
           </AreaChart>
         );
 
-      case 'bar':
+      case "bar":
         return (
           <BarChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              tickFormatter={(value) =>
+                new Date(value).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              }
             />
             <YAxis tickFormatter={(value) => `$${value}`} />
             <Tooltip
               formatter={(value: number) => formatCurrency(value)}
               labelFormatter={(label) => new Date(label).toLocaleDateString()}
             />
-            {showIncome && <Bar dataKey="income" fill="#10B981" name="Income" />}
-            {showExpenses && <Bar dataKey="expenses" fill="#EF4444" name="Expenses" />}
-            {showBalance && <Bar dataKey="balance" fill="#4F46E5" name="Balance" />}
+            {showIncome && (
+              <Bar dataKey="income" fill="#10B981" name="Income" />
+            )}
+            {showExpenses && (
+              <Bar dataKey="expenses" fill="#EF4444" name="Expenses" />
+            )}
+            {showBalance && (
+              <Bar dataKey="balance" fill="#4F46E5" name="Balance" />
+            )}
           </BarChart>
         );
     }

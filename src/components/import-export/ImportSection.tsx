@@ -1,90 +1,90 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { FileUpload } from "./FileUpload"
-import { ImportPreview } from "./ImportPreview"
-import { ImportErrors } from "./ImportErrors"
-import { Button } from "@/components/ui/button"
-import { CheckCircle2Icon, UploadIcon } from "lucide-react"
+import { useState } from "react";
+import { FileUpload } from "./FileUpload";
+import { ImportPreview } from "./ImportPreview";
+import { ImportErrors } from "./ImportErrors";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2Icon, UploadIcon } from "lucide-react";
 
 interface ImportResult {
-  total: number
-  successful: number
-  failed: number
+  total: number;
+  successful: number;
+  failed: number;
   errors: {
-    row: number
-    error: string
-    data: Record<string, unknown>
-  }[]
+    row: number;
+    error: string;
+    data: Record<string, unknown>;
+  }[];
 }
 
 interface PreviewTransaction {
-  date: string
-  amount: string
-  type: string
-  category: string
-  description?: string
+  date: string;
+  amount: string;
+  type: string;
+  category: string;
+  description?: string;
 }
 
 interface ImportSectionProps {
-  onDownloadTemplate: () => void
+  onDownloadTemplate: () => void;
 }
 
 export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
-  const [file, setFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [result, setResult] = useState<ImportResult | null>(null)
-  const [preview, setPreview] = useState<PreviewTransaction[]>([])
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [result, setResult] = useState<ImportResult | null>(null);
+  const [preview, setPreview] = useState<PreviewTransaction[]>([]);
 
   const handleFileSelect = async (selectedFile: File) => {
-    setFile(selectedFile)
-    setResult(null)
-    setPreview([])
+    setFile(selectedFile);
+    setResult(null);
+    setPreview([]);
 
     // Parse CSV for preview (first 10 rows)
-    const text = await selectedFile.text()
-    const lines = text.trim().split("\n")
+    const text = await selectedFile.text();
+    const lines = text.trim().split("\n");
     if (lines.length > 1) {
       const previewData = lines.slice(1, 11).map((line) => {
-        const values = line.split(",")
+        const values = line.split(",");
         return {
           date: values[0]?.trim() || "",
           amount: values[1]?.trim() || "",
           type: values[2]?.trim() || "",
           category: values[3]?.trim() || "",
           description: values[4]?.trim() || "",
-        }
-      })
-      setPreview(previewData)
+        };
+      });
+      setPreview(previewData);
     }
-  }
+  };
 
   const handleUpload = async () => {
-    if (!file) return
+    if (!file) return;
 
-    setIsUploading(true)
+    setIsUploading(true);
     try {
-      const formData = new FormData()
-      formData.append("file", file)
+      const formData = new FormData();
+      formData.append("file", file);
 
       const response = await fetch("/api/import-export/import", {
         method: "POST",
         body: formData,
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Upload failed")
+        throw new Error("Upload failed");
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (error) {
-      console.error("Import failed:", error)
-      alert("Import failed. Please check your file and try again.")
+      console.error("Import failed:", error);
+      alert("Import failed. Please check your file and try again.");
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -100,10 +100,7 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
         </Button>
       </div>
 
-      <FileUpload
-        onFileSelect={handleFileSelect}
-        disabled={isUploading}
-      />
+      <FileUpload onFileSelect={handleFileSelect} disabled={isUploading} />
 
       {preview.length > 0 && !result && (
         <>
@@ -115,7 +112,9 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
             size="lg"
           >
             <UploadIcon />
-            {isUploading ? "Importing..." : `Import ${preview.length}+ Transactions`}
+            {isUploading
+              ? "Importing..."
+              : `Import ${preview.length}+ Transactions`}
           </Button>
         </>
       )}
@@ -131,7 +130,8 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
                   Import Complete
                 </h3>
                 <p className="text-sm text-green-700">
-                  {result.successful} of {result.total} transactions imported successfully
+                  {result.successful} of {result.total} transactions imported
+                  successfully
                   {result.failed > 0 && ` (${result.failed} failed)`}
                 </p>
               </div>
@@ -139,16 +139,14 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
           </div>
 
           {/* Errors */}
-          {result.errors.length > 0 && (
-            <ImportErrors errors={result.errors} />
-          )}
+          {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
 
           <Button
             variant="outline"
             onClick={() => {
-              setFile(null)
-              setResult(null)
-              setPreview([])
+              setFile(null);
+              setResult(null);
+              setPreview([]);
             }}
             className="w-full"
           >
@@ -157,5 +155,5 @@ export function ImportSection({ onDownloadTemplate }: ImportSectionProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

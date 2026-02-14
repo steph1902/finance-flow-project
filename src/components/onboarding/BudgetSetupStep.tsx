@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PiggyBankIcon, PlusIcon, TrashIcon } from "lucide-react"
-import { EXPENSE_CATEGORIES } from "@/constants/categories"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PiggyBankIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { EXPENSE_CATEGORIES } from "@/constants/categories";
 
 interface BudgetSetupStepProps {
   onNext: (data: BudgetData[]) => void;
@@ -19,21 +25,25 @@ export interface BudgetData {
   amount: number;
 }
 
-export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStepProps) {
+export function BudgetSetupStep({
+  onNext,
+  onBack,
+  initialData,
+}: BudgetSetupStepProps) {
   const [budgets, setBudgets] = useState<BudgetData[]>(
     initialData?.length
       ? initialData
       : [
-        { category: 'Food', amount: 500 },
-        { category: 'Transportation', amount: 200 },
-        { category: 'Entertainment', amount: 150 },
-      ]
+          { category: "Food", amount: 500 },
+          { category: "Transportation", amount: 200 },
+          { category: "Entertainment", amount: 150 },
+        ],
   );
 
   const handleAddBudget = () => {
     const usedCategories = budgets.map((b) => b.category);
     const availableCategory = EXPENSE_CATEGORIES.find(
-      (cat) => !usedCategories.includes(cat)
+      (cat) => !usedCategories.includes(cat),
     );
 
     if (availableCategory) {
@@ -45,7 +55,11 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
     setBudgets(budgets.filter((_, i) => i !== index));
   };
 
-  const handleUpdateBudget = (index: number, field: keyof BudgetData, value: string | number) => {
+  const handleUpdateBudget = (
+    index: number,
+    field: keyof BudgetData,
+    value: string | number,
+  ) => {
     const updated = [...budgets];
     const current = updated[index];
     if (current) {
@@ -61,7 +75,7 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
   };
 
   const availableCategories = EXPENSE_CATEGORIES.filter(
-    (cat) => !budgets.some((b) => b.category === cat)
+    (cat) => !budgets.some((b) => b.category === cat),
   );
 
   return (
@@ -74,7 +88,8 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
           <div>
             <CardTitle>Set Your Budgets</CardTitle>
             <CardDescription>
-              Create monthly budgets for different categories (you can always adjust these later)
+              Create monthly budgets for different categories (you can always
+              adjust these later)
             </CardDescription>
           </div>
         </div>
@@ -90,7 +105,9 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
                     id={`category-${index}`}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     value={budget.category}
-                    onChange={(e) => handleUpdateBudget(index, 'category', e.target.value)}
+                    onChange={(e) =>
+                      handleUpdateBudget(index, "category", e.target.value)
+                    }
                   >
                     <option value={budget.category}>{budget.category}</option>
                     {availableCategories.map((cat) => (
@@ -110,7 +127,11 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
                     placeholder="0.00"
                     value={budget.amount}
                     onChange={(e) =>
-                      handleUpdateBudget(index, 'amount', parseFloat(e.target.value) || 0)
+                      handleUpdateBudget(
+                        index,
+                        "amount",
+                        parseFloat(e.target.value) || 0,
+                      )
                     }
                   />
                 </div>
@@ -150,9 +171,7 @@ export function BudgetSetupStep({ onNext, onBack, initialData }: BudgetSetupStep
             <Button type="button" variant="outline" onClick={onBack}>
               Back
             </Button>
-            <Button type="submit">
-              Continue
-            </Button>
+            <Button type="submit">Continue</Button>
           </div>
         </form>
       </CardContent>

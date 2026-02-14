@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { FileTextIcon } from "lucide-react"
-import { useReports } from "@/hooks/useReports"
-import { ReportCard } from "./ReportCard"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { FileTextIcon } from "lucide-react";
+import { useReports } from "@/hooks/useReports";
+import { ReportCard } from "./ReportCard";
 
 export function ReportList() {
-  const { reports, isLoading } = useReports(20)
+  const { reports, isLoading } = useReports(20);
 
   if (isLoading) {
     return (
@@ -16,7 +21,7 @@ export function ReportList() {
           <CardDescription>Loading...</CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   if (reports.length === 0) {
@@ -28,11 +33,12 @@ export function ReportList() {
             Your Reports
           </CardTitle>
           <CardDescription>
-            You haven&apos;t generated any reports yet. Create your first report above.
+            You haven&apos;t generated any reports yet. Create your first report
+            above.
           </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
@@ -40,15 +46,15 @@ export function ReportList() {
       <div>
         <h2 className="type-h3 mb-2">Your Reports</h2>
         <p className="type-small text-muted-foreground">
-          {reports.length} report{reports.length === 1 ? '' : 's'} generated
+          {reports.length} report{reports.length === 1 ? "" : "s"} generated
         </p>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {reports.map((report) => (
           <ReportCard key={report.id} report={report} />
         ))}
       </div>
     </div>
-  )
+  );
 }
