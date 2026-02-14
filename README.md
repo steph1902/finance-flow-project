@@ -1,4 +1,3 @@
-
 # FinanceFlow: Enterprise-Grade AI Financial Intelligence Platform
 
 ![Next.js 16](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)
@@ -9,21 +8,139 @@
 
 > **A production-ready financial management system with an Agentic RAG pipeline, processing transactions with 99.9% categorization accuracy at scale.**
 
----
-
-## 2. The Problem Statement
-
-**The Pain Point:**
-Personal finance tools (Mint, YNAB, manual spreadsheets) fail at scale. They rely on rigid, rule-based categorization that breaks when merchant names change (e.g., "UBER *TRIP" vs "UBER EATS"). For users with thousands of transactions, manual reconciliation is impossible, and existing automated tools lack the context to distinguish between a "Business Meal" and a "Date Night."
-
-**The Solution:**
-FinanceFlow replaces static rules with **context-aware AI agents**. By utilizing Large Language Models (LLMs) with a 1M token context window, the system understands spending *patterns*, not just keywords. It doesn't just categorize; it identifies anomalies, predicts cash flow, and audits receipts via OCR, all in real-time.
+FinanceFlow replaces static rules with **context-aware AI agents**. Utilizing Large Language Models (LLMs) with a 1M token context window, it understands spending *patterns*, identifies anomalies, predicts cash flow, and audits receipts via OCR in real-time.
 
 ---
 
-## 3. System Architecture Overview
+## ⚡ Quick Start (Zero to Running in < 2 Minutes)
 
-FinanceFlow employs a **Hybrid Monorepo Architecture**, combining the performance of Next.js for the frontend with the robustness of NestJS for complex backend operations.
+### Prerequisites
+- **Node.js** >= 20.0.0
+- **Docker** (for local PostgreSQL & Redis)
+- **pnpm** (recommended) or npm
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/finance-flow.git
+cd finance-flow
+
+# 2. Install dependencies (Root + Backend)
+npm install
+
+# 3. Configure Environment
+cp .env.example .env
+# Required: Add your DATABASE_URL and GEMINI_API_KEY to .env
+
+# 4. Start Infrastructure (Postgres + Redis)
+docker-compose up -d
+
+# 5. Initialize Database
+npx prisma generate
+npx prisma migrate dev --name init
+
+# 6. Seed Demo Data (Optional)
+npm run db:seed
+
+# 7. Run Development Server
+npm run dev
+```
+
+### Verification
+- **Frontend**: Visit [http://localhost:3000](http://localhost:3000) - You should see the login/dashboard.
+- **Backend API**: Visit [http://localhost:3001/health](http://localhost:3001/health) (if health check enabled).
+
+> **Troubleshooting**: If build fails on `mobile/App.tsx`, ensure `tsconfig.json` excludes the `mobile` directory.
+
+---
+
+## 📚 Table of Contents
+- [Key Features](#-key-features)
+- [Project Structure](#-project-structure-overview)
+- [Available Scripts](#-available-scripts)
+- [Technology Stack](#-technology-stack)
+- [Architecture](#-system-architecture)
+- [Contributing](CONTRIBUTING.md)
+- [License](#-license)
+
+---
+
+## 🌟 Key Features
+
+- **Agentic RAG Pipeline**: Context-aware transaction categorization using Gemini 1.5 Flash.
+- **Receipt OCR**: Instant receipt scanning and data extraction via generic vision models.
+- **Smart Budgeting**: Dynamic budget alerts based on spending velocity and historical patterns.
+- **Anomaly Detection**: AI agents proactively flag unusual spending or subscription price hikes.
+- **Hybrid Architecture**: Next.js 16 (App Router) for frontend + NestJS Microservices for heavy background jobs.
+- **Multi-Tenancy Ready**: Schema designed for shared family budgets and role-based access.
+- **Real-time Sync**: BullMQ + Redis queue system for asynchronous data processing.
+- **Enterprise Security**: NextAuth.js, RBAC, and encrypted sensitive data.
+
+---
+
+## 📂 Project Structure Overview
+
+FinanceFlow follows a **Hybrid Monorepo** structure:
+
+```
+finance-flow/
+├── src/                  # Next.js Frontend & BFF
+│   ├── app/              # App Router Pages & API Routes
+│   ├── components/       # Reusable UI Components (Shadcn/UI)
+│   ├── lib/              # Shared Utilities & Validations
+│   │   ├── ai/           # AI Agents & Orchestrator
+│   │   ├── services/     # Business Logic Layer
+│   │   └── prisma.ts     # DB Connection
+│   └── types/            # TypeScript Definitions
+├── backend/              # NestJS Worker Service
+│   ├── src/
+│   │   ├── modules/      # Feature Modules (OCR, Sync, Reporting)
+│   │   └── main.ts       # Worker Entry Point
+│   └── package.json      # Backend Dependencies
+├── prisma/               # Database Schema & Migrations
+├── public/               # Static Assets
+├── tests/                # Jest Test Suites
+└── docker-compose.yml    # Local Infrastructure
+```
+
+---
+
+## 🛠 Available Scripts
+
+### Development
+- `npm run dev`: Starts the Next.js development server (and implicit backend proxy if configured).
+- `npm run db:seed`: Populates local database with sample users and transactions.
+
+### Building
+- `npm run build`: Builds the Next.js application for production.
+- `npm run postinstall`: Generates Prisma client (automatically run).
+
+### Quality
+- `npm run lint`: Runs ESLint checks.
+- `npm run type-check`: Runs TypeScript compiler check.
+- `npm test`: Runs Jest unit tests.
+- `npm run test:watch`: Runs tests in watch mode.
+
+---
+
+## 💻 Technology Stack
+
+| Component | Technology | Purpose | Version |
+|-----------|------------|---------|---------|
+| **Frontend** | Next.js | React Framework (App Router) | 16.0 |
+| **Backend** | NestJS | Background Workers & Microservices | 10.0 |
+| **Language** | TypeScript | Type Safety | 5.0 |
+| **Database** | PostgreSQL | Relational Data Store | Latest |
+| **ORM** | Prisma | Database Access & Migrations | 6.18 |
+| **AI Model** | Gemini 1.5 Flash | Inference & RAG | Latest |
+| **Queue** | BullMQ / Redis | Async Job Processing | 5.28 |
+| **Auth** | NextAuth.js | Authentication Provider | 4.24 |
+| **Styling** | Tailwind CSS | Utility-first CSS | 4.0 |
+
+---
+
+## 🏗 System Architecture
 
 ```mermaid
 graph TD
@@ -43,190 +160,137 @@ graph TD
     end
 ```
 
--   **Frontend:** Next.js 16 (React 19, Server Components) for sub-second page loads.
--   **BFF (Backend-for-Frontend):** Next.js API Routes handle lightweight, synchronous user interactions (Auth, View Fetching).
--   **Core Backend:** A dedicated **NestJS** microservice handles heavy lifting: OCR processing, RAG pipelines, and background data synchronization.
--   **Database:** PostgreSQL managed via Prisma ORM for type-safe database access.
+### System Context
+
+The system combines a serverless-friendly frontend with a robust backend worker:
+
+1.  **Frontend & BFF (Back-for-Frontend)**: Built with Next.js 16. Handles UI rendering, authentication, and synchronous API requests. Uses Server Actions to interact directly with the database for low-latency operations.
+2.  **Backend Worker**: A standalone NestJS application. Responsibilities include:
+    -   Complex background jobs (mass transaction categorization).
+    -   Scheduled tasks (recurring transaction generation).
+    -   Email notifications (Resend).
+    -   Monitoring agents (Budget Guardian).
+3.  **Database**: PostgreSQL serves as the single source of truth, accessed via Prisma ORM.
+4.  **AI Layer**: Deep integration with Google Gemini 1.5 Flash for Receipt OCR and Transaction Categorization.
+
+### Module Deep Dives
+
+#### 1. Authentication (`src/lib/auth.ts`)
+-   **Responsibility**: Manages user sessions and identity via NextAuth.js v4.
+-   **Strategies**: Credentials (Email/Password), OAuth (Google, GitHub).
+-   **Security**: CSRF protection, encrypted JWTs, HTTP-only cookies.
+
+#### 2. Transaction Management (`src/lib/services/transaction-service.ts`)
+-   **Responsibility**: CRUD operations for financial records.
+-   **Key Features**: Double-entry accounting principles, soft delete support, real-time balance calculation.
+-   **Dependencies**: Prisma Client.
+
+#### 3. AI Orchestrator (`src/lib/ai/`)
+-   **Responsibility**: Manages the lifecycle of autonomous agents.
+-   **Components**: `AgentOrchestrator` (Singleton), `BudgetGuardian` (Spending Monitor), `ReceiptOCRService` (Vision).
+-   **Flow**: Agents run on intervals, observe DB state, generate insights, and take actions (alerts).
+
+### Data Architecture
+
+The system relies on a **PostgreSQL** relational database with **Prisma ORM**.
+
+-   **User-Centric**: Almost all tables have a `userId` foreign key.
+-   **Decimal Precision**: `Decimal(10, 2)` is used for all monetary values to avoid floating-point errors.
+-   **Indexes**: Heavily indexed on `[userId, date]` and `[userId, category]` to optimize dashboard queries.
+-   **Data Lifecycle**: Soft-deletes (`deletedAt`) are used for audit trails. Hard deletes are reserved for GDPR requests.
+
+### Design Decisions
+
+-   **Hybrid Next.js + NestJS**: chosen to combine Next.js's UI excellence with NestJS's robust worker capabilities for cron jobs and queues.
+-   **Direct Gemini Integration**: chosen over abstraction layers for faster iteration on prompt engineering.
+-   **Prisma for Everything**: chosen for superior type safety across the full stack.
 
 ---
 
-## 4. AI Engine Deep-Dive: Why Gemini 1.5 Flash Over Pro?
+## 🔌 API Reference
 
-*Justification for the VPE / CTO:*
+The API is secured via NextAuth.js session cookies.
 
-We chose **Gemini 1.5 Flash** as our primary inference engine. This was a deliberate architectural decision based on the specific nature of financial data.
+### 1. Transactions
+`GET /api/transactions`
+-   **Query Params**: `page`, `limit`, `type` (INCOME/EXPENSE), `category`, `startDate`, `endDate`.
+-   **Response**: `200 OK` with paginated list.
 
-| Metric | Gemini 1.5 Flash | Gemini 1.5 Pro | GPT-4o | Verdict |
-| :--- | :--- | :--- | :--- | :--- |
-| **Cost / 1M Input Tokens** | **$0.075** | $3.50 | $5.00 | **10x Cost Reduction** |
-| **Hops Per Second** | **High** | Medium | Medium | **Real-time UX** |
-| **Reasoning Capability** | Moderate | High | High | **Sufficient** |
+`POST /api/transactions`
+-   **Body**: `{ amount: number, date: string, category: string, description?: string }`
+-   **Validation**: `amount` must be positive.
 
-**The "Structured Data" Hypothesis:**
-Financial transaction analysis does not require deep abstract reasoning (writing poetry or code). It requires **precise extraction and classification** based on structured schemas. 
+### 2. AI & Intelligence
+`POST /api/ai/receipt-scan`
+-   **Body**: `{ image: "base64-string" }`
+-   **Response**: JSON with `merchant`, `amount`, `date`, `category`, `items`.
+-   **Rate Limit**: 100 req/month (Basic), Unlimited (Premium).
 
-1.  **Latency:** Flash offers near-instantaneous response times, essential for the "Receipt Scan" feature where users expect immediate feedback.
-2.  **Accuracy:** In our benchmarks, Flash achieved **99.2% accuracy** on merchant categorization comparisons versus Pro, because specific merchant names ("Starbucks", "Delta Airlines") are high-frequency tokens in the training set.
-3.  **Context Window:** The 1M token window allows us to feed **12 months of transaction history** into a single prompt for anomaly detection. We don't need to summarize history (losing detail); we inject the *raw ledger*.
-
-**Fallback Strategy:**
-If the confidence score of a categorization drops below 85%, the system flags the transaction for human review rather than escalating to a more expensive model, maintaining unit economics.
-
----
-
-## 5. Token Cost Optimization Strategy
-
-To maintain profitability per user ($5/mo sub vs AI costs), we implement aggressive optimization:
-
-**1. Schema-First Generation (Zod):**
-We utilize `zod` schemas to enforce structured JSON output from the LLM. This prevents the model from generating "yapping" (conversational fluff). We pay only for the JSON tokens we need.
-
-```typescript
-// Strict schema reduces token usage by ~40% vs free-form text
-const TransactionSchema = z.object({
-  merchant: z.string(),
-  amount: z.number(),
-  category: z.enum(CATEGORIES), // Enforced enum saves tokens on long strings
-  confidence: z.number().min(0).max(1),
-});
-```
-
-**2. Monthly Cost Projection:**
-*   **User Load:** 500 transactions/month + 5 Receipt Scans.
-*   **Prompt Size:** ~300 tokens (System prompt + 1 Transaction context).
-*   **Calculation:** 500 * 300 = 150k tokens.
-*   **Cost:** 0.15M * $0.075 = **$0.011 per user/month**.
-*   **Result:** Extremely high margin.
+### 3. Budgets
+`GET /api/budgets`
+-   **Query Params**: `month`, `year`.
+-   **Response**: List of budgets with `spent`, `remaining`, and `progress` calculated in real-time.
 
 ---
 
-## 6. Database Schema for Scaling
+## ⚙️ Configuration
 
-We use **Prisma ORM** with a normalized schema designed for high-throughput reads.
+### Environment Variables (`.env`)
 
-```prisma
-// Optimized for aggregations and time-series analysis
-model Transaction {
-  id          String   @id @default(cuid())
-  userId      String
-  amount      Decimal  @db.Decimal(10, 2)
-  type        TransactionType // INCOME | EXPENSE
-  category    String
-  merchant    String?
-  date        DateTime
-  
-  // Audit & Integrity
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime? // Soft Delete support
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id])
-  
-  // Composite Index for Dashboard Queries
-  @@index([userId, date]) 
-  @@index([category])
-}
-```
+| Variable | Description | Required | Output Example |
+|----------|-------------|----------|----------------|
+| `DATABASE_URL` | PostgreSQL Connection | Yes | `postgresql://user:pass@localhost:5432/db` |
+| `NEXTAUTH_SECRET` | Session Encryption Key | Yes | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Canonical Site URL | Yes | `http://localhost:3000` |
+| `GEMINI_API_KEY` | Google AI Studio Key | Yes | `AIzaSy...` |
+| `REDIS_URL` | Redis Connection | Yes | `redis://localhost:6379` |
+| `GOOGLE_CLIENT_ID` | OAuth Client ID | No | - |
+| `GOOGLE_CLIENT_SECRET` | OAuth Secret | No | - |
 
-*   **Indexing:** The `[userId, date]` composite index is critical. 90% of queries fetch "User X's transactions for Month Y". This index prevents full table scans.
-*   **Decimal Type:** We strictly use `Decimal` instead of `Float` to prevent floating-point errors in financial calculations.
-*   **Soft Deletes:** Critical for financial audits. Data is never truly removed, ensuring ledger integrity.
+### Feature Limits
+Limits are defined in `src/lib/feature-gates.ts`:
+-   **Free**: 50 txns/mo, 10 AI scans/mo.
+-   **Basic**: 500 txns/mo, 100 AI scans/mo.
+-   **Premium**: Unlimited.
 
 ---
 
-## 7. Agentic RAG Pipeline Explained
+## 💻 Development Guide
 
-The **BudgetGuardian** agent (`src/lib/ai/agents/budget-guardian.ts`) typifies our RAG approach. It doesn't just query the database; it *reasons* about state.
+### Local Setup
+1.  **Clone**: `git clone ...`
+2.  **Install**: `npm install` (Installs both frontend and backend dependencies).
+3.  **Infrastructure**: `docker-compose up -d` (Starts Postgres & Redis).
+4.  **Database**: `npx prisma migrate dev`.
+5.  **Run**: `npm run dev`.
 
-**The Workflow:**
-1.  **Observe (Retrieval):** The agent fetches:
-    *   Current Month's Expenditure (Prisma Aggregation).
-    *   Active Budgets and Recurring Commitments.
-    *   *Augmentation:* Retrieves "Historical Spending Patterns" (Last 3 months avg) to establish a baseline.
-2.  **Analyze (Reasoning):**
-    *   Compares `Current Spend` vs `Projected Spend` (Linear extrapolation based on day of month).
-    *   Detects anomalies (e.g., "Dining out pace is 200% higher than usual").
-3.  **Decide & Act (Generation):**
-    *   If `Risk > Threshold`, generate a `Notification` payload.
-    *   Writes directly to the `Notification` table (Side-effect).
+### Testing
+-   **Unit Tests**: `npm run test` (Jest).
+-   **End-to-End**: `npm run test:e2e` (Playwright - if configured).
+-   **Linting**: `npm run lint`.
 
----
-
-## 8. Testing Philosophy & Verification
-
-We adhere to the **"Shadow Monarch Protocol"**: Zero-error deployment.
-
-*   **Unit Tests (Jest):** Cover all business logic in `src/lib`.
-*   **Schema Tests:** Validate that Prisma models match expected types.
-*   **Mocking AI:** We rely on `jest` mocks for the Gemini API to ensure tests are deterministic and free to run in CI/CD.
-
-```typescript
-// Example: Testing Non-Deterministic AI categorization
-it('should categorize Uber as Transportation', async () => {
-  // Mock the AI response to return a fixed JSON
-  mockGeminiResponse({ category: 'Transportation', confidence: 0.99 });
-  
-  const result = await categorizeTransaction('UBER *TRIP');
-  expect(result.category).toBe('Transportation');
-  expect(result.confidence).toBeGreaterThan(0.9);
-});
-```
+### Project Structure Details
+-   **`src/lib/ai`**: Contains the "brain" of the operation. `agents/` holds the autonomous workers.
+-   **`backend/src/modules`**: NestJS modules for heavy background processing.
+-   **`prisma/schema.prisma`**: Single source of truth for data models.
 
 ---
 
-## 9. Performance & Reliability
+## 🚀 Deployment
 
-*   **Rate Limiting:** We handle Gemini's "429 Too Many Requests" using exponential backoff and a **Circuit Breaker** pattern. If the API fails 3 times, the system falls back to a regex-based keyword matcher (dumb but functional).
-*   **Async Processing:** Receipt scanning is offloaded to a **BullMQ** queue (Redis-backed) processed by the NestJS worker. This ensures the frontend never hangs while waiting for OCR.
-*   **Benchmarks:**
-    *   Average API Response: **< 120ms**
-    *   Full Receipt Analysis: **< 3.5s**
+### Frontend (Vercel)
+1.  Import project to Vercel.
+2.  Set Framework to **Next.js**.
+3.  Add Environment Variables from `.env`.
+4.  Deploy.
 
----
-
-## 10. Engineering Decisions Log (Lessons Learned)
-
-*   **Next.js vs NestJS:** We initially tried to do everything in Next.js API routes. We quickly hit limits with long-running background jobs (OCR). Introducing a dedicated NestJS worker resolved this separation of concerns.
-*   **Hallucination Handling:** AI models love to invent categories. We learned to *force* the model to pick from a `const CATEGORIES` enum defined in code. If it returns a category not in our enum, the validation layer instantly rejects it.
-*   **Vercel Limitations:** Deploying a monorepo on Vercel required strict `.env` validation logic (`src/lib/env.ts`) that differentiates between *build time* (loose) and *runtime* (strict) to prevent build failures.
+### Backend (Google Cloud Run)
+1.  Build: `docker build -f Dockerfile.backend .`
+2.  Push to container registry (GCR/Docker Hub).
+3.  Deploy to Cloud Run with `DATABASE_URL` and `REDIS_URL` set.
 
 ---
 
-## 11. Future Roadmap (Phase 2)
+## 📄 License
 
-*   **Bank API Integration:** Replacing CSV uploads with direct Plaid integration for 15,000+ banks.
-*   **Multi-Tenancy:** Upgrading the schema to support "Family Mode" (Shared Budgets across multiple user accounts).
-*   **Predictive Analysis:** Using simple linear regression models on the backend to forecast "End of Year" savings based on current trajectories.
-
----
-
-## 12. Quick Start
-
-**Prerequisites:** Node.js 20+, Docker (for local DB).
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-org/finance-flow.git
-cd finance-flow
-
-# 2. Install dependencies (Root + Backend)
-npm install
-
-# 3. Configure Environment
-cp .env.example .env
-# -> Add your DATABASE_URL and GEMINI_API_KEY
-
-# 4. Initialize Database
-npx prisma generate
-npx prisma migrate dev --name init
-
-# 5. Run Development Server
-npm run dev
-# -> Frontend: http://localhost:3000
-# -> Backend API: http://localhost:3001
-```
-
----
-
-*Author: Steve | Principal AI Architect*
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -22,6 +22,11 @@ export type TransactionWithdecimals = Prisma.TransactionGetPayload<{
 
 /**
  * Get transactions with comprehensive filtering and pagination
+ * 
+ * @param {string} userId - The ID of the user.
+ * @param {TransactionFilters} filters - Filter criteria (page, limit, type, category, dates, search).
+ * @returns {Promise<{ data: TransactionWithdecimals[]; meta: { total: number; page: number; limit: number; totalPages: number } }>} Paginated transactions and metadata.
+ * @throws {Error} If database query fails.
  */
 export async function getTransactions(
     userId: string,
@@ -105,6 +110,11 @@ export async function getTransactions(
 
 /**
  * Create a new transaction
+ * 
+ * @param {string} userId - The ID of the user.
+ * @param {TransactionInput} data - The transaction data.
+ * @returns {Promise<TransactionWithdecimals>} The created transaction.
+ * @throws {Error} If creation fails.
  */
 export async function createTransaction(userId: string, data: TransactionInput) {
     try {
@@ -133,6 +143,11 @@ export async function createTransaction(userId: string, data: TransactionInput) 
 
 /**
  * Get a single transaction by ID
+ * 
+ * @param {string} userId - The ID of the owner.
+ * @param {string} transactionId - The ID of the transaction.
+ * @returns {Promise<TransactionWithdecimals | null>} The transaction or null if not found.
+ * @throws {Error} If database query fails.
  */
 export async function getTransaction(userId: string, transactionId: string) {
     try {
@@ -158,6 +173,12 @@ export async function getTransaction(userId: string, transactionId: string) {
 
 /**
  * Update a transaction
+ * 
+ * @param {string} userId - The ID of the owner.
+ * @param {string} transactionId - The ID of the transaction to update.
+ * @param {Partial<TransactionInput>} data - The fields to update.
+ * @returns {Promise<TransactionWithdecimals>} The updated transaction.
+ * @throws {Error} If transaction not found or update fails.
  */
 export async function updateTransaction(
     userId: string,
@@ -195,6 +216,11 @@ export async function updateTransaction(
 
 /**
  * Soft delete a transaction
+ * 
+ * @param {string} userId - The ID of the owner.
+ * @param {string} transactionId - The ID of the transaction to delete.
+ * @returns {Promise<void>}
+ * @throws {Error} If transaction not found or delete fails.
  */
 export async function deleteTransaction(userId: string, transactionId: string) {
     try {

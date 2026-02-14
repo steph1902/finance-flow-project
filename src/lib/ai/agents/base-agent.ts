@@ -129,31 +129,49 @@ export abstract class AutonomousAgent<
 
     /**
      * STEP 1: Observe the current state
-     * Each agent implements this to gather relevant data
+     * Each agent implements this to gather relevant data from the environment, database, or external APIs.
+     * 
+     * @returns {Promise<TState>} A promise resolving to the current state object containing all necessary data for analysis.
+     * @throws {Error} If data gathering fails critical requirements.
      */
     protected abstract observe(): Promise<TState>;
 
     /**
      * STEP 2: Analyze the observed state to generate insights
      * Pattern detection, anomaly detection, forecasting, etc.
+     * 
+     * @param {TState} state - The current state gathered during the observation phase.
+     * @returns {Promise<TInsight[]>} A list of insights derived from the state. Returns empty array if no significant patterns found.
      */
     protected abstract analyze(state: TState): Promise<TInsight[]>;
 
     /**
      * STEP 3: Decide what actions to take based on insights
-     * Multi-step reasoning, constraint evaluation, option comparison
+     * Multi-step reasoning, constraint evaluation, option comparison.
+     * 
+     * @param {TInsight[]} insights - The insights generated from the analysis phase.
+     * @returns {Promise<TAction[]>} A list of concrete actions to execute.
      */
     protected abstract decide(insights: TInsight[]): Promise<TAction[]>;
 
     /**
      * STEP 4: Execute the decided actions
      * Send notifications, update database, call external APIs, etc.
+     * 
+     * @param {TAction[]} actions - The list of actions to execute.
+     * @returns {Promise<void>} Resolves when all actions have been processed.
      */
     protected abstract act(actions: TAction[]): Promise<void>;
 
     /**
      * STEP 5: Learn from outcomes
-     * Track user responses, update models, adjust thresholds
+     * Track user responses, update models, adjust thresholds.
+     * 
+     * @param {Object} cycle - The complete decision cycle data.
+     * @param {TState} cycle.state - The initial state.
+     * @param {TInsight[]} cycle.insights - The generated insights.
+     * @param {TAction[]} cycle.actions - The executed actions.
+     * @returns {Promise<void>} Resolves when learning data has been persisted.
      */
     protected abstract learn(cycle: {
         state: TState;
@@ -163,6 +181,9 @@ export abstract class AutonomousAgent<
 
     /**
      * Log the complete decision cycle for audit trail
+     * 
+     * @param {AgentDecisionLog<TState, TInsight, TAction>} log - The structured log object to persist.
+     * @returns {Promise<void>} Resolves when logging is complete.
      */
     protected abstract logDecision(log: AgentDecisionLog<TState, TInsight, TAction>): Promise<void>;
 

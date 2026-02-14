@@ -396,6 +396,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-6 text-sm text-sumi-500">
               <Link href="/docs" className="hover:text-sumi transition-colors">Docs</Link>
               <Link href="/ai-guide" className="hover:text-sumi transition-colors">AI Guide</Link>
+              <Link href="/whitepaper" className="hover:text-sumi transition-colors">Whitepaper</Link>
               <Link href="/privacy" className="hover:text-sumi transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-sumi transition-colors">Terms</Link>
             </div>

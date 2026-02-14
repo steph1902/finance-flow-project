@@ -6,6 +6,13 @@ import { startOfMonth, endOfMonth } from "date-fns";
 
 /**
  * Get budgets for a specific month/year with spending progress
+ * Calculates spending progress based on transactions for the period.
+ * 
+ * @param {string} userId - The ID of the user.
+ * @param {number} month - The month number (1-12).
+ * @param {number} year - The full year (e.g., 2024).
+ * @returns {Promise<Array<Budget & { spent: number; remaining: number; progress: number }>>} List of budgets with progress metrics.
+ * @throws {Error} If database query fails.
  */
 export async function getBudgets(
     userId: string,
@@ -61,7 +68,12 @@ export async function getBudgets(
 }
 
 /**
- * Create a new budget
+ * Create a new budget for a category in a specific month
+ * 
+ * @param {string} userId - The ID of the user.
+ * @param {BudgetInput} data - The budget data (category, amount, month, year).
+ * @returns {Promise<Budget>} The created budget.
+ * @throws {Error} If budget for category/month already exists or creation fails.
  */
 export async function createBudget(userId: string, data: BudgetInput) {
     try {
@@ -89,7 +101,13 @@ export async function createBudget(userId: string, data: BudgetInput) {
 }
 
 /**
- * Update a budget
+ * Update an existing budget
+ * 
+ * @param {string} userId - The ID of the owner.
+ * @param {string} budgetId - The ID of the budget to update.
+ * @param {Partial<BudgetInput>} data - The fields to update.
+ * @returns {Promise<Budget>} The updated budget.
+ * @throws {Error} If budget not found or update fails.
  */
 export async function updateBudget(
     userId: string,
@@ -128,6 +146,11 @@ export async function updateBudget(
 
 /**
  * Delete a budget
+ * 
+ * @param {string} userId - The ID of the owner.
+ * @param {string} budgetId - The ID of the budget to delete.
+ * @returns {Promise<void>}
+ * @throws {Error} If budget not found or delete fails.
  */
 export async function deleteBudget(userId: string, budgetId: string) {
     try {
