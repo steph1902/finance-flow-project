@@ -141,7 +141,7 @@ export default function WhitepaperPage() {
                     <p className="mb-6 leading-relaxed">
                         The decision to split the stack was driven by the &quot;Cold Start&quot; penalty of Serverless Functions for heavy compute.
                     </p>
-                    <div className="bg-sumi-900 text-cream p-6 rounded-xl font-mono text-sm mb-8 space-y-4">
+                    <div className="bg-sumi text-cream p-6 rounded-xl font-mono text-sm mb-8 space-y-4">
                         <div>
                             <div className="text-apricot mb-2">Scenario: Receipt OCR Processing</div>
                             <div className="pl-4 border-l border-white/20 space-y-2 text-white/80">
@@ -259,7 +259,7 @@ export default function WhitepaperPage() {
                     <p className="mb-6 leading-relaxed">
                         FinanceFlow demonstrates that <strong>Stochastic Fintech</strong> is viable, provided one rigorously manages the Latency and Cost constraints. The <strong>Hybrid Edge/Compute</strong> pattern is essential for masking the inference time of LLMs.
                     </p>
-                    <div className="bg-sumi-900 text-cream p-8 rounded-2xl mt-12 text-center">
+                    <div className="bg-sumi text-cream p-8 rounded-2xl mt-12 text-center">
                         <h3 className="text-xl font-serif font-bold mb-4">References & Citations</h3>
                         <p className="text-sm text-white/60 mb-6">
                             Sutton & Barto (2018), Pearl (1988), Google DeepMind (2024), Fowler (2006).
